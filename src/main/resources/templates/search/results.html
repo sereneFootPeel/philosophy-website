@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head}" th:with="pageTitle='搜索结果 - ' + ${query}">
+    <!-- Like Button Component -->
+    <script th:src="@{/js/like-button-component.js}"></script>
+
+    <!-- 自定义工具类 -->
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .transition-smooth {
+                transition: all 0.3s ease-in-out;
+            }
+            .hover-scale-105:hover {
+                transform: scale(1.05);
+            }
+            .hover-scale-110:hover {
+                transform: scale(1.1);
+            }
+            .group-hover-scale-105:hover {
+                transform: scale(1.05);
+            }
+            .group-hover-scale-110:hover {
+                transform: scale(1.1);
+            }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-up { animation: fadeInUp 0.4s ease-out both; }
+        .search-highlight {
+            background-color: var(--bg-tertiary);
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+    </style>
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+</head>
+<body class="bg-secondary min-h-screen flex flex-col">
+    <!-- 导航栏 -->
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <!-- 主要内容 -->
+    <main class="flex-grow container mx-auto px-4 py-8 pt-24">
+        <!-- 搜索头部 -->
+        <div class="mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <h1 class="text-3xl font-bold text-dark">
+                    <i class="fa fa-search mr-2"></i>
+                    <span th:text="${translationService.getStaticText('search_results', language)}">搜索结果</span>
+                </h1>
+            </div>
+            
+            <!-- 搜索框 -->
+            <div class="flex justify-center">
+                <div class="w-2/3">
+                    <form action="/search/results" method="get">
+                        <div class="relative">
+                            <input type="text" 
+                                   name="query" 
+                                   th:value="${query}"
+                                   th:placeholder="${translationService.getStaticText('enter_keywords_to_search', language)}"
+                                   class="w-full px-6 py-4 text-lg border-2 border-gray-300 rounded-full focus:ring-2 focus:ring-primary focus:border-transparent outline-none shadow-lg bg-white/90 backdrop-blur-sm">
+                            <button type="submit" 
+                                    class="absolute right-2 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-primary text-white rounded-full hover:bg-primary/90 transition-colors flex items-center justify-center">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- 搜索结果统计 -->
+        <div class="mb-6 text-sm text-gray-600">
+            <span>共找到 <span id="total-results">0</span> 条结果</span>
+        </div>
+
+        <!-- 搜索结果容器 -->
+        <div id="search-results-container" class="space-y-6">
+            <!-- 哲学家搜索结果 - 折叠卡片 -->
+            <div th:if="${philosophers != null and !philosophers.isEmpty()}" class="category-section bg-white rounded-lg shadow-md overflow-hidden" data-category="philosophers">
+                <div class="category-header p-6 cursor-pointer hover:bg-tertiary transition-colors flex items-center justify-between"
+                     onclick="toggleCategory('philosophers')">
+                    <div class="flex items-center">
+                        <i class="fa fa-users text-2xl mr-4 text-primary"></i>
+                        <div>
+                            <h2 class="text-xl font-semibold text-dark">
+                                <span th:text="${translationService.getStaticText('philosophers', language)}">哲学家</span>
+                            </h2>
+                            <p class="text-sm text-gray-500 mt-1">
+                                共找到 <span class="category-count" th:text="${#lists.size(philosophers)}">0</span> 位哲学家
+                            </p>
+                        </div>
+                    </div>
+                    <i class="fa fa-chevron-down text-gray-400 transform transition-transform" id="philosophers-icon"></i>
+                </div>
+                <div class="category-content hidden p-6 pt-0" id="philosophers-content">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="philosophers-list"></div>
+                    <div class="flex justify-center mt-6">
+                        <button class="load-more-btn hidden px-6 py-2 bg-primary text-white rounded-full hover:bg-primary/90 transition-colors"
+                                onclick="loadMoreResults('philosophers')">
+                            <i class="fa fa-chevron-down mr-2"></i>加载更多
+                        </button>
+                        <div class="loading-spinner hidden">
+                            <i class="fa fa-spinner fa-spin text-2xl text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 学派搜索结果 - 折叠卡片 -->
+            <div th:if="${schools != null and !schools.isEmpty()}" class="category-section bg-white rounded-lg shadow-md overflow-hidden" data-category="schools">
+                <div class="category-header p-6 cursor-pointer hover:bg-tertiary transition-colors flex items-center justify-between"
+                     onclick="toggleCategory('schools')">
+                    <div class="flex items-center">
+                        <i class="fa fa-university text-2xl mr-4 text-accent"></i>
+                        <div>
+                            <h2 class="text-xl font-semibold text-dark">
+                                <span th:text="${translationService.getStaticText('schools', language)}">学派</span>
+                            </h2>
+                            <p class="text-sm text-gray-500 mt-1">
+                                共找到 <span class="category-count" th:text="${#lists.size(schools)}">0</span> 个学派
+                            </p>
+                        </div>
+                    </div>
+                    <i class="fa fa-chevron-down text-gray-400 transform transition-transform" id="schools-icon"></i>
+                </div>
+                <div class="category-content hidden p-6 pt-0" id="schools-content">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="schools-list"></div>
+                    <div class="flex justify-center mt-6">
+                        <button class="load-more-btn hidden px-6 py-2 bg-primary text-white rounded-full hover:bg-primary/90 transition-colors"
+                                onclick="loadMoreResults('schools')">
+                            <i class="fa fa-chevron-down mr-2"></i>加载更多
+                        </button>
+                        <div class="loading-spinner hidden">
+                            <i class="fa fa-spinner fa-spin text-2xl text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 内容搜索结果 - 折叠卡片 -->
+            <div th:if="${contents != null and !contents.isEmpty()}" class="category-section bg-white rounded-lg shadow-md overflow-hidden" data-category="contents">
+                <div class="category-header p-6 cursor-pointer hover:bg-tertiary transition-colors flex items-center justify-between"
+                     onclick="toggleCategory('contents')">
+                    <div class="flex items-center">
+                        <i class="fa fa-file-text text-2xl mr-4 text-secondary"></i>
+                        <div>
+                            <h2 class="text-xl font-semibold text-dark">
+                                <span th:text="${translationService.getStaticText('contents', language)}">内容</span>
+                            </h2>
+                            <p class="text-sm text-gray-500 mt-1">
+                                共找到 <span class="category-count" th:text="${#lists.size(contents)}">0</span> 条内容
+                            </p>
+                        </div>
+                    </div>
+                    <i class="fa fa-chevron-down text-gray-400 transform transition-transform" id="contents-icon"></i>
+                </div>
+                <div class="category-content hidden p-6 pt-0" id="contents-content">
+                    <div class="space-y-4" id="contents-list"></div>
+                    <div class="flex justify-center mt-6">
+                        <button class="load-more-btn hidden px-6 py-2 bg-primary text-white rounded-full hover:bg-primary/90 transition-colors"
+                                onclick="loadMoreResults('contents')">
+                            <i class="fa fa-chevron-down mr-2"></i>加载更多
+                        </button>
+                        <div class="loading-spinner hidden">
+                            <i class="fa fa-spinner fa-spin text-2xl text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 用户搜索结果 - 折叠卡片 -->
+            <div th:if="${users != null and !users.isEmpty()}" class="category-section bg-white rounded-lg shadow-md overflow-hidden" data-category="users">
+                <div class="category-header p-6 cursor-pointer hover:bg-tertiary transition-colors flex items-center justify-between"
+                     onclick="toggleCategory('users')">
+                    <div class="flex items-center">
+                        <i class="fa fa-user text-2xl mr-4 text-blue-500"></i>
+                        <div>
+                            <h2 class="text-xl font-semibold text-dark">
+                                <span th:text="${translationService.getStaticText('users', language)}">用户</span>
+                            </h2>
+                            <p class="text-sm text-gray-500 mt-1">
+                                共找到 <span class="category-count" th:text="${#lists.size(users)}">0</span> 位用户
+                            </p>
+                        </div>
+                    </div>
+                    <i class="fa fa-chevron-down text-gray-400 transform transition-transform" id="users-icon"></i>
+                </div>
+                <div class="category-content hidden p-6 pt-0" id="users-content">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="users-list"></div>
+                    <div class="flex justify-center mt-6">
+                        <button class="load-more-btn hidden px-6 py-2 bg-primary text-white rounded-full hover:bg-primary/90 transition-colors"
+                                onclick="loadMoreResults('users')">
+                            <i class="fa fa-chevron-down mr-2"></i>加载更多
+                        </button>
+                        <div class="loading-spinner hidden">
+                            <i class="fa fa-spinner fa-spin text-2xl text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 无结果提示 -->
+        <div th:if="${(philosophers == null or philosophers.isEmpty()) and (schools == null or schools.isEmpty()) and (contents == null or contents.isEmpty()) and (users == null or users.isEmpty())}" 
+             class="text-center py-12">
+            <div class="w-24 h-24 bg-accent rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fa fa-search text-3xl text-gray-400"></i>
+            </div>
+            <div class="space-y-2">
+                <p class="text-sm text-gray-500">
+                    <span th:text="${translationService.getStaticText('search_tips', language)}">搜索建议：</span>
+                </p>
+                <ul class="text-sm text-gray-500 space-y-1">
+                    <li>• <span th:text="${translationService.getStaticText('check_spelling', language)}">检查拼写是否正确</span></li>
+                    <li>• <span th:text="${translationService.getStaticText('try_different_keywords', language)}">尝试使用不同的关键词</span></li>
+                    <li>• <span th:text="${translationService.getStaticText('use_general_terms', language)}">使用更通用的术语</span></li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <div th:replace="~{fragments/footer :: language-switcher-script}"></div>
+    <div th:replace="~{fragments/footer :: search-script}"></div>
+    <div th:replace="~{fragments/footer :: search-modal}"></div>
+    <div th:replace="~{fragments/footer :: like-script}"></div>
+    
+    <!-- 引入点赞按钮组件脚本 -->
+    <script th:src="@{/js/like-button-component.js}"></script>
+
+    <script>
+        // 全局变量
+        const searchQuery = '[[${query}]]';
+        const categoryPages = {
+            philosophers: 0,
+            schools: 0,
+            contents: 0,
+            users: 0
+        };
+        const categoryHasMore = {
+            philosophers: true,
+            schools: true,
+            contents: true,
+            users: true
+        };
+        const categoryTotals = {
+            philosophers: [[${philosophers != null ? #lists.size(philosophers) : 0}]],
+            schools: [[${schools != null ? #lists.size(schools) : 0}]],
+            contents: [[${contents != null ? #lists.size(contents) : 0}]],
+            users: [[${users != null ? #lists.size(users) : 0}]]
+        };
+
+        // 计算总结果数
+        function updateTotalResults() {
+            const total = categoryTotals.philosophers + categoryTotals.schools + 
+                         categoryTotals.contents + categoryTotals.users;
+            document.getElementById('total-results').textContent = total;
+        }
+
+        // 切换类别的展开/折叠
+        function toggleCategory(category) {
+            const content = document.getElementById(category + '-content');
+            const icon = document.getElementById(category + '-icon');
+            const list = document.getElementById(category + '-list');
+            
+            if (content.classList.contains('hidden')) {
+                // 展开
+                content.classList.remove('hidden');
+                icon.classList.add('rotate-180');
+                
+                // 如果是第一次展开，加载第一页数据
+                if (list.children.length === 0) {
+                    loadMoreResults(category, true);
+                }
+            } else {
+                // 折叠
+                content.classList.add('hidden');
+                icon.classList.remove('rotate-180');
+            }
+        }
+
+        // 加载更多结果
+        async function loadMoreResults(category, isFirstLoad = false) {
+            const list = document.getElementById(category + '-list');
+            const loadMoreBtn = document.querySelector(`#${category}-content .load-more-btn`);
+            const spinner = document.querySelector(`#${category}-content .loading-spinner`);
+            
+            console.log(`加载 ${category} 的第 ${categoryPages[category]} 页`);
+            
+            // 显示加载中状态
+            if (loadMoreBtn) loadMoreBtn.classList.add('hidden');
+            if (spinner) spinner.classList.remove('hidden');
+            
+            try {
+                const url = `/api/search/paged?query=${encodeURIComponent(searchQuery)}&category=${category}&page=${categoryPages[category]}&size=10`;
+                console.log('请求URL:', url);
+                
+                const response = await fetch(url);
+                console.log('响应状态:', response.status, response.statusText);
+                
+                // 先获取文本内容
+                const text = await response.text();
+                console.log('响应内容（前200字符）:', text.substring(0, 200));
+                
+                // 尝试解析JSON
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (e) {
+                    console.error('JSON解析失败，返回的内容是:', text);
+                    throw new Error('服务器返回的不是有效的JSON格式');
+                }
+                
+                console.log(`${category} API响应:`, data);
+                
+                if (data.success) {
+                    console.log(`成功获取 ${data.results.length} 条 ${category} 结果`);
+                    
+                    // 渲染结果
+                    renderResults(category, data.results, list);
+                    
+                    // 更新状态
+                    categoryPages[category]++;
+                    categoryHasMore[category] = data.hasMore;
+                    categoryTotals[category] = data.totalCount;
+                    
+                    // 更新加载更多按钮状态
+                    if (data.hasMore && loadMoreBtn) {
+                        loadMoreBtn.classList.remove('hidden');
+                    }
+                    
+                    // 高亮搜索关键词
+                    highlightSearchTerms();
+                } else {
+                    console.error('加载失败:', data.message);
+                    alert('加载失败: ' + data.message);
+                }
+            } catch (error) {
+                console.error('加载错误:', error);
+                alert('加载错误: ' + error.message);
+            } finally {
+                // 隐藏加载中状态
+                if (spinner) spinner.classList.add('hidden');
+            }
+        }
+
+        // 渲染搜索结果
+        function renderResults(category, results, container) {
+            console.log(`渲染 ${category}:`, results);
+            
+            if (!results || results.length === 0) {
+                console.log(`${category} 没有结果可渲染`);
+                return;
+            }
+            
+            switch (category) {
+                case 'philosophers':
+                    results.forEach(philosopher => {
+                        const html = renderPhilosopherCard(philosopher);
+                        console.log('哲学家卡片HTML:', html.substring(0, 100));
+                        container.insertAdjacentHTML('beforeend', html);
+                    });
+                    break;
+                case 'schools':
+                    results.forEach(school => {
+                        const html = renderSchoolCard(school);
+                        console.log('学派卡片HTML:', html.substring(0, 100));
+                        container.insertAdjacentHTML('beforeend', html);
+                    });
+                    break;
+                case 'contents':
+                    results.forEach((content, index) => {
+                        console.log(`Content ${index}:`, content);
+                        const html = renderContentCard(content);
+                        console.log(`内容卡片HTML (前100字符):`, html.substring(0, 100));
+                        container.insertAdjacentHTML('beforeend', html);
+                    });
+                    break;
+                case 'users':
+                    results.forEach(user => {
+                        const html = renderUserCard(user);
+                        console.log('用户卡片HTML:', html.substring(0, 100));
+                        container.insertAdjacentHTML('beforeend', html);
+                    });
+                    break;
+            }
+            
+            console.log(`${category} 渲染完成，容器子元素数量:`, container.children.length);
+        }
+
+        // 渲染哲学家卡片
+        function renderPhilosopherCard(philosopher) {
+            const initial = philosopher.name ? philosopher.name.charAt(0) : '?';
+            const bio = philosopher.bio ? (philosopher.bio.length > 100 ? philosopher.bio.substring(0, 100) + '...' : philosopher.bio) : '';
+            return `
+                <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow group relative animate-fade-in-up">
+                    <a href="/philosophers?philosopherId=${philosopher.id}" class="block cursor-pointer">
+                        <div class="flex items-start space-x-4">
+                            <div class="flex-shrink-0">
+                                <div class="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                                    <span>${initial}</span>
+                                </div>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h3 class="text-lg font-semibold text-dark mb-2">
+                                    <span>${philosopher.name || ''}</span>
+                                </h3>
+                                ${philosopher.birthYear ? `<p class="text-sm text-gray-600 mb-2">${philosopher.birthYear}</p>` : ''}
+                                ${bio ? `<p class="text-sm text-gray-500 mb-3">${bio}</p>` : ''}
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            `;
+        }
+
+        // 渲染学派卡片
+        function renderSchoolCard(school) {
+            const description = school.description ? (school.description.length > 100 ? school.description.substring(0, 100) + '...' : school.description) : '';
+            return `
+                <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow group relative animate-fade-in-up">
+                    <a href="/schools/filter/${school.id}" class="block cursor-pointer">
+                        <div class="flex items-start space-x-4">
+                            <div class="flex-shrink-0">
+                                <div class="w-16 h-16 bg-gradient-to-br from-accent to-light rounded-full flex items-center justify-center text-dark text-2xl font-bold">
+                                    <i class="fa fa-university"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h3 class="text-lg font-semibold text-dark mb-2">
+                                    <span>${school.name || ''}</span>
+                                </h3>
+                                ${description ? `<p class="text-sm text-gray-500 mb-3">${description}</p>` : ''}
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            `;
+        }
+
+        // 渲染内容卡片 (改进版)
+        function renderContentCard(content) {
+            if (!content) return '';
+            
+            const contentText = content.content ? content.content : '';
+            const title = content.title || '';
+            const philosopherName = content.philosopher ? content.philosopher.name : '未知';
+            const philosopherId = content.philosopher ? content.philosopher.id : '';
+            const schoolName = content.school ? content.school.name : '';
+            const schoolId = content.school ? content.school.id : '';
+            const parentSchoolName = (content.school && content.school.parent) ? content.school.parent.name : '';
+            const parentSchoolId = (content.school && content.school.parent) ? content.school.parent.id : '';
+            const contentId = content.id || '';
+            
+            // 构建学派标签HTML
+            let schoolBadges = '';
+            if (schoolId) {
+                if (parentSchoolId && parentSchoolName) {
+                    schoolBadges += `
+                        <a href="/schools/filter/${parentSchoolId}" 
+                           onclick="event.stopPropagation()"
+                           class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs hover:bg-gray-200 transition-smooth">
+                            ${parentSchoolName}
+                        </a>
+                    `;
+                }
+                schoolBadges += `
+                    <a href="/schools/filter/${schoolId}" 
+                       onclick="event.stopPropagation()"
+                       class="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs hover:bg-primary/20 transition-smooth">
+                        ${schoolName}
+                    </a>
+                `;
+            }
+            
+            return `
+                <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px] group relative animate-fade-in-up cursor-pointer hover:bg-tertiary" 
+                     onclick="window.location.href='/comments/content/${contentId}'">
+                    <!-- 流派标签 -->
+                    ${schoolBadges ? `<div class="flex flex-wrap gap-2 mb-3">${schoolBadges}</div>` : ''}
+                    
+                    <!-- 标题（如果有） -->
+                    ${title ? `<div class="mb-2"><h3 class="text-lg font-semibold text-gray-900">${escapeHtml(title)}</h3></div>` : ''}
+                    
+                    <!-- 内容正文 -->
+                    <div class="prose prose-gray max-w-none mb-4">
+                        <p class="text-gray-800">${escapeHtml(contentText)}</p>
+                    </div>
+                    
+                    <!-- 哲学家信息 -->
+                    ${philosopherId ? `
+                        <div class="flex items-center justify-between pt-3 border-t border-gray-100">
+                            <div class="flex items-center">
+                                <a href="/philosophers?philosopherId=${philosopherId}" 
+                                   onclick="event.stopPropagation()"
+                                   class="flex items-center text-secondary hover:text-primary transition-colors duration-200">
+                                    <span class="text-xs font-medium">${escapeHtml(philosopherName)}</span>
+                                </a>
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+        
+        // HTML转义函数
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // 渲染用户卡片
+        function renderUserCard(user) {
+            const initial = user.username ? user.username.charAt(0).toUpperCase() : '?';
+            const fullName = [user.firstName, user.lastName].filter(n => n).join(' ');
+            
+            return `
+                <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow group relative animate-fade-in-up">
+                    <a href="/user/profile/${user.id}" class="block cursor-pointer">
+                        <div class="flex items-start space-x-4">
+                            <div class="flex-shrink-0">
+                                <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                                    <span>${initial}</span>
+                                </div>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h3 class="text-lg font-semibold text-dark mb-2">
+                                    <span>${user.username || ''}</span>
+                                </h3>
+                                ${fullName ? `<p class="text-sm text-gray-600 mb-2">${fullName}</p>` : ''}
+                                <p class="text-sm text-gray-500 mb-2">${user.role || ''}</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            `;
+        }
+
+        // 高亮搜索关键词
+        function highlightSearchTerms() {
+            if (searchQuery && searchQuery.trim()) {
+                const elements = document.querySelectorAll('h3, p');
+                elements.forEach(element => {
+                    if (!element.innerHTML.includes('search-highlight')) {
+                        const text = element.innerHTML;
+                        const highlightedText = text.replace(
+                            new RegExp(searchQuery, 'gi'),
+                            '<span class="search-highlight">$&</span>'
+                        );
+                        element.innerHTML = highlightedText;
+                    }
+                });
+            }
+        }
+
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            updateTotalResults();
+            // 点赞按钮由footer中的like-script统一初始化
+        });
+    </script>
+</body>
+</html>

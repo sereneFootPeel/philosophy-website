@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>哲学家管理 - 哲学网站</title>
+    <div th:replace="~{fragments/admin-head :: admin-head}"></div>
+</head>
+<body class="min-h-screen">
+    <div class="flex min-h-screen">
+        <!-- 侧边栏 -->
+        <div th:replace="~{fragments/admin-sidebar :: sidebar}"></div>
+
+        <!-- 主内容 -->
+        <main class="flex-1 p-4 md:p-8">
+            <div class="max-w-6xl mx-auto">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-2xl md:text-3xl font-bold admin-text-primary">哲学家管理</h1>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <a href="/admin/philosophers/new" class="admin-btn-secondary"><i class="fa fa-plus"></i> 添加新哲学家</a>
+                        <div class="md:hidden">
+                            <button id="menu-toggle" class="admin-text-primary text-xl"><i class="fa fa-bars"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 admin-card">
+                    <div class="p-4" th:if="${missingBirthYearMessage}">
+                        <div class="admin-badge-warning" th:text="${missingBirthYearMessage}">提示</div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full">
+                            <thead class="admin-table-head">
+                                <tr>
+                                    <th class="admin-table-cell">ID</th>
+                                    <th class="admin-table-cell">姓名</th>
+                                    <th class="admin-table-cell">时代</th>
+                                    <th class="admin-table-cell">出生年份</th>
+                                    <th class="admin-table-cell">流派</th>
+                                    <th class="admin-table-cell">作者</th>
+                                    <th class="admin-table-cell">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-sm">
+                                <tr th:each="philosopher : ${philosophers}">
+                                    <td class="admin-table-cell" th:text="${philosopher.id}"></td>
+                                    <td class="admin-table-cell" th:text="${philosopher.name}"></td>
+                                    <td class="admin-table-cell" th:text="${philosopher.era}"></td>
+                                    <td class="admin-table-cell">
+                                        <span th:text="${philosopher.birthYear}"></span>
+                                        <span th:unless="${philosopher.birthYear}" style="color: var(--color-error);" class="text-xs ml-1">未设置</span>
+                                    </td>
+                                    <td class="admin-table-cell">
+                                        <span th:each="school, status : ${philosopher.schools}">
+                                            <span th:text="${school.name}"></span>
+                                            <span th:unless="${status.last}">, </span>
+                                        </span>
+                                    </td>
+                                    <td class="admin-table-cell">
+                                        <span th:if="${philosopher.user != null}" th:text="${philosopher.user.username}"></span>
+                                        <span th:unless="${philosopher.user != null}" class="admin-text-tertiary">已注销</span>
+                                    </td>
+                                    <td class="admin-table-cell">
+                                        <div class="flex items-center gap-2">
+                                            <a th:href="@{/admin/philosophers/edit/{id}(id=${philosopher.id})}" class="admin-btn-secondary btn-sm"><i class="fa fa-pencil"></i> 编辑</a>
+                                            <form th:action="@{/admin/philosophers/delete/{id}(id=${philosopher.id})}" method="post" onsubmit="return confirm('确定要删除这个哲学家吗?');">
+                                                <button type="submit" class="admin-btn-secondary btn-sm"><i class="fa fa-trash"></i> 删除</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="text-center p-4 admin-text-secondary" th:if="${philosophers.empty}">
+                        暂无哲学家数据，请添加新的哲学家。
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 移动端抽屉菜单 -->
+    <div th:replace="~{fragments/admin-sidebar :: mobile-drawer}"></div>
+    
+    <!-- Admin Scripts -->
+    <div th:replace="~{fragments/admin-head :: admin-scripts}"></div>
+</body>
+</html>

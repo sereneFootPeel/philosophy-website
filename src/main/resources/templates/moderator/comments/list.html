@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>评论管理 - 版主后台</title>
+    <div th:replace="~{fragments/admin-head :: moderator-head}"></div>
+    <style>
+        .comment-highlight {
+            background-color: var(--bg-tertiary) !important;
+            transition: all 0.5s ease;
+        }
+        .comment-item {
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div class="flex min-h-screen">
+        <!-- 侧边栏 -->
+        <div th:replace="~{fragments/admin-sidebar :: moderator-sidebar}"></div>
+
+        <!-- 主内容 -->
+        <main class="flex-1 p-4 md:p-8">
+            <div class="max-w-6xl mx-auto">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-2xl md:text-3xl font-bold moderator-text-primary">评论管理</h1>
+                        <p class="moderator-text-secondary mt-1">管理您负责流派的评论内容</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <a href="/moderator" class="moderator-btn-secondary">
+                            <i class="fa fa-arrow-left"></i>
+                            <span>返回仪表盘</span>
+                        </a>
+                        <div class="md:hidden">
+                            <button id="menu-toggle" class="moderator-text-primary text-xl"><i class="fa fa-bars"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 错误信息 -->
+                <div th:if="${errorMessage}" class="mt-6 moderator-alert-error">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fa fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium">
+                                注意
+                            </h3>
+                            <div class="mt-2 text-sm">
+                                <p th:text="${errorMessage}"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 评论统计 -->
+                <div th:if="!${errorMessage}" class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="moderator-card p-4">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <i class="fa fa-comments text-2xl" style="color: var(--color-primary);"></i>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm font-medium moderator-text-secondary">总评论数</p>
+                                <p class="text-2xl font-semibold moderator-text-primary" th:text="${comments != null ? comments.size() : 0}">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="moderator-card p-4">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <i class="fa fa-clock-o text-2xl" style="color: var(--color-info);"></i>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm font-medium moderator-text-secondary">今日评论</p>
+                                <p class="text-2xl font-semibold moderator-text-primary" th:text="${todayCommentsCount != null ? todayCommentsCount : 0}">0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 评论列表 -->
+                <div th:if="!${errorMessage}" class="mt-8">
+                    <div class="moderator-card">
+                        <div class="px-6 py-4" style="border-bottom: 1px solid var(--border-primary);">
+                            <h3 class="text-lg font-medium moderator-text-primary">评论列表</h3>
+                            <p class="mt-1 text-sm moderator-text-secondary">按时间排序，最新的在前</p>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <th:block th:if="${comments == null or comments.empty}">
+                                <div class="text-center py-12">
+                                    <i class="fa fa-comment-o text-4xl mb-4" style="color: var(--text-tertiary);"></i>
+                                    <h3 class="text-lg font-medium moderator-text-primary mb-2">暂无评论</h3>
+                                    <p class="moderator-text-secondary">您负责的流派下还没有评论</p>
+                                </div>
+                            </th:block>
+                            
+                            <th:block th:each="comment : ${comments}">
+                                <div th:id="'comment-' + ${comment.id}" 
+                                     class="pb-4 last:border-b-0 comment-item relative group cursor-pointer transition-colors duration-200"
+                                     style="border-bottom: 1px solid var(--border-primary);"
+                                     th:onclick="'window.location.href=\'/comments/view/' + ${comment.content.id} + '#comment-' + ${comment.id} + '\''">
+
+                                    <div class="flex justify-between items-start mb-2">
+                                        <a th:href="@{/user/profile/{id}(id=${comment.user.id})}" 
+                                           class="flex items-center p-1 rounded-lg transition-smooth" 
+                                           style="background-color: var(--bg-tertiary);"
+                                           onclick="event.stopPropagation()">
+                                            <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold" style="background-color: color-mix(in srgb, var(--color-primary) 10%, transparent); color: var(--color-primary);">
+                                                <span th:text="${comment.user != null ? #strings.substring(comment.user.username, 0, 1) : 'U'}">U</span>
+                                            </div>
+                                            <div class="ml-3">
+                                                <div class="flex items-center gap-2">
+                                                    <p class="font-medium moderator-text-primary" th:text="${comment.user != null ? comment.user.username : '未知用户'}">用户名</p>
+                                                </div>
+                                                <p class="text-xs moderator-text-secondary" th:text="${comment.createdAt != null ? #temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm') : '未知时间'}">
+                                                    2023-01-01 12:00
+                                                </p>
+                                            </div>
+                                        </a>
+                                        
+                                        <!-- 屏蔽按钮 -->
+                                        <th:block th:if="${comment.deletedAt == null}">
+                                            <th:block th:if="${!comment.isBlocked}">
+                                                <form th:action="@{/comments/block/{commentId}(commentId=${comment.id})}" method="post" class="inline" onclick="event.stopPropagation()">
+                                                    <button type="submit" 
+                                                            class="transition-smooth" 
+                                                            style="color: var(--text-tertiary);"
+                                                            onmouseover="this.style.color='var(--color-error)'"
+                                                            onmouseout="this.style.color='var(--text-tertiary)'"
+                                                            onclick="return confirm('确定要屏蔽这条评论吗？屏蔽后只有作者和管理员可见。');"
+                                                            title="屏蔽评论">
+                                                        <i class="fa fa-ban"></i>
+                                                    </button>
+                                                </form>
+                                            </th:block>
+                                            <th:block th:if="${comment.isBlocked}">
+                                                <form th:action="@{/comments/unblock/{commentId}(commentId=${comment.id})}" method="post" class="inline" onclick="event.stopPropagation()">
+                                                    <button type="submit" 
+                                                            class="transition-smooth" 
+                                                            style="color: var(--color-error);"
+                                                            onmouseover="this.style.color='var(--color-error-dark)'"
+                                                            onmouseout="this.style.color='var(--color-error)'"
+                                                            onclick="return confirm('确定要取消屏蔽这条评论吗？');"
+                                                            title="取消屏蔽评论">
+                                                        <i class="fa fa-ban"></i>
+                                                    </button>
+                                                </form>
+                                            </th:block>
+                                        </th:block>
+                                    </div>
+                                    <p class="ml-13 mb-3 moderator-text-primary" th:text="${comment.body}">评论内容</p>
+
+                                    <!-- 关联内容信息 -->
+                                    <div class="ml-13 flex items-center text-xs moderator-text-secondary mb-3">
+                                        <i class="fa fa-file-text-o mr-1"></i>
+                                        <span>关联内容：</span>
+                                        <a th:href="@{/content/{contentId}(contentId=${comment.content.id})}" 
+                                           class="ml-1"
+                                           style="color: var(--color-primary);"
+                                           onmouseover="this.style.color='var(--color-primary-dark)'"
+                                           onmouseout="this.style.color='var(--color-primary)'"
+                                           th:text="${comment.content.title != null and !comment.content.title.isEmpty() ? comment.content.title : '无标题'}"
+                                           onclick="event.stopPropagation()">内容标题</a>
+                                        
+                                        <th:block th:if="${comment.content.school != null}">
+                                            <span class="mx-2">•</span>
+                                            <i class="fa fa-tag mr-1"></i>
+                                            <span th:text="${comment.content.school.name}">流派名称</span>
+                                        </th:block>
+                                        
+                                        <th:block th:if="${comment.content.philosopher != null}">
+                                            <span class="mx-2">•</span>
+                                            <i class="fa fa-user mr-1"></i>
+                                            <span th:text="${comment.content.philosopher.name}">哲学家名称</span>
+                                        </th:block>
+                                    </div>
+
+                                    <!-- 回复评论 -->
+                                    <th:block th:if="${comment.replies != null and !comment.replies.isEmpty()}">
+                                        <div class="ml-8 mt-4 space-y-3">
+                                            <th:block th:each="reply : ${comment.replies}">
+                                                <div th:id="'reply-' + ${reply.id}" 
+                                                     class="pl-4 py-2 relative group"
+                                                     style="border-left: 2px solid var(--border-primary);"
+                                                     th:onclick="'window.location.href=\'/comments/view/' + ${reply.content.id} + '#reply-' + ${reply.id} + '\''">
+
+                                                    <div class="flex justify-between items-start mb-1">
+                                                        <a th:href="@{/user/profile/{id}(id=${reply.user.id})}" 
+                                                           class="flex items-center p-1 rounded-lg transition-smooth" 
+                                                           style="background-color: var(--bg-tertiary);"
+                                                           onclick="event.stopPropagation()">
+                                                            <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold" style="background-color: var(--bg-quaternary); color: var(--text-secondary);">
+                                                                <span th:text="${reply.user != null ? #strings.substring(reply.user.username, 0, 1) : 'U'}">U</span>
+                                                            </div>
+                                                            <div class="ml-2">
+                                                                <div class="flex items-center gap-2">
+                                                                    <p class="text-sm font-medium moderator-text-primary" th:text="${reply.user != null ? reply.user.username : '未知用户'}">用户名</p>
+                                                                </div>
+                                                                <p class="text-xs moderator-text-secondary" th:text="${reply.createdAt != null ? #temporals.format(reply.createdAt, 'yyyy-MM-dd HH:mm') : '未知时间'}">
+                                                                    2023-01-01 12:00
+                                                                </p>
+                                                            </div>
+                                                        </a>
+                                                        
+                                                        <!-- 屏蔽按钮 -->
+                                                        <th:block th:if="${reply.deletedAt == null}">
+                                                            <th:block th:if="${!reply.isBlocked}">
+                                                                <form th:action="@{/comments/block/{commentId}(commentId=${reply.id})}" method="post" class="inline" onclick="event.stopPropagation()">
+                                                                    <button type="submit" 
+                                                                            class="transition-smooth" 
+                                                                            style="color: var(--text-tertiary);"
+                                                                            onmouseover="this.style.color='var(--color-error)'"
+                                                                            onmouseout="this.style.color='var(--text-tertiary)'"
+                                                                            onclick="return confirm('确定要屏蔽这条回复吗？屏蔽后只有作者和管理员可见。');"
+                                                                            title="屏蔽回复">
+                                                                        <i class="fa fa-ban text-xs"></i>
+                                                                    </button>
+                                                                </form>
+                                                            </th:block>
+                                                            <th:block th:if="${reply.isBlocked}">
+                                                                <form th:action="@{/comments/unblock/{commentId}(commentId=${reply.id})}" method="post" class="inline" onclick="event.stopPropagation()">
+                                                                    <button type="submit" 
+                                                                            class="transition-smooth" 
+                                                                            style="color: var(--color-error);"
+                                                                            onmouseover="this.style.color='var(--color-error-dark)'"
+                                                                            onmouseout="this.style.color='var(--color-error)'"
+                                                                            onclick="return confirm('确定要取消屏蔽这条回复吗？');"
+                                                                            title="取消屏蔽回复">
+                                                                        <i class="fa fa-ban text-xs"></i>
+                                                                    </button>
+                                                                </form>
+                                                            </th:block>
+                                                        </th:block>
+                                                    </div>
+                                                    <p class="text-sm ml-8 moderator-text-secondary" th:text="${reply.body}">回复内容</p>
+                                                </div>
+                                            </th:block>
+                                        </div>
+                                    </th:block>
+                                </div>
+                            </th:block>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 移动端抽屉菜单 -->
+    <div th:replace="~{fragments/admin-sidebar :: moderator-mobile-drawer}"></div>
+
+    <!-- Moderator Scripts -->
+    <div th:replace="~{fragments/admin-head :: moderator-scripts}"></div>
+
+    <!-- JavaScript -->
+    <script>
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 检查URL中是否有评论锚点
+            function highlightCommentFromHash() {
+                const hash = window.location.hash;
+                if (hash && hash.startsWith('#comment-')) {
+                    const commentId = hash.substring(1); // 移除#号
+                    const commentElement = document.getElementById(commentId);
+                    
+                    if (commentElement) {
+                        // 添加高亮样式
+                        commentElement.classList.add('comment-highlight');
+                        
+                        // 滚动到评论位置
+                        commentElement.scrollIntoView({ 
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+                        
+                        // 3秒后移除高亮效果
+                        setTimeout(() => {
+                            commentElement.classList.remove('comment-highlight');
+                        }, 3000);
+                    }
+                }
+            }
+            
+            // 初始加载时检查
+            highlightCommentFromHash();
+            
+            // 监听hash变化（当用户点击浏览器前进/后退按钮时）
+            window.addEventListener('hashchange', highlightCommentFromHash);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head}" th:with="pageTitle=${translationService.getStaticText('search', language)}">
+    
+    <!-- 自定义工具类 -->
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .transition-smooth {
+                transition: all 0.3s ease-in-out;
+            }
+            .hover-scale-105:hover {
+                transform: scale(1.05);
+            }
+            .hover-scale-110:hover {
+                transform: scale(1.1);
+            }
+            .group-hover-scale-105:hover {
+                transform: scale(1.05);
+            }
+            .group-hover-scale-110:hover {
+                transform: scale(1.1);
+            }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-up { animation: fadeInUp 0.4s ease-out both; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+    <!-- 导航栏 -->
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <!-- 主要内容 -->
+    <main class="flex-grow container mx-auto px-4 py-8 pt-24">
+        <!-- 搜索标题 -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-dark mb-4">
+                <i class="fa fa-search mr-3"></i>
+                <span th:text="${translationService.getStaticText('search', language)}">搜索</span>
+            </h1>
+        </div>
+
+        <!-- 搜索表单 -->
+        <div class="flex justify-center mb-8">
+            <div class="w-2/3">
+                <form action="/search/results" method="get">
+                    <div class="relative">
+                        <input type="text" 
+                               name="query" 
+                               th:placeholder="${translationService.getStaticText('enter_keywords_to_search', language)}"
+                               class="w-full px-6 py-4 text-lg border-2 border-gray-300 rounded-full focus:ring-2 focus:ring-primary focus:border-transparent outline-none shadow-lg bg-white/90 backdrop-blur-sm"
+                               required>
+                        <button type="submit" 
+                                class="absolute right-2 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-primary text-white rounded-full hover:bg-primary/90 transition-colors flex items-center justify-center">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </main>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <div th:replace="~{fragments/footer :: language-switcher-script}"></div>
+    <div th:replace="~{fragments/footer :: search-script}"></div>
+    <div th:replace="~{fragments/footer :: search-modal}"></div>
+
+    <script>
+        // 自动聚焦到搜索框
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.querySelector('input[name="query"]');
+            if (searchInput) {
+                searchInput.focus();
+            }
+        });
+
+        // 搜索建议点击处理
+        document.addEventListener('click', function(e) {
+            if (e.target.matches('a[href*="/search/results"]')) {
+                // 让链接正常工作，不需要额外处理
+            }
+        });
+    </script>
+</body>
+</html>

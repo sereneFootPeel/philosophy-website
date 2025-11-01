@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${translationService != null ? translationService.getStaticText('create_content', language) + ' - ' + (language != null and language == 'en' ? 'Philosophy Website' : '哲学网站') : '创建内容 - 哲学网站'}">创建内容 - 哲学网站</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/ckeditor5-build-classic@34.2.0/build/classic.min.js"></script>
+    <script>
+        tailwind.config = { theme: { extend: { colors: { primary: '#4B5563', secondary: '#6B7280', accent: '#F3F4F6', light: '#E5E7EB', dark: '#1F2937' }, fontFamily: { sans: ['system-ui', 'sans-serif'] } } } }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .sidebar-link { @apply block px-4 py-3 text-white hover:bg-primary/40 transition-colors; }
+            .input { @apply w-full px-3 py-2 border border-light rounded-md focus:outline-none focus:ring-2 focus:ring-primary; }
+            .label { @apply block font-medium text-gray-700 mb-2; }
+            .btn-primary { @apply inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-white hover:bg-primary/90; }
+            .btn-secondary { @apply inline-flex items-center gap-2 px-4 py-2 rounded-md border border-secondary text-gray-700 hover:bg-accent; }
+            .card { @apply bg-white rounded-lg shadow overflow-hidden; }
+            .form-container { @apply max-w-3xl mx-auto p-4 md:p-8; }
+        }
+    </style>
+</head>
+<body class="bg-secondary min-h-screen text-gray-800 flex flex-col">
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="flex-grow pt-16">
+        <div class="form-container">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-800">
+                    <i class="fa fa-plus mr-2"></i>
+                    <span th:text="${translationService != null ? translationService.getStaticText('create_content', language) : '创建内容'}">创建内容</span>
+                </h1>
+                <p class="text-gray-600 mt-1" th:text="${translationService != null ? translationService.getStaticText('creating_new_philosophy_content', language) : '创建新的哲学内容'}">创建新的哲学内容</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="/user/content-edits" class="btn-secondary">
+                    <i class="fa fa-arrow-left"></i> <span th:text="${translationService != null ? translationService.getStaticText('back_to_edit_list', language) : '返回编辑列表'}">返回编辑列表</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- 消息提示将通过JavaScript显示 -->
+
+        <!-- 创建表单 -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <form th:action="@{/user/content-edits/create}" method="post">
+                <div class="mb-5">
+                    <label for="philosopher" class="label" th:text="${translationService != null ? translationService.getStaticText('philosopher_name', language) + ' *' : '哲学家 *'}">哲学家 <span class="text-red-500">*</span></label>
+                    <select class="input" id="philosopher" name="philosopherId" required>
+                        <option value="" th:text="${translationService != null ? translationService.getStaticText('select_philosopher', language) : '请选择哲学家'}">请选择哲学家</option>
+                        <option th:each="philosopher : ${philosophers}"
+                                th:value="${philosopher.id}"
+                                th:text="${philosopher.name}">
+                            哲学家名称
+                        </option>
+                    </select>
+                </div>
+
+                <div class="mb-5">
+                    <label for="school" class="label" th:text="${translationService != null ? translationService.getStaticText('school_name', language) + ' *' : '流派 *'}">流派 <span class="text-red-500">*</span></label>
+                    <select class="input" id="school" name="schoolId" required>
+                        <option value="" th:text="${translationService != null ? translationService.getStaticText('select_school', language) : '请选择流派'}">请选择流派</option>
+                        <option th:each="school : ${schools}"
+                                th:value="${school.id}"
+                                th:text="${school.name}">
+                            流派名称
+                        </option>
+                    </select>
+                </div>
+
+                <div class="mb-5">
+                    <label for="title" class="label" th:text="${translationService != null ? translationService.getStaticText('title', language) + ' *' : '标题 *'}">标题 <span class="text-red-500">*</span></label>
+                    <input type="text" class="input" id="title" name="title"
+                           th:placeholder="${translationService != null ? translationService.getStaticText('enter_title', language) : '请输入标题'}" required>
+                </div>
+
+                <div class="mb-5">
+                    <label for="content" class="label" th:text="${translationService != null ? translationService.getStaticText('content', language) + ' *' : '内容 *'}">内容 <span class="text-red-500">*</span></label>
+                    <textarea class="input" id="content" name="content" rows="15"
+                              th:placeholder="${translationService != null ? translationService.getStaticText('enter_content', language) : '请输入内容'}" required></textarea>
+                </div>
+
+                <!-- 英文翻译部分 -->
+                <div class="mb-5 border-t pt-5">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4" th:text="${translationService != null ? translationService.getStaticText('english_translation_optional', language) : '英文翻译（可选）'}">英文翻译（可选）</h3>
+
+                    <div class="mb-4">
+                        <label class="label" for="contentEn" th:text="${translationService != null ? translationService.getStaticText('english_content', language) : '英文内容'}">英文内容</label>
+                        <textarea id="contentEn" name="contentEn" class="input"
+                                  placeholder="Please enter English translation of the content"
+                                  style="min-height: 200px;"></textarea>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex items-center justify-end gap-3">
+                    <a href="/user/content-edits" class="btn-secondary" th:text="${translationService != null ? translationService.getStaticText('cancel', language) : '取消'}">取消</a>
+                    <button type="submit" class="btn-primary" th:text="${translationService != null ? translationService.getStaticText('save', language) : '保存'}">保存</button>
+                </div>
+            </form>
+        </div>
+        </div>
+    </main>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <div th:replace="~{fragments/footer :: message-script}"></div>
+
+    <script>
+        // 页面加载时显示消息
+        document.addEventListener('DOMContentLoaded', function() {
+            const successMessage = /*[[${successMessage}]]*/ null;
+            const errorMessage = /*[[${errorMessage}]]*/ null;
+            
+            if (successMessage) {
+                showMessage(successMessage, 'success');
+            }
+            
+            if (errorMessage) {
+                showMessage(errorMessage, 'error');
+            }
+        });
+
+        // 初始化CKEditor
+        ClassicEditor
+            .create(document.querySelector('#content'))
+            .then(editor => {
+                console.log('CKEditor initialized');
+            })
+            .catch(error => {
+                console.error('CKEditor initialization failed:', error);
+            });
+
+        // 表单验证
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const title = document.getElementById('title').value.trim();
+            const content = document.getElementById('content').value.trim();
+            const philosopher = document.getElementById('philosopher').value;
+            const school = document.getElementById('school').value;
+
+            if (!title || !content || !philosopher || !school) {
+                e.preventDefault();
+                const message = /*[[${translationService != null ? translationService.getStaticText('fill_all_required_fields', language) : '请填写所有必填字段'}]]*/ '请填写所有必填字段';
+                showMessage(message, 'error');
+                return false;
+            }
+        });
+    </script>
+</body>
+</html>

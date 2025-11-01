@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>验证码</title>
+    <link rel="stylesheet" th:href="@{/css/theme.css}">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 8px; padding: 20px; }
+        .header { text-align: center; border-bottom: 1px solid #ddd; padding-bottom: 10px; margin-bottom: 20px; }
+        .code { font-size: 24px; font-weight: bold; color: #2a6496; letter-spacing: 2px; text-align: center; margin: 20px 0; }
+        .footer { font-size: 12px; color: #777; text-align: center; margin-top: 20px; }
+    </style>
+</head>
+<body class="bg-secondary min-h-screen flex flex-col">
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<main class="flex-grow pt-16">
+    <div class="container">
+        <div class="header">
+            <h2>【哲学】邮箱验证</h2>
+        </div>
+        <p>您好,</p>
+        <p>感谢您注册。您的验证码是:</p>
+        <div class="code" th:text="${code}">123456</div>
+        <p>此验证码将在10分钟内失效。请勿将此验证码告知他人。</p>
+        <div class="footer">
+            <p>此邮件为系统自动发送，请勿回复。</p>
+        </div>
+    </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+</html>

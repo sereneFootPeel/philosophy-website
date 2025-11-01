@@ -1,0 +1,1367 @@
+/* 
+ * Philosophy Website Theme: Curated by a Senior UI Designer
+ * Three harmonious and modern themes for an elevated user experience.
+ */
+
+/* ==========================================================================
+   Theme 1: Ocean Wave (Default Theme)
+   - Concept: 海洋波浪，清新自然，充满活力
+   - Palette: 海蓝、珊瑚粉、珍珠白
+   ========================================================================== */
+:root {
+    /* Primary & Accent Colors */
+    --color-primary: #0891B2; /* Ocean Blue */
+    --color-primary-dark: #0E7490;
+    --color-primary-light: #22D3EE;
+    --color-secondary: #F97316; /* Coral Orange */
+    --color-accent: #F0FDFF; /* Ice Blue */
+    
+    /* Background Colors */
+    --bg-primary: #FFFFFF; /* Pure White */
+    --bg-secondary: #F0FDFF; /* Very Light Blue */
+    --bg-tertiary: #E0F7FA; /* Light Blue */
+    --bg-quaternary: #CCFBF1; /* Soft Teal */
+    
+    /* Text Colors */
+    --text-primary: #0C4A6E; /* Deep Ocean Blue */
+    --text-secondary: #0F766E; /* Dark Teal */
+    --text-tertiary: #155E75; /* Medium Blue */
+    --text-on-primary: #FFFFFF; /* White text on primary color */
+    
+    /* Border Colors */
+    --border-primary: #E0F7FA;
+    --border-secondary: #CCFBF1;
+    --border-tertiary: #99F6E4;
+    
+    /* Status Colors */
+    --color-success: #28a745;
+    --color-success-light: #d4edda;
+    --color-error: #dc3545;
+    --color-error-light: #f8d7da;
+    --color-warning: #ffc107;
+    --color-warning-light: #fff3cd;
+    --color-info: #17a2b8;
+    --color-info-light: #d1ecf1;
+    
+    /* Shadows, Transitions, Radii (Consistent across themes) */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    --radius-md: 0.375rem;
+    --radius-lg: 0.5rem;
+}
+
+/* ==========================================================================
+   Theme 2: Mocha Coffee
+   - Concept: 温暖舒适的深棕 + 米色，文艺复古
+   - Palette: 深棕、米色、温暖白
+   ========================================================================== */
+.theme-forest {
+    --color-primary: #8B7968; /* Deep Brown */
+    --color-primary-dark: #6f6152;
+    --color-primary-light: #a18f7d;
+    --color-secondary: #D4C4B0; /* Beige */
+    --color-accent: #F5F0EA;
+
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #FAF5F0;
+    --bg-tertiary: #F5EBE0;
+    --bg-quaternary: #E8D9C8;
+    
+    --text-primary: #2D1B12;
+    --text-secondary: #5C4033;
+    --text-tertiary: #8B7355;
+    --text-on-primary: #FFFFFF;
+    
+    --border-primary: #E8D5C4;
+    --border-secondary: #D4BFB0;
+}
+
+/* ==========================================================================
+   Theme 3: Lavender Field
+   - Concept: 优雅梦幻的紫灰 + 蓝灰，浪漫而现代
+   - Palette: 紫灰、蓝灰、纯白
+   ========================================================================== */
+.theme-dark {
+    --color-primary: #9B8FAA; /* Purple Gray */
+    --color-primary-dark: #7e7389;
+    --color-primary-light: #b3a5c0;
+    --color-secondary: #7E9BAB; /* Blue Gray */
+    --color-accent: #F0EBF5;
+    
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #FAF5FF;
+    --bg-tertiary: #F0EDF5;
+    --bg-quaternary: #E5DFE8;
+
+    --text-primary: #3B0764;
+    --text-secondary: #581C87;
+    --text-tertiary: #6B21A8;
+    --text-on-primary: #FFFFFF;
+    
+    --border-primary: #E9D5FF;
+    --border-secondary: #D8B4FE;
+}
+
+/* ==========================================================================
+   Theme 4: Christmas Red-Green
+   - Concept: 圣诞红绿配色，节日氛围
+   - Palette: 深红、深绿、象牙白
+   ========================================================================== */
+.theme-sunset {
+    --color-primary: #C84B4B; /* Deep Red - more saturated */
+    --color-primary-dark: #A03030;
+    --color-primary-light: #E06666;
+    --color-secondary: #059669; /* Christmas Green */
+    --color-accent: #FEF5F5;
+
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #FFF7ED;
+    --bg-tertiary: #FEF5F5;
+    --bg-quaternary: #FEEAEA;
+    
+    --text-primary: #7C2D12;
+    --text-secondary: #9A3412;
+    --text-tertiary: #C2410C;
+    --text-on-primary: #FFFFFF;
+    
+    --border-primary: #FFEDD5;
+    --border-secondary: #FED7AA;
+}
+
+/* ==========================================================================
+   Theme 5: Stormy Blue
+   - Concept: 灰蓝色系，沉稳专业，现代简约
+   - Palette: 深灰蓝、中灰蓝、浅灰蓝、纯白
+   ========================================================================== */
+.theme-ocean {
+    --color-primary: #64748B; /* Stormy Blue Gray */
+    --color-primary-dark: #334155; /* Deeper blue for dark parts */
+    --color-primary-light: #94A3B8;
+    --color-secondary: #8B9DC3; /* Medium Blue Gray */
+    --color-accent: #F8FAFC;
+
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #FAFBFC;
+    --bg-tertiary: #F5F7FA;
+    --bg-quaternary: #EDF1F5;
+    
+    --text-primary: #1E293B;
+    --text-secondary: #334155;
+    --text-tertiary: #475569;
+    --text-on-primary: #FFFFFF;
+    
+    --border-primary: #EDF1F5;
+    --border-secondary: #E0E6ED;
+}
+
+/* ==========================================================================
+   Theme 6: Low Saturation Pink
+   - Concept: 低饱和度粉色系，柔和优雅
+   - Palette: 低饱和度深粉、浅粉灰、象牙白
+   ========================================================================== */
+.theme-purple {
+    --color-primary: #B88A8A; /* Low Saturation Pink */
+    --color-primary-dark: #8A5F5F; /* Deeper pink for dark parts */
+    --color-primary-light: #D8B8B8;
+    --color-secondary: #D4B8B8; /* Light Pink Gray */
+    --color-accent: #F8F5F5;
+
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #FFF8F8;
+    --bg-tertiary: #F8F5F5;
+    --bg-quaternary: #F0E8E8;
+    
+    --text-primary: #6A4545;
+    --text-secondary: #7A5A5A;
+    --text-tertiary: #8B6B6B;
+    --text-on-primary: #FFFFFF;
+    
+    --border-primary: #F0E8E8;
+    --border-secondary: #E8D8D8;
+}
+
+/* ==========================================================================
+   Theme 7: Emerald Forest
+   - Concept: 翡翠墨绿 + 杏黄，自然温暖
+   - Palette: 墨绿、杏黄、清新白
+   ========================================================================== */
+.theme-sakura {
+    --color-primary: #5F8E7E; /* Dark Green */
+    --color-primary-dark: #4c7265;
+    --color-primary-light: #76a593;
+    --color-secondary: #D9B88F; /* Apricot Yellow */
+    --color-accent: #E5F3EC;
+
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #F0FDF4;
+    --bg-tertiary: #EBF5E8;
+    --bg-quaternary: #D9E8D3;
+    
+    --text-primary: #064E3B;
+    --text-secondary: #065F46;
+    --text-tertiary: #047857;
+    --text-on-primary: #FFFFFF;
+    
+    --border-primary: #D1FAE5;
+    --border-secondary: #A7F3D0;
+}
+
+/* ==========================================================================
+   Theme 8: Low Saturation Green
+   - Concept: 低饱和度绿色系，清新自然
+   - Palette: 低饱和度绿、浅绿灰、清新白
+   ========================================================================== */
+.theme-nordic {
+    --color-primary: #6B8A6B; /* Low Saturation Green - more saturated */
+    --color-primary-dark: #4A6A4A; /* Deeper and more green for header/footer */
+    --color-primary-light: #8FAF8F;
+    --color-secondary: #B8C8B8; /* Light Green Gray */
+    --color-accent: #F5F8F5;
+
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #F8FFF8;
+    --bg-tertiary: #F5F8F5;
+    --bg-quaternary: #EDF2ED;
+    
+    --text-primary: #2F4F2F;
+    --text-secondary: #456345;
+    --text-tertiary: #5A7A5A;
+    --text-on-primary: #FFFFFF;
+    
+    --border-primary: #EDF2ED;
+    --border-secondary: #D8E2D8;
+}
+
+/* ==========================================================================
+   Theme 9: Cyber Dark
+   - Concept: 赛博朋克暗黑，科技感十足
+   - Palette: 深灰、青灰、淡青
+   ========================================================================== */
+.theme-emerald {
+    --color-primary: #6B8E9C; /* Cyan Gray */
+    --color-primary-dark: #56727d;
+    --color-primary-light: #84a5b2;
+    --color-secondary: #4A5568; /* Dark Gray */
+    --color-accent: #2d3748;
+
+    --bg-primary: #111827;
+    --bg-secondary: #1F2937;
+    --bg-tertiary: #374151;
+    --bg-quaternary: #4B5563;
+    
+    --text-primary: #F9FAFB;
+    --text-secondary: #E5E7EB;
+    --text-tertiary: #D1D5DB;
+    --text-on-primary: #111827;
+    
+    --border-primary: #374151;
+    --border-secondary: #4B5563;
+    
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
+}
+
+/* ==========================================================================
+   Theme 10: Pure White Minimal
+   - Concept: 极简纯白主题，几乎完全白色，字体黑色，适合游客和新用户
+   - Palette: 纯白、极浅灰、黑色字体
+   ========================================================================== */
+.theme-midnight {
+    --color-primary: #374151; /* Dark Gray for buttons */
+    --color-primary-dark: #1F2937;
+    --color-primary-light: #6B7280;
+    --color-secondary: #9CA3AF; /* Light Gray */
+    --color-accent: #FAFAFA; /* Very Light Gray */
+
+    --bg-primary: #FAFAFA; /* Very Light Gray - slightly off white */
+    --bg-secondary: #FAFAFA; /* Very Light Gray - slightly off white */
+    --bg-tertiary: #F5F5F5; /* Slightly darker light gray */
+    --bg-quaternary: #F0F0F0; /* Light gray */
+    
+    --text-primary: #000000; /* Pure Black */
+    --text-secondary: #1F2937; /* Very Dark Gray */
+    --text-tertiary: #374151; /* Dark Gray */
+    --text-on-primary: #FFFFFF;
+    
+    --border-primary: #F0F0F0; /* Light Gray */
+    --border-secondary: #E5E5E5; /* Slightly darker gray */
+    
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.02);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.03), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+}
+
+/* Special override for theme-midnight to ensure light gray background */
+.theme-midnight body {
+    background-color: #FAFAFA !important;
+    color: #000000 !important;
+}
+
+.theme-midnight .bg-secondary {
+    background-color: #FAFAFA !important;
+}
+
+.theme-midnight .theme-card.active {
+    background: #FAFAFA !important;
+}
+
+/* ==========================================================================
+   Theme 11: Pure Black Scale
+   - Concept: 黑色系纯黑色不同明度，极简奢华
+   - Palette: 纯黑、深黑、中黑、浅黑
+   ========================================================================== */
+.theme-carbon {
+    --color-primary: #2A2A2A; /* Dark Gray */
+    --color-primary-dark: #1A1A1A; /* Very Dark Gray */
+    --color-primary-light: #3A3A3A; /* Medium Dark */
+    --color-secondary: #3A3A3A; /* Medium Dark Gray */
+    --color-accent: #1A1A1A; /* Nearly Black */
+
+    --bg-primary: #0A0A0A; /* Very Dark - almost black */
+    --bg-secondary: #1A1A1A; /* Lighter for better visibility */
+    --bg-tertiary: #2A2A2A; /* Card background - lighter */
+    --bg-quaternary: #3A3A3A; /* Lighter for contrast */
+    
+    --text-primary: #FFFFFF; /* Pure White */
+    --text-secondary: #E0E0E0; /* Light Gray */
+    --text-tertiary: #B0B0B0; /* Medium Light Gray */
+    --text-on-primary: #FFFFFF;
+    
+    --border-primary: #3A3A3A; /* Lighter border for visibility */
+    --border-secondary: #4A4A4A; /* Even lighter border */
+    
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.9);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.9), 0 2px 4px -1px rgba(0, 0, 0, 0.8);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.9), 0 4px 6px -2px rgba(0, 0, 0, 0.8);
+}
+
+/* ==========================================================================
+   Theme 12: Elegant Purple
+   - Concept: 优雅紫系，高贵典雅，现代感十足，降低饱和度
+   - Palette: 柔和深紫、淡紫、极浅紫、纯白
+   ========================================================================== */
+.theme-obsidian {
+    --color-primary: #8B7D9A; /* Muted Elegant Purple */
+    --color-primary-dark: #6B5F7A;
+    --color-primary-light: #A89BB8;
+    --color-secondary: #B8A8CC; /* Light Muted Purple */
+    --color-accent: #FCFAFD; /* Very Light Purple */
+
+    --bg-primary: #FFFFFF; /* Pure White */
+    --bg-secondary: #FCFAFD; /* Very Light Purple */
+    --bg-tertiary: #F5F0F8; /* Light Purple */
+    --bg-quaternary: #EDE5F2; /* Soft Purple */
+    
+    --text-primary: #5A4A6B; /* Muted Dark Purple */
+    --text-secondary: #6B5F7A; /* Muted Medium Purple */
+    --text-tertiary: #8B7D9A; /* Muted Purple */
+    --text-on-primary: #FFFFFF;
+    
+    --border-primary: #EDE5F2;
+    --border-secondary: #DBC9E8;
+    
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* ==========================================================================
+   Global Styles & Component Application
+   ========================================================================== */
+
+/* Note: Removed global transition to prevent theme switching delay */
+
+body {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Header & Navbar */
+.navbar {
+    background-color: var(--bg-primary);
+    border-bottom: 1px solid var(--border-primary);
+    box-shadow: var(--shadow-md);
+}
+
+.nav-link {
+    color: var(--text-secondary);
+    transition: color var(--transition-fast);
+}
+
+.nav-link:hover, .nav-link.active {
+    color: var(--color-primary);
+}
+
+/* Cards */
+.card {
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow var(--transition-normal), transform var(--transition-normal);
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+/* Buttons */
+.btn {
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+    cursor: pointer;
+    border: none;
+    font-weight: 600;
+    padding: 0.65rem 1.25rem;
+}
+
+.btn-primary {
+    background-color: var(--color-primary);
+    color: var(--text-on-primary);
+}
+
+.btn-primary:hover {
+    background-color: var(--color-primary-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-secondary {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-primary);
+}
+
+.btn-secondary:hover {
+    background-color: var(--bg-quaternary);
+}
+
+/* Form Inputs */
+.form-control, .input {
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-primary);
+    color: var(--text-primary);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+}
+
+.form-control:focus, .input:focus {
+    border-color: var(--color-primary);
+    outline: none;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 15%, transparent);
+}
+
+/* Text & Headings */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--text-primary);
+}
+
+p, a, span, li, label {
+    color: var(--text-secondary);
+}
+
+a {
+    color: var(--color-primary);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+}
+
+a:hover {
+    color: var(--color-primary-dark);
+    text-decoration: underline;
+}
+
+/* Status Messages */
+.message {
+    padding: 0.75rem 1.25rem;
+    border-radius: var(--radius-md);
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+}
+
+.message-success {
+    background-color: var(--color-success-light);
+    color: color-mix(in srgb, var(--color-success) 85%, black);
+    border-color: color-mix(in srgb, var(--color-success) 40%, transparent);
+}
+
+.message-error {
+    background-color: var(--color-error-light);
+    color: color-mix(in srgb, var(--color-error) 85%, black);
+    border-color: color-mix(in srgb, var(--color-error) 40%, transparent);
+}
+
+.message-warning {
+    background-color: var(--color-warning-light);
+    color: color-mix(in srgb, var(--color-warning) 85%, black);
+    border-color: color-mix(in srgb, var(--color-warning) 40%, transparent);
+}
+
+.message-info {
+    background-color: var(--color-info-light);
+    color: color-mix(in srgb, var(--color-info) 85%, black);
+    border-color: color-mix(in srgb, var(--color-info) 40%, transparent);
+}
+
+/* Footer Styles - Enhanced contrast for all themes */
+.footer-component {
+    background-color: var(--color-primary);
+    color: var(--text-on-primary);
+}
+
+.footer-title {
+    color: var(--text-on-primary);
+}
+
+.footer-subtitle {
+    color: var(--text-on-primary);
+    opacity: 0.85;
+}
+
+.footer-search-btn {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: var(--text-on-primary);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.footer-search-btn:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Search Modal Styles - Override Tailwind for theme consistency */
+#search-panel {
+    background-color: var(--bg-primary) !important;
+}
+
+#search-panel h3 {
+    color: var(--text-primary) !important;
+}
+
+#search-panel button {
+    color: var(--text-secondary) !important;
+}
+
+#search-panel button:hover {
+    color: var(--text-primary) !important;
+}
+
+#search-input {
+    background-color: var(--bg-primary) !important;
+    border-color: var(--border-primary) !important;
+    color: var(--text-primary) !important;
+}
+
+#search-input:focus {
+    border-color: var(--color-primary) !important;
+}
+
+#search-input::placeholder {
+    color: var(--text-tertiary) !important;
+    opacity: 1;
+}
+
+#search-panel .bg-primary {
+    background-color: var(--color-primary) !important;
+}
+
+#search-panel .text-white {
+    color: var(--text-on-primary) !important;
+}
+
+#search-panel .hover\:bg-primary-dark:hover {
+    background-color: var(--color-primary-dark) !important;
+}
+
+#search-results .text-gray-600 {
+    color: var(--text-secondary) !important;
+}
+
+#search-results .text-gray-800 {
+    color: var(--text-primary) !important;
+}
+
+#search-results .text-gray-500 {
+    color: var(--text-tertiary) !important;
+}
+
+#search-results .bg-tertiary {
+    background-color: var(--bg-tertiary) !important;
+}
+
+#search-results .hover\:bg-quaternary:hover {
+    background-color: var(--bg-quaternary) !important;
+}
+
+/* Forest theme footer - ensure white text on forest green background */
+.theme-forest .footer-component {
+    background-color: var(--color-primary);
+}
+
+.theme-forest .footer-title,
+.theme-forest .footer-subtitle {
+    color: #FFFFFF;
+}
+
+.theme-forest .footer-search-btn {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: #FFFFFF;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.theme-forest .footer-search-btn:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Dark theme footer adjustments */
+.theme-dark .footer-component {
+    background-color: var(--bg-tertiary);
+    border-top: 1px solid var(--border-primary);
+}
+
+.theme-dark .footer-title,
+.theme-dark .footer-subtitle {
+    color: var(--text-primary);
+}
+
+.theme-dark .footer-search-btn {
+    background-color: var(--color-primary);
+    color: var(--text-on-primary);
+    border-color: var(--color-primary);
+}
+
+.theme-dark .footer-search-btn:hover {
+    background-color: var(--color-primary-dark);
+    border-color: var(--color-primary-dark);
+}
+
+/* Sunset theme footer - warm colors on coral background */
+.theme-sunset .footer-component {
+    background-color: var(--color-primary);
+}
+
+.theme-sunset .footer-title,
+.theme-sunset .footer-subtitle {
+    color: #FFFFFF;
+}
+
+.theme-sunset .footer-search-btn {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: #FFFFFF;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.theme-sunset .footer-search-btn:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Ocean theme footer - deep navy background */
+.theme-ocean .footer-component {
+    background-color: var(--color-primary);
+}
+
+.theme-ocean .footer-title,
+.theme-ocean .footer-subtitle {
+    color: #FFFFFF;
+}
+
+.theme-ocean .footer-search-btn {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: #FFFFFF;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.theme-ocean .footer-search-btn:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Purple theme footer - elegant purple background */
+.theme-purple .footer-component {
+    background-color: var(--color-primary);
+}
+
+.theme-purple .footer-title,
+.theme-purple .footer-subtitle {
+    color: #FFFFFF;
+}
+
+.theme-purple .footer-search-btn {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: #FFFFFF;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.theme-purple .footer-search-btn:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Sakura theme footer - pink blossom background */
+.theme-sakura .footer-component {
+    background-color: var(--color-primary);
+}
+
+.theme-sakura .footer-title,
+.theme-sakura .footer-subtitle {
+    color: #FFFFFF;
+}
+
+.theme-sakura .footer-search-btn {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: #FFFFFF;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.theme-sakura .footer-search-btn:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Nordic theme footer - clean minimal background */
+.theme-nordic .footer-component {
+    background-color: var(--color-primary);
+}
+
+.theme-nordic .footer-title,
+.theme-nordic .footer-subtitle {
+    color: #FFFFFF;
+}
+
+.theme-nordic .footer-search-btn {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: #FFFFFF;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.theme-nordic .footer-search-btn:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Emerald (Cyber Dark) theme footer - dark cyber style */
+.theme-emerald .footer-component {
+    background-color: var(--bg-tertiary);
+    border-top: 1px solid var(--border-primary);
+}
+
+.theme-emerald .footer-title,
+.theme-emerald .footer-subtitle {
+    color: var(--text-primary);
+}
+
+.theme-emerald .footer-search-btn {
+    background-color: var(--color-primary);
+    color: var(--text-on-primary);
+    border-color: var(--color-primary);
+}
+
+.theme-emerald .footer-search-btn:hover {
+    background-color: var(--color-primary-dark);
+    border-color: var(--color-primary-dark);
+}
+
+/* Midnight Black theme footer */
+.theme-midnight .footer-component {
+    background-color: var(--bg-tertiary);
+    border-top: 1px solid var(--border-primary);
+}
+
+.theme-midnight .footer-title,
+.theme-midnight .footer-subtitle {
+    color: var(--text-primary);
+}
+
+.theme-midnight .footer-search-btn {
+    background-color: var(--color-primary);
+    color: var(--text-on-primary);
+    border-color: var(--color-primary);
+}
+
+.theme-midnight .footer-search-btn:hover {
+    background-color: var(--color-primary-dark);
+    border-color: var(--color-primary-dark);
+}
+
+/* Midnight Black theme navbar - match footer style */
+.theme-midnight .navbar {
+    background-color: var(--bg-tertiary);
+    border-bottom: 1px solid var(--border-primary);
+}
+
+/* Carbon Gray theme footer */
+.theme-carbon .footer-component {
+    background-color: var(--bg-tertiary);
+    border-top: 1px solid var(--border-primary);
+}
+
+.theme-carbon .footer-title,
+.theme-carbon .footer-subtitle {
+    color: var(--text-primary);
+}
+
+.theme-carbon .footer-search-btn {
+    background-color: var(--color-primary);
+    color: var(--text-on-primary);
+    border-color: var(--color-primary);
+}
+
+.theme-carbon .footer-search-btn:hover {
+    background-color: var(--color-primary-dark);
+    border-color: var(--color-primary-dark);
+}
+
+/* Obsidian Night theme footer */
+.theme-obsidian .footer-component {
+    background-color: var(--bg-tertiary);
+    border-top: 1px solid var(--border-primary);
+}
+
+.theme-obsidian .footer-title,
+.theme-obsidian .footer-subtitle {
+    color: var(--text-primary);
+}
+
+.theme-obsidian .footer-search-btn {
+    background-color: var(--color-primary);
+    color: var(--text-on-primary);
+    border-color: var(--color-primary);
+}
+
+.theme-obsidian .footer-search-btn:hover {
+    background-color: var(--color-primary-dark);
+    border-color: var(--color-primary-dark);
+}
+
+/* Login Page Styles - Theme-aware colors */
+body .bg-white {
+    background-color: var(--bg-primary) !important;
+}
+
+body .text-gray-900,
+body .text-gray-800,
+body .text-gray-700 {
+    color: var(--text-primary) !important;
+}
+
+body .text-gray-600 {
+    color: var(--text-secondary) !important;
+}
+
+body .text-gray-500,
+body .text-gray-400 {
+    color: var(--text-tertiary) !important;
+}
+
+body .bg-gray-100,
+body .bg-gray-200 {
+    background-color: var(--bg-tertiary) !important;
+}
+
+body .bg-gray-50 {
+    background-color: var(--bg-secondary) !important;
+}
+
+body .border-gray-300,
+body .border-gray-200 {
+    border-color: var(--border-primary) !important;
+}
+
+body input[type="text"],
+body input[type="password"],
+body input[type="email"],
+body textarea {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+}
+
+body input::placeholder {
+    color: var(--text-tertiary) !important;
+    opacity: 0.7;
+}
+
+body .bg-primary {
+    background-color: var(--color-primary) !important;
+}
+
+body .hover\:bg-primary\/90:hover {
+    background-color: var(--color-primary-dark) !important;
+}
+
+body .text-white {
+    color: var(--text-on-primary) !important;
+}
+
+body .text-primary {
+    color: var(--color-primary) !important;
+}
+
+body .hover\:text-primary\/80:hover {
+    color: var(--color-primary-dark) !important;
+}
+
+/* Button text - ensure visibility on all themes */
+body button .text-white,
+body button span,
+body button.text-white {
+    color: var(--text-on-primary) !important;
+}
+
+body .bg-primary.text-white span,
+body button[type="submit"] span,
+body button[type="submit"] {
+    color: var(--text-on-primary) !important;
+}
+
+/* Default theme - white text on royal blue */
+:root button[type="submit"] span,
+:root .bg-primary span {
+    color: #FFFFFF !important;
+}
+
+/* Forest theme - white text on forest green */
+.theme-forest button[type="submit"],
+.theme-forest button[type="submit"] span,
+.theme-forest .bg-primary span,
+.theme-forest button .text-white {
+    color: #FFFFFF !important;
+}
+
+/* Dark theme - dark text on aqua */
+.theme-dark button[type="submit"],
+.theme-dark button[type="submit"] span,
+.theme-dark .bg-primary span,
+.theme-dark button .text-white {
+    color: #121212 !important;
+}
+
+/* Sunset theme - white text on coral */
+.theme-sunset button[type="submit"],
+.theme-sunset button[type="submit"] span,
+.theme-sunset .bg-primary span,
+.theme-sunset button .text-white {
+    color: #FFFFFF !important;
+}
+
+/* Ocean theme - white text on navy */
+.theme-ocean button[type="submit"],
+.theme-ocean button[type="submit"] span,
+.theme-ocean .bg-primary span,
+.theme-ocean button .text-white {
+    color: #FFFFFF !important;
+}
+
+/* Purple theme - white text on purple */
+.theme-purple button[type="submit"],
+.theme-purple button[type="submit"] span,
+.theme-purple .bg-primary span,
+.theme-purple button .text-white {
+    color: #FFFFFF !important;
+}
+
+/* Sakura theme - white text on pink */
+.theme-sakura button[type="submit"],
+.theme-sakura button[type="submit"] span,
+.theme-sakura .bg-primary span,
+.theme-sakura button .text-white {
+    color: #FFFFFF !important;
+}
+
+/* Nordic theme - white text on slate */
+.theme-nordic button[type="submit"],
+.theme-nordic button[type="submit"] span,
+.theme-nordic .bg-primary span,
+.theme-nordic button .text-white {
+    color: #FFFFFF !important;
+}
+
+/* Emerald theme - white text on green */
+.theme-emerald button[type="submit"],
+.theme-emerald button[type="submit"] span,
+.theme-emerald .bg-primary span,
+.theme-emerald button .text-white {
+    color: #FFFFFF !important;
+}
+
+/* Midnight Black theme - white text on dark */
+.theme-midnight button[type="submit"],
+.theme-midnight button[type="submit"] span,
+.theme-midnight .bg-primary span,
+.theme-midnight button .text-white {
+    color: #FFFFFF !important;
+}
+
+/* Carbon Gray theme - white text on dark */
+.theme-carbon button[type="submit"],
+.theme-carbon button[type="submit"] span,
+.theme-carbon .bg-primary span,
+.theme-carbon button .text-white {
+    color: #FFFFFF !important;
+}
+
+/* Obsidian Night theme - white text on dark */
+.theme-obsidian button[type="submit"],
+.theme-obsidian button[type="submit"] span,
+.theme-obsidian .bg-primary span,
+.theme-obsidian button .text-white {
+    color: #FFFFFF !important;
+}
+
+/* Alert boxes and status colors */
+body .bg-green-100 {
+    background-color: var(--color-success-light) !important;
+}
+
+body .text-green-700 {
+    color: color-mix(in srgb, var(--color-success) 85%, black) !important;
+}
+
+body .border-green-400 {
+    border-color: color-mix(in srgb, var(--color-success) 60%, transparent) !important;
+}
+
+body .bg-red-100 {
+    background-color: var(--color-error-light) !important;
+}
+
+body .text-red-500,
+body .text-red-700 {
+    color: var(--color-error) !important;
+}
+
+body .border-red-400 {
+    border-color: color-mix(in srgb, var(--color-error) 60%, transparent) !important;
+}
+
+body .bg-blue-100 {
+    background-color: var(--color-info-light) !important;
+}
+
+body .text-blue-700 {
+    color: color-mix(in srgb, var(--color-info) 85%, black) !important;
+}
+
+body .border-blue-400 {
+    border-color: color-mix(in srgb, var(--color-info) 60%, transparent) !important;
+}
+
+body .bg-yellow-100 {
+    background-color: var(--color-warning-light) !important;
+}
+
+body .text-yellow-700 {
+    color: color-mix(in srgb, var(--color-warning) 85%, black) !important;
+}
+
+body .border-yellow-400 {
+    border-color: color-mix(in srgb, var(--color-warning) 60%, transparent) !important;
+}
+
+/* Dark theme specific overrides for better visibility */
+.theme-dark .text-red-500,
+.theme-dark .text-red-700 {
+    color: #ff6b6b !important; /* Lighter red for dark background */
+}
+
+.theme-dark .bg-red-100 {
+    background-color: rgba(220, 53, 69, 0.15) !important;
+}
+
+.theme-dark .text-green-700 {
+    color: #51cf66 !important; /* Lighter green for dark background */
+}
+
+.theme-dark .bg-green-100 {
+    background-color: rgba(40, 167, 69, 0.15) !important;
+}
+
+.theme-dark .text-blue-700 {
+    color: #4dabf7 !important; /* Lighter blue for dark background */
+}
+
+.theme-dark .bg-blue-100 {
+    background-color: rgba(23, 162, 184, 0.15) !important;
+}
+
+.theme-dark .text-yellow-700 {
+    color: #ffd43b !important; /* Lighter yellow for dark background */
+}
+
+.theme-dark .bg-yellow-100 {
+    background-color: rgba(255, 193, 7, 0.15) !important;
+}
+
+/* Cyber Dark (emerald) theme specific overrides for better visibility */
+.theme-emerald .text-red-500,
+.theme-emerald .text-red-700 {
+    color: #ff6b6b !important;
+}
+
+.theme-emerald .bg-red-100 {
+    background-color: rgba(220, 53, 69, 0.15) !important;
+}
+
+.theme-emerald .text-green-700 {
+    color: #51cf66 !important;
+}
+
+.theme-emerald .bg-green-100 {
+    background-color: rgba(40, 167, 69, 0.15) !important;
+}
+
+.theme-emerald .text-blue-700 {
+    color: #4dabf7 !important;
+}
+
+.theme-emerald .bg-blue-100 {
+    background-color: rgba(23, 162, 184, 0.15) !important;
+}
+
+.theme-emerald .text-yellow-700 {
+    color: #ffd43b !important;
+}
+
+.theme-emerald .bg-yellow-100 {
+    background-color: rgba(255, 193, 7, 0.15) !important;
+}
+
+/* Midnight Black theme specific overrides */
+.theme-midnight .text-red-500,
+.theme-midnight .text-red-700 {
+    color: #ff6b6b !important;
+}
+
+.theme-midnight .bg-red-100 {
+    background-color: rgba(220, 53, 69, 0.15) !important;
+}
+
+.theme-midnight .text-green-700 {
+    color: #51cf66 !important;
+}
+
+.theme-midnight .bg-green-100 {
+    background-color: rgba(40, 167, 69, 0.15) !important;
+}
+
+.theme-midnight .text-blue-700 {
+    color: #4dabf7 !important;
+}
+
+.theme-midnight .bg-blue-100 {
+    background-color: rgba(23, 162, 184, 0.15) !important;
+}
+
+.theme-midnight .text-yellow-700 {
+    color: #ffd43b !important;
+}
+
+.theme-midnight .bg-yellow-100 {
+    background-color: rgba(255, 193, 7, 0.15) !important;
+}
+
+/* Carbon Gray theme specific overrides */
+.theme-carbon .text-red-500,
+.theme-carbon .text-red-700 {
+    color: #ff6b6b !important;
+}
+
+.theme-carbon .bg-red-100 {
+    background-color: rgba(220, 53, 69, 0.15) !important;
+}
+
+.theme-carbon .text-green-700 {
+    color: #51cf66 !important;
+}
+
+.theme-carbon .bg-green-100 {
+    background-color: rgba(40, 167, 69, 0.15) !important;
+}
+
+.theme-carbon .text-blue-700 {
+    color: #4dabf7 !important;
+}
+
+.theme-carbon .bg-blue-100 {
+    background-color: rgba(23, 162, 184, 0.15) !important;
+}
+
+.theme-carbon .text-yellow-700 {
+    color: #ffd43b !important;
+}
+
+.theme-carbon .bg-yellow-100 {
+    background-color: rgba(255, 193, 7, 0.15) !important;
+}
+
+/* Obsidian Night theme specific overrides */
+.theme-obsidian .text-red-500,
+.theme-obsidian .text-red-700 {
+    color: #ff6b6b !important;
+}
+
+.theme-obsidian .bg-red-100 {
+    background-color: rgba(220, 53, 69, 0.15) !important;
+}
+
+.theme-obsidian .text-green-700 {
+    color: #51cf66 !important;
+}
+
+.theme-obsidian .bg-green-100 {
+    background-color: rgba(40, 167, 69, 0.15) !important;
+}
+
+.theme-obsidian .text-blue-700 {
+    color: #4dabf7 !important;
+}
+
+.theme-obsidian .bg-blue-100 {
+    background-color: rgba(23, 162, 184, 0.15) !important;
+}
+
+.theme-obsidian .text-yellow-700 {
+    color: #ffd43b !important;
+}
+
+.theme-obsidian .bg-yellow-100 {
+    background-color: rgba(255, 193, 7, 0.15) !important;
+}
+
+/* Shadow overrides for cards in dark theme */
+.theme-dark .shadow-md,
+.theme-dark .shadow-lg {
+    box-shadow: var(--shadow-md);
+}
+
+/* Shadow overrides for cards in cyber dark theme */
+.theme-emerald .shadow-md,
+.theme-emerald .shadow-lg {
+    box-shadow: var(--shadow-md);
+}
+
+/* Shadow overrides for cards in midnight black theme */
+.theme-midnight .shadow-md,
+.theme-midnight .shadow-lg {
+    box-shadow: var(--shadow-md);
+}
+
+/* Shadow overrides for cards in carbon gray theme */
+.theme-carbon .shadow-md,
+.theme-carbon .shadow-lg {
+    box-shadow: var(--shadow-md);
+}
+
+/* Shadow overrides for cards in obsidian night theme */
+.theme-obsidian .shadow-md,
+.theme-obsidian .shadow-lg {
+    box-shadow: var(--shadow-md);
+}
+
+/* Print Styles - Ensure readability on paper */
+@media print {
+    body {
+        --bg-primary: #FFFFFF;
+        --bg-secondary: #FFFFFF;
+        --text-primary: #000000;
+        --text-secondary: #333333;
+        --border-primary: #CCCCCC;
+    }
+    .navbar, .btn {
+        display: none;
+    }
+}
+
+/* ==========================================================================
+   User Profile Page - Language & Theme Switcher Styles
+   ========================================================================== */
+
+/* Language Switch Button */
+.language-switch-btn {
+    color: var(--text-secondary);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.language-switch-btn:hover:not(.active) {
+    color: var(--text-primary);
+    background-color: var(--bg-tertiary);
+}
+
+.language-switch-btn.active {
+    color: var(--text-on-primary);
+    background-color: var(--color-primary);
+    box-shadow: var(--shadow-md);
+}
+
+.language-switch-btn.active:hover {
+    background-color: var(--color-primary-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Theme Button */
+.theme-btn {
+    color: var(--text-primary);
+    background-color: var(--bg-primary);
+    border: 2px solid transparent;
+}
+
+.theme-btn:hover {
+    background-color: var(--bg-tertiary);
+}
+
+.theme-btn span {
+    color: var(--text-primary);
+}
+
+/* Override for active theme button */
+.theme-btn.bg-blue-50 {
+    background-color: var(--bg-tertiary) !important;
+    border-color: var(--color-primary) !important;
+}
+
+.theme-btn.bg-blue-50 span {
+    color: var(--color-primary) !important;
+}
+
+/* Settings sections borders - ensure theme compatibility */
+body .border-gray-200 {
+    border-color: var(--border-primary) !important;
+}
+
+/* Search Modal - ensure bottom positioning */
+#search-modal {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 9999 !important;
+}
+
+#search-panel {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 50% !important;
+    transform: translateX(-50%) translateY(100%) !important;
+    width: 66.666667% !important;
+    max-width: 1000px;
+    background-color: var(--bg-primary) !important;
+    border-top-left-radius: 1rem !important;
+    border-top-right-radius: 1rem !important;
+    box-shadow: 0 -10px 25px -5px rgba(0, 0, 0, 0.1), 0 -4px 10px -2px rgba(0, 0, 0, 0.05) !important;
+    transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1) !important;
+    z-index: 10000 !important;
+}
+
+/* When search panel is open (JavaScript removes translate-y-full class) */
+#search-panel:not(.translate-y-full) {
+    transform: translateX(-50%) translateY(0) !important;
+}
+

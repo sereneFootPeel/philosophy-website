@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员仪表盘 - 哲学网站</title>
+    <div th:replace="~{fragments/admin-head :: admin-head}"></div>
+</head>
+<body class="min-h-screen">
+    <div class="flex min-h-screen">
+        <!-- 侧边栏 -->
+        <div th:replace="~{fragments/admin-sidebar :: sidebar}"></div>
+
+        <!-- 主内容 -->
+        <main class="flex-1 p-4 md:p-8">
+            <div class="max-w-6xl mx-auto">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-2xl md:text-3xl font-bold admin-text-primary">管理员仪表盘</h1>
+                        <p class="admin-text-secondary mt-1">欢迎访问哲学网站管理系统</p>
+                    </div>
+                    <div class="md:hidden">
+                        <button id="menu-toggle" class="admin-text-primary text-xl"><i class="fa fa-bars"></i></button>
+                    </div>
+                </div>
+
+                <!-- 导出操作 -->
+                <div class="mt-6 flex flex-wrap gap-3">
+                    <a href="/admin/data-import" class="inline-flex items-center gap-2 px-4 py-2 rounded-md admin-btn-secondary">
+                        <i class="fa fa-upload"></i>
+                        <span>数据导入</span>
+                    </a>
+                    <a href="/admin/export/download" class="inline-flex items-center gap-2 px-4 py-2 rounded-md admin-btn-primary">
+                        <i class="fa fa-download"></i>
+                        <span>下载CSV</span>
+                    </a>
+                    <a href="/admin/export/email" class="inline-flex items-center gap-2 px-4 py-2 rounded-md admin-btn-primary">
+                        <i class="fa fa-envelope"></i>
+                        <span>发送到邮箱</span>
+                    </a>
+                </div>
+
+                <!-- 统计卡片 -->
+                <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="admin-card p-5">
+                        <div class="text-sm admin-text-secondary">哲学家总数</div>
+                        <div class="text-3xl font-bold admin-text-primary mt-2" th:text="${philosophersCount}">0</div>
+                        <a href="/admin/philosophers" class="mt-4 inline-flex items-center gap-2 text-sm admin-text-primary hover:opacity-80">
+                            <span>管理哲学家</span>
+                            <i class="fa fa-angle-right"></i>
+                        </a>
+                    </div>
+                    <div class="admin-card p-5">
+                        <div class="text-sm admin-text-secondary">流派总数</div>
+                        <div class="text-3xl font-bold admin-text-primary mt-2" th:text="${schoolsCount}">0</div>
+                        <a href="/admin/schools" class="mt-4 inline-flex items-center gap-2 text-sm admin-text-primary hover:opacity-80">
+                            <span>管理流派</span>
+                            <i class="fa fa-angle-right"></i>
+                        </a>
+                    </div>
+                    <div class="admin-card p-5">
+                        <div class="text-sm admin-text-secondary">内容总数</div>
+                        <div class="text-3xl font-bold admin-text-primary mt-2" th:text="${contentsCount}">0</div>
+                        <a href="/admin/contents" class="mt-4 inline-flex items-center gap-2 text-sm admin-text-primary hover:opacity-80">
+                            <span>管理内容</span>
+                            <i class="fa fa-angle-right"></i>
+                        </a>
+                    </div>
+                    <div class="admin-card p-5">
+                        <div class="text-sm admin-text-secondary">用户总数</div>
+                        <div class="text-3xl font-bold admin-text-primary mt-2" th:text="${usersCount}">0</div>
+                        <a href="/admin/users" class="mt-4 inline-flex items-center gap-2 text-sm admin-text-primary hover:opacity-80">
+                            <span>管理用户</span>
+                            <i class="fa fa-angle-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 移动端抽屉菜单 -->
+    <div th:replace="~{fragments/admin-sidebar :: mobile-drawer}"></div>
+    
+    <!-- Admin Scripts -->
+    <div th:replace="~{fragments/admin-head :: admin-scripts}"></div>
+</body>
+</html>

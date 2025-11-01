@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<div th:fragment="schoolForm(school, parentSchools, nameEn, descriptionEn, actionUrl, cancelUrl, title)">
+    <div class="max-w-3xl mx-auto">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-bold admin-text-primary" th:text="${title}"></h1>
+            </div>
+            <div class="md:hidden">
+                <button id="menu-toggle" class="text-xl admin-text-primary"><i class="fa fa-bars"></i></button>
+            </div>
+        </div>
+        <div class="mt-6 admin-card rounded-lg p-6">
+            <form th:action="@{${actionUrl}}" th:object="${school}" method="post">
+                <input type="hidden" th:field="*{id}" />
+                <input type="hidden" name="redirectUrl" th:value="${param.redirectUrl != null ? param.redirectUrl[0] : ''}" />
+                <div class="mb-5">
+                    <label class="admin-form-label" for="name">流派名称 <span class="admin-text-error">*</span></label>
+                    <input type="text" id="name" class="admin-form-input" th:field="*{name}" placeholder="请输入流派名称" required />
+                </div>
+                <div class="mb-5">
+                    <label class="admin-form-label" for="description">流派描述</label>
+                    <textarea id="description" class="admin-form-input" th:field="*{description}" placeholder="请输入流派描述"></textarea>
+                </div>
+                <div class="mb-5">
+                    <label class="admin-form-label" for="parent">父流派</label>
+                    <select id="parent" class="admin-form-input" th:field="*{parent}">
+                        <option value="">无父流派</option>
+                        <option th:each="parentSchool : ${parentSchools}" th:value="${parentSchool.id}" th:text="${parentSchool.name}" th:selected="${school.parent != null && school.parent.id == parentSchool.id}"></option>
+                    </select>
+                </div>
+
+                <!-- 英文翻译部分 -->
+                <div class="mb-5 border-t pt-5 admin-border">
+                    <h3 class="text-lg font-semibold mb-4 admin-text-primary">英文翻译（可选）</h3>
+                    
+                    <div class="mb-4">
+                        <label class="admin-form-label" for="nameEn">英文名称</label>
+                        <input type="text" id="nameEn" name="nameEn" class="admin-form-input" 
+                               th:value="${nameEn}" placeholder="请输入流派英文名称" />
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="admin-form-label" for="descriptionEn">英文描述</label>
+                        <textarea id="descriptionEn" name="descriptionEn" class="admin-form-input" 
+                                  th:text="${descriptionEn}" placeholder="请输入流派英文描述"></textarea>
+                    </div>
+                </div>
+                <div class="mt-6 flex items-center justify-end gap-3">
+                    <a th:href="@{${cancelUrl}}" class="admin-btn-secondary">取消</a>
+                    <button type="submit" class="admin-btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

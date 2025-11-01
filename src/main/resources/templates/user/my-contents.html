@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/springsecurity6" lang="zh-CN">
+<head th:replace="~{fragments/header :: head}" th:with="pageTitle='我的内容 - 哲学网站'">
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .sidebar-link { @apply block px-4 py-3 text-white hover:bg-primary/40 transition-colors; }
+            .table-head { @apply bg-accent text-gray-700 text-left text-sm; }
+            .table-cell { @apply px-4 py-3 border-b border-light; }
+            .btn-primary { @apply inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-primary text-white hover:bg-primary/90; }
+            .btn-secondary { @apply inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-secondary text-gray-700 hover:bg-accent; }
+        }
+    </style>
+</head>
+<body class="bg-secondary min-h-screen text-gray-800 flex flex-col">
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="flex-grow pt-16">
+        <div class="max-w-6xl mx-auto p-4 md:p-8">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-800">我的内容</h1>
+                <p class="text-gray-600 mt-1">您创建的所有内容</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="/user/content-edits/create" class="btn-secondary">
+                    <i class="fa fa-plus"></i> 创建内容
+                </a>
+                <div class="md:hidden">
+                    <button id="menu-toggle" class="text-gray-700 text-xl"><i class="fa fa-bars"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-6 bg-white rounded-lg shadow overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full">
+                    <thead class="table-head">
+                        <tr>
+                            <th class="table-cell">ID</th>
+                            <th class="table-cell">标题</th>
+                            <th class="table-cell">内容</th>
+                            <th class="table-cell">哲学家</th>
+                            <th class="table-cell">流派</th>
+                            <th class="table-cell">状态</th>
+                            <th class="table-cell">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm">
+                        <tr class="hover:bg-accent/60" th:each="content : ${contents != null ? contents.content : []}">
+                            <td class="table-cell" th:text="${content != null and content.id != null ? content.id : ''}"></td>
+                            <td class="table-cell" th:text="${content != null and content.title != null ? content.title : '无标题'}"></td>
+                            <td class="table-cell">
+                                <div class="max-w-xs truncate" th:title="${content != null and content.content != null ? content.content : ''}" th:text="${content != null and content.content != null ? #strings.abbreviate(content.content, 50) : ''}"></div>
+                            </td>
+                            <td class="table-cell" th:text="${content != null and content.philosopher != null ? content.philosopher.name : ''}"></td>
+                            <td class="table-cell" th:text="${content != null and content.school != null ? content.school.name : ''}"></td>
+                            <td class="table-cell">
+                                <span th:if="${content != null and content.isLocked()}" class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-red-100 text-red-800">
+                                    <i class="fa fa-lock mr-1"></i>已锁定
+                                </span>
+                                <span th:if="${content != null and !content.isLocked()}" class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
+                                    <i class="fa fa-unlock mr-1"></i>未锁定
+                                </span>
+                            </td>
+                            <td class="table-cell">
+                                <!-- 管理员操作 -->
+                                <div sec:authorize="hasRole('ADMIN')" class="flex items-center gap-2">
+                                    <a th:href="${content != null and content.id != null ? '/admin/contents/edit/' + content.id : '#'}" class="btn-secondary btn-sm">
+                                        <i class="fa fa-pencil"></i> 编辑
+                                    </a>
+                                    <form th:if="${content != null and content.id != null and !content.isLocked()}" th:action="'/admin/contents/' + ${content.id} + '/lock'" method="post" onsubmit="return confirm('确定要锁定这个内容吗?');">
+                                        <button type="submit" class="btn-secondary btn-sm">
+                                            <i class="fa fa-lock"></i> 锁定
+                                        </button>
+                                    </form>
+                                    <form th:if="${content != null and content.id != null and content.isLocked()}" th:action="'/admin/contents/' + ${content.id} + '/unlock'" method="post" onsubmit="return confirm('确定要解锁这个内容吗?');">
+                                        <button type="submit" class="btn-secondary btn-sm">
+                                            <i class="fa fa fa-unlock"></i> 解锁
+                                        </button>
+                                    </form>
+                                </div>
+                                <!-- 版主操作 -->
+                                <div sec:authorize="hasRole('MODERATOR')" class="flex items-center gap-2">
+                                    <a th:href="${content != null and content.id != null ? '/moderator/contents/edit/' + content.id : '#'}" class="btn-secondary btn-sm">
+                                        <i class="fa fa-pencil"></i> 编辑
+                                    </a>
+                                    <form th:if="${content != null and content.id != null and !content.isLocked()}" th:action="'/moderator/contents/' + ${content.id} + '/lock'" method="post" onsubmit="return confirm('确定要锁定这个内容吗?');">
+                                        <button type="submit" class="btn-secondary btn-sm">
+                                            <i class="fa fa-lock"></i> 锁定
+                                        </button>
+                                    </form>
+                                    <form th:if="${content != null and content.id != null and content.isLocked()}" th:action="'/moderator/contents/' + ${content.id} + '/unlock'" method="post" onsubmit="return confirm('确定要解锁这个内容吗?');">
+                                        <button type="submit" class="btn-secondary btn-sm">
+                                            <i class="fa fa fa-unlock"></i> 解锁
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="text-center p-4 text-secondary" th:if="${contents == null or contents.isEmpty()}">暂无内容数据，请创建新的内容。</div>
+        </div>
+        </div>
+
+        <!-- 分页 -->
+        <div class="flex justify-center mt-6" th:if="${contents != null and contents.totalPages > 1}">
+            <nav class="flex items-center space-x-1">
+                <a th:if="${currentPage > 0}" th:href="'?page=' + ${currentPage - 1}" class="px-3 py-2 rounded-md text-sm font-medium text-gray-500 bg-white border border-gray-300 hover:bg-tertiary">
+                    上一页
+                </a>
+                <span th:each="pageNum : ${#numbers.sequence(0, contents.totalPages - 1)}" class="px-3 py-2 rounded-md text-sm font-medium">
+                    <a th:href="'?page=' + ${pageNum}" th:classappend="${pageNum == currentPage} ? 'text-primary bg-primary/10' : 'text-gray-500 bg-white border border-gray-300 hover:bg-tertiary'" th:text="${pageNum + 1}"></a>
+                </span>
+                <a th:if="${currentPage < contents.totalPages - 1}" th:href="'?page=' + ${currentPage + 1}" class="px-3 py-2 rounded-md text-sm font-medium text-gray-500 bg-white border border-gray-300 hover:bg-tertiary">
+                    下一页
+                </a>
+            </nav>
+        </div>
+
+        <!-- 返回按钮 -->
+        <div class="text-center mt-8">
+            <a href="/user/profile" class="inline-flex items-center px-6 py-3 border border-gray-300 text-gray-700 bg-white rounded-lg hover:bg-tertiary transition-colors">
+                <i class="fa fa-arrow-left mr-2"></i>
+                <span th:text="${translationService.getStaticText('back_to_profile', language)}">返回个人主页</span>
+            </a>
+        </div>
+    </main>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- CSRF Token for AJAX requests - James Gosling Fix -->
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <title th:text="${pageTitle != null ? pageTitle + (language != null and language == 'en' ? ' - Philosophy Website' : ' - 哲学网站') : (language != null and language == 'en' ? 'Philosophy Website' : '哲学网站')}">哲学网站</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- 主题样式 -->
+    <link th:href="@{/css/theme.css}" rel="stylesheet">
+    
+    <!-- 立即应用主题（避免闪烁） - James Gosling改进版：增强跨页面一致性 -->
+    <script th:inline="javascript">
+        (function() {
+            try {
+                const serverTheme = /*[[${savedTheme}]]*/ null;
+                const localTheme = localStorage.getItem('philosophy_theme');
+                
+                // 【James Gosling增强】优先使用localStorage主题，确保跨页面一致性
+                let finalTheme = 'light'; // 默认使用light主题
+                
+                // 如果localStorage有主题，优先使用（用户最近的主动选择）
+                if (localTheme && localTheme !== 'null' && localTheme !== '') {
+                    finalTheme = localTheme;
+                    console.log('Using localStorage theme:', finalTheme);
+                } 
+                // 如果localStorage没有，但服务器有，则同步到localStorage并使用
+                else if (serverTheme && serverTheme !== 'null' && serverTheme !== '') {
+                    finalTheme = serverTheme;
+                    localStorage.setItem('philosophy_theme', serverTheme);
+                    console.log('Syncing server theme to localStorage:', finalTheme);
+                }
+                // 如果都没有，使用默认light主题
+                else {
+                    finalTheme = 'light';
+                    console.log('Using default light theme');
+                }
+                
+                // 强制移除所有可能的主题类，确保清洁状态
+                document.documentElement.classList.remove(
+                    'theme-light', 'theme-dark', 'theme-forest', 
+                    'theme-sunset', 'theme-ocean', 'theme-purple',
+                    'theme-sakura', 'theme-nordic', 'theme-emerald',
+                    'theme-midnight', 'theme-carbon', 'theme-obsidian'
+                );
+                
+                // 应用主题类
+                if (finalTheme && finalTheme !== 'light') {
+                    document.documentElement.classList.add('theme-' + finalTheme);
+                    console.log('Applied theme class: theme-' + finalTheme);
+                } else {
+                    console.log('Using default light theme (no class added)');
+                }
+                
+                console.log('Theme initialization completed. Final theme:', finalTheme);
+            } catch (e) {
+                console.error('Theme initialization failed:', e);
+                // 确保至少移除可能存在的主题类
+                try {
+                    document.documentElement.classList.remove(
+                        'theme-light', 'theme-dark', 'theme-forest', 
+                        'theme-sunset', 'theme-ocean', 'theme-purple',
+                        'theme-sakura', 'theme-nordic', 'theme-emerald',
+                        'theme-midnight', 'theme-carbon', 'theme-obsidian'
+                    );
+                } catch (cleanupError) {
+                    console.error('Failed to cleanup theme classes:', cleanupError);
+                }
+            }
+        })();
+    </script>
+
+    <!-- 配置Tailwind主题 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        // 1. Map theme variables to custom Tailwind color names for @apply rules
+                        primary: 'var(--color-primary)',
+                        'primary-dark': 'var(--color-primary-dark)',
+                        'primary-light': 'var(--color-primary-light)',
+                        secondary: 'var(--color-secondary)',
+                        accent: 'var(--bg-quaternary)',
+                        light: 'var(--border-primary)',
+                        parchment: 'var(--bg-secondary)',  // Use theme variable instead of fixed color
+
+                        // 2. Override default palette colors to make them theme-aware
+                        white: 'var(--bg-primary)',
+                        black: 'var(--text-primary)',
+                        gray: {
+                            50: 'var(--bg-secondary)',
+                            100: 'var(--bg-secondary)',
+                            200: 'var(--bg-tertiary)',
+                            300: 'var(--bg-quaternary)',
+                            400: 'var(--border-secondary)',
+                            500: 'var(--text-tertiary)',
+                            600: 'var(--text-secondary)',
+                            700: 'var(--text-primary)',
+                            800: 'var(--text-primary)',
+                            900: 'var(--text-primary)',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        inter: ['Inter', 'sans-serif'],
+                        'chinese': ['Noto Serif SC', 'serif'],
+                        'english': ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+
+    <!-- 自定义工具类 -->
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .transition-smooth {
+                transition: all 0.3s ease-in-out;
+            }
+            .hover-scale-105:hover {
+                transform: scale(1.05);
+            }
+            .hover-scale-110:hover {
+                transform: scale(1.1);
+            }
+            .group-hover-scale-105:hover {
+                transform: scale(1.05);
+            }
+            .group-hover-scale-110:hover {
+                transform: scale(1.1);
+            }
+            .bg-blur {
+                backdrop-filter: blur(8px);
+            }
+            /* Shared UI utilities used by admin/moderator forms */
+            .sidebar-link { @apply block px-4 py-3 text-white hover:bg-primary-light transition-colors; }
+            .input { @apply w-full px-3 py-2 border border-light rounded-md focus:outline-none focus:ring-2 focus:ring-primary; }
+            .label { @apply block font-medium text-gray-700 mb-2; }
+            .btn-primary { @apply inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-white hover:bg-primary-dark; }
+            .btn-secondary { @apply inline-flex items-center gap-2 px-4 py-2 rounded-md border border-secondary text-gray-700 hover:bg-accent; }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-up { animation: fadeInUp 0.4s ease-out both; }
+    </style>
+</head>
+
+<!-- This is a new fragment containing the contents of the head -->
+<th:block th:fragment="header-contents">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- CSRF Token for AJAX requests - James Gosling Fix -->
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <title th:text="${pageTitle != null ? pageTitle + (language != null and language == 'en' ? ' - Philosophy Website' : ' - 哲学网站') : (language != null and language == 'en' ? 'Philosophy Website' : '哲学网站')}">哲学网站</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- 主题样式 -->
+    <link th:href="@{/css/theme.css}" rel="stylesheet">
+    <link th:href="@{/css/admin-theme.css}" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        // Use theme variables instead of fixed colors
+                        primary: 'var(--color-primary)',
+                        'primary-dark': 'var(--color-primary-dark)',
+                        'primary-light': 'var(--color-primary-light)',
+                        secondary: 'var(--color-secondary)',
+                        accent: 'var(--bg-quaternary)',
+                        light: 'var(--border-primary)',
+                        dark: 'var(--text-primary)',
+                        parchment: 'var(--bg-secondary)',
+                        ink: 'var(--text-primary)',
+                        // Override default palette colors to make them theme-aware
+                        white: 'var(--bg-primary)',
+                        black: 'var(--text-primary)',
+                        gray: {
+                            50: 'var(--bg-secondary)',
+                            100: 'var(--bg-secondary)',
+                            200: 'var(--bg-tertiary)',
+                            300: 'var(--bg-quaternary)',
+                            400: 'var(--border-secondary)',
+                            500: 'var(--text-tertiary)',
+                            600: 'var(--text-secondary)',
+                            700: 'var(--text-primary)',
+                            800: 'var(--text-primary)',
+                            900: 'var(--text-primary)',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        inter: ['Inter', 'sans-serif'],
+                        'chinese': ['Noto Serif SC', 'serif'],
+                        'english': ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <!-- 立即应用主题（避免闪烁） -->
+    <script th:inline="javascript">
+        (function() {
+            try {
+                const serverTheme = /*[[${savedTheme}]]*/ null;
+                const localTheme = localStorage.getItem('philosophy_theme');
+                
+                let finalTheme = 'light';
+                
+                if (localTheme && localTheme !== 'null' && localTheme !== '') {
+                    finalTheme = localTheme;
+                } 
+                else if (serverTheme && serverTheme !== 'null' && serverTheme !== '') {
+                    finalTheme = serverTheme;
+                    localStorage.setItem('philosophy_theme', serverTheme);
+                }
+                
+                document.documentElement.classList.remove(
+                    'theme-light', 'theme-dark', 'theme-forest', 
+                    'theme-sunset', 'theme-ocean', 'theme-purple',
+                    'theme-sakura', 'theme-nordic', 'theme-emerald',
+                    'theme-midnight', 'theme-carbon', 'theme-obsidian'
+                );
+                
+                if (finalTheme && finalTheme !== 'light') {
+                    document.documentElement.classList.add('theme-' + finalTheme);
+                }
+            } catch (e) {
+                console.error('Theme initialization failed:', e);
+            }
+        })();
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .transition-smooth {
+                transition: all 0.3s ease-in-out;
+            }
+            .hover-scale-105:hover {
+                transform: scale(1.05);
+            }
+            .hover-scale-110:hover {
+                transform: scale(1.1);
+            }
+            .group-hover-scale-105:hover {
+                transform: scale(1.05);
+            }
+            .group-hover-scale-110:hover {
+                transform: scale(1.1);
+            }
+            .bg-blur {
+                backdrop-filter: blur(8px);
+            }
+            /* Shared UI utilities used by admin/moderator forms */
+            .sidebar-link { @apply block px-4 py-3 text-white hover:bg-primary/40 transition-colors; }
+            .input { @apply w-full px-3 py-2 border border-light rounded-md focus:outline-none focus:ring-2 focus:ring-primary; }
+            .label { @apply block font-medium text-gray-700 mb-2; }
+            .btn-primary { @apply inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-white hover:bg-primary/90; }
+            .btn-secondary { @apply inline-flex items-center gap-2 px-4 py-2 rounded-md border border-secondary text-gray-700 hover:bg-accent; }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-up { animation: fadeInUp 0.4s ease-out both; }
+    </style>
+</th:block>
+
+    <!-- 导航栏 -->
+    <header id="navbar" class="fixed top-0 left-0 right-0 z-50 bg-primary shadow-sm" th:fragment="header">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="/" class="text-2xl font-bold text-gray-900 font-sans">
+                        <i class="fa fa-book mr-2"></i>
+                        <span th:text="${language != null and language == 'en'} ? 'Philosophy Website' : '哲学网站'">哲学网站</span>
+                    </a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <nav class="hidden md:flex space-x-6">
+                        <a href="/" class="text-gray-600 hover:text-gray-900 px-3 py-3 rounded-md text-sm font-medium">
+                            <i class="fa fa-home mr-1"></i>
+                            <span th:text="${language != null and language == 'en'} ? 'Home' : '首页'">首页</span>
+                        </a>
+                        <a href="/quotes" class="text-gray-600 hover:text-gray-900 px-3 py-3 rounded-md text-sm font-medium">
+                            <i class="fa fa-quote-left mr-1"></i>
+                            <span th:text="${language != null and language == 'en'} ? 'Recommendations' : '推荐'">推荐</span>
+                        </a>
+                        <a href="/philosophers" class="text-gray-600 hover:text-gray-900 px-3 py-3 rounded-md text-sm font-medium">
+                            <i class="fa fa-users mr-1"></i>
+                            <span th:text="${language != null and language == 'en'} ? 'Philosophers' : '哲学家'">哲学家</span>
+                        </a>
+                        <a href="/schools" class="text-gray-600 hover:text-gray-900 px-3 py-3 rounded-md text-sm font-medium">
+                            <i class="fa fa-university mr-1"></i>
+                            <span th:text="${language != null and language == 'en'} ? 'Schools' : '学派'">学派</span>
+                        </a>
+                    </nav>
+                    
+                    <!-- 用户相关链接 -->
+                    <div class="flex items-center space-x-2">
+                        <a th:href="${isAuthenticated} ? '/user/profile' : '/login'" class="text-gray-600 hover:text-gray-900 px-3 py-3 rounded-md text-sm font-medium">
+                            <i th:class="${isAuthenticated} ? 'fa fa-user mr-1' : 'fa fa-sign-in mr-1'"></i>
+                            <span th:if="${isAuthenticated}" th:text="${language != null and language == 'en'} ? 'Profile' : '用户主页'">用户主页</span>
+                            <span th:unless="${isAuthenticated}" th:text="${language != null and language == 'en'} ? 'Login' : '登录'">登录</span>
+                        </a>
+                    </div>
+                    
+                    <!-- 移动端菜单按钮 -->
+                    <button id="menu-toggle" class="md:hidden text-gray-600 text-xl">
+                        <i class="fa fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 移动端菜单 -->
+        <div id="mobile-menu" class="hidden md:hidden bg-primary">
+            <div class="container mx-auto px-4 py-4 flex flex-col space-y-2">
+                <a href="/" class="text-gray-600 hover:text-gray-900 px-3 py-3 rounded-md text-sm font-medium">
+                    <i class="fa fa-home mr-2"></i>
+                    <span th:text="${language != null and language == 'en'} ? 'Home' : '首页'">首页</span>
+                </a>
+                <a href="/quotes" class="text-gray-600 hover:text-gray-900 px-3 py-3 rounded-md text-sm font-medium">
+                    <i class="fa fa-quote-left mr-2"></i>
+                    <span th:text="${language != null and language == 'en'} ? 'Recommendations' : '推荐'">推荐</span>
+                </a>
+                <a href="/philosophers" class="text-gray-600 hover:text-gray-900 px-3 py-3 rounded-md text-sm font-medium">
+                    <i class="fa fa-users mr-2"></i>
+                    <span th:text="${language != null and language == 'en'} ? 'Philosophers' : '哲学家'">哲学家</span>
+                </a>
+                <a href="/schools" class="text-gray-600 hover:text-gray-900 px-3 py-3 rounded-md text-sm font-medium">
+                    <i class="fa fa-university mr-2"></i>
+                    <span th:text="${language != null and language == 'en'} ? 'Schools' : '学派'">学派</span>
+                </a>
+                <a th:href="${isAuthenticated} ? '/user/profile' : '/login'" class="text-gray-600 hover:text-gray-900 px-3 py-3 rounded-md text-sm font-medium">
+                    <i th:class="${isAuthenticated} ? 'fa fa-user mr-2' : 'fa fa-sign-in mr-2'"></i>
+                    <span th:if="${isAuthenticated}" th:text="${language != null and language == 'en'} ? 'Profile' : '用户主页'">用户主页</span>
+                    <span th:unless="${isAuthenticated}" th:text="${language != null and language == 'en'} ? 'Login' : '登录'">登录</span>
+                </a>
+            </div>
+        </div>
+    </header>

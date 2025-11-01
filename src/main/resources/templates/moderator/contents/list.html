@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>内容管理 - 哲学网站版主后台</title>
+    <div th:replace="~{fragments/admin-head :: moderator-head}"></div>
+</head>
+<body class="min-h-screen">
+    <div class="flex min-h-screen">
+        <!-- 侧边栏 -->
+        <div th:replace="~{fragments/admin-sidebar :: moderator-sidebar}"></div>
+
+        <main class="flex-1 p-4 md:p-8">
+            <div class="max-w-6xl mx-auto">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-2xl md:text-3xl font-bold moderator-text-primary">内容管理</h1>
+                        <p class="moderator-text-secondary mt-1">管理您负责流派下的哲学内容</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <a href="/moderator/contents/create" class="moderator-btn-secondary"><i class="fa fa-plus"></i> 添加内容</a>
+                        <div class="md:hidden">
+                            <button id="menu-toggle" class="moderator-text-primary text-xl"><i class="fa fa-bars"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 moderator-card">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full">
+                            <thead class="moderator-table-head">
+                                <tr>
+                                    <th class="moderator-table-cell">ID</th>
+                                    <th class="moderator-table-cell">内容</th>
+                                    <th class="moderator-table-cell">哲学家</th>
+                                    <th class="moderator-table-cell">流派</th>
+                                    <th class="moderator-table-cell">作者</th>
+                                    <th class="moderator-table-cell">状态</th>
+                                    <th class="moderator-table-cell">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-sm">
+                                <tr th:each="content : ${contents}">
+                                    <td class="moderator-table-cell" th:text="${content.id}"></td>
+                                    <td class="moderator-table-cell">
+                                        <div class="max-w-xs truncate" th:text="${content.content}"></div>
+                                    </td>
+                                    <td class="moderator-table-cell" th:text="${content.philosopher != null ? content.philosopher.name : '无'}"></td>
+                                    <td class="moderator-table-cell" th:text="${content.school != null ? content.school.name : '无'}"></td>
+                                    <td class="moderator-table-cell">
+                                        <span th:if="${content.user != null}" th:text="${content.user.username}"></span>
+                                        <span th:unless="${content.user != null}" class="moderator-text-tertiary">已注销</span>
+                                    </td>
+                                    <td class="moderator-table-cell">
+                                        <span th:if="${content.locked}" class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium" style="background-color: var(--color-error-light); color: var(--color-error);">
+                                            <i class="fa fa-lock mr-1"></i>已锁定
+                                        </span>
+                                        <span th:if="${!content.locked}" class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium" style="background-color: var(--color-success-light); color: var(--color-success);">
+                                            <i class="fa fa-unlock mr-1"></i>未锁定
+                                        </span>
+                                    </td>
+                                    <td class="moderator-table-cell">
+                                        <div class="flex items-center gap-2">
+                                            <a th:href="@{/moderator/contents/edit/{id}(id=${content.id})}" class="moderator-btn-secondary btn-sm"><i class="fa fa-pencil"></i> 编辑</a>
+                                            <form th:action="@{/moderator/contents/delete/{id}(id=${content.id})}" method="post" onsubmit="return confirm('确定要删除这个内容吗?');">
+                                                <button type="submit" class="moderator-btn-secondary btn-sm"><i class="fa fa-trash"></i> 删除</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="text-center p-4 moderator-text-secondary" th:if="${contents.empty}">暂无内容数据。</div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 移动端抽屉菜单 -->
+    <div th:replace="~{fragments/admin-sidebar :: moderator-mobile-drawer}"></div>
+
+    <!-- Moderator Scripts -->
+    <div th:replace="~{fragments/admin-head :: moderator-scripts}"></div>
+</body>
+</html>

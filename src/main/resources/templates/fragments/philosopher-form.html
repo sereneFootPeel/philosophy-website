@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<div th:fragment="philosopherForm(philosopher, nameEn, biographyEn, actionUrl, cancelUrl, title)">
+    <div class="max-w-3xl mx-auto">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-bold admin-text-primary" th:text="${title}"></h1>
+            </div>
+            <div class="md:hidden">
+                <button id="menu-toggle" class="text-xl admin-text-primary"><i class="fa fa-bars"></i></button>
+            </div>
+        </div>
+
+        <div class="mt-6 admin-card rounded-lg p-6">
+            <form th:action="@{${actionUrl}}" th:object="${philosopher}" method="post">
+                <input type="hidden" th:field="*{id}" />
+                <input type="hidden" name="redirectUrl" th:value="${param.redirectUrl != null ? param.redirectUrl[0] : ''}" />
+
+                <div class="mb-5">
+                    <label class="admin-form-label" for="name">哲学家姓名 <span class="admin-text-error">*</span></label>
+                    <input type="text" id="name" class="admin-form-input" th:field="*{name}" placeholder="请输入哲学家姓名" required />
+                </div>
+
+                <div class="mb-5">
+                    <label class="admin-form-label" for="era">时代</label>
+                    <input type="text" id="era" class="admin-form-input" th:field="*{era}" placeholder="请输入哲学家所处时代" />
+                </div>
+
+                <div class="mb-5">
+                    <label class="admin-form-label" for="birthYear">出生年份</label>
+                    <input type="number" id="birthYear" class="admin-form-input" th:field="*{birthYear}" placeholder="请输入哲学家出生年份（整数）" />
+                    <p class="text-xs admin-text-secondary mt-1">输入整数年份（如：公元前551年请输入-551），用于前端自动排序。</p>
+                </div>
+
+                <div class="mb-5">
+                    <label class="admin-form-label" for="imageUrl">图片URL</label>
+                    <input type="text" id="imageUrl" class="admin-form-input" th:field="*{imageUrl}" placeholder="请输入哲学家图片URL" />
+                </div>
+
+                <div class="mb-5">
+                    <label class="admin-form-label" for="bio">简介</label>
+                    <textarea id="bio" class="admin-form-input" th:field="*{bio}" placeholder="请输入哲学家简介"></textarea>
+                </div>
+
+                <!-- 英文翻译部分 -->
+                <div class="mb-5 border-t pt-5 admin-border">
+                    <h3 class="text-lg font-semibold mb-4 admin-text-primary">英文翻译（可选）</h3>
+                    
+                    <div class="mb-4">
+                        <label class="admin-form-label" for="nameEn">英文姓名</label>
+                        <input type="text" id="nameEn" name="nameEn" class="admin-form-input" 
+                               th:value="${nameEn}" placeholder="请输入哲学家英文姓名" />
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="admin-form-label" for="biographyEn">英文简介</label>
+                        <textarea id="biographyEn" name="biographyEn" class="admin-form-input" 
+                                  th:text="${biographyEn}" placeholder="请输入哲学家英文简介"></textarea>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex items-center justify-end gap-3">
+                    <a th:href="@{${cancelUrl}}" class="admin-btn-secondary">取消</a>
+                    <button type="submit" class="admin-btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

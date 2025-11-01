@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的内容编辑 - 哲学网站</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4B5563',
+                        secondary: '#6B7280',
+                        accent: '#F3F4F6',
+                        light: '#E5E7EB',
+                        dark: '#1F2937',
+                    },
+                    fontFamily: {
+                        sans: ['system-ui', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .sidebar-link { @apply block px-4 py-3 text-white hover:bg-primary/40 transition-colors; }
+            .table-head { @apply bg-accent text-gray-700 text-left text-sm; }
+            .table-cell { @apply px-4 py-3 border-b border-light; }
+            .btn-primary { @apply inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-primary text-white hover:bg-primary/90; }
+            .btn-secondary { @apply inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-secondary text-gray-700 hover:bg-accent; }
+            .btn-danger { @apply inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-red-300 text-red-700 hover:bg-red-50; }
+            .btn-sm { @apply px-2.5 py-1 text-xs; }
+        }
+
+        /* 确保header不会影响body布局 */
+        #navbar {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            z-index: 50 !important;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col m-0 p-0">
+    <!-- 导航栏 -->
+    <header th:replace="~{fragments/header :: header}"></header>
+
+    <!-- 主要内容 -->
+    <main class="flex-grow p-4 md:p-8" style="padding-top: calc(5rem + 2rem);">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-bold text-gray-800">我的内容编辑</h1>
+                    <p class="text-secondary mt-1">管理您的内容编辑</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <a href="/user/content-edits/create" class="btn-primary"><i class="fa fa-plus"></i> 编辑内容</a>
+                    <a href="/user/profile" class="btn-secondary"><i class="fa fa-user"></i> 返回个人主页</a>
+                </div>
+            </div>
+
+            <div class="mt-6 bg-white rounded-lg shadow overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full" th:if="${edits != null and edits.content != null and !edits.content.isEmpty()}">
+                        <thead class="table-head">
+                            <tr>
+                                <th class="table-cell">ID</th>
+                                <th class="table-cell">标题</th>
+                                <th class="table-cell">内容</th>
+                                <th class="table-cell">哲学家</th>
+                                <th class="table-cell">流派</th>
+                                <th class="table-cell">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm">
+                            <tr class="hover:bg-accent/60" th:each="edit : ${edits.content}">
+                                <td class="table-cell" th:text="${edit.id}"></td>
+                                <td class="table-cell" th:text="${edit.title}"></td>
+                                <td class="table-cell">
+                                    <div class="max-w-xs truncate" th:text="${edit.content}" th:title="${edit.content}"></div>
+                                </td>
+                                <td class="table-cell" th:text="${edit.philosopher != null ? edit.philosopher.name : '无'}"></td>
+                                <td class="table-cell" th:text="${edit.school != null ? edit.school.name : '无'}"></td>
+                                <td class="table-cell">
+                                    <div class="flex items-center gap-2">
+                                        <a th:href="'/user/content-edits/edit/' + ${edit.id}" class="btn-secondary btn-sm"><i class="fa fa-pencil"></i> 编辑</a>
+                                        <form th:action="'/user/content-edits/delete/' + ${edit.id}" method="post" class="inline" onsubmit="return confirm('确定要删除这个编辑吗?');">
+                                            <button type="submit" class="btn-danger btn-sm"><i class="fa fa-trash"></i> 删除</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-center p-4 text-secondary" th:if="${edits == null or edits.content == null or edits.content.isEmpty()}">
+                    暂无内容数据，请添加新的内容编辑。
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+
+    <!-- 搜索模态框 -->
+    <div th:replace="~{fragments/footer :: search-modal}"></div>
+
+    <!-- 脚本 -->
+    <script th:replace="~{fragments/footer :: language-switcher-script}"></script>
+    <script th:replace="~{fragments/footer :: search-script}"></script>
+    <script th:replace="~{fragments/footer :: like-script}"></script>
+
+    <!-- Like Button Component -->
+    <script th:src="@{/js/like-button-component.js}"></script>
+
+</body>
+</html>

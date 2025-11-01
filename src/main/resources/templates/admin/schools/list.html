@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学派管理</title>
+    <div th:replace="~{fragments/admin-head :: admin-head}"></div>
+</head>
+<body class="min-h-screen">
+    <div class="flex min-h-screen">
+        <!-- 侧边栏 -->
+        <div th:replace="~{fragments/admin-sidebar :: sidebar}"></div>
+
+        <main class="flex-1 p-4 md:p-8">
+            <div class="max-w-6xl mx-auto">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-2xl md:text-3xl font-bold admin-text-primary">流派管理</h1>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <a href="/admin/schools/new" class="admin-btn-secondary"><i class="fa fa-plus"></i> 添加新流派</a>
+                        <div class="md:hidden">
+                            <button id="menu-toggle" class="admin-text-primary text-xl"><i class="fa fa-bars"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 admin-card">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full">
+                            <thead class="admin-table-head">
+                                <tr>
+                                    <th class="admin-table-cell">ID</th>
+                                    <th class="admin-table-cell">名称</th>
+                                    <th class="admin-table-cell">父流派</th>
+                                    <th class="admin-table-cell">作者</th>
+                                    <th class="admin-table-cell">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-sm">
+                                <tr th:each="school : ${schools}">
+                                    <td class="admin-table-cell" th:text="${school.id}"></td>
+                                    <td class="admin-table-cell" th:text="${school.name}"></td>
+                                    <td class="admin-table-cell" th:text="${school.parent != null ? school.parent.name : '无'}"></td>
+                                    <td class="admin-table-cell">
+                                        <span th:if="${school.user != null}" th:text="${school.user.username}"></span>
+                                        <span th:unless="${school.user != null}" class="admin-text-tertiary">已注销</span>
+                                    </td>
+                                    <td class="admin-table-cell">
+                                        <div class="flex items-center gap-2">
+                                            <a th:href="@{/admin/schools/edit/{id}(id=${school.id})}" class="admin-btn-secondary btn-sm"><i class="fa fa-pencil"></i> 编辑</a>
+                                            <form th:action="@{/admin/schools/delete/{id}(id=${school.id})}" method="post" onsubmit="return confirm('确定要删除这个流派吗?这将同时移除与哲学家的关联。');">
+                                                <button type="submit" class="admin-btn-secondary btn-sm"><i class="fa fa-trash"></i> 删除</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="text-center p-4 admin-text-secondary" th:if="${schools.empty}">暂无流派数据，请添加新的流派。</div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 移动端抽屉菜单 -->
+    <div th:replace="~{fragments/admin-sidebar :: mobile-drawer}"></div>
+    
+    <!-- Admin Scripts -->
+    <div th:replace="~{fragments/admin-head :: admin-scripts}"></div>
+</body>
+</html>

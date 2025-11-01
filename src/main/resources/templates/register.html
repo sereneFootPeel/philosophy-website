@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head}" th:with="pageTitle=${language != null and language == 'en' ? 'Philosophy - Register' : '哲学 - 注册'}">
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .transition-smooth {
+                transition: all 0.3s ease-in-out;
+            }
+        }
+    </style>
+</head>
+<body class="bg-secondary min-h-screen flex flex-col">
+    <div th:replace="~{fragments/header :: header}"></div>
+    
+    <main class="min-h-screen flex items-center justify-center p-4 pt-24">
+        <div class="max-w-md w-full bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="p-6">
+                <h2 class="text-2xl font-bold text-center text-gray-700 mb-6" th:text="${language != null and language == 'en' ? 'Create Account' : '创建账号'}">创建账号</h2>
+                
+                <form th:action="@{/register}" method="post" th:object="${user}">
+                    <!-- 用户名 -->
+                    <div class="mb-4">
+                        <label for="username" class="block text-gray-700 mb-2" th:text="${language != null and language == 'en' ? 'Username' : '用户名'}">用户名</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                <i class="fa fa-user"></i>
+                            </span>
+                            <input type="text" id="username" name="username" th:field="*{username}"
+                                   class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                                   th:placeholder="${language != null and language == 'en' ? 'Please enter username' : '请输入用户名'}" required>
+                        </div>
+                        <p th:if="${#fields.hasErrors('username')}" th:errors="*{username}" class="text-red-500 text-xs mt-1"></p>
+                    </div>
+                    
+                    <!-- 邮箱 -->
+                    <div class="mb-4">
+                        <label for="email" class="block text-gray-700 mb-2" th:text="${language != null and language == 'en' ? 'Email' : '邮箱'}">邮箱</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                <i class="fa fa-envelope"></i>
+                            </span>
+                            <input type="email" id="email" name="email" th:field="*{email}"
+                                   class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                                   th:placeholder="${language != null and language == 'en' ? 'Please enter email' : '请输入邮箱'}" required>
+                        </div>
+                        <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="text-red-500 text-xs mt-1"></p>
+                        <p id="email-error" class="text-red-500 text-xs mt-1 hidden"></p>
+                    </div>
+
+                    <!-- 验证码 -->
+                    <div class="mb-4">
+                        <label for="verificationCode" class="block text-gray-700 mb-2" th:text="${language != null and language == 'en' ? 'Verification Code' : '验证码'}">验证码</label>
+                        <div class="flex items-center">
+                            <input type="text" id="verificationCode" name="verificationCode"
+                                   class="w-full mr-2 py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                                   th:placeholder="${language != null and language == 'en' ? 'Enter code' : '请输入验证码'}" required>
+                            <button type="button" id="send-code-btn"
+                                    class="bg-secondary hover:bg-secondary/90 text-white font-medium py-2 px-4 rounded-md whitespace-nowrap">
+                                <span th:text="${language != null and language == 'en' ? 'Send Code' : '发送验证码'}">发送验证码</span>
+                            </button>
+                        </div>
+                        <p id="code-info" class="text-green-500 text-xs mt-1 hidden"></p>
+                        <p id="code-error" class="text-red-500 text-xs mt-1 hidden"></p>
+                    </div>
+                    
+                    <!-- 密码 -->
+                    <div class="mb-6">
+                        <label for="password" class="block text-gray-700 mb-2" th:text="${language != null and language == 'en' ? 'Password' : '密码'}">密码</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                <i class="fa fa-lock"></i>
+                            </span>
+                            <input type="password" id="password" name="password" th:field="*{password}"
+                                   class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                                   th:placeholder="${language != null and language == 'en' ? 'Please enter password (at least 6 characters)' : '请输入密码（至少6位）'}" minlength="6" required>
+                        </div>
+                        <p th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="text-red-500 text-xs mt-1"></p>
+                        <p id="password-inline-error" class="text-red-500 text-xs mt-1 hidden"></p>
+                    </div>
+
+                    <!-- 确认密码 -->
+                    <div class="mb-6">
+                        <label for="confirmPassword" class="block text-gray-700 mb-2" th:text="${language != null and language == 'en' ? 'Confirm Password' : '确认密码'}">确认密码</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                                <i class="fa fa-lock"></i>
+                            </span>
+                            <input type="password" id="confirmPassword" name="confirmPassword"
+                                   class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                                   th:placeholder="${language != null and language == 'en' ? 'Please enter password again' : '请再次输入密码'}" required>
+                        </div>
+                        <p id="confirm-password-error" class="text-red-500 text-xs mt-1 hidden"></p>
+                    </div>
+                    
+                    <button type="submit" id="register-submit"
+                            class="w-full bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200">
+                        <span th:text="${language != null and language == 'en' ? 'Register' : '注册'}">注册</span>
+                    </button>
+                </form>
+                
+                <div class="mt-6 text-center">
+                    <p class="text-gray-600">
+                        <span th:if="${language != null and language == 'en'}" th:text="'Already have an account?'">Already have an account?</span>
+                        <span th:unless="${language != null and language == 'en'}" th:text="'已有账号?'">已有账号?</span> <a href="/login" class="text-primary hover:text-primary/80 font-medium" th:text="${language != null and language == 'en' ? 'Login now' : '立即登录'}">立即登录</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <div th:replace="~{fragments/footer :: language-switcher-script}"></div>
+    <div th:replace="~{fragments/footer :: search-script}"></div>
+    <div th:replace="~{fragments/footer :: search-modal}"></div>
+
+    <script>
+        
+        // 表单校验：优雅显示密码长度错误
+        (function() {
+            const form = document.querySelector('form[th\\:action="@{/register}"]') || document.querySelector('form[action="/register"]') || document.querySelector('form');
+            const passwordInput = document.getElementById('password');
+            const inlineError = document.getElementById('password-inline-error');
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+            const confirmError = document.getElementById('confirm-password-error');
+            const submitButton = document.getElementById('register-submit');
+
+            if (!form || !passwordInput || !inlineError || !confirmPasswordInput || !confirmError || !submitButton) return;
+
+            function setError(message) {
+                inlineError.textContent = message;
+                inlineError.classList.remove('hidden');
+                // 移除添加红色边框的代码
+                // passwordInput.classList.add('border-red-400', 'focus:ring-red-400');
+            }
+
+            function clearError() {
+                inlineError.textContent = '';
+                inlineError.classList.add('hidden');
+                // 移除移除红色边框的代码
+                // passwordInput.classList.remove('border-red-400', 'focus:ring-red-400');
+            }
+
+            function setConfirmError(message) {
+                confirmError.textContent = message;
+                confirmError.classList.remove('hidden');
+                // 移除添加红色边框的代码
+                // confirmPasswordInput.classList.add('border-red-400', 'focus:ring-red-400');
+            }
+
+            function clearConfirmError() {
+                confirmError.textContent = '';
+                confirmError.classList.add('hidden');
+                // 移除移除红色边框的代码
+                // confirmPasswordInput.classList.remove('border-red-400', 'focus:ring-red-400');
+            }
+
+            function syncSubmitState() {
+                const hasPasswordError = !inlineError.classList.contains('hidden');
+                const hasConfirmError = !confirmError.classList.contains('hidden');
+                submitButton.disabled = hasPasswordError || hasConfirmError;
+                if (submitButton.disabled) {
+                    submitButton.classList.add('opacity-70', 'cursor-not-allowed');
+                } else {
+                    submitButton.classList.remove('opacity-70', 'cursor-not-allowed');
+                }
+            }
+
+            // 获取当前语言
+            function getCurrentLanguage() {
+                // 从页面获取语言设置
+                const activeButton = document.querySelector('.language-btn.bg-primary');
+                if (activeButton) {
+                    return activeButton.textContent.trim() === '中文' ? 'zh' : 'en';
+                }
+                // 从URL参数获取
+                const urlParams = new URLSearchParams(window.location.search);
+                const lang = urlParams.get('lang');
+                return lang || 'zh';
+            }
+
+            // 获取错误消息
+            function getErrorMessage(key) {
+                const isEnglish = getCurrentLanguage() === 'en';
+                const messages = {
+                    'password_min_length': isEnglish ? 'Password must be at least 6 characters' : '密码至少6位',
+                    'password_mismatch': isEnglish ? 'Passwords do not match' : '两次输入的密码不一致'
+                };
+                return messages[key] || '';
+            }
+
+            // 实时校验
+            passwordInput.addEventListener('input', function() {
+                if (passwordInput.value && passwordInput.value.length < 6) {
+                    setError(getErrorMessage('password_min_length'));
+                } else {
+                    clearError();
+                }
+                if (confirmPasswordInput.value) {
+                    if (confirmPasswordInput.value !== passwordInput.value) {
+                        setConfirmError(getErrorMessage('password_mismatch'));
+                    } else {
+                        clearConfirmError();
+                    }
+                }
+                syncSubmitState();
+            });
+
+            // 确认密码实时校验
+            confirmPasswordInput.addEventListener('input', function() {
+                if (confirmPasswordInput.value && confirmPasswordInput.value !== passwordInput.value) {
+                    setConfirmError(getErrorMessage('password_mismatch'));
+                } else {
+                    clearConfirmError();
+                }
+                syncSubmitState();
+            });
+
+            // 提交时校验，阻止原生气泡
+            form.addEventListener('submit', function(e) {
+                if (!passwordInput.value || passwordInput.value.length < 6) {
+                    e.preventDefault();
+                    setError(getErrorMessage('password_min_length'));
+                    passwordInput.focus();
+                    syncSubmitState();
+                    return;
+                }
+                if (!confirmPasswordInput.value || confirmPasswordInput.value !== passwordInput.value) {
+                    e.preventDefault();
+                    setConfirmError(getErrorMessage('password_mismatch'));
+                    confirmPasswordInput.focus();
+                    syncSubmitState();
+                }
+            });
+
+            // 屏蔽默认校验气泡
+            passwordInput.addEventListener('invalid', function(e) {
+                e.preventDefault();
+            });
+            confirmPasswordInput.addEventListener('invalid', function(e) {
+                e.preventDefault();
+            });
+        })();
+
+        // Verification code logic
+        (function() {
+            const emailInput = document.getElementById('email');
+            const emailError = document.getElementById('email-error');
+            const sendCodeBtn = document.getElementById('send-code-btn');
+            const codeInfo = document.getElementById('code-info');
+            const codeError = document.getElementById('code-error');
+
+            if (!emailInput || !sendCodeBtn || !emailError || !codeError || !codeInfo) return;
+
+            function getCurrentLanguage() {
+                const activeButton = document.querySelector('.language-btn.bg-primary');
+                if (activeButton) {
+                    return activeButton.textContent.trim() === '中文' ? 'zh' : 'en';
+                }
+                const urlParams = new URLSearchParams(window.location.search);
+                const lang = urlParams.get('lang');
+                return lang || 'zh';
+            }
+
+            function showEmailError(message) { emailError.textContent = message; emailError.classList.remove('hidden'); }
+            function clearEmailError() { emailError.textContent = ''; emailError.classList.add('hidden'); }
+            function showCodeInfo(message) { codeError.classList.add('hidden'); codeInfo.textContent = message; codeInfo.classList.remove('hidden'); }
+            function showCodeError(message) { codeInfo.classList.add('hidden'); codeError.textContent = message; codeError.classList.remove('hidden'); }
+            function clearCodeMessages() { codeInfo.textContent = ''; codeInfo.classList.add('hidden'); codeError.textContent = ''; codeError.classList.add('hidden'); }
+
+            function getMessage(key) {
+                const isEnglish = getCurrentLanguage() === 'en';
+                const messages = {
+                    'sending': isEnglish ? 'Sending...' : '发送中...',
+                    'send_code': isEnglish ? 'Send Code' : '发送验证码',
+                    'resend_in': isEnglish ? 'Resend ({s}s)' : '重发({s}s)',
+                    'email_invalid': isEnglish ? 'Please enter a valid email address.' : '请输入有效的邮箱地址。',
+                    'code_sent': isEnglish ? 'Verification code sent. Please check your email.' : '验证码已发送，请注意查收。',
+                    'send_failed': isEnglish ? 'Failed to send, please try again later.' : '发送失败，请稍后再试。',
+                    'too_many_requests': isEnglish ? 'Too many requests, please try again later.' : '请求过于频繁，请稍后再试。'
+                };
+                return messages[key] || '';
+            }
+
+            sendCodeBtn.addEventListener('click', async function() {
+                clearEmailError();
+                clearCodeMessages();
+                const email = emailInput.value;
+                const emailRegex = /^[A-Za-z0-9+_.-]+@(.+)$/;
+
+                if (!email || !emailRegex.test(email)) {
+                    showEmailError(getMessage('email_invalid'));
+                    return;
+                }
+
+                sendCodeBtn.disabled = true;
+                sendCodeBtn.querySelector('span').textContent = getMessage('sending');
+
+                try {
+                    const response = await fetch('/register/send-code', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: `email=${encodeURIComponent(email)}`
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        showCodeInfo(getMessage('code_sent'));
+                        let cooldown = 60;
+                        
+                        const interval = setInterval(() => {
+                            cooldown--;
+                            if (cooldown <= 0) {
+                                clearInterval(interval);
+                                sendCodeBtn.disabled = false;
+                                sendCodeBtn.querySelector('span').textContent = getMessage('send_code');
+                            } else {
+                                sendCodeBtn.querySelector('span').textContent = getMessage('resend_in').replace('{s}', cooldown);
+                            }
+                        }, 1000);
+
+                    } else {
+                        let errorMessage = getMessage('send_failed');
+                        if (data && data.error) {
+                            errorMessage = data.error;
+                        } else if (response.status === 429) {
+                            errorMessage = getMessage('too_many_requests');
+                        }
+                        showEmailError(errorMessage);
+                        sendCodeBtn.disabled = false;
+                        sendCodeBtn.querySelector('span').textContent = getMessage('send_code');
+                    }
+                } catch (error) {
+                    showEmailError(getMessage('send_failed'));
+                    sendCodeBtn.disabled = false;
+                    sendCodeBtn.querySelector('span').textContent = getMessage('send_code');
+                }
+            });
+        })();
+    </script>
+</body>
+</html>

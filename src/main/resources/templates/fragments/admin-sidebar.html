@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Sidebar Fragment</title>
+</head>
+<body>
+    <!-- 侧边栏 fragment -->
+    <aside th:fragment="sidebar" class="w-64 flex-shrink-0 hidden md:block" style="background-color: var(--color-primary); color: var(--text-on-primary);">
+        <div class="px-4 py-5 border-b" style="border-color: rgba(255, 255, 255, 0.2);">
+            <a href="/admin" class="text-xl font-semibold" style="color: var(--text-on-primary);">管理后台</a>
+        </div>
+        <nav class="mt-2">
+            <a href="/admin" class="sidebar-link block px-4 py-3 transition-colors" style="color: var(--text-on-primary);" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.1)'" onmouseout="this.style.backgroundColor='transparent'">仪表盘</a>
+            <a href="/admin/philosophers" class="sidebar-link block px-4 py-3 transition-colors" style="color: var(--text-on-primary);" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.1)'" onmouseout="this.style.backgroundColor='transparent'">哲学家管理</a>
+            <a href="/admin/schools" class="sidebar-link block px-4 py-3 transition-colors" style="color: var(--text-on-primary);" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.1)'" onmouseout="this.style.backgroundColor='transparent'">流派管理</a>
+            <a href="/admin/contents" class="sidebar-link block px-4 py-3 transition-colors" style="color: var(--text-on-primary);" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.1)'" onmouseout="this.style.backgroundColor='transparent'">内容管理</a>
+            <a href="/admin/users" class="sidebar-link block px-4 py-3 transition-colors" style="color: var(--text-on-primary);" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.1)'" onmouseout="this.style.backgroundColor='transparent'">用户管理</a>
+            <a href="/admin/exit" class="sidebar-link block px-4 py-3 transition-colors" style="color: var(--text-on-primary);" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.1)'" onmouseout="this.style.backgroundColor='transparent'">退出后台</a>
+        </nav>
+    </aside>
+
+    <!-- 移动端抽屉菜单 fragment -->
+    <div th:fragment="mobile-drawer" id="mobile-drawer" class="fixed inset-0 bg-black/40 hidden">
+        <div class="absolute left-0 top-0 bottom-0 w-64 p-4" style="background-color: var(--color-primary); color: var(--text-on-primary);">
+            <div class="flex items-center justify-between pb-3 border-b" style="border-color: rgba(255, 255, 255, 0.2);">
+                <span class="text-lg font-semibold" style="color: var(--text-on-primary);">管理导航</span>
+                <button id="drawer-close" style="color: var(--text-on-primary);"><i class="fa fa-times"></i></button>
+            </div>
+            <nav class="mt-3 space-y-1">
+                <a href="/admin" class="sidebar-link block px-4 py-3 transition-colors" style="color: var(--text-on-primary);" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.1)'" onmouseout="this.style.backgroundColor='transparent'">仪表盘</a>
+                <a href="/admin/philosophers" class="sidebar-link block px-4 py-3 transition-colors" style="color: var(--text-on-primary);" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.1)'" onmouseout="this.style.backgroundColor='transparent'">哲学家管理</a>
+                <a href="/admin/schools" class="sidebar-link block px-4 py-3 transition-colors" style="color: var(--text-on-primary);" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.1)'" onmouseout="this.style.backgroundColor='transparent'">流派管理</a>
+                <a href="/admin/contents" class="sidebar-link block px-4 py-3 transition-colors" style="color: var(--text-on-primary);" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.1)'" onmouseout="this.style.backgroundColor='transparent'">内容管理</a>
+                <a href="/admin/users" class="sidebar-link block px-4 py-3 transition-colors" style="color: var(--text-on-primary);" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.1)'" onmouseout="this.style.backgroundColor='transparent'">用户管理</a>
+                <a href="/admin/exit" class="sidebar-link block px-4 py-3 transition-colors" style="color: var(--text-on-primary);" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.1)'" onmouseout="this.style.backgroundColor='transparent'">退出后台</a>
+            </nav>
+        </div>
+    </div>
+
+    <!-- 版主侧边栏 fragment -->
+    <aside th:fragment="moderator-sidebar" class="w-64 flex-shrink-0 hidden md:block" style="background-color: var(--color-primary); color: var(--text-on-primary);">
+        <div class="px-4 py-5 border-b" style="border-color: rgba(255, 255, 255, 0.2);">
+            <a href="/moderator" class="text-xl font-semibold" style="color: var(--text-on-primary);">版主后台</a>
+        </div>
+        <nav class="mt-2">
+            <a href="/moderator" class="sidebar-link block px-4 py-3 transition-colors" style="color: var(--text-on-primary);" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.1)'" onmouseout="this.style.backgroundColor='transparent'">仪表盘</a>
+            <a href="/moderator/philosophers" class="sidebar-link block px-4 py-3 transition-colors" style="color: var(--text-on-primary);" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.1)'" onmouseout="this.style.backgroundColor='transparent'">哲学家管理</a>
+            <a href="/moderator/schools" class="sidebar-link block px-4 py-3 transition-colors" style="color: var(--text-on-primary);" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.1)'" onmouseout="this.style.backgroundColor='transparent'">流派管理</a>
+            <a href="/moderator/contents" class="sidebar-link block px-4 py-3 transition-colors" style="color: var(--text-on-primary);" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.1)'" onmouseout="this.style.backgroundColor='transparent'">内容管理</a>
+            <a href="/moderator/comments" class="sidebar-link block px-4 py-3 transition-colors" style="color: var(--text-on-primary);" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.1)'" onmouseout="this.style.backgroundColor='transparent'">评论管理</a>
+            <a href="/moderator/exit" class="sidebar-link block px-4 py-3 transition-colors" style="color: var(--text-on-primary);" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.1)'" onmouseout="this.style.backgroundColor='transparent'">退出后台</a>
+        </nav>
+    </aside>
+
+    <!-- 版主移动端抽屉菜单 fragment -->
+    <div th:fragment="moderator-mobile-drawer" id="mobile-drawer" class="fixed inset-0 bg-black/40 hidden">
+        <div class="absolute left-0 top-0 bottom-0 w-64 p-4" style="background-color: var(--color-primary); color: var(--text-on-primary);">
+            <div class="flex items-center justify-between pb-3 border-b" style="border-color: rgba(255, 255, 255, 0.2);">
+                <span class="text-lg font-semibold" style="color: var(--text-on-primary);">版主导航</span>
+                <button id="drawer-close" style="color: var(--text-on-primary);"><i class="fa fa-times"></i></button>
+            </div>
+            <nav class="mt-3 space-y-1">
+                <a href="/moderator" class="sidebar-link block px-4 py-3 transition-colors" style="color: var(--text-on-primary);" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.1)'" onmouseout="this.style.backgroundColor='transparent'">仪表盘</a>
+                <a href="/moderator/philosophers" class="sidebar-link block px-4 py-3 transition-colors" style="color: var(--text-on-primary);" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.1)'" onmouseout="this.style.backgroundColor='transparent'">哲学家管理</a>
+                <a href="/moderator/schools" class="sidebar-link block px-4 py-3 transition-colors" style="color: var(--text-on-primary);" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.1)'" onmouseout="this.style.backgroundColor='transparent'">流派管理</a>
+                <a href="/moderator/contents" class="sidebar-link block px-4 py-3 transition-colors" style="color: var(--text-on-primary);" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.1)'" onmouseout="this.style.backgroundColor='transparent'">内容管理</a>
+                <a href="/moderator/comments" class="sidebar-link block px-4 py-3 transition-colors" style="color: var(--text-on-primary);" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.1)'" onmouseout="this.style.backgroundColor='transparent'">评论管理</a>
+                <a href="/moderator/exit" class="sidebar-link block px-4 py-3 transition-colors" style="color: var(--text-on-primary);" onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.1)'" onmouseout="this.style.backgroundColor='transparent'">退出后台</a>
+            </nav>
+        </div>
+    </div>
+
+    <!-- 移动端菜单切换脚本 fragment -->
+    <script th:fragment="mobile-menu-script">
+        // 移动端菜单切换功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuBtn = document.getElementById('menu-toggle');
+            const drawer = document.getElementById('mobile-drawer');
+            const drawerClose = document.getElementById('drawer-close');
+
+            if (menuBtn && drawer) {
+                menuBtn.addEventListener('click', function() {
+                    drawer.classList.remove('hidden');
+                });
+            }
+
+            if (drawerClose && drawer) {
+                drawerClose.addEventListener('click', function() {
+                    drawer.classList.add('hidden');
+                });
+            }
+
+            // 点击遮罩层关闭抽屉
+            if (drawer) {
+                drawer.addEventListener('click', function(e) {
+                    if (e.target === drawer) {
+                        drawer.classList.add('hidden');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

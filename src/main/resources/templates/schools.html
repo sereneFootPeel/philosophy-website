@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/springsecurity6">
+<head th:replace="~{fragments/header :: head}" th:with="pageTitle=${translationService.getStaticText('philosophy', language)} + ' - ' + ${translationService.getStaticText('schools', language)}">
+    <!-- Like Button Component -->
+    <script th:src="@{/js/like-button-component.js}"></script>
+
+        <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+
+            .school-tag {
+                transition: all 0.2s ease;
+                text-align: center;
+            }
+
+                .school-tag:hover {
+                    transform: scale(1.05);
+                }
+
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .transition-smooth {
+                transition: all 0.3s ease-in-out;
+            }
+            
+            /* 流派树样式 */
+            .school-link:hover {
+                background-color: var(--bg-tertiary);
+            }
+            
+            .school-link.bg-primary:hover {
+                background-color: #2563eb !important;
+            }
+            
+            .expand-icon {
+                font-size: 0.75rem;
+                color: #6b7280;
+                transition: transform 0.2s ease;
+            }
+            
+            .school-link:hover .expand-icon {
+                color: #374151;
+            }
+            
+            .school-link.bg-primary .expand-icon {
+                color: #ffffff;
+            }
+            
+            .children {
+                margin-left: 1rem;
+                border-left: 1px solid var(--border-primary);
+                padding-left: 0.5rem;
+            }
+        }
+        /* 淡入效果已移除 */
+    </style>
+</head>
+<body class="bg-secondary font-sans antialiased min-h-screen flex flex-col">
+    <script>
+        // 设置当前用户角色，供JavaScript使用
+        window.userRole = 'USER';
+    </script>
+    <script sec:authorize="hasRole('ADMIN')">
+        window.userRole = 'ADMIN';
+    </script>
+    <script sec:authorize="hasRole('MODERATOR')">
+        window.userRole = 'MODERATOR';
+    </script>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="flex-grow pt-16">
+        <section id="schools-page" class="page active bg-secondary min-h-[50vh]">
+            <div class="container mx-auto px-4 py-8">
+                <h1 class="text-3xl font-bold text-primary mb-8 text-center" th:text="${translationService.getStaticText('philosophy_schools', language)}">哲学流派</h1>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- 左侧：树 -->
+                    <aside class="md:col-span-1">
+                        <div class="sticky top-20">
+                            <div id="school-tree" class="bg-white rounded-lg shadow p-4">
+                                <ul class="space-y-2">
+                                    <li th:each="school : ${topLevelSchools}" class="">
+                                        <div class="school-link px-3 py-2 rounded-lg transition-smooth text-gray-700 cursor-pointer flex items-center justify-between" th:attr="data-id=${school.id}">
+                                            <span class="font-medium" th:text="${translationService.getSchoolDisplayName(school, language)}">流派名称</span>
+                                            <i class="fa fa-chevron-right expand-icon transition-transform duration-200" style="display: none;"></i>
+                                        </div>
+                                        <ul class="children mt-2 hidden" th:attr="id=${'children-of-' + school.id}"></ul>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </aside>
+
+                    <!-- 右侧：详情 + 内容 -->
+                    <section class="md:col-span-2">
+                        <div id="school-detail" class="bg-white rounded-lg shadow p-6 hidden relative group">
+                            <!-- 编辑图标 (仅管理员/版主可见) -->
+                            <div sec:authorize="hasAnyRole('ADMIN', 'MODERATOR')" class="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                <a id="school-edit-link" href="#"
+                                   title="编辑流派"
+                                   onclick="event.stopPropagation()"
+                                   class="flex items-center justify-center w-8 h-8 bg-white/80 backdrop-blur-sm rounded-md shadow-md hover:bg-primary hover:text-white text-gray-700 transition-all duration-200">
+                                    <i class="fa fa-pencil"></i>
+                                </a>
+                            </div>
+
+                            <h2 id="school-title" class="text-2xl font-bold text-primary mb-2">—</h2>
+                            <p id="school-desc" class="text-gray-600">—</p>
+                        </div>
+                        <div id="school-contents" class="mt-6"></div>
+                        <div id="school-empty" class="bg-white rounded-lg shadow p-12 text-center text-gray-500">
+                            <span th:text="${translationService.getStaticText('please_select_school', language)}">请从左侧选择一个流派</span>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 右下角固定按钮：回到顶部 -->
+    <div class="fixed bottom-6 right-6">
+        <button id="back-to-top" 
+                class="w-16 h-16 rounded-full bg-primary text-white shadow-lg flex items-center justify-center transition-all duration-300 hover:bg-primary/90 hover:scale-105 active:scale-95 opacity-0 pointer-events-none"
+                onclick="scrollToTop()"
+                th:title="${translationService.getStaticText('back_to_top', language)}">
+            <i class="fa fa-chevron-up text-xl"></i>
+        </button>
+    </div>
+    
+
+    <!-- 点赞按钮功能 -->
+    <script th:src="@{/js/like-button-component.js}"></script>
+    <script th:src="@{/js/school-tree.js}"></script>
+    
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <div th:replace="~{fragments/footer :: language-switcher-script}"></div>
+    <div th:replace="~{fragments/footer :: search-script}"></div>
+    <div th:replace="~{fragments/footer :: search-modal}"></div>
+    <div th:replace="~{fragments/footer :: theme-script}"></div>
+    <div th:replace="~{fragments/footer :: like-script}"></div>
+
+    <script>
+        // 添加导航栏滚动效果
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            const backToTopButton = document.getElementById('back-to-top');
+            
+            if (window.scrollY > 10) {
+                navbar.classList.add('py-2');
+                navbar.classList.add('shadow-lg');
+                // 显示回到顶部按钮
+                if (backToTopButton) {
+                    backToTopButton.classList.remove('opacity-0', 'pointer-events-none');
+                    backToTopButton.classList.add('opacity-100');
+                }
+            } else {
+                navbar.classList.remove('py-2');
+                navbar.classList.remove('shadow-lg');
+                // 隐藏回到顶部按钮
+                if (backToTopButton) {
+                    backToTopButton.classList.add('opacity-0', 'pointer-events-none');
+                    backToTopButton.classList.remove('opacity-100');
+                }
+            }
+        });
+
+        // 回到顶部功能
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+    </script>
+    
+</body>
+</html>
+    

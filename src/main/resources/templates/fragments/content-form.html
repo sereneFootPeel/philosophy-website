@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<div th:fragment="contentForm(contentForm, philosophers, schools, actionUrl, cancelUrl, title, contentEn, currentUserId, lockBaseUrl)">
+    <div class="max-w-3xl mx-auto">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-bold admin-text-primary" th:text="${title}"></h1>
+            </div>
+            <div class="md:hidden">
+                <button id="menu-toggle" class="text-xl admin-text-primary"><i class="fa fa-bars"></i></button>
+            </div>
+        </div>
+
+        <div class="mt-6 admin-card rounded-lg p-6">
+            <!-- 错误信息将通过JavaScript显示 -->
+            <form th:action="@{${actionUrl}}" method="post">
+                <input type="hidden" name="id" th:value="${contentForm != null ? contentForm.id : null}" />
+                <input type="hidden" name="version" th:value="${contentForm != null ? contentForm.version : null}" />
+                <input type="hidden" name="redirectUrl" th:value="${param.redirectUrl != null ? param.redirectUrl[0] : ''}" />
+
+                <div class="mb-5">
+                    <label class="admin-form-label" for="philosopher">所属哲学家 (可选)</label>
+                    <select id="philosopher" class="admin-form-input" name="philosopherId">
+                        <option value="">请选择哲学家</option>
+                        <option th:each="p : ${philosophers}" th:value="${p.id}" th:text="${p.name}" th:selected="${contentForm != null && contentForm.philosopher != null && contentForm.philosopher.id == p.id}"></option>
+                    </select>
+                </div>
+
+                <div class="mb-5">
+                    <label class="admin-form-label" for="school">所属流派 (可选)</label>
+                    <select id="school" class="admin-form-input" name="schoolId">
+                        <option value="">请选择流派</option>
+                        <option th:each="s : ${schools}" th:value="${s.id}" th:text="${s.name}" th:selected="${contentForm != null && contentForm.school != null && contentForm.school.id == s.id}"></option>
+                    </select>
+                </div>
+
+                <div class="mb-5">
+                    <label class="admin-form-label" for="contentText">内容 <span class="admin-text-error">*</span></label>
+                    <textarea id="contentText" class="admin-form-input" name="content" placeholder="请输入内容" required style="min-height: 200px;" th:text="${contentForm != null ? contentForm.content : ''}"></textarea>
+                </div>
+
+                <div class="mt-6 flex items-center justify-between gap-3">
+                    <!-- 创建时：允许选择保存后锁定（仅创建者可见） -->
+                    <div th:if="${contentForm == null || contentForm.id == null}">
+                        <label class="inline-flex items-center gap-2 text-sm admin-text-primary">
+                            <input type="checkbox" name="lockAfterSave" value="true" class="h-4 w-4 rounded" style="border-color: var(--border-primary);">
+                            <span>保存后锁定（仅创建者可编辑）</span>
+                        </label>
+                    </div>
+                    <a th:href="@{${cancelUrl}}" class="admin-btn-secondary">取消</a>
+                    <button type="submit" class="admin-btn-primary">保存</button>
+                </div>
+            </form>
+
+            <!-- 编辑时：仅创建者本人可见的锁定/解锁操作（放置在卡片内） -->
+            <div class="mt-4" th:if="${contentForm != null and contentForm.id != null and contentForm.user != null and currentUserId != null and contentForm.user.id == currentUserId}">
+                <div class="flex items-center gap-2">
+                    <form th:if="${!contentForm.locked}" th:action="@{|${lockBaseUrl}/${contentForm.id}/lock|}" method="post" class="inline" onsubmit="return confirm('确定要锁定这个内容吗？锁定后只有本人可以编辑。');">
+                        <button type="submit" class="admin-btn-secondary"><i class="fa fa-lock"></i> 锁定</button>
+                    </form>
+                    <form th:if="${contentForm.locked}" th:action="@{|${lockBaseUrl}/${contentForm.id}/unlock|}" method="post" class="inline" onsubmit="return confirm('确定要解锁这个内容吗？');">
+                        <button type="submit" class="admin-btn-secondary"><i class="fa fa-unlock"></i> 解锁</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

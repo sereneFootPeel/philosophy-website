@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head}" th:with="pageTitle=${translationService != null ? translationService.getStaticText('my_likes', language) : '我的点赞'}">
+    <!-- Like Button Component script is now loaded at the end of the body -->
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <!-- 主要内容 -->
+    <main class="flex-grow pt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- 页面标题 -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-gray-900 mb-2" th:text="${translationService != null ? translationService.getStaticText('my_likes', language) : '我的点赞'}">我的点赞</h1>
+            </div>
+
+            <!-- 点赞的用户 -->
+            <div class="bg-white rounded-lg shadow-md mb-8 p-6">
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">点赞的用户</h2>
+                
+                
+                <div th:if="${likedUsers == null or likedUsers.empty}" class="text-center text-gray-500 py-8">
+                    <i class="fa fa-users text-4xl mb-4"></i>
+                    <p class="text-lg">您还没有点赞任何用户</p>
+                </div>
+                <div th:if="${likedUsers != null and !likedUsers.empty}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div th:each="likedUser : ${likedUsers}" class="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
+                                <i class="fa fa-user text-white"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-medium text-gray-900" th:text="${likedUser.username}">用户名</h3>
+                                <p class="text-sm text-gray-600" th:text="${likedUser.email}">用户邮箱</p>
+                            </div>
+                            <a th:href="@{'/user/profile/' + ${likedUser.id}}" class="text-primary hover:text-primary-dark">
+                                <i class="fa fa-eye"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 点赞的内容 -->
+            <div class="bg-white rounded-lg shadow-md mb-8 p-6">
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">点赞的内容</h2>
+
+                <div th:if="${likedContents == null or likedContents.empty}" class="text-center text-gray-500 py-8">
+                    <i class="fa fa-file-text text-4xl mb-4"></i>
+                    <p class="text-lg">您还没有点赞任何内容</p>
+                </div>
+                <div th:if="${likedContents != null and !likedContents.empty}" class="space-y-4">
+                    <div th:each="content : ${likedContents}">
+                        <div th:replace="~{fragments/content-card :: content-card(
+                            content=${content}, 
+                            showPhilosopherInfo=true, 
+                            showActions='hover-only', 
+                            clickable=true, 
+                            customClasses='bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors cursor-pointer relative group', 
+                            isAuthenticated=${isAuthenticated}, 
+                            showLikeButton=true, 
+                            showViewMoreButton=false, 
+                            isContentOwner=false, 
+                            showParentSchool=true
+                        )}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <!-- 返回按钮 -->
+            <div class="text-center">
+                <a href="/user/profile" class="inline-flex items-center px-6 py-3 border border-gray-300 text-gray-700 bg-white rounded-lg hover:bg-gray-50 transition-colors">
+                    <i class="fa fa-arrow-left mr-2"></i>
+                    <span th:text="${translationService != null ? translationService.getStaticText('back_to_profile', language) : '返回个人主页'}">返回个人主页</span>
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <div th:replace="~{fragments/footer :: language-switcher-script}"></div>
+    <script th:src="@{/js/like-button-component.js}"></script>
+    <div th:replace="~{fragments/footer :: like-script}"></div>
+
+</body>
+</html>

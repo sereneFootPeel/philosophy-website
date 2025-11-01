@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${philosopher.id == null ? '添加新哲学家' : '编辑哲学家'} + ' - 哲学网站版主后台'">哲学家管理 - 哲学网站版主后台</title>
+    <div th:replace="~{fragments/admin-head :: moderator-head}"></div>
+</head>
+<body class="min-h-screen">
+<div class="flex min-h-screen">
+
+    <!-- Moderator Sidebar -->
+    <div th:replace="~{fragments/admin-sidebar :: moderator-sidebar}"></div>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-4 md:p-8">
+        <div class="max-w-3xl mx-auto">
+            <div th:replace="~{fragments/philosopher-form :: philosopherForm(
+                philosopher=${philosopher},
+                nameEn=${nameEn},
+                biographyEn=${biographyEn},
+                actionUrl='/moderator/philosophers/save',
+                cancelUrl='/moderator/philosophers',
+                title=(${philosopher.id != null} ? '编辑哲学家' : '添加新哲学家')
+            )}"></div>
+        </div>
+    </main>
+</div>
+
+<!-- Mobile Drawer and Script -->
+<div th:replace="~{fragments/admin-sidebar :: moderator-mobile-drawer}"></div>
+
+<!-- Moderator Scripts -->
+<div th:replace="~{fragments/admin-head :: moderator-scripts}"></div>
+
+</body>
+</html>
+
+

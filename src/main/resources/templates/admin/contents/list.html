@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>内容管理 - 哲学网站</title>
+    <div th:replace="~{fragments/admin-head :: admin-head}"></div>
+</head>
+<body class="min-h-screen">
+    <div class="flex min-h-screen">
+        <!-- 侧边栏 -->
+        <div th:replace="~{fragments/admin-sidebar :: sidebar}"></div>
+
+        <main class="flex-1 p-4 md:p-8">
+            <div class="max-w-6xl mx-auto">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-2xl md:text-3xl font-bold admin-text-primary">内容管理</h1>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <a href="/admin/contents/new" class="admin-btn-secondary"><i class="fa fa-plus"></i> 添加新内容</a>
+                        <div class="md:hidden">
+                            <button id="menu-toggle" class="admin-text-primary text-xl"><i class="fa fa-bars"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Success/Error Messages -->
+                <div th:if="${param.success}" class="mb-4 p-4 rounded" style="background-color: var(--color-success-light); border: 1px solid var(--color-success); color: var(--color-success);">
+                    <i class="fa fa-check-circle mr-2"></i>
+                    <span th:text="${param.success[0]}"></span>
+                </div>
+                <div th:if="${param.error}" class="mb-4 p-4 rounded" style="background-color: var(--color-error-light); border: 1px solid var(--color-error); color: var(--color-error);">
+                    <i class="fa fa-exclamation-circle mr-2"></i>
+                    <span th:text="${param.error[0]}"></span>
+                </div>
+
+                <div class="mt-6 admin-card">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full">
+                            <thead class="admin-table-head">
+                                <tr>
+                                    <th class="admin-table-cell">ID</th>
+                                    <th class="admin-table-cell">内容</th>
+                                    <th class="admin-table-cell">哲学家</th>
+                                    <th class="admin-table-cell">流派</th>
+                                    <th class="admin-table-cell">作者</th>
+                                    <th class="admin-table-cell">状态</th>
+                                    <th class="admin-table-cell">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-sm">
+                                <tr th:each="content : ${contents}">
+                                    <td class="admin-table-cell" th:text="${content.id}"></td>
+                                    <td class="admin-table-cell" th:text="${#strings.abbreviate(content.content, 50)}"></td>
+                                    <td class="admin-table-cell" th:text="${content.philosopher != null ? content.philosopher.name : ''}"></td>
+                                    <td class="admin-table-cell" th:text="${content.school != null ? content.school.name : ''}"></td>
+                                    <td class="admin-table-cell">
+                                        <span th:if="${content.user != null}" th:text="${content.user.username}"></span>
+                                        <span th:unless="${content.user != null}" class="admin-text-secondary">已注销</span>
+                                    </td>
+                                    <td class="admin-table-cell">
+                                        <span th:if="${content.locked}" class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium" style="background-color: var(--color-error-light); color: var(--color-error);">
+                                            <i class="fa fa-lock mr-1"></i>已锁定
+                                        </span>
+                                        <span th:if="${!content.locked}" class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium" style="background-color: var(--color-success-light); color: var(--color-success);">
+                                            <i class="fa fa-unlock mr-1"></i>未锁定
+                                        </span>
+                                    </td>
+                                    <td class="admin-table-cell">
+                                        <div class="flex items-center gap-2">
+                                            <a th:href="@{/admin/contents/edit/{id}(id=${content.id})}" class="admin-btn-secondary btn-sm"><i class="fa fa-pencil"></i> 编辑</a>
+                                            <form th:action="@{/admin/contents/toggle-history-pin/{id}(id=${content.id})}" method="post">
+                                                <button type="submit" class="admin-btn-secondary btn-sm"
+                                                        th:title="${content.historyPinned} ? '取消固定历史' : '固定历史'">
+                                                    <i class="fa fa-thumb-tack" th:style="${content.historyPinned} ? 'color: var(--color-error);' : ''"></i>
+                                                </button>
+                                            </form>
+                                            <form th:action="@{/admin/contents/delete/{id}(id=${content.id})}" method="post" onsubmit="return confirm('确定要删除这个内容吗?');">
+                                                <button type="submit" class="admin-btn-secondary btn-sm"><i class="fa fa-trash"></i> 删除</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="text-center p-4 admin-text-secondary" th:if="${contents == null or contents.empty}">暂无内容数据，请添加新的内容。</div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 移动端抽屉菜单 -->
+    <div th:replace="~{fragments/admin-sidebar :: mobile-drawer}"></div>
+    
+    <!-- Admin Scripts -->
+    <div th:replace="~{fragments/admin-head :: admin-scripts}"></div>
+</body>
+</html>

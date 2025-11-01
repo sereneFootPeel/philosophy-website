@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/springsecurity6">
+<head>
+    <meta charset="UTF-8">
+    <title>Content Card Fragment</title>
+</head>
+<body>
+    <!-- Content Card Fragment -->
+    <div th:fragment="content-card(content, showPhilosopherInfo, showActions, clickable, customClasses, isAuthenticated, showLikeButton, showViewMoreButton, isContentOwner, showParentSchool)"
+         th:class="${customClasses != null} ? ${customClasses} : 'bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px] relative group'"
+         th:data-content-id="${content != null ? content.id : ''}"
+         th:data-clickable="${clickable != null and clickable}"
+         th:classappend="${clickable != null and clickable} ? 'cursor-pointer hover:bg-tertiary content-card-clickable' : ''">
+
+        <!-- 编辑图标 (仅管理员可见) -->
+        <div sec:authorize="hasRole('ADMIN')"
+             class="absolute top-3 left-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <a th:href="@{/admin/contents/edit/{id}(id=${content.id})}"
+               th:title="${'编辑ID: ' + content.id}"
+               onclick="event.stopPropagation()"
+               class="flex items-center justify-center w-8 h-8 bg-white/80 backdrop-blur-sm rounded-md shadow-md hover:bg-primary hover:text-white text-gray-700 transition-all duration-200">
+                <i class="fa fa-pencil"></i>
+            </a>
+        </div>
+
+        <!-- 编辑图标 (仅版主可见) -->
+        <div sec:authorize="hasRole('MODERATOR')"
+             class="absolute top-3 left-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <a th:href="@{/moderator/contents/edit/{id}(id=${content.id})}"
+               th:title="${'编辑ID: ' + content.id}"
+               onclick="event.stopPropagation()"
+               class="flex items-center justify-center w-8 h-8 bg-white/80 backdrop-blur-sm rounded-md shadow-md hover:bg-primary hover:text-white text-gray-700 transition-all duration-200">
+                <i class="fa fa-pencil"></i>
+            </a>
+        </div>
+
+        <!-- 右上角图标区域 -->
+        <div class="absolute top-3 right-3 transition-opacity duration-300">
+            <!-- 点赞按钮 -->
+            <th:block th:if="${showLikeButton != null and showLikeButton and isAuthenticated != null and isAuthenticated}">
+                <div th:id="'like-container-' + ${content != null ? content.id : ''}"
+                     th:data-like="'like-container-' + ${content != null ? content.id : ''}"
+                     th:data-entity-type="CONTENT"
+                     th:data-entity-id="${content != null ? content.id : ''}"
+                     th:data-is-authenticated="${isAuthenticated != null and isAuthenticated ? 'true' : 'false'}"
+                     class="like-btn opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center w-8 h-8 rounded-md cursor-pointer hover:bg-gray-100"
+                     th:title="${isAuthenticated != null and isAuthenticated ? '点赞/取消点赞' : '请先登录'}"
+                     onclick="event.stopPropagation()">
+                    <i class="fa fa-heart-o text-gray-400 hover:text-red-500 text-sm transition-colors duration-200"></i>
+                </div>
+            </th:block>
+
+            <!-- 查看更多图标 -->
+            <th:block th:if="${showViewMoreButton != null and showViewMoreButton}">
+                <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <a th:href="@{/contents(schoolId=${content != null and content.school != null ? content.school.id : null}, philosopherId=${content != null and content.philosopher != null ? content.philosopher.id : null})}"
+                       onclick="event.stopPropagation()"
+                       title="查看更多"
+                       class="flex items-center justify-center w-8 h-8 hover:bg-gray-100 rounded-md transition-colors duration-200">
+                        <i class="fa fa-external-link text-gray-600 text-sm"></i>
+                    </a>
+                </div>
+            </th:block>
+        </div>
+        
+        <!-- 显示流派信息（根据showParentSchool参数决定是否显示父流派） -->
+        <div class="flex flex-wrap gap-2 mb-3">
+            <th:block th:if="${content != null and content.school != null}">
+                <th:block th:if="${content.school.parent != null and (showParentSchool == null or showParentSchool)}">
+                    <a th:href="@{/schools/filter/{id}(id=${content != null and content.school != null and content.school.parent != null ? content.school.parent.id : ''})}"
+                       onclick="event.stopPropagation()"
+                       class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs hover:bg-gray-200 transition-smooth">
+                        <span th:text="${content != null and content.school != null and content.school.parent != null ? translationService.getSchoolDisplayName(content.school.parent, language != null ? language : 'zh') : '无父流派'}">父流派</span>
+                    </a>
+                </th:block>
+                <a th:href="@{/schools/filter/{id}(id=${content != null and content.school != null ? content.school.id : ''})}"
+                   onclick="event.stopPropagation()"
+                   class="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs hover:bg-primary/20 transition-smooth">
+                    <span th:text="${content != null and content.school != null ? translationService.getSchoolDisplayName(content.school, language != null ? language : 'zh') : '无流派'}">流派名称</span>
+                </a>
+            </th:block>
+        </div>
+        
+        <!-- 显示标题（仅对UserContentEdit显示） -->
+        <div th:if="${content.title != null}" class="mb-2">
+            <h3 class="text-lg font-semibold text-gray-900" th:text="${content.title != null ? content.title : '无标题'}">编辑标题</h3>
+        </div>
+        
+        <!-- 显示内容 -->
+        <div class="prose prose-gray max-w-none mb-4">
+            <p class="text-gray-800" th:text="${translationService.getContentDisplayText(content, language != null ? language : 'zh')}">内容正文...</p>
+        </div>
+        
+        <!-- 底部操作栏（可选显示，主要用于非悬浮模式） -->
+        <div th:if="${showActions != null and showActions != 'hover-only'}" class="flex justify-between items-center mt-4">
+            <!-- 底部操作栏内容可以在这里添加 -->
+        </div>
+        
+        <!-- 哲学家信息（可选显示） -->
+        <div th:if="${showPhilosopherInfo != null and showPhilosopherInfo and content.philosopher != null}" 
+             class="flex items-center justify-between pt-3 border-t border-gray-100">
+            <div class="flex items-center">
+                <a th:href="@{/philosophers(philosopherId=${content != null and content.philosopher != null ? content.philosopher.id : ''})}"
+                   onclick="event.stopPropagation()"
+                   class="flex items-center text-secondary hover:text-primary transition-colors duration-200">
+                    <span class="text-xs font-medium" th:text="${content.philosopher != null and content.philosopher.name != null ? content.philosopher.name : '未知哲学家'}">哲学家名称</span>
+                    <span th:if="${content.philosopher != null and content.philosopher.era != null}" class="text-gray-400 mx-1 text-xs">|</span>
+                    <span th:if="${content.philosopher != null and content.philosopher.era != null}" class="text-xs text-gray-500" th:text="${content.philosopher.era}">时代</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 简化版Content Card Fragment（用于评论页面等不需要完整功能的场景） -->
+    <div th:fragment="content-card-simple(content, customClasses, showParentSchool)" 
+         th:class="${customClasses != null} ? ${customClasses} : 'bg-white rounded-xl p-6 shadow-md'">
+        
+        <div class="flex justify-between items-start">
+            <div class="w-full">
+                <!-- 显示流派信息（根据showParentSchool参数决定是否显示父流派） -->
+                <div class="flex flex-wrap gap-2 mb-3">
+                    <th:block th:if="${content != null and content.school != null}">
+                        <th:block th:if="${content.school.parent != null and (showParentSchool == null or showParentSchool)}">
+                            <a th:href="@{/schools/filter/{id}(id=${content != null and content.school != null and content.school.parent != null ? content.school.parent.id : ''})}"
+                               class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs hover:bg-gray-200 transition-smooth">
+                                <span th:text="${content.school.parent != null ? content.school.parent.name : '无父流派'}">父流派</span>
+                            </a>
+                        </th:block>
+                        <a th:href="@{/schools/filter/{id}(id=${content != null and content.school != null ? content.school.id : ''})}"
+                           class="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs hover:bg-primary/20 transition-smooth">
+                            <span th:text="${content != null and content.school != null ? translationService.getSchoolDisplayName(content.school, language != null ? language : 'zh') : '无流派'}">流派名称</span>
+                        </a>
+                    </th:block>
+                </div>
+                
+                <div class="prose prose-gray max-w-none">
+                    <p class="text-gray-700 leading-relaxed" th:text="${content.content != null ? translationService.getContentDisplayText(content, language != null ? language : 'zh') : '内容加载中...'}">内容正文...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- UserContentEdit卡片组件 -->
+    <div th:fragment="user-edit-card(edit, customClasses, showParentSchool)" 
+         th:class="${customClasses != null} ? ${customClasses} : 'bg-white rounded-xl p-6 shadow-md'">
+        
+        <div class="flex justify-between items-start">
+            <div class="w-full">
+                <!-- 显示流派信息 -->
+                <div class="flex flex-wrap gap-2 mb-3">
+                    <th:block th:if="${edit.school != null}">
+                        <th:block th:if="${edit.school.parent != null and (showParentSchool == null or showParentSchool)}">
+                            <a th:href="@{/schools/filter/{id}(id=${edit.school.parent.id})}"
+                               class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs hover:bg-gray-200 transition-smooth">
+                                <span th:text="${edit.school.parent != null ? edit.school.parent.name : '无父流派'}">父流派</span>
+                            </a>
+                        </th:block>
+                        <a th:href="@{/schools/filter/{id}(id=${edit.school.id})}"
+                           class="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs hover:bg-primary/20 transition-smooth">
+                            <span th:text="${translationService.getSchoolDisplayName(edit.school, language != null ? language : 'zh')}">流派名称</span>
+                        </a>
+                    </th:block>
+                </div>
+                
+                <!-- 显示标题 -->
+                <div class="mb-2">
+                    <h3 class="text-lg font-semibold text-gray-900" th:text="${edit.title != null ? edit.title : '无标题'}">编辑标题</h3>
+                </div>
+                
+                <!-- 显示内容 -->
+                <div class="prose prose-gray max-w-none mb-3">
+                    <p class="text-gray-700 leading-relaxed" th:text="${edit.content != null ? edit.content : '内容加载中...'}">编辑内容...</p>
+                </div>
+                
+                <!-- 显示哲学家信息 -->
+                <div th:if="${edit.philosopher != null}" class="flex items-center text-sm text-gray-500 mb-2">
+                    <i class="fa fa-user mr-1"></i>
+                    <span th:text="${edit.philosopher.name != null ? edit.philosopher.name : '未知哲学家'}">哲学家名称</span>
+                    <span th:if="${edit.philosopher.era != null}" class="mx-1">|</span>
+                    <span th:if="${edit.philosopher.era != null}" th:text="${edit.philosopher.era}">时代</span>
+                </div>
+                
+                <!-- 显示创建时间 -->
+                <div class="flex items-center justify-end text-xs text-gray-500">
+                    <div th:text="${edit.createdAt != null ? #temporals.format(edit.createdAt, 'yyyy-MM-dd HH:mm') : '未知时间'}">创建时间</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript for content menu and clickable cards -->
+    <script>
+        // 页面加载完成后初始化菜单事件和可点击卡片事件
+        document.addEventListener('DOMContentLoaded', function() {
+            // 为菜单项添加点击事件，点击后可以关闭菜单
+            document.querySelectorAll('[id^="content-menu-"] a').forEach(link => {
+                link.addEventListener('click', function() {
+                    // 点击菜单项后，菜单会自动隐藏（通过CSS的group-hover机制）
+                    // 这里不需要额外的JavaScript逻辑
+                });
+            });
+            
+            // 为可点击的content卡片添加点击事件，跳转到评论区
+            document.querySelectorAll('.content-card-clickable').forEach(card => {
+                card.addEventListener('click', function(e) {
+                    // 如果点击的是链接或按钮，不处理（让原有功能继续工作）
+                    if (e.target.closest('a') || e.target.closest('button') || e.target.closest('[onclick]')) {
+                        return;
+                    }
+                    
+                    const contentId = this.getAttribute('data-content-id');
+                    if (contentId) {
+                        window.location.href = '/comments/content/' + contentId;
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

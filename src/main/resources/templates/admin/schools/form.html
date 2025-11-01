@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[[${school.id} ? '编辑流派' : '添加新流派']] - 哲学网站</title>
+    <div th:replace="~{fragments/admin-head :: admin-head}"></div>
+</head>
+<body class="min-h-screen">
+    <div class="flex min-h-screen">
+        <!-- 侧边栏 -->
+        <div th:replace="~{fragments/admin-sidebar :: sidebar}"></div>
+
+        <main class="flex-1 p-4 md:p-8">
+            <div th:replace="~{fragments/school-form :: schoolForm(
+                school=${school},
+                parentSchools=${parentSchools},
+                nameEn=${nameEn},
+                descriptionEn=${descriptionEn},
+                actionUrl='/admin/schools',
+                cancelUrl='/admin/schools',
+                title=${school.id} ? '编辑流派' : '添加新流派'
+            )}"></div>
+        </main>
+    </div>
+
+    <!-- 移动端抽屉菜单 -->
+    <div th:replace="~{fragments/admin-sidebar :: mobile-drawer}"></div>
+    
+    <!-- Admin Scripts -->
+    <div th:replace="~{fragments/admin-head :: admin-scripts}"></div>
+</body>
+</html>

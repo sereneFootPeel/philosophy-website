@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<th:block th:fragment="content-list(contents, isAuthenticated, translationService)">
+    <div class="space-y-4">
+        <th:block th:if="${contents != null and !contents.isEmpty()}">
+            <th:block th:each="content : ${contents}">
+                <div th:if="${content != null}"
+                     th:replace="~{fragments/content-card :: content-card(
+                         content=${content},
+                         showPhilosopherInfo=true,
+                         showActions='hover-only',
+                         clickable=true,
+                         customClasses='bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px] relative group',
+                         isAuthenticated=${isAuthenticated},
+                         showLikeButton=true,
+                         showViewMoreButton=true,
+                         isContentOwner=false,
+                         showParentSchool=true
+                     )}">
+                </div>
+            </th:block>
+        </th:block>
+        <div th:if="${contents == null or contents.isEmpty()}" class="bg-white rounded-lg shadow p-10 text-center text-gray-500">
+            <span>暂无内容</span>
+        </div>
+    </div>
+</th:block>
+</body>
+</html>
+
+

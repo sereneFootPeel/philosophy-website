@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据导入 - 哲学网站管理后台</title>
+    <div th:replace="~{fragments/admin-head :: admin-head}"></div>
+    <style>
+        /* Data import specific styles */
+        .upload-area {
+            border: 2px dashed var(--border-primary);
+            border-radius: 0.5rem;
+            padding: 2.5rem;
+            text-align: center;
+            background-color: var(--bg-secondary);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .upload-area:hover {
+            background-color: var(--bg-tertiary);
+            border-color: var(--color-primary);
+        }
+        .upload-area.dragover {
+            background-color: var(--color-success-light);
+            border-color: var(--color-success);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+<div class="flex min-h-screen">
+    <div th:replace="~{fragments/admin-sidebar :: sidebar}"></div>
+
+    <main class="flex-1 p-4 md:p-8">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex items-center justify-between pb-4 mb-6 border-b admin-border">
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-bold admin-text-primary">数据导入</h1>
+                    <p class="mt-1 admin-text-secondary">上传CSV文件以批量导入数据</p>
+                </div>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <a href="/admin/data-import/template" class="inline-flex items-center gap-2 px-4 py-2 rounded-md admin-btn-secondary transition-colors">
+                        <i class="fa fa-download"></i>
+                        <span>下载导入模板</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 导入说明 -->
+            <div class="border border-blue-200 rounded-lg p-4 mb-6 bg-blue-50 text-blue-800">
+                <h5 class="font-bold flex items-center gap-2"><i class="fa fa-info-circle"></i> 导入说明</h5>
+                <ul class="list-disc list-inside mt-2 space-y-1">
+                    <li>支持上传CSV格式的文件，无文件大小限制</li>
+                    <li>CSV文件必须按照指定格式组织数据，各数据段用标题分隔</li>
+                    <li><strong>默认行为：</strong>保留现有数据，只导入新数据</li>
+                    <li>可以勾选"清空现有数据"选项来清空所有现有数据后导入，实现完全覆盖</li>
+                    <li>所有ID使用CSV文件中的值，不会自动生成新ID</li>
+                    <li>建议先下载导入模板作为参考</li>
+                    <li>导入操作不可逆，请谨慎操作</li>
+                </ul>
+            </div>
+
+            <!-- 上传区域 -->
+            <div class="p-6 rounded-lg shadow admin-card">
+                <div class="border-b admin-border px-6 py-4 -mx-6 -mt-6 mb-6">
+                    <h5 class="text-lg font-semibold flex items-center gap-2 admin-text-primary"><i class="fa fa-upload"></i> 上传CSV文件</h5>
+                </div>
+                <form id="uploadForm" method="post" enctype="multipart/form-data" action="/admin/data-import/upload">
+                    <!-- 清空数据选项 -->
+                    <div class="mb-6 p-4 border border-yellow-200 rounded-lg bg-yellow-50">
+                        <div class="flex items-start gap-3">
+                            <input type="checkbox" id="clearExistingData" name="clearExistingData" class="mt-1 h-4 w-4 rounded text-red-600 border-gray-300">
+                            <div>
+                                <label for="clearExistingData" class="text-sm font-medium cursor-pointer text-yellow-800">
+                                    <i class="fa fa-warning text-yellow-600"></i> 清空现有数据后导入
+                                </label>
+                                <p class="text-xs mt-1 text-yellow-700">
+                                    勾选此项将删除所有现有数据（用户、哲学家、学派、内容等），然后导入新数据。
+                                    <strong class="text-red-600">此操作不可逆，请谨慎使用！</strong>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="upload-area" id="uploadArea">
+                        <i class="fa fa-cloud-upload fa-3x mb-3 admin-text-secondary"></i>
+                        <h4 class="text-lg font-semibold mb-2 admin-text-primary">拖拽CSV文件到此处或点击选择文件</h4>
+                        <p class="admin-text-secondary">支持的文件格式：CSV</p>
+                        <input type="file" id="fileInput" name="file" accept=".csv" class="hidden">
+                        <button type="button" class="mt-4 px-4 py-2 rounded-md transition-colors admin-btn-primary" id="selectFileBtn">
+                            <i class="fa fa-folder-open"></i> 选择文件
+                        </button>
+                    </div>
+
+                    <div id="fileInfo" class="mt-4 p-3 rounded-lg admin-card hidden">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center gap-2">
+                                <i class="fa fa-file-text-o" style="color: var(--color-success);"></i>
+                                <span id="fileName" class="font-semibold admin-text-primary"></span>
+                                <small class="admin-text-secondary">(<span id="fileSize"></span>)</small>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button type="submit" class="px-4 py-2 rounded-md transition-colors disabled:opacity-50" style="background-color: var(--color-success); color: white;" id="uploadBtn" disabled>
+                                    <i class="fa fa-upload"></i> 开始导入
+                                </button>
+                                <button type="button" class="px-4 py-2 rounded-md admin-btn-secondary transition-colors" onclick="clearFile()">
+                                    <i class="fa fa-times"></i> 清除
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- 导入结果将通过JavaScript显示 -->
+
+            <!-- 详细导入结果 -->
+            <div th:if="${importDetails}" class="mt-6 rounded-lg shadow admin-card">
+                <div class="border-b admin-border px-6 py-4">
+                    <h5 class="text-lg font-semibold flex items-center gap-2 admin-text-primary"><i class="fa fa-bar-chart"></i> 导入详情</h5>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div class="rounded-lg p-4 text-center bg-green-600 text-white">
+                            <h3 class="text-3xl font-bold" th:text="${importDetails.totalImported}">0</h3>
+                            <p>成功导入</p>
+                        </div>
+                        <div class="rounded-lg p-4 text-center bg-red-600 text-white">
+                            <h3 class="text-3xl font-bold" th:text="${importDetails.totalFailed}">0</h3>
+                            <p>导入失败</p>
+                        </div>
+                    </div>
+
+                    <div class="max-h-96 overflow-y-auto">
+                        <table class="min-w-full border admin-border">
+                            <thead style="background-color: var(--bg-tertiary);">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider admin-text-secondary">数据表</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider admin-text-secondary">成功导入</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider admin-text-secondary">导入失败</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider admin-text-secondary">总计</th>
+                                </tr>
+                            </thead>
+                            <tbody style="background-color: var(--bg-primary);">
+                                <tr th:each="result : ${importDetails.results}" class="border-t admin-border">
+                                    <td class="px-6 py-4 whitespace-nowrap admin-text-primary" th:text="${result.key}"></td>
+                                    <td class="px-6 py-4 whitespace-nowrap" style="color: var(--color-success);" th:text="${result.value.success}"></td>
+                                    <td class="px-6 py-4 whitespace-nowrap" style="color: var(--color-error);" th:text="${result.value.failed}"></td>
+                                    <td class="px-6 py-4 whitespace-nowrap admin-text-primary" th:text="${result.value.success + result.value.failed}"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 导入格式说明 -->
+            <div class="mt-6 rounded-lg shadow admin-card">
+                <div class="border-b admin-border px-6 py-4">
+                    <h5 class="text-lg font-semibold flex items-center gap-2 admin-text-primary"><i class="fa fa-file-text-o"></i> CSV文件格式要求</h5>
+                </div>
+                <div class="p-6 space-y-2">
+                    <p class="admin-text-primary">CSV文件需要按照以下格式组织：</p>
+                    <details class="border admin-border rounded-lg" open>
+                        <summary class="font-semibold p-3 cursor-pointer transition-colors admin-text-primary" style="background-color: var(--bg-secondary);">用户数据格式</summary>
+                        <div class="p-3 border-t admin-border" style="background-color: var(--bg-tertiary);">
+                            <code class="admin-text-primary">ID,用户名,邮箱,角色,创建时间</code>
+                            <br><small class="admin-text-secondary">例如：1,testuser,test@example.com,USER,2024-01-01T00:00:00</small>
+                        </div>
+                    </details>
+                    <details class="border admin-border rounded-lg">
+                        <summary class="font-semibold p-3 cursor-pointer transition-colors admin-text-primary" style="background-color: var(--bg-secondary);">学派数据格式</summary>
+                        <div class="p-3 border-t admin-border" style="background-color: var(--bg-tertiary);">
+                            <code class="admin-text-primary">ID,名称,描述,父学派ID,创建时间</code>
+                            <br><small class="admin-text-secondary">例如：1,古希腊哲学,古希腊时期的哲学思想,,2024-01-01T00:00:00</small>
+                        </div>
+                    </details>
+                    <details class="border admin-border rounded-lg">
+                        <summary class="font-semibold p-3 cursor-pointer transition-colors admin-text-primary" style="background-color: var(--bg-secondary);">哲学家数据格式</summary>
+                         <div class="p-3 border-t admin-border" style="background-color: var(--bg-tertiary);">
+                            <code class="admin-text-primary">ID,姓名,生年,时代,创建时间</code>
+                            <br><small class="admin-text-secondary">例如：1,苏格拉底,-470,古典时期,2024-01-01T00:00:00</small>
+                            <br><small style="color: var(--color-info);">注意：哲学家与学派的关联请在"哲学家学派关联数据"中填写</small>
+                        </div>
+                    </details>
+                    <details class="border admin-border rounded-lg">
+                        <summary class="font-semibold p-3 cursor-pointer transition-colors admin-text-primary" style="background-color: var(--bg-secondary);">哲学家学派关联数据格式</summary>
+                         <div class="p-3 border-t admin-border" style="background-color: var(--bg-tertiary);">
+                            <code class="admin-text-primary">哲学家ID,学派ID</code>
+                            <br><small class="admin-text-secondary">例如：1,2</small>
+                            <br><small style="color: var(--color-success);">用于建立哲学家与学派的多对多关联关系</small>
+                        </div>
+                    </details>
+                     <details class="border admin-border rounded-lg">
+                        <summary class="font-semibold p-3 cursor-pointer transition-colors admin-text-primary" style="background-color: var(--bg-secondary);">内容数据格式</summary>
+                         <div class="p-3 border-t admin-border" style="background-color: var(--bg-tertiary);">
+                            <code class="admin-text-primary">ID,内容,内容英文,哲学家,学派,作者,标题,排序索引,版主可编辑,锁定用户,锁定时间,创建时间,更新时间</code>
+                            <br><small class="admin-text-secondary">例如：1,"苏格拉底的主要思想...","Socrates' main thoughts...",苏格拉底,古希腊哲学,admin,"哲学思想探讨",1,1,,,2024-01-01T00:00:00,2024-01-01T00:00:00</small>
+                            <br><small style="color: var(--color-success);">包含完整的内容信息：中英文内容、排序、权限设置等</small>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<div th:replace="~{fragments/footer :: message-script}"></div>
+<div th:replace="~{fragments/admin-head :: admin-scripts}"></div>
+
+<script>
+    // 页面加载时显示消息
+    document.addEventListener('DOMContentLoaded', function() {
+        const success = /*[[${success}]]*/ null;
+        const error = /*[[${error}]]*/ null;
+        
+        if (success) {
+            showMessage('导入成功：' + success, 'success');
+        }
+        
+        if (error) {
+            showMessage('导入失败：' + error, 'error');
+        }
+    });
+
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
+    const fileInfo = document.getElementById('fileInfo');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const uploadBtn = document.getElementById('uploadBtn');
+
+    // 点击上传区域选择文件（排除按钮）
+    if (uploadArea) {
+        uploadArea.addEventListener('click', (e) => {
+            // 如果点击的是按钮，不触发文件选择
+            if (e.target.id === 'selectFileBtn' || e.target.closest('#selectFileBtn')) {
+                return;
+            }
+            fileInput.click();
+        });
+    }
+
+    // 按钮点击事件
+    const selectFileBtn = document.getElementById('selectFileBtn');
+    if (selectFileBtn) {
+        selectFileBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // 阻止事件冒泡
+            fileInput.click();
+        });
+    }
+
+    // 文件选择变化
+    if (fileInput) {
+        fileInput.addEventListener('change', handleFileSelect);
+    }
+
+    // 拖拽上传
+    if (uploadArea) {
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                handleFileSelect();
+            }
+        });
+    }
+
+    function handleFileSelect() {
+        const file = fileInput.files[0];
+        if (file) {
+            fileName.textContent = file.name;
+            fileSize.textContent = formatFileSize(file.size);
+            fileInfo.style.display = 'block';
+            uploadBtn.disabled = false;
+        } else {
+            clearFile();
+        }
+    }
+
+    function clearFile() {
+        fileInput.value = '';
+        fileInfo.style.display = 'none';
+        uploadBtn.disabled = true;
+    }
+
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    // 表单提交前确认
+    const uploadForm = document.getElementById('uploadForm');
+    if (uploadForm) {
+        uploadForm.addEventListener('submit', function(e) {
+            const clearExistingData = document.getElementById('clearExistingData').checked;
+            
+            let confirmMessage;
+            
+            if (clearExistingData) {
+                confirmMessage = '⚠️ 警告：将清空现有数据！\n\n这将删除所有现有数据（用户、哲学家、学派、内容等），然后导入新数据。\n\n所有ID将使用CSV文件中的值。\n\n此操作不可逆，确定要继续吗？';
+            } else {
+                confirmMessage = '确定要导入这个CSV文件吗？\n\n将保留现有数据，跳过已存在的数据。\n\n导入操作不可逆，请确认数据格式正确。';
+            }
+            
+            if (!confirm(confirmMessage)) {
+                e.preventDefault();
+            } else {
+                uploadBtn.disabled = true;
+                uploadBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> 导入中...';
+            }
+        });
+    }
+</script>
+</body>
+</html>

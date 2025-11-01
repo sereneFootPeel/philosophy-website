@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${contentForm.id == null ? '添加新内容' : '编辑内容'} + ' - 哲学网站版主后台'">内容管理 - 哲学网站版主后台</title>
+    <div th:replace="~{fragments/admin-head :: moderator-head}"></div>
+</head>
+<body class="min-h-screen">
+<div class="flex min-h-screen">
+
+    <!-- Moderator Sidebar -->
+    <div th:replace="~{fragments/admin-sidebar :: moderator-sidebar}"></div>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-4 md:p-8">
+        <div class="max-w-3xl mx-auto">
+            <div th:replace="~{fragments/content-form :: contentForm(
+                contentForm=${contentForm},
+                philosophers=${philosophers},
+                schools=${schools},
+                actionUrl='/moderator/contents/save',
+                cancelUrl='/moderator/contents',
+                title=(${contentForm.id != null} ? '编辑内容' : '添加新内容'),
+                contentEn=${contentEn},
+                currentUserId=${currentUserId},
+                lockBaseUrl='/moderator/contents'
+            )}"></div>
+        </div>
+    </main>
+</div>
+
+<!-- Mobile Drawer and Script -->
+<div th:replace="~{fragments/admin-sidebar :: moderator-mobile-drawer}"></div>
+
+<!-- Moderator Scripts -->
+<div th:replace="~{fragments/admin-head :: moderator-scripts}"></div>
+
+<!-- 消息提示脚本 -->
+<div th:replace="~{fragments/footer :: message-script}"></div>
+
+<script>
+    // 页面加载时显示错误消息
+    document.addEventListener('DOMContentLoaded', function() {
+        const error = /*[[${error}]]*/ null;
+        
+        if (error) {
+            showMessage(error, 'error');
+        }
+    });
+</script>
+
+</body>
+</html>

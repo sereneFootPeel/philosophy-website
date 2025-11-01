@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head}" th:with="pageTitle=${translationService.getStaticText('philosophy', language)} + ' - 全部内容'">
+    <!-- Like Button Component script is now loaded at the end of the body -->
+
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .transition-smooth {
+                transition: all 0.3s ease-in-out;
+            }
+            .hover-scale-105:hover {
+                transform: scale(1.05);
+            }
+            .hover-scale-110:hover {
+                transform: scale(1.1);
+            }
+            .school-tag {
+                transition: all 0.2s ease;
+                text-align: center;
+            }
+
+                .school-tag:hover {
+                    transform: scale(1.05);
+                }
+
+            .school-parent {
+                font-weight: bold;
+            }
+
+            .school-child {
+                font-size: 0.9rem;
+            }
+
+
+            /* 确保卡片内容区域有最小高度，避免内容过少时的布局问题 */
+            .content-card-content {
+                min-height: 120px;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+            }
+        }
+    </style>
+</head>
+<body class="bg-secondary font-sans antialiased min-h-screen flex flex-col">
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="flex-grow pt-16">
+        <section id="contents-page" class="page active bg-tertiary min-h-[50vh]">
+            <div class="container mx-auto px-4 py-8">
+                <h1 class="text-3xl font-bold text-primary mb-8 text-center" th:text="${translationService.getStaticText('all_content', language)}">所有内容</h1>
+                <!-- 内容卡片 -->
+                <div id="content-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- 初始内容 -->
+                    <th:block th:each="content : ${contents}">
+                        <div th:if="${content != null}"
+                             th:replace="~{fragments/content-card :: content-card(
+                                 content=${content},
+                                 showPhilosopherInfo=true,
+                                 showActions='hover-only',
+                                 clickable=true,
+                                 customClasses='block bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px] hover:bg-tertiary cursor-pointer relative group',
+                                 isAuthenticated=${isAuthenticated},
+                                 showLikeButton=true,
+                                 showViewMoreButton=true,
+                                 isContentOwner=false,
+                                 showParentSchool=true
+                             )}"
+                        ></div>
+                    </th:block>
+                </div>
+            </div>
+        </section>
+
+        <!-- 最新编辑页面 -->
+        <section id="edits-page" class="page hidden bg-tertiary min-h-[50vh]">
+            <div class="container mx-auto px-4 py-8">
+                <h1 class="text-3xl font-bold text-primary mb-8 text-center" th:text="${translationService.getStaticText('latest_edits', language)}">最新编辑</h1>
+                <div id="user-edits-container" class="space-y-6">
+                    <th:block th:each="userEdit : ${userEdits}">
+                        <div th:if="${userEdit != null}"
+                             th:replace="~{fragments/content-card :: user-edit-card(edit=${userEdit}, customClasses='block bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px] hover:bg-tertiary cursor-pointer relative group', showParentSchool=false)}"
+                        ></div>
+                    </th:block>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
+
+    <!-- 右下角固定按钮：回到顶部 -->
+    <div class="fixed bottom-6 right-6">
+        <button id="back-to-top"
+                class="w-16 h-16 rounded-full bg-primary text-white shadow-lg flex items-center justify-center transition-all duration-300 hover:bg-primary/90 hover:scale-105 active:scale-95 opacity-0 pointer-events-none"
+                onclick="scrollToTop()"
+                th:title="${translationService.getStaticText('back_to_top', language)}">
+            <i class="fa fa-chevron-up text-xl"></i>
+        </button>
+    </div>
+
+    <!-- 页脚 -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <div th:replace="~{fragments/footer :: language-switcher-script}"></div>
+    <div th:replace="~{fragments/footer :: search-script}"></div>
+    <div th:replace="~{fragments/footer :: search-modal}"></div>
+
+    <!-- Like Button Component -->
+    <script th:src="@{/js/like-button-component.js}"></script>
+    <div th:replace="~{fragments/footer :: like-script}"></div>
+
+    <script th:inline="javascript">
+        // 无限滚动变量
+        let currentPage = 0;
+        let isLoading = false;
+        let hasMore = /*[[${hasMore}]]*/ true;
+        const isShowingAll = /*[[${selectedSchool == null and selectedPhilosopher == null}]]*/ true;
+
+        // 添加导航栏滚动效果和无限滚动检测
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            const backToTopButton = document.getElementById('back-to-top');
+
+            if (window.scrollY > 10) {
+                navbar.classList.add('py-2');
+                navbar.classList.add('shadow-lg');
+                // 显示回到顶部按钮
+                if (backToTopButton) {
+                    backToTopButton.classList.remove('opacity-0', 'pointer-events-none');
+                    backToTopButton.classList.add('opacity-100');
+                }
+            } else {
+                navbar.classList.remove('py-2');
+                navbar.classList.remove('shadow-lg');
+                // 隐藏回到顶部按钮
+                if (backToTopButton) {
+                    backToTopButton.classList.add('opacity-0', 'pointer-events-none');
+                    backToTopButton.classList.remove('opacity-100');
+                }
+            }
+
+            // 无限滚动检测（仅在显示所有内容时启用）- 提前800px触发，让用户无感知
+            if (isShowingAll && !isLoading && hasMore) {
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                const windowHeight = window.innerHeight;
+                const documentHeight = document.documentElement.scrollHeight;
+
+                if (scrollTop + windowHeight >= documentHeight - 800) {
+                    loadMoreContents();
+                }
+            }
+        });
+
+        // 回到顶部功能
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // 加载更多内容（静默加载，用户无感知）
+        async function loadMoreContents() {
+            if (isLoading || !hasMore || !isShowingAll) return;
+
+            isLoading = true;
+            currentPage++;
+
+            try {
+                const response = await fetch(`/api/contents/more?page=${currentPage}&size=15`);
+                if (!response.ok) {
+                    throw new Error('加载失败');
+                }
+
+                const data = await response.json();
+                
+                if (data.success && data.contents && data.contents.length > 0) {
+                    // 获取当前语言
+                    const language = document.documentElement.lang || 'zh';
+                    
+                    // 渲染新的内容卡片（静默追加到末尾）
+                    const contentsEl = document.getElementById('school-contents');
+                    
+                    data.contents.forEach(content => {
+                        const contentCard = createContentCard(content, language);
+                        contentsEl.appendChild(contentCard);
+                    });
+
+                    // 更新是否有更多数据
+                    hasMore = data.hasMore;
+
+                    // 重新初始化点赞按钮和卡片点击事件
+                    if (typeof initLikeButtons === 'function') {
+                        initLikeButtons();
+                    }
+                    if (typeof initContentCardClickHandlers === 'function') {
+                        initContentCardClickHandlers();
+                    }
+                } else {
+                    hasMore = false;
+                }
+            } catch (error) {
+                console.error('加载更多内容失败:', error);
+                hasMore = false;
+            } finally {
+                isLoading = false;
+            }
+        }
+
+        // 创建内容卡片HTML
+        function createContentCard(content, language) {
+            const div = document.createElement('div');
+            div.className = 'block bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px] hover:bg-tertiary cursor-pointer relative group';
+            div.setAttribute('data-content-id', content.id);
+            div.onclick = function() {
+                if (content.philosopher && content.school) {
+                    window.location.href = `/contents?schoolId=${content.school.id}&philosopherId=${content.philosopher.id}`;
+                }
+            };
+            
+            // 获取哲学家名称
+            const philosopherName = content.philosopher ? 
+                (language === 'en' && content.philosopher.nameEn ? content.philosopher.nameEn : content.philosopher.name) : '';
+            
+            // 获取流派名称
+            const schoolName = content.school ? 
+                (language === 'en' && content.school.nameEn ? content.school.nameEn : content.school.name) : '';
+            
+            // 获取作者信息
+            const authorName = content.user ? content.user.username : '匿名';
+            const authorRole = content.user ? content.user.role : '';
+            let roleTag = '';
+            if (authorRole === 'ADMIN') {
+                roleTag = '<span class="ml-2 px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded">管理员</span>';
+            } else if (authorRole === 'MODERATOR') {
+                roleTag = '<span class="ml-2 px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded">版主</span>';
+            }
+            
+            // 内容预览（限制长度）
+            const contentText = content.content || '';
+            const contentPreview = contentText.length > 200 ? contentText.substring(0, 200) + '...' : contentText;
+            
+            div.innerHTML = `
+                <div class="flex justify-between items-start mb-2">
+                    <div class="flex-1">
+                        <h3 class="text-lg font-semibold text-primary mb-1">${escapeHtml(content.title || philosopherName)}</h3>
+                        <div class="text-sm text-gray-500">
+                            <span>${escapeHtml(philosopherName)}</span>
+                            ${schoolName ? `<span class="mx-2">•</span><span>${escapeHtml(schoolName)}</span>` : ''}
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <like-button entity-type="content" entity-id="${content.id}" like-count="${content.likeCount || 0}"></like-button>
+                    </div>
+                </div>
+                <p class="text-gray-700 mb-3">${escapeHtml(contentPreview)}</p>
+                <div class="flex justify-between items-center text-sm text-gray-500">
+                    <span>
+                        作者: ${escapeHtml(authorName)}${roleTag}
+                    </span>
+                    ${content.commentCount ? `<span><i class="fa fa-comment mr-1"></i>${content.commentCount} 条评论</span>` : ''}
+                </div>
+            `;
+            
+            return div;
+        }
+
+        // HTML 转义函数
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+    </script>
+
+</body>
+</html>

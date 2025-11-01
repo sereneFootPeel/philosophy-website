@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>哲学家管理 - 哲学网站版主后台</title>
+    <div th:replace="~{fragments/admin-head :: moderator-head}"></div>
+</head>
+<body class="min-h-screen">
+    <div class="flex min-h-screen">
+        <!-- 侧边栏 -->
+        <div th:replace="~{fragments/admin-sidebar :: moderator-sidebar}"></div>
+
+        <main class="flex-1 p-4 md:p-8">
+            <div class="max-w-6xl mx-auto">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-2xl md:text-3xl font-bold moderator-text-primary">哲学家管理</h1>
+                        <p class="moderator-text-secondary mt-1">管理您负责流派下的哲学家</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <a href="/moderator/philosophers/create" class="moderator-btn-secondary"><i class="fa fa-plus"></i> 添加哲学家</a>
+                        <div class="md:hidden">
+                            <button id="menu-toggle" class="moderator-text-primary text-xl"><i class="fa fa-bars"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 moderator-card">
+                    <div class="p-4" th:if="${missingBirthYearMessage}">
+                        <div class="moderator-badge-warning" th:text="${missingBirthYearMessage}">提示</div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full">
+                            <thead class="moderator-table-head">
+                                <tr>
+                                    <th class="moderator-table-cell">ID</th>
+                                    <th class="moderator-table-cell">姓名</th>
+                                    <th class="moderator-table-cell">时代</th>
+                                    <th class="moderator-table-cell">出生年份</th>
+                                    <th class="moderator-table-cell">流派</th>
+                                    <th class="moderator-table-cell">作者</th>
+                                    <th class="moderator-table-cell">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-sm">
+                                <tr th:each="philosopher : ${philosophers}">
+                                    <td class="moderator-table-cell" th:text="${philosopher.id}"></td>
+                                    <td class="moderator-table-cell" th:text="${philosopher.name}"></td>
+                                    <td class="moderator-table-cell" th:text="${philosopher.era}"></td>
+                                    <td class="moderator-table-cell">
+                                        <span th:text="${philosopher.birthYear}"></span>
+                                        <span th:unless="${philosopher.birthYear}" style="color: var(--color-error);" class="text-xs ml-1">未设置</span>
+                                    </td>
+                                    <td class="moderator-table-cell">
+                                        <span th:each="school, status : ${philosopher.schools}">
+                                            <span th:text="${school.name}"></span>
+                                            <span th:unless="${status.last}">, </span>
+                                        </span>
+                                    </td>
+                                    <td class="moderator-table-cell">
+                                        <span th:if="${philosopher.user != null}" th:text="${philosopher.user.username}"></span>
+                                        <span th:unless="${philosopher.user != null}" class="moderator-text-tertiary">已注销</span>
+                                    </td>
+                                    <td class="moderator-table-cell">
+                                        <div class="flex items-center gap-2">
+                                            <a th:href="@{/moderator/philosophers/edit/{id}(id=${philosopher.id})}" class="moderator-btn-secondary btn-sm"><i class="fa fa-pencil"></i> 编辑</a>
+                                            <form th:action="@{/moderator/philosophers/delete/{id}(id=${philosopher.id})}" method="post" onsubmit="return confirm('确定要删除这个哲学家吗?');">
+                                                <button type="submit" class="moderator-btn-secondary btn-sm"><i class="fa fa-trash"></i> 删除</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="text-center p-4 moderator-text-secondary" th:if="${philosophers.empty}">
+                        暂无哲学家数据，请添加新的哲学家。
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 移动端抽屉菜单 -->
+    <div th:replace="~{fragments/admin-sidebar :: moderator-mobile-drawer}"></div>
+
+    <!-- Moderator Scripts -->
+    <div th:replace="~{fragments/admin-head :: moderator-scripts}"></div>
+</body>
+</html>

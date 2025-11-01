@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head}" th:with="pageTitle=${translationService.getStaticText('user_profile', language)}">
+    
+    <style>
+        /* 隐私设置开关样式 */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 24px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #E5E7EB;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #4B5563;
+        }
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+        .privacy-lock {
+            transition: all 0.3s ease-in-out;
+            border: 2px solid transparent;
+        }
+        .privacy-lock:hover {
+            transform: scale(1.05);
+        }
+        .privacy-lock.locked {
+            background-color: #f56565; /* red-500 */
+            color: white;
+            border-color: #c53030; /* red-700 */
+        }
+        .privacy-lock.unlocked {
+            background-color: #48bb78; /* green-500 */
+            color: white;
+            border-color: #2f855a; /* green-700 */
+        }
+        
+        /* 语言切换按钮样式 */
+        .language-switch-btn {
+            color: #6B7280;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .language-switch-btn:hover:not(.active) {
+            color: #374151;
+            background: rgba(255, 255, 255, 0.5);
+        }
+        
+        .language-switch-btn.active {
+            color: white;
+            background: var(--color-primary, #4B5563);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .language-switch-btn.active:hover {
+            background: var(--color-primary-dark, #374151);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 8px -1px rgba(0, 0, 0, 0.15), 0 3px 5px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* 主题卡片样式 */
+        .theme-card {
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+        }
+        
+        .theme-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 0.75rem;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        
+        .theme-card:hover::before {
+            opacity: 1;
+        }
+        
+        .theme-card.active {
+            border-color: var(--color-primary, #4B5563);
+            background: linear-gradient(135deg, var(--bg-secondary, #f8f9fa), var(--bg-primary, #ffffff));
+            box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.15), 0 4px 8px -2px rgba(0, 0, 0, 0.1);
+            transform: scale(1.02);
+        }
+        
+        /* Special handling for midnight theme (theme-midnight) to show light gray background */
+        .theme-midnight .theme-card.active {
+            background: #FAFAFA !important;
+            border-color: #374151 !important;
+        }
+        
+        .theme-card.active::after {
+            content: '\f00c';
+            font-family: 'FontAwesome';
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: var(--color-primary, #4B5563);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .theme-card .w-16 {
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        .theme-card:active .w-16 {
+            transform: scale(0.95) rotate(12deg);
+        }
+        
+        @keyframes themeSwitch {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .theme-card.switching {
+            animation: themeSwitch 0.4s ease-out;
+        }
+    </style>
+</head>
+<body class="bg-secondary min-h-screen flex flex-col">
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <!-- 主要内容 -->
+    <main class="flex-grow pt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- 用户信息卡片 -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <div class="flex items-center space-x-4 mb-6">
+                    <div class="w-16 h-16 bg-primary rounded-full flex items-center justify-center">
+                        <i class="fa fa-user text-white text-2xl"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h1 class="text-2xl font-bold text-gray-900" th:text="${user.username}">用户名</h1>
+                                <p class="text-gray-600" th:text="${user.email}">用户邮箱</p>
+                            </div>
+                            <!-- 操作按钮区域 - 仅当不是当前用户且已登录时显示 -->
+                            <div th:if="${!isCurrentUser && isAuthenticated}" class="flex items-center space-x-3">
+                                <!-- 点赞按钮 -->
+                                <div class="like-user-container" th:data-entity-type="'USER'" th:data-entity-id="${user.id}" th:data-is-authenticated="${isAuthenticated}">
+                                    <!-- 静态点赞按钮作为回退 -->
+                                    <button type="button"
+                                            class="like-btn cursor-pointer transition-all duration-200 p-2 rounded-full hover:bg-gray-100"
+                                            title="点赞用户"
+                                            th:onclick="'handleUserLike(this, ' + ${user.id} + ')'">
+                                        <i class="fa fa-heart-o text-gray-400 hover:text-red-500 text-xl transition-colors duration-200"></i>
+                                    </button>
+                                </div>
+                                
+                                <!-- 屏蔽按钮 -->
+                                <div class="block-user-container" th:data-user-id="${user.id}" th:data-is-blocked="${isBlocked}">
+                                    <button type="button" 
+                                            th:id="'block-btn-' + ${user.id}"
+                                            th:class="'block-user-btn w-8 h-8 flex items-center justify-center transition-all duration-200 hover:bg-gray-100 rounded-full'"
+                                            th:onclick="'toggleBlockUser(' + ${user.id} + ')'"
+                                            th:title="${isBlocked} ? '取消屏蔽' : '屏蔽该用户'">
+                                        <i th:class="${isBlocked} ? 'fa fa-times-circle text-red-500' : 'fa fa-ban text-black'" class="text-lg"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 功能菜单 - 使用content卡片样式 -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4" th:if="${isCurrentUser && user.role != 'MODERATOR' && user.role != 'ADMIN'}">
+                    <!-- 点赞 -->
+                    <a href="/likes/my-likes" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px] relative group cursor-pointer">
+                        <div class="text-center">
+                            <div class="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-gray-200 transition-all duration-300">
+                                <i class="fa fa-heart text-gray-600 text-2xl group-hover:scale-105 transition-transform duration-300"></i>
+                            </div>
+                            <h3 class="font-semibold text-gray-900 text-lg" th:text="${translationService.getStaticText('likes', language)}">点赞</h3>
+                        </div>
+                    </a>
+
+                    <!-- 评论 -->
+                    <a href="/comments/my-comments" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px] relative group cursor-pointer">
+                        <div class="text-center">
+                            <div class="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-gray-200 transition-all duration-300">
+                                <i class="fa fa-comment text-gray-600 text-2xl group-hover:scale-105 transition-transform duration-300"></i>
+                            </div>
+                            <h3 class="font-semibold text-gray-900 text-lg" th:text="${translationService.getStaticText('comments', language)}">评论</h3>
+                        </div>
+                    </a>
+
+                    <!-- 编辑 -->
+                    <a href="/user/content-edits" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px] relative group cursor-pointer">
+                        <div class="text-center">
+                            <div class="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-gray-200 transition-all duration-300">
+                                <i class="fa fa-edit text-gray-600 text-2xl group-hover:scale-105 transition-transform duration-300"></i>
+                            </div>
+                            <h3 class="font-semibold text-gray-900 text-lg" th:text="${translationService.getStaticText('edit', language)}">编辑</h3>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- 版主功能菜单 -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4" th:if="${isCurrentUser && user.role == 'MODERATOR'}">
+                    <!-- 点赞 -->
+                    <a href="/likes/my-likes" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px] relative group cursor-pointer">
+                        <div class="text-center">
+                            <div class="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-gray-200 transition-all duration-300">
+                                <i class="fa fa-heart text-gray-600 text-2xl group-hover:scale-105 transition-transform duration-300"></i>
+                            </div>
+                            <h3 class="font-semibold text-gray-900 text-lg" th:text="${translationService.getStaticText('likes', language)}">点赞</h3>
+                        </div>
+                    </a>
+
+                    <!-- 评论 -->
+                    <a href="/comments/my-comments" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px] relative group cursor-pointer">
+                        <div class="text-center">
+                            <div class="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-gray-200 transition-all duration-300">
+                                <i class="fa fa-comment text-gray-600 text-2xl group-hover:scale-105 transition-transform duration-300"></i>
+                            </div>
+                            <h3 class="font-semibold text-gray-900 text-lg" th:text="${translationService.getStaticText('comments', language)}">评论</h3>
+                        </div>
+                    </a>
+
+
+                    <!-- 版主后台 -->
+                    <a href="/moderator" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px] relative group cursor-pointer">
+                        <div class="text-center">
+                            <div class="w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-200 transition-all duration-300">
+                                <i class="fa fa-shield text-blue-600 text-2xl group-hover:scale-105 transition-transform duration-300"></i>
+                            </div>
+                            <h3 class="font-semibold text-gray-900 text-lg" th:text="${translationService.getStaticText('moderator_backend', language)}">版主后台</h3>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- 管理员功能菜单 -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4" th:if="${isCurrentUser && user.role == 'ADMIN'}">
+                    <!-- 点赞 -->
+                    <a href="/likes/my-likes" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px] relative group cursor-pointer">
+                        <div class="text-center">
+                            <div class="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-gray-200 transition-all duration-300">
+                                <i class="fa fa-heart text-gray-600 text-2xl group-hover:scale-105 transition-transform duration-300"></i>
+                            </div>
+                            <h3 class="font-semibold text-gray-900 text-lg" th:text="${translationService.getStaticText('likes', language)}">点赞</h3>
+                        </div>
+                    </a>
+
+                    <!-- 评论 -->
+                    <a href="/comments/my-comments" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px] relative group cursor-pointer">
+                        <div class="text-center">
+                            <div class="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-lg flex items-center justify-center group-hover:bg-gray-200 transition-all duration-300">
+                                <i class="fa fa-comment text-gray-600 text-2xl group-hover:scale-105 transition-transform duration-300"></i>
+                            </div>
+                            <h3 class="font-semibold text-gray-900 text-lg" th:text="${translationService.getStaticText('comments', language)}">评论</h3>
+                        </div>
+                    </a>
+
+                    <!-- 管理员后台 -->
+                    <a href="/admin" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px] relative group cursor-pointer">
+                        <div class="text-center">
+                            <div class="w-16 h-16 mx-auto mb-4 bg-red-100 rounded-lg flex items-center justify-center group-hover:bg-red-200 transition-all duration-300">
+                                <i class="fa fa-cog text-red-600 text-2xl group-hover:scale-105 transition-transform duration-300"></i>
+                            </div>
+                            <h3 class="font-semibold text-gray-900 text-lg" th:text="${translationService.getStaticText('admin_backend', language)}">管理员后台</h3>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 用户创建的内容展示区域（管理员除外） -->
+            <div th:if="${!isAdmin}" class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xl font-bold text-gray-900" th:text="${isCurrentUser ? '我的内容' : '用户内容'}">用户内容</h2>
+                    <span class="text-sm text-gray-500" th:text="'共 ' + ${userContentCount} + ' 条内容'">共 X 条内容</span>
+                </div>
+
+                <div class="space-y-6" th:if="${userCreatedContents != null && !userCreatedContents.isEmpty()}">
+                    <th:block th:each="content : ${userCreatedContents}">
+                        <div th:if="${content != null}"
+                             th:replace="~{fragments/content-card :: content-card(
+                                 content=${content},
+                                 showPhilosopherInfo=true,
+                                 showActions='hover-only',
+                                 clickable=true,
+                                 customClasses='block bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px] hover:bg-tertiary cursor-pointer relative group',
+                                 isAuthenticated=${isAuthenticated},
+                                 showLikeButton=true,
+                                 showViewMoreButton=true,
+                                 isContentOwner=${isCurrentUser},
+                                 showParentSchool=true
+                             )}"
+                        ></div>
+                    </th:block>
+                </div>
+
+                <!-- 如果没有内容 -->
+                <div th:if="${userCreatedContents == null || userCreatedContents.isEmpty()}" class="text-center py-8">
+                    <p class="text-gray-500" th:text="${isCurrentUser ? '您还没有创建任何内容' : '该用户还没有创建任何内容'}">暂无内容</p>
+                </div>
+            </div>
+
+            <!-- 设置卡片 (仅当前用户可见) -->
+            <div th:if="${isCurrentUser}" class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <h2 class="text-xl font-bold text-dark mb-6" th:text="${translationService.getStaticText('settings', language)}">设置</h2>
+                
+                <!-- 语言切换设置 -->
+                <div class="mb-6 pb-6 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4" th:text="${translationService.getStaticText('language_settings', language)}">语言设置</h3>
+                    <div class="flex items-center justify-start">
+                        <!-- 语言切换器容器 -->
+                        <div class="inline-flex items-center bg-gray-100 rounded-lg p-1 shadow-inner">
+                            <button id="lang-toggle-zh" 
+                                    class="language-switch-btn relative px-4 py-2 rounded-md transition-all duration-300 font-sans text-sm font-medium"
+                                    th:classappend="${language == 'zh' or language == null} ? 'active' : ''"
+                                    onclick="switchLanguage('zh')">
+                                <span class="relative z-10 flex items-center space-x-1.5">
+                                    <i class="fa fa-language text-base"></i>
+                                    <span th:text="${translationService.getStaticText('chinese', language)}">中文</span>
+                                </span>
+                            </button>
+                            <button id="lang-toggle-en" 
+                                    class="language-switch-btn relative px-4 py-2 rounded-md transition-all duration-300 font-sans text-sm font-medium"
+                                    th:classappend="${language != null and language == 'en'} ? 'active' : ''"
+                                    onclick="switchLanguage('en')">
+                                <span class="relative z-10 flex items-center space-x-1.5">
+                                    <i class="fa fa-language text-base"></i>
+                                    <span th:text="${translationService.getStaticText('english', language)}">English</span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 主题颜色设置 -->
+                <div class="mb-6 pb-6 border-b border-gray-200" th:data-user-id="${user.id}">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4" th:text="${translationService.getStaticText('theme_color', language)}">主题颜色</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        <!-- Theme 1: Ocean Wave -->
+                        <button class="theme-card group relative overflow-hidden bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 hover:scale-105 theme-btn p-4 border-2 border-transparent"
+                                data-theme="light"
+                                title="海洋波浪">
+                            <div class="flex flex-col items-center justify-center h-full">
+                                <div class="flex space-x-1.5">
+                                    <div class="w-6 h-6 rounded-full bg-[#0891B2] shadow-md border border-blue-200"></div>
+                                    <div class="w-6 h-6 rounded-full bg-[#F97316] shadow-md border border-orange-200"></div>
+                                    <div class="w-6 h-6 rounded-full bg-[#F0FDFF] shadow-md border border-gray-300"></div>
+                                </div>
+                            </div>
+                        </button>
+
+                        <!-- Theme 2: Mocha Coffee -->
+                        <button class="theme-card group relative overflow-hidden bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 hover:scale-105 theme-btn p-4 border-2 border-transparent"
+                                data-theme="forest"
+                                title="摩卡咖啡">
+                            <div class="flex flex-col items-center justify-center h-full">
+                                <div class="flex space-x-1.5">
+                                    <div class="w-6 h-6 rounded-full bg-[#8B7968] shadow-md border border-gray-200"></div>
+                                    <div class="w-6 h-6 rounded-full bg-[#D4C4B0] shadow-md border border-gray-200"></div>
+                                    <div class="w-6 h-6 rounded-full bg-[#FAF5F0] shadow-md border border-gray-300"></div>
+                                </div>
+                            </div>
+                        </button>
+
+                        <!-- Theme 3: Lavender Field -->
+                        <button class="theme-card group relative overflow-hidden bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 hover:scale-105 theme-btn p-4 border-2 border-transparent"
+                                data-theme="dark"
+                                title="薰衣草野">
+                            <div class="flex flex-col items-center justify-center h-full">
+                                <div class="flex space-x-1.5">
+                                    <div class="w-6 h-6 rounded-full bg-[#9B8FAA] shadow-md border border-gray-200"></div>
+                                    <div class="w-6 h-6 rounded-full bg-[#7E9BAB] shadow-md border border-gray-200"></div>
+                                    <div class="w-6 h-6 rounded-full bg-[#FAF5FF] shadow-md border border-gray-300"></div>
+                                </div>
+                            </div>
+                        </button>
+
+                        <!-- Theme 4: Christmas Red-Green -->
+                        <button class="theme-card group relative overflow-hidden bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 hover:scale-105 theme-btn p-4 border-2 border-transparent"
+                                data-theme="sunset"
+                                title="圣诞红绿">
+                            <div class="flex flex-col items-center justify-center h-full">
+                                <div class="flex space-x-1.5">
+                                    <div class="w-6 h-6 rounded-full bg-[#C84B4B] shadow-md border border-gray-200"></div>
+                                    <div class="w-6 h-6 rounded-full bg-[#059669] shadow-md border border-gray-200"></div>
+                                    <div class="w-6 h-6 rounded-full bg-[#FEF5F5] shadow-md border border-gray-300"></div>
+                                </div>
+                            </div>
+                        </button>
+
+                        <!-- Theme 5: Stormy Blue -->
+                        <button class="theme-card group relative overflow-hidden bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 hover:scale-105 theme-btn p-4 border-2 border-transparent"
+                                data-theme="ocean"
+                                title="风暴蓝韵">
+                            <div class="flex flex-col items-center justify-center h-full">
+                                <div class="flex space-x-1.5">
+                                    <div class="w-6 h-6 rounded-full bg-[#64748B] shadow-md border border-gray-300"></div>
+                                    <div class="w-6 h-6 rounded-full bg-[#334155] shadow-md border border-gray-300"></div>
+                                    <div class="w-6 h-6 rounded-full bg-[#F8FAFC] shadow-md border border-gray-300"></div>
+                                </div>
+                            </div>
+                        </button>
+
+                        <!-- Theme 6: Low Saturation Pink -->
+                        <button class="theme-card group relative overflow-hidden bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 hover:scale-105 theme-btn p-4 border-2 border-transparent"
+                                data-theme="purple"
+                                title="低饱和粉">
+                            <div class="flex flex-col items-center justify-center h-full">
+                                <div class="flex space-x-1.5">
+                                    <div class="w-6 h-6 rounded-full bg-[#B88A8A] shadow-md border border-gray-200"></div>
+                                    <div class="w-6 h-6 rounded-full bg-[#8A5F5F] shadow-md border border-gray-300"></div>
+                                    <div class="w-6 h-6 rounded-full bg-[#FFF8F8] shadow-md border border-gray-300"></div>
+                                </div>
+                            </div>
+                        </button>
+
+                        <!-- Theme 7: Emerald Forest -->
+                        <button class="theme-card group relative overflow-hidden bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 hover:scale-105 theme-btn p-4 border-2 border-transparent"
+                                data-theme="sakura"
+                                title="翡翠森林">
+                            <div class="flex flex-col items-center justify-center h-full">
+                                <div class="flex space-x-1.5">
+                                    <div class="w-6 h-6 rounded-full bg-[#5F8E7E] shadow-md border border-gray-200"></div>
+                                    <div class="w-6 h-6 rounded-full bg-[#D9B88F] shadow-md border border-gray-200"></div>
+                                    <div class="w-6 h-6 rounded-full bg-[#F0FDF4] shadow-md border border-gray-300"></div>
+                                </div>
+                            </div>
+                        </button>
+
+                        <!-- Theme 8: Low Saturation Green -->
+                        <button class="theme-card group relative overflow-hidden bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 hover:scale-105 theme-btn p-4 border-2 border-transparent"
+                                data-theme="nordic"
+                                title="低饱和绿">
+                            <div class="flex flex-col items-center justify-center h-full">
+                                <div class="flex space-x-1.5">
+                                    <div class="w-6 h-6 rounded-full bg-[#6B8A6B] shadow-md border border-gray-200"></div>
+                                    <div class="w-6 h-6 rounded-full bg-[#4A6A4A] shadow-md border border-gray-300"></div>
+                                    <div class="w-6 h-6 rounded-full bg-[#F8FFF8] shadow-md border border-gray-300"></div>
+                                </div>
+                            </div>
+                        </button>
+
+                        <!-- Theme 9: Cyber Dark -->
+                        <button class="theme-card group relative overflow-hidden bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 hover:scale-105 theme-btn p-4 border-2 border-transparent"
+                                data-theme="emerald"
+                                title="赛博暗黑">
+                            <div class="flex flex-col items-center justify-center h-full">
+                                <div class="flex space-x-1.5">
+                                    <div class="w-6 h-6 rounded-full bg-[#4A5568] shadow-md border border-gray-500"></div>
+                                    <div class="w-6 h-6 rounded-full bg-[#6B8E9C] shadow-md border border-gray-400"></div>
+                                    <div class="w-6 h-6 rounded-full bg-[#A8C5D1] shadow-md border border-gray-300"></div>
+                                </div>
+                            </div>
+                        </button>
+
+                        <!-- Theme 10: Pure White Minimal -->
+                        <button class="theme-card group relative overflow-hidden bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 hover:scale-105 theme-btn p-4 border-2 border-transparent"
+                                data-theme="midnight"
+                                title="极简纯白">
+                            <div class="flex flex-col items-center justify-center h-full">
+                                <div class="flex space-x-1.5">
+                                    <div class="w-6 h-6 rounded-full bg-[#FFFFFF] shadow-md border border-gray-200"></div>
+                                    <div class="w-6 h-6 rounded-full bg-[#FFFFFF] shadow-md border border-gray-200"></div>
+                                    <div class="w-6 h-6 rounded-full bg-[#000000] shadow-md border border-gray-300"></div>
+                                </div>
+                            </div>
+                        </button>
+
+                        <!-- Theme 11: Pure Black Scale -->
+                        <button class="theme-card group relative overflow-hidden bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 hover:scale-105 theme-btn p-4 border-2 border-transparent"
+                                data-theme="carbon"
+                                title="纯黑奢华">
+                            <div class="flex flex-col items-center justify-center h-full">
+                                <div class="flex space-x-1.5">
+                                    <div class="w-6 h-6 rounded-full bg-[#0A0A0A] shadow-md border border-gray-700"></div>
+                                    <div class="w-6 h-6 rounded-full bg-[#2A2A2A] shadow-md border border-gray-500"></div>
+                                    <div class="w-6 h-6 rounded-full bg-[#3A3A3A] shadow-md border border-gray-400"></div>
+                                </div>
+                            </div>
+                        </button>
+
+                        <!-- Theme 12: Elegant Purple -->
+                        <button class="theme-card group relative overflow-hidden bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 hover:scale-105 theme-btn p-4 border-2 border-transparent"
+                                data-theme="obsidian"
+                                title="优雅紫韵">
+                            <div class="flex flex-col items-center justify-center h-full">
+                                <div class="flex space-x-1.5">
+                                    <div class="w-6 h-6 rounded-full bg-[#8B7D9A] shadow-md border border-purple-300"></div>
+                                    <div class="w-6 h-6 rounded-full bg-[#A89BB8] shadow-md border border-purple-200"></div>
+                                    <div class="w-6 h-6 rounded-full bg-[#B8A8CC] shadow-md border border-purple-100"></div>
+                                </div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 隐私设置 -->
+                <div class="flex items-center justify-between">
+                    <!-- Left side: Text -->
+                    <div class="text-left pr-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2" th:text="${translationService.getStaticText('profile_privacy_status', language)}">主页隐私状态</h3>
+                        <p class="text-gray-600 text-sm">
+                            <span class="block mt-1" th:text="${translationService.getStaticText('privacy_lock_description', language)}">锁定后，您的所有内容和评论将仅自己可见。</span>
+                        </p>
+                    </div>
+
+                    <!-- Right side: Button -->
+                    <div>
+                        <button id="privacy-lock-btn"
+                                class="privacy-lock w-20 h-20 rounded-full flex items-center justify-center focus:outline-none focus:ring-4 transition-transform transform hover:scale-105"
+                                th:classappend="${user.isProfilePrivate()} ? 'locked focus:ring-red-300' : 'unlocked focus:ring-green-300'"
+                                th:data-user-id="${user.id}"
+                                th:data-current-privacy="${user.isProfilePrivate()}">
+                            <i id="privacy-lock-icon" class="fa fa-3x"
+                               th:classappend="${user.isProfilePrivate()} ? 'fa-lock' : 'fa-unlock-alt'"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 退出登录按钮 -->
+            <div class="mt-8 text-center" th:if="${isCurrentUser}">
+                <a href="/logout" class="inline-flex items-center px-6 py-3 border border-gray-300 text-gray-700 bg-white rounded-lg hover:bg-tertiary transition-colors">
+                    <i class="fa fa-sign-out mr-2"></i>
+                    <span th:text="${translationService.getStaticText('logout', language)}">退出登录</span>
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <div th:replace="~{fragments/footer :: language-switcher-script}"></div>
+    <div th:replace="~{fragments/footer :: search-script}"></div>
+    <div th:replace="~{fragments/footer :: search-modal}"></div>
+    <div th:replace="~{fragments/footer :: theme-script}"></div>
+    <div th:replace="~{fragments/footer :: message-script}"></div>
+    <script th:src="@{/js/like-button.js}"></script>
+    <script th:src="@{/js/like-button-component.js}"></script>
+    <div th:replace="~{fragments/footer :: like-script}"></div>
+
+    <!-- 隐私设置脚本 -->
+    <script th:if="${isCurrentUser}">
+        document.addEventListener('DOMContentLoaded', function() {
+            const lockButton = document.getElementById('privacy-lock-btn');
+            if (lockButton) {
+                const lockIcon = document.getElementById('privacy-lock-icon');
+                
+                lockButton.addEventListener('click', function() {
+                    const userId = this.getAttribute('data-user-id');
+                    const currentPrivacy = this.getAttribute('data-current-privacy') === 'true';
+                    const newPrivacy = !currentPrivacy;
+
+                    const confirmMessage = newPrivacy ? translations.confirmLockProfile : translations.confirmUnlockProfile;
+
+                    if (confirm(confirmMessage)) {
+                        setProfilePrivacy(userId, newPrivacy, this, lockIcon);
+                    }
+                });
+            }
+        });
+
+        function setProfilePrivacy(userId, isPrivate, button, icon) {
+            button.disabled = true;
+            icon.className = 'fa fa-spinner fa-spin fa-3x';
+
+            // 获取CSRF token
+            const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content') || '';
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content') || 'X-CSRF-TOKEN';
+
+            fetch(`/user/profile/${userId}/privacy`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    [csrfHeader]: csrfToken
+                },
+                body: `isPrivate=${isPrivate}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    button.setAttribute('data-current-privacy', isPrivate.toString());
+                    
+                    if(isPrivate) {
+                        button.classList.remove('unlocked', 'focus:ring-green-300');
+                        button.classList.add('locked', 'focus:ring-red-300');
+                        icon.className = 'fa fa-lock fa-3x';
+                    } else {
+                        button.classList.remove('locked', 'focus:ring-red-300');
+                        button.classList.add('unlocked', 'focus:ring-green-300');
+                        icon.className = 'fa fa-unlock-alt fa-3x';
+                    }
+                    
+                    showMessage(data.message, 'success');
+                } else {
+                    showMessage(data.message, 'error');
+                    const currentPrivacy = button.getAttribute('data-current-privacy') === 'true';
+                    if(currentPrivacy) {
+                        icon.className = 'fa fa-lock fa-3x';
+                    } else {
+                        icon.className = 'fa fa-unlock-alt fa-3x';
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showMessage('设置失败，请重试', 'error');
+            })
+            .finally(() => {
+                button.disabled = false;
+            });
+        }
+    </script>
+    
+    <!-- 点赞按钮功能 -->
+    <script>
+        // 用户点赞处理函数（回退方案）
+        function handleUserLike(button, userId) {
+            if (!button) return;
+            
+            const icon = button.querySelector('i');
+            if (!icon) return;
+            
+            // 显示加载状态
+            button.disabled = true;
+            icon.className = 'fa fa-spinner fa-spin text-gray-500';
+            
+            // 发送点赞请求
+            fetch('/likes/toggle', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `entityType=USER&entityId=${userId}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // 更新按钮状态
+                    if (data.isLiked) {
+                        icon.className = 'fa fa-heart text-red-500';
+                    } else {
+                        icon.className = 'fa fa-heart-o text-gray-400 hover:text-red-500';
+                        button.classList.remove('bg-red-50');
+                    }
+                    showMessage(data.message, 'success');
+                } else {
+                    showMessage(data.message || '操作失败', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('点赞操作失败:', error);
+                showMessage('网络错误，请重试', 'error');
+            })
+            .finally(() => {
+                button.disabled = false;
+            });
+        }
+        
+        
+        // 初始化页面功能
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('开始初始化用户个人资料页面功能');
+
+            // 初始化搜索功能
+            initializeSearchFunctionality();
+
+            // 初始化用户点赞按钮
+            const likeUserContainer = document.querySelector('.like-user-container');
+            console.log('找到点赞按钮容器:', likeUserContainer);
+
+            if (likeUserContainer) {
+                const entityType = likeUserContainer.getAttribute('data-entity-type');
+                const entityId = likeUserContainer.getAttribute('data-entity-id');
+                const isAuthenticated = likeUserContainer.getAttribute('data-is-authenticated') === 'true';
+
+                console.log('点赞按钮参数:', {
+                    entityType: entityType,
+                    entityId: entityId,
+                    isAuthenticated: isAuthenticated
+                });
+
+                // 检查LikeButtonComponent是否可用
+                if (window.LikeButtonComponent) {
+                    try {
+                        // 使用LikeButtonComponent初始化
+                        const likeButton = new window.LikeButtonComponent({
+                            entityType: entityType,
+                            entityId: parseInt(entityId),
+                            container: likeUserContainer,
+                            isAuthenticated: isAuthenticated,
+                            onLikeChange: function(data) {
+                                console.log('用户点赞状态改变:', data);
+                            },
+                            onError: function(message, error) {
+                                console.error('点赞错误:', message, error);
+                            }
+                        });
+                        console.log('点赞按钮组件创建完成:', likeButton);
+                    } catch (error) {
+                        console.error('LikeButtonComponent初始化失败，使用回退方案:', error);
+                    }
+                } else {
+                    console.log('LikeButtonComponent不可用，使用静态按钮');
+                }
+
+                // 检查点赞状态
+                if (isAuthenticated) {
+                    checkUserLikeStatus(entityId, likeUserContainer);
+                }
+            } else {
+                console.log('未找到点赞按钮容器，可能不是其他用户的个人资料页面');
+            }
+
+            // 初始化屏蔽用户功能
+            const blockContainer = document.querySelector('.block-user-container');
+            if (blockContainer) {
+                const isBlocked = blockContainer.getAttribute('data-is-blocked') === 'true';
+                if (isBlocked) {
+                    // 如果用户已被屏蔽，禁用点赞按钮
+                    const likeContainer = document.querySelector('.like-user-container');
+                    if (likeContainer) {
+                        const likeBtn = likeContainer.querySelector('button');
+                        if (likeBtn) {
+                            likeBtn.disabled = true;
+                            likeBtn.style.opacity = '0.5';
+                            likeBtn.style.cursor = 'not-allowed';
+                        }
+                    }
+                }
+            }
+        });
+        
+        // 检查用户点赞状态
+        function checkUserLikeStatus(userId, container) {
+            fetch(`/likes/check?entityType=USER&entityId=${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    const button = container.querySelector('.like-btn');
+                    const icon = button?.querySelector('i');
+                    
+                    if (button && icon) {
+                        if (data.isLiked) {
+                            icon.className = 'fa fa-heart text-red-500';
+                            button.classList.add('bg-red-50');
+                        } else {
+                            icon.className = 'fa fa-heart-o text-gray-400 hover:text-red-500';
+                            button.classList.remove('bg-red-50');
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('检查点赞状态失败:', error);
+                });
+        }
+    </script>
+
+    <script th:inline="javascript">
+        // 翻译文本变量
+        const translations = {
+            updateFailed: /*[[${translationService.getStaticText('update_failed', language)}]]*/ '更新失败',
+            locked: /*[[${translationService.getStaticText('locked', language)}]]*/ '已锁定',
+            unlocked: /*[[${translationService.getStaticText('unlocked', language)}]]*/ '已解锁',
+            confirmLockProfile: /*[[${translationService.getStaticText('confirm_lock_profile', language)}]]*/ '确定要锁定您的主页吗？所有内容和评论将变为私密。',
+            confirmUnlockProfile: /*[[${translationService.getStaticText('confirm_unlock_profile', language)}]]*/ '确定要解锁您的主页吗？所有内容和评论将变为公开。'
+        };
+
+        // 搜索功能函数
+        function openSearchModal() {
+            console.log('打开搜索模态框');
+            const modal = document.getElementById('search-modal');
+            const panel = document.getElementById('search-panel');
+
+            if (modal && panel) {
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    panel.classList.remove('translate-y-full');
+                    // 聚焦到输入框
+                    const input = document.getElementById('search-input');
+                    if (input) {
+                        input.focus();
+                    }
+                }, 10);
+            } else {
+                console.error('搜索模态框元素不存在');
+            }
+        }
+
+        function closeSearchModal() {
+            console.log('关闭搜索模态框');
+            const modal = document.getElementById('search-modal');
+            const panel = document.getElementById('search-panel');
+
+            if (modal && panel) {
+                panel.classList.add('translate-y-full');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                }, 300);
+            }
+        }
+
+        function performSearch() {
+            const input = document.getElementById('search-input');
+            const query = input ? input.value.trim() : '';
+
+            if (query) {
+                console.log('执行搜索:', query);
+                window.location.href = '/search/results?query=' + encodeURIComponent(query);
+            }
+        }
+
+        function handleSearchKeypress(event) {
+            if (event.key === 'Enter') {
+                performSearch();
+            }
+        }
+
+        // 初始化搜索功能
+        function initializeSearchFunctionality() {
+            console.log('初始化搜索功能...');
+
+            // 检查搜索按钮是否存在
+            const searchButton = document.getElementById('search-toggle');
+            console.log('搜索按钮元素:', searchButton);
+
+            // 检查搜索模态框是否存在
+            const searchModal = document.getElementById('search-modal');
+            const searchPanel = document.getElementById('search-panel');
+            console.log('搜索模态框元素:', searchModal);
+            console.log('搜索面板元素:', searchPanel);
+
+            if (!searchButton) {
+                console.error('搜索按钮不存在！');
+                return;
+            }
+
+            if (!searchModal || !searchPanel) {
+                console.error('搜索模态框或面板不存在！');
+                return;
+            }
+
+            // 添加搜索按钮点击事件
+            searchButton.addEventListener('click', function() {
+                console.log('搜索按钮被点击');
+                openSearchModal();
+            });
+
+            // 添加模态框背景点击关闭事件
+            if (searchModal) {
+                searchModal.addEventListener('click', function(event) {
+                    if (event.target === searchModal) {
+                        closeSearchModal();
+                    }
+                });
+            }
+
+            // 添加关闭按钮点击事件
+            const closeButton = searchPanel.querySelector('button');
+            if (closeButton) {
+                closeButton.addEventListener('click', function() {
+                    closeSearchModal();
+                });
+            }
+
+            // 添加搜索输入框按键事件
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) {
+                searchInput.addEventListener('keypress', handleSearchKeypress);
+            }
+
+            // 添加搜索按钮点击事件
+            const searchBtn = searchPanel.querySelector('.absolute button');
+            if (searchBtn) {
+                searchBtn.addEventListener('click', performSearch);
+            }
+
+            // 添加搜索建议点击事件
+            const suggestionElements = searchPanel.querySelectorAll('#search-suggestions span');
+            suggestionElements.forEach(span => {
+                span.addEventListener('click', function() {
+                    const suggestion = this.textContent.trim();
+                    if (searchInput) {
+                        searchInput.value = suggestion;
+                        performSearch();
+                    }
+                });
+            });
+
+            // 添加ESC键关闭事件
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape' && searchModal && !searchModal.classList.contains('hidden')) {
+                    closeSearchModal();
+                }
+            });
+
+            console.log('搜索功能初始化完成');
+        }
+
+        // 屏蔽用户功能
+        function toggleBlockUser(userId) {
+            const blockBtn = document.getElementById('block-btn-' + userId);
+            const blockContainer = document.querySelector('.block-user-container[data-user-id="' + userId + '"]');
+            const isCurrentlyBlocked = blockContainer.getAttribute('data-is-blocked') === 'true';
+            
+            // 禁用按钮防止重复点击
+            blockBtn.disabled = true;
+            blockBtn.innerHTML = '<i class="fa fa-spinner fa-spin mr-1"></i>处理中...';
+            
+            const url = isCurrentlyBlocked ? `/user/unblock/${userId}` : `/user/block/${userId}`;
+            const method = 'POST';
+            
+            fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // 更新按钮状态
+                    const newIsBlocked = !isCurrentlyBlocked;
+                    blockContainer.setAttribute('data-is-blocked', newIsBlocked);
+                    
+                    if (newIsBlocked) {
+                        // 已屏蔽状态
+                        blockBtn.className = 'block-user-btn w-8 h-8 flex items-center justify-center transition-all duration-200 hover:bg-gray-100 rounded-full';
+                        blockBtn.innerHTML = '<i class="fa fa-times-circle text-red-500 text-lg"></i>';
+                        blockBtn.title = '取消屏蔽';
+                        
+                        // 禁用点赞按钮
+                        const likeContainer = document.querySelector('.like-user-container');
+                        if (likeContainer) {
+                            const likeBtn = likeContainer.querySelector('button');
+                            if (likeBtn) {
+                                likeBtn.disabled = true;
+                                likeBtn.style.opacity = '0.5';
+                                likeBtn.style.cursor = 'not-allowed';
+                            }
+                        }
+                    } else {
+                        // 未屏蔽状态
+                        blockBtn.className = 'block-user-btn w-8 h-8 flex items-center justify-center transition-all duration-200 hover:bg-gray-100 rounded-full';
+                        blockBtn.innerHTML = '<i class="fa fa-ban text-black text-lg"></i>';
+                        blockBtn.title = '屏蔽该用户';
+                        
+                        // 启用点赞按钮
+                        const likeContainer = document.querySelector('.like-user-container');
+                        if (likeContainer) {
+                            const likeBtn = likeContainer.querySelector('button');
+                            if (likeBtn) {
+                                likeBtn.disabled = false;
+                                likeBtn.style.opacity = '1';
+                                likeBtn.style.cursor = 'pointer';
+                            }
+                        }
+                    }
+                    
+                    showMessage(data.message, 'success');
+                } else {
+                    showMessage(data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showMessage('操作失败，请稍后再试', 'error');
+            })
+            .finally(() => {
+                // 恢复按钮状态
+                blockBtn.disabled = false;
+            });
+        }
+
+    </script>
+</body>
+</html>

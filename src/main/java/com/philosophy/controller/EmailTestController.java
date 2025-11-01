@@ -1,0 +1,1 @@
+// Deprecated: Removed legacy email test endpoint. Keeping file intentionally empty to avoid 404 references.

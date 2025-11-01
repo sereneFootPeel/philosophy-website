@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户详情 - 哲学网站</title>
+    <div th:replace="~{fragments/admin-head :: admin-head}"></div>
+</head>
+<body class="min-h-screen">
+    <div class="flex min-h-screen">
+        <!-- 侧边栏 -->
+        <div th:replace="~{fragments/admin-sidebar :: sidebar}"></div>
+
+        <!-- 主内容 -->
+        <main class="flex-1 p-4 md:p-8">
+            <div class="max-w-5xl mx-auto">
+                <div class="mb-4">
+                    <a href="/admin/users" class="admin-btn-secondary">
+                        <i class="fa fa-arrow-left"></i> 返回用户列表
+                    </a>
+                </div>
+
+                <div class="text-center mb-8 p-8 admin-card rounded-xl">
+                    <img th:src="@{https://ui-avatars.com/api/?name=${user.username}&background=random}" alt="用户头像" class="w-28 h-28 rounded-full mx-auto mb-4 shadow">
+                    <div class="text-2xl font-bold admin-text-primary" th:text="${user.username}"></div>
+                    <div class="admin-text-secondary" th:text="${user.email}"></div>
+                    <div class="mt-3">
+                        <span class="px-3 py-1 rounded-full text-sm font-semibold" th:classappend="${user.accountLocked} ? 'admin-badge-error' : 'admin-badge-success'" th:text="${user.accountLocked} ? '账户已锁定' : '账户正常'"></span>
+                        <div class="mt-2">
+                            <form th:action="@{/admin/users/toggle-lock/} + ${user.id}" method="post" class="inline-block">
+                                <button type="submit" class="admin-btn-secondary" th:classappend="${user.accountLocked} ? 'admin-badge-success' : 'admin-badge-error'" th:text="${user.accountLocked} ? '解除锁定' : '锁定账户'" onclick="return confirm('确定要执行此操作吗?')"></button>
+                            </form>
+                            <a th:href="@{'/admin/users/edit/' + ${user.id}}" class="admin-btn-secondary ml-2">编辑用户</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+                    <div class="admin-card rounded-xl p-4 text-center">
+                        <div class="text-3xl font-bold admin-text-primary" th:text="${loginCount}"></div>
+                        <div class="admin-text-secondary text-sm">登录次数</div>
+                    </div>
+                    <div class="admin-card rounded-xl p-4 text-center">
+                        <div class="text-3xl font-bold admin-text-primary" th:text="${commentCount}"></div>
+                        <div class="admin-text-secondary text-sm">评论总数</div>
+                    </div>
+                    <div class="admin-card rounded-xl p-4 text-center">
+                        <div class="text-3xl font-bold admin-text-primary" th:text="${allUserIpAddresses.size()}"></div>
+                        <div class="admin-text-secondary text-sm">唯一IP地址</div>
+                    </div>
+                    <div class="admin-card rounded-xl p-4 text-center">
+                        <div class="text-3xl font-bold admin-text-primary" th:text="${allUserDevices.size()}"></div>
+                        <div class="admin-text-secondary text-sm">设备类型</div>
+                    </div>
+                    <div class="admin-card rounded-xl p-4 text-center">
+                        <div class="text-3xl font-bold admin-text-primary" th:text="${userEditCount}"></div>
+                        <div class="admin-text-secondary text-sm">编辑内容</div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="admin-card rounded-xl overflow-hidden h-full">
+                        <div class="px-5 py-3 border-b admin-table-head font-semibold">基本信息</div>
+                        <div class="p-5 space-y-3">
+                            <div class="flex justify-between border-b pb-2 admin-border"><span class="font-medium admin-text-primary">用户名：</span><span class="admin-text-secondary" th:text="${user.username}"></span></div>
+                            <div class="flex justify-between border-b pb-2 admin-border"><span class="font-medium admin-text-primary">邮箱：</span><span class="admin-text-secondary" th:text="${user.email}"></span></div>
+                            <div class="flex justify-between border-b pb-2 admin-border"><span class="font-medium admin-text-primary">角色：</span><span class="admin-text-secondary" th:text="${user.role}"></span></div>
+                            <div class="flex justify-between border-b pb-2 admin-border"><span class="font-medium admin-text-primary">创建时间：</span><span class="admin-text-secondary" th:text="${user.createdAt != null ? #temporals.format(user.createdAt, 'yyyy-MM-dd HH:mm:ss') : '未知时间'}"></span></div>
+                            <div class="flex justify-between border-b pb-2 admin-border"><span class="font-medium admin-text-primary">更新时间：</span><span class="admin-text-secondary" th:text="${user.updatedAt != null ? #temporals.format(user.updatedAt, 'yyyy-MM-dd HH:mm:ss') : '未知时间'}"></span></div>
+                            <div class="flex justify-between border-b pb-2 admin-border"><span class="font-medium admin-text-primary">账户状态：</span><span class="admin-text-secondary" th:text="${user.enabled ? '启用' : '禁用'}"></span></div>
+                            <div class="flex justify-between border-b pb-2 admin-border"><span class="font-medium admin-text-primary">登录失败次数：</span><span class="admin-text-secondary" th:text="${user.failedLoginAttempts}"></span></div>
+                            <div class="flex justify-between" th:if="${user.lockTime != null}"><span class="font-medium admin-text-primary">锁定时间：</span><span class="admin-text-secondary" th:text="${#temporals.format(user.lockTime, 'yyyy-MM-dd HH:mm:ss')}"></span></div>
+                            <!-- 版主流派分配 -->
+                            <div th:if="${user.role == 'MODERATOR'}" class="flex justify-between border-b pb-2 admin-border">
+                                <span class="font-medium admin-text-primary">负责流派：</span>
+                                <span class="admin-text-secondary">
+                                    <span th:if="${user.assignedSchoolId != null and schoolService.getSchoolById(user.assignedSchoolId) != null}" th:text="${schoolService.getSchoolById(user.assignedSchoolId).name}"></span>
+                                    <span th:if="${user.assignedSchoolId == null or schoolService.getSchoolById(user.assignedSchoolId) == null}">未分配</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="admin-card rounded-xl overflow-hidden h-full min-h-[18rem]">
+                        <div class="px-5 py-3 border-b admin-table-head font-semibold">设备信息</div>
+                        <div class="p-5 space-y-3">
+                            <div class="flex justify-between border-b pb-2 admin-border"><span class="font-medium admin-text-primary">最近登录IP：</span><span class="admin-text-secondary" th:text="${userIpAddress}"></span></div>
+                            <div class="flex justify-between border-b pb-2 admin-border"><span class="font-medium admin-text-primary">最近设备类型：</span><span class="admin-text-secondary" th:text="${userDevice}"></span></div>
+                            <div class="mt-2">
+                                <div class="font-medium mb-2 admin-text-primary">所有IP地址：</div>
+                                <div class="grid grid-cols-2 md:grid-cols-3 gap-2" th:if="${!allUserIpAddresses.isEmpty()}">
+                                    <div class="rounded px-3 py-2 text-center" style="background-color: var(--bg-tertiary); color: var(--text-primary);" th:each="ip : ${allUserIpAddresses}" th:text="${ip}"></div>
+                                </div>
+                                <p th:if="${allUserIpAddresses.isEmpty()}" class="admin-text-secondary">暂无IP地址记录</p>
+                            </div>
+                            <div class="mt-2">
+                                <div class="font-medium mb-2 admin-text-primary">设备ID：</div>
+                                <div th:if="${allUserDeviceIds != null and !allUserDeviceIds.isEmpty()}">
+                                    <div th:each="did : ${allUserDeviceIds}" class="text-sm admin-text-secondary break-all mb-1" th:text="${did}"></div>
+                                </div>
+                                <p th:if="${allUserDeviceIds == null or allUserDeviceIds.isEmpty()}" class="admin-text-secondary">暂无设备ID记录</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 评论历史 - 分成两个卡片 -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+                    <!-- 未删除评论卡片 -->
+                    <div class="admin-card rounded-xl overflow-hidden">
+                        <div class="px-5 py-3 border-b admin-table-head font-semibold">
+                            <span>正常评论 (共 <span th:text="${comments != null ? comments.size() : 0}"></span> 条)</span>
+                        </div>
+                        <div class="p-5">
+                            <div th:if="${comments == null or comments.isEmpty()}">
+                                <p class="admin-text-secondary text-center">暂无正常评论</p>
+                            </div>
+                            <div th:if="${comments != null and !comments.isEmpty()}">
+                                <div th:each="comment : ${comments}" class="border-b last:border-b-0 py-4 admin-border admin-table-row">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <div class="flex-1 cursor-pointer" th:if="${comment.content != null}" th:onclick="'window.location.href=\'/comments/content/' + ${comment.content.id} + '#comment-' + ${comment.id} + '\''">
+                                            <div class="text-sm admin-text-secondary mb-1">
+                                                <span th:text="${comment.createdAt != null ? #temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm:ss') : '未知时间'}"></span>
+                                                <span> | 所属文章： </span>
+                                                <span class="italic" th:text="${comment.content != null and comment.content.content != null ? #strings.abbreviate(comment.content.content, 60) : '内容不可用'}"></span>
+                                            </div>
+                                            <div class="admin-text-primary" th:text="${comment.body}"></div>
+                                        </div>
+                                        <div class="flex items-center space-x-2 ml-4">
+                                            <!-- 状态标签 -->
+                                            <div class="flex flex-col space-y-1">
+                                                <span class="text-xs px-2 py-1 rounded-full" 
+                                                      th:classappend="${comment.status == 1} ? 'admin-badge-warning' : 'admin-badge-success'"
+                                                      th:text="${comment.status == 1} ? '隐藏' : '正常'"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 已删除评论卡片 -->
+                    <div class="admin-card rounded-xl overflow-hidden">
+                        <div class="px-5 py-3 border-b admin-table-head font-semibold">
+                            <span>已删除评论 (共 <span th:text="${allComments != null ? allComments.size() - (comments != null ? comments.size() : 0) : 0}"></span> 条)</span>
+                        </div>
+                        <div class="p-5">
+                            <div th:if="${allComments == null or allComments.isEmpty() or (allComments.size() == (comments != null ? comments.size() : 0))}">
+                                <p class="admin-text-secondary text-center">暂无已删除评论</p>
+                            </div>
+                            <div th:if="${allComments != null and !allComments.isEmpty() and allComments.size() > (comments != null ? comments.size() : 0)}">
+                                <div th:each="comment : ${allComments}" th:if="${comment.deletedAt != null and comment.content != null}" class="border-b last:border-b-0 py-4 admin-border admin-table-row cursor-pointer" th:onclick="'window.location.href=\'/comments/content/' + ${comment.content.id} + '#comment-' + ${comment.id} + '\''">
+                                    <div class="text-sm admin-text-secondary mb-1 flex items-center justify-between">
+                                        <div>
+                                            <span th:text="${comment.createdAt != null ? #temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm:ss') : '未知时间'}"></span>
+                                            <span> | 所属文章： </span>
+                                            <span class="italic" th:text="${comment.content != null and comment.content.content != null ? #strings.abbreviate(comment.content.content, 60) : '内容不可用'}"></span>
+                                        </div>
+                                        <div class="flex items-center space-x-2">
+                                            <span class="admin-badge-error inline-flex items-center">
+                                                <i class="fa fa-trash mr-1"></i>已删除
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="text-xs admin-text-error mb-2">
+                                        <span th:text="'删除时间: ' + ${comment.deletedAt != null ? #temporals.format(comment.deletedAt, 'yyyy-MM-dd HH:mm:ss') : '未知时间'}"></span>
+                                        <span th:if="${comment.deletedBy != null}" th:text="' | 删除者: ' + ${comment.deletedBy.username}"></span>
+                                    </div>
+                                    <div th:text="${comment.body}" class="admin-text-primary"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 用户编辑内容 -->
+                <div class="mt-6">
+                    <div class="admin-card rounded-xl overflow-hidden">
+                        <div class="px-5 py-3 border-b admin-table-head font-semibold">
+                            <span>用户编辑内容 (共 <span th:text="${userEditCount}"></span> 条)</span>
+                        </div>
+                        <div class="p-5">
+                            <div th:if="${userEdits == null or userEdits.isEmpty()}">
+                                <p class="admin-text-secondary text-center">暂无编辑内容</p>
+                            </div>
+                            <div th:if="${userEdits != null and !userEdits.isEmpty()}">
+                                <div th:each="edit : ${userEdits}" class="border-b last:border-b-0 py-4 admin-border admin-table-row">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <div class="flex-1">
+                                            <div class="text-sm admin-text-secondary mb-1">
+                                                <span th:text="${edit.createdAt != null ? #temporals.format(edit.createdAt, 'yyyy-MM-dd HH:mm:ss') : '未知时间'}"></span>
+                                            </div>
+                                            <div class="font-medium mb-2 admin-text-primary" th:text="${edit.title}"></div>
+                                            <div class="text-sm admin-text-tertiary mb-2">
+                                                <span>哲学家：</span><span th:text="${edit.philosopher != null ? edit.philosopher.name : '未知哲学家'}"></span>
+                                                <span class="ml-4">流派：</span><span th:text="${edit.school != null ? edit.school.name : '未知流派'}"></span>
+                                            </div>
+                                            <div class="admin-text-primary" th:text="${#strings.abbreviate(edit.content, 200)}"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 移动端抽屉菜单 -->
+    <div th:replace="~{fragments/admin-sidebar :: mobile-drawer}"></div>
+
+    <!-- Admin Scripts -->
+    <div th:replace="~{fragments/admin-head :: admin-scripts}"></div>
+    
+    <!-- JavaScript -->
+    <script>
+        // 显示消息提示
+        function showMessage(message, type) {
+            const messageDiv = document.createElement('div');
+            const bgColor = type === 'success' ? 'var(--color-success)' : 'var(--color-error)';
+            messageDiv.style.cssText = `position: fixed; top: 5rem; right: 1rem; z-index: 50; padding: 0.5rem 1rem; border-radius: 0.5rem; box-shadow: var(--shadow-lg); transition: all 0.3s; background-color: ${bgColor}; color: var(--text-on-primary);`;
+            messageDiv.textContent = message;
+            
+            // 添加到页面
+            document.body.appendChild(messageDiv);
+            
+            // 3秒后自动移除
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

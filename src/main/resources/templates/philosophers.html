@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/springsecurity6">
+<head th:replace="~{fragments/header :: head}" th:with="pageTitle=${translationService.getStaticText('philosophy', language)} + ' - ' + ${translationService.getStaticText('philosophers', language)}">
+    <!-- Like Button Component -->
+    <script th:src="@{/js/like-button-component.js}"></script>
+
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .transition-smooth {
+                transition: all 0.3s ease-in-out;
+            }
+            .hover-scale-105:hover {
+                transform: scale(1.05);
+            }
+            .hover-scale-110:hover {
+                transform: scale(1.1);
+            }
+            .group-hover-scale-105:hover {
+                transform: scale(1.05);
+            }
+            .group-hover-scale-110:hover {
+                transform: scale(1.1);
+            }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-up { animation: fadeInUp 0.4s ease-out both; }
+    </style>
+</head>
+<body class="bg-secondary min-h-screen flex flex-col">
+    <!-- 导航栏 -->
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <!-- [TEMP DEBUG] 显示当前用户名 -->
+    <div class="bg-red-500 text-white text-center p-2">
+        Current User: <span sec:authentication="name"></span>
+        | Is Authenticated: <span sec:authorize="isAuthenticated()">TRUE</span>
+        <span sec:authorize="!isAuthenticated()">FALSE</span>
+    </div>
+
+    <!-- 主要内容 -->
+    <main class="flex-grow container mx-auto px-4 py-8 pt-24">
+        
+        <!-- 移动端下拉选择器 -->
+        <div class="md:hidden mb-6">
+            <select id="mobile-philosopher-select" class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-smooth">
+                <option th:each="philosopher : ${philosophers}" 
+                        th:value="${philosopher.id}" 
+                        th:text="${translationService.getPhilosopherDisplayName(philosopher, language)}" 
+                        th:selected="${philosopher == firstPhilosopher}"></option>
+            </select>
+        </div>
+
+        <div class="flex flex-col md:flex-row gap-8">
+            <!-- 左侧哲学家列表 (桌面端) -->
+            <aside id="philosophers-sidebar" class="hidden md:block sticky top-24 h-[calc(100vh-6rem)] w-64 overflow-y-auto pr-4 scrollbar-hide">
+                <ul id="philosophers-timeline" class="space-y-2">
+                    <li th:each="philosopher : ${philosophers}">
+                        <a href="javascript:void(0)" 
+                           th:data-id="${philosopher.id}" 
+                           th:class="|philosopher-link py-2 px-3 block rounded-lg transition-smooth hover:bg-primary/10 hover:text-primary ${philosopher == currentPhilosopher ? 'bg-primary text-white' : 'text-gray-700'}|"
+                           th:onclick="|showPhilosopher('${philosopher.id}')|">
+                            <span th:text="${translationService.getPhilosopherDisplayName(philosopher, language)}"></span>
+                        </a>
+                    </li>
+                </ul>
+            </aside>
+
+            <!-- 右侧主内容区 -->
+            <div class="flex-1 relative">
+                <div id="philosopher-content" class="bg-white rounded-xl shadow-md p-6 transition-opacity duration-300 animate-fade-in-up">
+                    <!-- 哲学家信息将通过JavaScript动态加载 -->
+                    <th:block th:if="${currentPhilosopher}">
+                        <!-- 哲学家基本信息 -->
+                        <div class="mb-8 relative group">
+
+                            <!-- 编辑图标 (仅管理员/版主可见) -->
+                            <div sec:authorize="hasAnyRole('ADMIN', 'MODERATOR')"
+                                 class="absolute top-0 right-0 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                <a th:href="@{/admin/philosophers/edit/{id}(id=${currentPhilosopher.id})}"
+                                   th:title="${'编辑ID: ' + currentPhilosopher.id}"
+                                   onclick="event.stopPropagation()"
+                                   class="flex items-center justify-center w-10 h-10 bg-white/80 backdrop-blur-sm rounded-md shadow-md hover:bg-primary hover:text-white text-gray-700 transition-all duration-200">
+                                    <i class="fa fa-pencil"></i>
+                                </a>
+                            </div>
+                            
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <h1 class="text-3xl font-bold text-dark mb-2" th:text="${translationService.getPhilosopherDisplayName(currentPhilosopher, language)}"></h1>
+                                    <p class="text-lg text-gray-600 mb-4" th:text="${currentPhilosopher.era}"></p>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <!-- 显示哲学家关联的流派（包括通过内容推断的流派及其父流派） -->
+                                <th:block th:if="${currentPhilosopher.contents != null and !currentPhilosopher.contents.isEmpty()}">
+                                    <!-- 创建去重的流派集合 -->
+                                    <th:block th:with="displayedSchools=${new java.util.HashSet()}, displayedParents=${new java.util.HashSet()}">
+                                        <th:block th:each="content : ${currentPhilosopher.contents}">
+                                            <th:block th:if="${content.school != null}">
+                                                <!-- 显示父流派（去重） -->
+                                                <th:block th:if="${content.school.parent != null and !displayedParents.contains(content.school.parent.id)}">
+                                                    <a th:href="@{/schools/filter/{id}(id=${content.school.parent.id})}"
+                                                       class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-200 transition-smooth"
+                                                       th:with="added=${displayedParents.add(content.school.parent.id)}">
+                                                        <span th:text="${translationService.getSchoolDisplayName(content.school.parent, language)}">父流派</span>
+                                                    </a>
+                                                </th:block>
+                                                <!-- 显示直接流派（去重） -->
+                                                <th:block th:if="${!displayedSchools.contains(content.school.id)}">
+                                                    <a th:href="@{/schools/filter/{id}(id=${content.school.id})}"
+                                                       class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm hover:bg-primary/20 transition-smooth"
+                                                       th:with="added=${displayedSchools.add(content.school.id)}">
+                                                        <span th:text="${translationService.getSchoolDisplayName(content.school, language)}">流派名称</span>
+                                                    </a>
+                                                </th:block>
+                                            </th:block>
+                                        </th:block>
+                                    </th:block>
+                                </th:block>
+                                <!-- 如果没有内容，显示直接关联的流派 -->
+                                <th:block th:if="${currentPhilosopher.contents == null or currentPhilosopher.contents.isEmpty()}">
+                                    <a th:each="school : ${currentPhilosopher.schools}"
+                                       th:href="@{/schools/filter/{id}(id=${school.id})}"
+                                       class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm hover:bg-primary/20 transition-smooth">
+                                        <span th:text="${translationService.getSchoolDisplayName(school, language)}"></span>
+                                    </a>
+                                </th:block>
+                            </div>
+                        </div>
+
+                        <!-- 左图右文：肖像 + 生平简介 -->
+                        <div class="flex flex-col md:flex-row gap-6 mb-8">
+                            <div class="md:w-1/3">
+                                <div class="aspect-square bg-gray-200 rounded-lg overflow-hidden relative group cursor-pointer transition-transform duration-500 ease-out" 
+                                     th:attr="data-image-url=${currentPhilosopher.imageUrl}"
+                                     onclick="openImageModal(this)">
+                                    <i class="fa fa-user-circle text-6xl text-gray-400" th:if="${currentPhilosopher.imageUrl == null || currentPhilosopher.imageUrl.isEmpty()}"></i>
+                                    <img th:src="@{${currentPhilosopher.imageUrl}}" 
+                                         alt="${currentPhilosopher.name}" 
+                                         class="w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-105" 
+                                         th:unless="${currentPhilosopher.imageUrl == null || currentPhilosopher.imageUrl.isEmpty()}">
+                                </div>
+                            </div>
+                            <div class="md:w-2/3">
+                                <h2 class="text-2xl font-bold text-dark mb-4" th:text="${translationService.getStaticText('biography', language)}">生平简介</h2>
+                                <p class="text-gray-700 leading-relaxed" th:text="${translationService.getPhilosopherDisplayBiography(currentPhilosopher, language)}"></p>
+                            </div>
+                        </div>
+
+                        <!-- 思想卡片 -->
+                        <div class="space-y-6">
+                            <h2 class="text-2xl font-bold text-dark mb-4" th:text="${translationService.getStaticText('main_thoughts', language)}">主要思想</h2>
+                            <th:block th:each="content : ${currentPhilosopher.contents}">
+                                <div th:replace="~{fragments/content-card :: content-card(
+                                    content=${content}, 
+                                    showPhilosopherInfo=false, 
+                                    showActions='hover-only', 
+                                    clickable=true, 
+                                    customClasses='bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px] relative group', 
+                                    isAuthenticated=${isAuthenticated}, 
+                                    showLikeButton=true, 
+                                    showViewMoreButton=true, 
+                                    isContentOwner=false, 
+                                    showParentSchool=true
+                                )}">
+                                </div>
+                            </th:block>
+                            <th:block th:if="${currentPhilosopher.contents.isEmpty()}">
+                                <div class="bg-accent rounded-xl p-6 text-center text-gray-500" th:text="${translationService.getStaticText('no_thoughts', language)}">
+                                    暂无相关思想内容
+                                </div>
+                            </th:block>
+                        </div>
+                    </th:block>
+                    <th:block th:unless="${currentPhilosopher}">
+                        <div class="text-center py-12">
+                            <p class="text-gray-500" th:text="${translationService.getStaticText('please_select_philosopher', language)}">请从左侧选择一位哲学家</p>
+                        </div>
+                    </th:block>
+                </div>
+
+                <!-- 右下角固定按钮：上一人/下一人 -->
+                <div class="fixed bottom-6 right-6 flex flex-col gap-4 z-40">
+                    <button id="prev-philosopher" 
+                            class="w-16 h-16 rounded-full bg-primary text-white shadow-lg flex items-center justify-center transition-all duration-300 hover:bg-primary/90 hover:scale-105 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
+                            onclick="navigatePhilosopher(-1)"
+                            title="上一位哲学家">
+                        <i class="fa fa-chevron-up text-xl"></i>
+                    </button>
+                    <button id="next-philosopher" 
+                            class="w-16 h-16 rounded-full bg-primary text-white shadow-lg flex items-center justify-center transition-all duration-300 hover:bg-primary/90 hover:scale-105 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
+                            onclick="navigatePhilosopher(1)"
+                            title="下一位哲学家">
+                        <i class="fa fa-chevron-down text-xl"></i>
+                    </button>
+                </div>
+                
+            </div>
+        </div>
+    </main>
+
+
+    <!-- 图片查看模态框 -->
+    <div id="imageModal" class="fixed inset-0 bg-black/80 hidden z-50 flex items-center justify-center" onclick="closeImageModal()">
+        <div class="relative max-w-4xl max-h-[90vh] p-4" onclick="event.stopPropagation()">
+            <img id="modalImage" src="" th:alt="${translationService.getStaticText('philosopher_name', language)} + ' ' + ${translationService.getStaticText('content_text', language)}" class="max-w-full max-h-[85vh] object-contain rounded-lg">
+            <button onclick="closeImageModal()" class="absolute -top-2 -right-2 bg-white text-gray-800 rounded-full w-8 h-8 flex items-center justify-center shadow-lg hover:bg-gray-100 transition-colors">
+                <i class="fa fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 图片查看功能
+        function openImageModal(element) {
+            const imageUrl = element.getAttribute('data-image-url');
+            if (imageUrl && imageUrl.trim() !== '') {
+                const modal = document.getElementById('imageModal');
+                const modalImage = document.getElementById('modalImage');
+                modalImage.src = imageUrl;
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeImageModal() {
+            const modal = document.getElementById('imageModal');
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        // ESC键关闭模态框
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeImageModal();
+            }
+        });
+
+
+        // 显示特定哲学家的信息
+        function showPhilosopher(philosopherId) {
+            // 添加详细的调试信息
+            console.log('尝试切换到哲学家ID:', philosopherId);
+            
+            // 确保philosopherId有效
+            if (philosopherId && !isNaN(philosopherId)) {
+                console.log('准备导航到:', '/philosophers?philosopherId=' + philosopherId);
+                // 使用页面刷新来切换哲学家
+                window.location.href = '/philosophers?philosopherId=' + philosopherId;
+            } else {
+                console.error('无效的哲学家ID:', philosopherId);
+            }
+        }
+
+        // 导航到上一个或下一个哲学家
+        function navigatePhilosopher(direction) {
+            // 获取当前页面上所有哲学家链接
+            const philosopherLinks = document.querySelectorAll('.philosopher-link');
+            let currentIndex = -1;
+            let allPhilosophers = [];
+            
+            // 找出当前选中的哲学家索引
+            philosopherLinks.forEach((link, index) => {
+                const philosopherId = link.getAttribute('data-id');
+                allPhilosophers.push(philosopherId);
+                if (link.classList.contains('bg-primary')) {
+                    currentIndex = index;
+                }
+            });
+            
+            // 计算新索引
+            let newIndex = currentIndex + direction;
+            
+            // 确保索引在有效范围内
+            if (newIndex < 0) {
+                newIndex = allPhilosophers.length - 1;
+            } else if (newIndex >= allPhilosophers.length) {
+                newIndex = 0;
+            }
+            
+            // 导航到新哲学家
+            if (allPhilosophers[newIndex]) {
+                showPhilosopher(allPhilosophers[newIndex]);
+            }
+        }
+
+        // 移动端哲学家选择器事件监听
+        // 添加URL参数处理功能
+        function getUrlParameter(name) {
+            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            const regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            const results = regex.exec(window.location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        }
+
+        // 修改页面加载时的初始化逻辑
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileSelect = document.getElementById('mobile-philosopher-select');
+            if (mobileSelect) {
+                mobileSelect.addEventListener('change', function() {
+                    const philosopherId = this.value;
+                    showPhilosopher(philosopherId);
+                });
+            }
+            
+            // 检查URL参数中是否有philosopherId
+            const philosopherIdParam = getUrlParameter('philosopherId');
+            if (philosopherIdParam) {
+                console.log('从URL参数获取到哲学家ID:', philosopherIdParam);
+                // 确保哲学家ID存在于下拉列表中
+                const mobileSelect = document.getElementById('mobile-philosopher-select');
+                if (mobileSelect) {
+                    mobileSelect.value = philosopherIdParam;
+                }
+                
+                // 更新左侧列表的选中状态
+                const philosopherLinks = document.querySelectorAll('.philosopher-link');
+                philosopherLinks.forEach(link => {
+                    link.classList.remove('bg-primary', 'text-white');
+                    link.classList.add('text-gray-700');
+                    if (link.getAttribute('data-id') === philosopherIdParam) {
+                        link.classList.add('bg-primary', 'text-white');
+                        link.classList.remove('text-gray-700');
+                    }
+                });
+            }
+            
+            // 检查URL中是否有思想ID参数，如果有则滚动到对应的思想卡片
+            checkAndScrollToIdea();
+            
+            // 检查语言设置
+            checkLanguageSetting();
+        });
+        
+        // 检查URL中是否有思想ID参数并滚动到对应卡片
+        function checkAndScrollToIdea() {
+            // 尝试从URL参数中获取思想ID
+            const urlParams = new URLSearchParams(window.location.search);
+            const ideaId = urlParams.get('ideaId');
+            
+            if (ideaId) {
+                // 查找对应的思想卡片
+                const ideaCard = document.querySelector(`[data-content-id="${ideaId}"]`);
+                if (ideaCard) {
+                    ideaCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    // 添加高亮效果
+                    ideaCard.classList.add('ring-2', 'ring-primary');
+                    setTimeout(() => {
+                        ideaCard.classList.remove('ring-2', 'ring-primary');
+                    }, 3000);
+                }
+            }
+        }
+
+    </script>
+
+    <!-- 点赞按钮功能 -->
+    <script th:src="@{/js/like-button-component.js}"></script>
+
+    <!-- 无限滚动脚本 -->
+    <script th:inline="javascript">
+        // 无限滚动变量
+        let currentPage = 0;
+        let isLoading = false;
+        let hasMore = /*[[${hasMoreContents}]]*/ false;
+        let currentPhilosopherId = /*[[${currentPhilosopher != null ? currentPhilosopher.id : null}]]*/ null;
+
+        // 初始化滚动监听
+        window.addEventListener('scroll', handlePhilosopherScroll);
+
+        function handlePhilosopherScroll() {
+            if (isLoading || !hasMore || !currentPhilosopherId) return;
+
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const windowHeight = window.innerHeight;
+            const documentHeight = document.documentElement.scrollHeight;
+
+            // 提前800px触发加载，让用户无感知
+            if (scrollTop + windowHeight >= documentHeight - 800) {
+                loadMorePhilosopherContents();
+            }
+        }
+
+        // 加载更多哲学家的内容（静默加载，用户无感知）
+        async function loadMorePhilosopherContents() {
+            if (isLoading || !hasMore || !currentPhilosopherId) return;
+
+            isLoading = true;
+            currentPage++;
+
+            try {
+                const response = await fetch(`/api/philosophers/contents/more?philosopherId=${currentPhilosopherId}&page=${currentPage}&size=12`);
+                if (!response.ok) {
+                    throw new Error('加载失败');
+                }
+
+                const data = await response.json();
+                
+                if (data.success && data.contents && data.contents.length > 0) {
+                    // 获取当前语言
+                    const language = document.documentElement.lang || 'zh';
+                    
+                    // 找到内容容器（思想卡片区域）
+                    const thoughtsSection = document.querySelector('.space-y-6');
+                    
+                    data.contents.forEach(content => {
+                        const contentCard = createPhilosopherContentCard(content, language);
+                        thoughtsSection.appendChild(contentCard);
+                    });
+
+                    // 更新是否有更多数据
+                    hasMore = data.hasMore;
+
+                    // 重新初始化点赞按钮和卡片点击事件
+                    if (typeof initLikeButtons === 'function') {
+                        initLikeButtons();
+                    }
+                    if (typeof initContentCardClickHandlers === 'function') {
+                        initContentCardClickHandlers();
+                    }
+                } else {
+                    hasMore = false;
+                }
+            } catch (error) {
+                console.error('加载更多内容失败:', error);
+                hasMore = false;
+            } finally {
+                isLoading = false;
+            }
+        }
+
+        // 创建哲学家内容卡片HTML
+        function createPhilosopherContentCard(content, language) {
+            const div = document.createElement('div');
+            div.className = 'bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px] relative group';
+            div.setAttribute('data-content-id', content.id);
+            div.onclick = function() {
+                if (content.philosopher && content.school) {
+                    window.location.href = `/contents?schoolId=${content.school.id}&philosopherId=${content.philosopher.id}`;
+                }
+            };
+            
+            // 获取流派名称
+            const schoolName = content.school ? 
+                (language === 'en' && content.school.nameEn ? content.school.nameEn : content.school.name) : '';
+            
+            // 获取作者信息
+            const authorName = content.user ? content.user.username : '匿名';
+            const authorRole = content.user ? content.user.role : '';
+            let roleTag = '';
+            if (authorRole === 'ADMIN') {
+                roleTag = '<span class="ml-2 px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded">管理员</span>';
+            } else if (authorRole === 'MODERATOR') {
+                roleTag = '<span class="ml-2 px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded">版主</span>';
+            }
+            
+            // 内容预览（限制长度）
+            const contentText = content.content || '';
+            const contentPreview = contentText.length > 200 ? contentText.substring(0, 200) + '...' : contentText;
+            
+            // 显示父流派（如果有）
+            const parentSchoolTag = content.school && content.school.parent ? 
+                `<a href="/schools/filter/${content.school.parent.id}" class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-200 transition-smooth" onclick="event.stopPropagation()">
+                    ${escapeHtml(language === 'en' && content.school.parent.nameEn ? content.school.parent.nameEn : content.school.parent.name)}
+                </a>` : '';
+            
+            div.innerHTML = `
+                <div class="flex justify-between items-start mb-4">
+                    <div class="flex-1">
+                        ${schoolName ? `
+                        <div class="flex flex-wrap gap-2 mb-2">
+                            ${parentSchoolTag}
+                            <a href="/schools/filter/${content.school.id}" class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm hover:bg-primary/20 transition-smooth" onclick="event.stopPropagation()">
+                                ${escapeHtml(schoolName)}
+                            </a>
+                        </div>
+                        ` : ''}
+                        <h3 class="text-xl font-bold text-primary">${escapeHtml(content.title || '无标题')}</h3>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <like-button entity-type="content" entity-id="${content.id}" like-count="${content.likeCount || 0}"></like-button>
+                    </div>
+                </div>
+                <p class="text-gray-700 mb-4">${escapeHtml(contentPreview)}</p>
+                <div class="flex justify-between items-center text-sm text-gray-500">
+                    <span>
+                        作者: ${escapeHtml(authorName)}${roleTag}
+                    </span>
+                    ${content.commentCount ? `<span><i class="fa fa-comment mr-1"></i>${content.commentCount} 条评论</span>` : ''}
+                </div>
+            `;
+            
+            return div;
+        }
+
+        // HTML 转义函数
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        // 当切换哲学家时，重置无限滚动状态
+        const originalShowPhilosopher = window.showPhilosopher;
+        window.showPhilosopher = function(philosopherId) {
+            currentPhilosopherId = philosopherId;
+            currentPage = 0;
+            hasMore = true;
+            isLoading = false;
+            
+            if (originalShowPhilosopher) {
+                originalShowPhilosopher(philosopherId);
+            }
+        };
+    </script>
+    
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <div th:replace="~{fragments/footer :: language-switcher-script}"></div>
+    <div th:replace="~{fragments/footer :: search-script}"></div>
+    <div th:replace="~{fragments/footer :: search-modal}"></div>
+    <div th:replace="~{fragments/footer :: theme-script}"></div>
+    <div th:replace="~{fragments/footer :: like-script}"></div>
+    
+</body>
+</html>

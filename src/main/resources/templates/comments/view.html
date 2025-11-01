@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head}" th:with="pageTitle=${translationService.getStaticText('comments', language)} + ' - ' + ${translationService.getStaticText('philosophy', language)}">
+    <!-- Like Button Component -->
+    <script th:src="@{/js/like-button-component.js}"></script>
+
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-balance {
+                text-wrap: balance;
+            }
+            .scrollbar-hide {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+            .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+            }
+            .bg-blur {
+                backdrop-filter: blur(8px);
+            }
+            .transition-smooth {
+                transition: all 0.3s ease;
+            }
+            .shadow-md-hover {
+                transition: shadow 0.3s ease;
+            }
+            .shadow-md-hover:hover {
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            }
+            /* 评论高亮样式 */
+            .comment-highlight {
+                background-color: var(--bg-tertiary) !important;
+                transition: all 0.5s ease;
+            }
+            .comment-item {
+                transition: all 0.3s ease;
+            }
+        }
+    </style>
+</head>
+<body class="bg-secondary font-sans">
+    <!-- 导航栏 -->
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <!-- 主内容区域 -->
+    <main class="min-h-screen pb-16" style="padding-top: calc(5rem + 2rem);">
+        <div class="container mx-auto px-4">
+            <!-- 内容卡片部分 -->
+            <div class="relative">
+                <div th:replace="~{fragments/content-card :: content-card(content=${content}, showPhilosopherInfo=true, showActions='hover-only', clickable=false, customClasses='bg-white rounded-xl p-6 shadow-md mb-8', isAuthenticated=${isAuthenticated}, showLikeButton=true, showViewMoreButton=false, isContentOwner=false, showParentSchool=true)}">
+                </div>
+            </div>
+
+            <!-- 评论部分 -->
+            <div class="bg-white rounded-xl p-6 shadow-md">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold text-dark">
+                        <i class="fa fa-comments text-primary mr-2"></i><span th:text="${translationService.getStaticText('comments', language)}">评论区</span>
+                        <span class="text-sm font-normal text-gray-500 ml-2" th:text="'(' + (${comments} != null ? ${comments.size()} : 0) + ${translationService.getStaticText('comments_count', language)} + ')'">
+                            (0条评论)
+                        </span>
+                    </h3>
+
+                    <!-- 查看更多按钮 -->
+                    <a th:href="@{/content/{contentId}(contentId=${content.id})}"
+                       class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors duration-200">
+                        <i class="fa fa-external-link text-gray-600 text-sm"></i>
+                        <span class="text-sm text-gray-700">查看更多</span>
+                    </a>
+                </div>
+
+                <!-- 评论列表 -->
+                <div class="space-y-4 mb-8">
+                    <th:block th:if="${comments == null or comments.empty}">
+                        <div class="text-center text-gray-500 py-8">
+                            <i class="fa fa-comment-o text-4xl mb-2"></i>
+                            <p th:text="${translationService.getStaticText('no_comments', language)}">暂无评论，快来发表第一条评论吧！</p>
+                        </div>
+                    </th:block>
+                    <th:block th:each="comment : ${comments}">
+                        <div th:id="'comment-' + ${comment.id}" class="border-b border-gray-100 pb-4 last:border-b-0 comment-item relative group">
+                            
+                            <div class="flex justify-between items-start mb-2">
+                                <a th:href="@{/user/profile/{id}(id=${comment.user.id})}" class="flex items-center hover:bg-gray-50 p-1 rounded-lg transition-smooth">
+                                    <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                                        <span th:text="${comment.user != null ? #strings.substring(comment.user.username, 0, 1) : 'U'}">U</span>
+                                    </div>
+                                    <div class="ml-3">
+                                        <div class="flex items-center gap-2">
+                                            <p class="font-medium text-dark hover:text-primary" th:text="${comment.user != null ? comment.user.username : '未知用户'}">用户名</p>
+                                            <!-- 已删除提示 -->
+                                            <th:block th:if="${comment.deletedAt != null and isAdmin}">
+                                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                    <i class="fa fa-trash mr-1"></i><span th:text="${translationService.getStaticText('deleted', language)}">已删除</span>
+                                                </span>
+                                            </th:block>
+                                        </div>
+                                        <p class="text-xs text-gray-500" th:text="${comment.createdAt != null ? #temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm') : '未知时间'}">
+                                            2023-01-01 12:00
+                                        </p>
+                                    </div>
+                                </a>
+                                <div class="flex space-x-2">
+                                    <!-- 只有未删除的评论才显示操作按钮 -->
+                                    <th:block th:if="${comment.deletedAt == null and isAuthenticated and (currentUsername == comment.user.username or isAdmin)}">
+                                        <!-- 删除按钮 -->
+                                        <form th:action="@{/comments/delete/{commentId}(commentId=${comment.id})}" method="post" class="inline">
+                                            <button type="submit" class="text-gray-400 hover:text-red-500 transition-smooth" 
+                                                    th:data-confirm="${translationService.getStaticText('delete_confirm', language)}"
+                                                    onclick="return confirm(this.getAttribute('data-confirm'));">
+                                                <i class="fa fa-trash-o"></i>
+                                            </button>
+                                        </form>
+                                    </th:block>
+                                </div>
+                            </div>
+                            <p class="text-gray-700 ml-13" th:text="${comment.body}">评论内容</p>
+                            
+                            <!-- 回复评论 -->
+                            <th:block th:if="${comment.replies != null and !comment.replies.isEmpty()}">
+                                <div class="ml-8 mt-4 space-y-3">
+                                    <th:block th:each="reply : ${comment.replies}">
+                                        <div th:id="'reply-' + ${reply.id}" class="border-l-2 border-gray-200 pl-4 py-2 relative group">
+                                            
+                                            <div class="flex justify-between items-start mb-1">
+                                                <a th:href="@{/user/profile/{id}(id=${reply.user.id})}" class="flex items-center hover:bg-gray-50 p-1 rounded-lg transition-smooth">
+                                                    <div class="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 text-xs font-bold">
+                                                        <span th:text="${reply.user != null ? #strings.substring(reply.user.username, 0, 1) : 'U'}">U</span>
+                                                    </div>
+                                                    <div class="ml-2">
+                                                        <div class="flex items-center gap-2">
+                                                            <p class="text-sm font-medium text-gray-700 hover:text-primary" th:text="${reply.user != null ? reply.user.username : '未知用户'}">用户名</p>
+                                                            <!-- 已删除提示 -->
+                                                            <th:block th:if="${reply.deletedAt != null and isAdmin}">
+                                                                <span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                                    <i class="fa fa-trash mr-1"></i><span th:text="${translationService.getStaticText('deleted', language)}">已删除</span>
+                                                                </span>
+                                                            </th:block>
+                                                        </div>
+                                                        <p class="text-xs text-gray-500" th:text="${#temporals.format(reply.createdAt, 'yyyy-MM-dd HH:mm')}">
+                                                            2023-01-01 12:00
+                                                        </p>
+                                                    </div>
+                                                </a>
+                                                <div class="flex space-x-2">
+                                                    <!-- 只有未删除的回复才显示操作按钮 -->
+                                                    <th:block th:if="${reply.deletedAt == null and isAuthenticated and (currentUsername == reply.user.username or isAdmin)}">
+                                                        <!-- 删除按钮 -->
+                                                        <form th:action="@{/comments/delete/{commentId}(commentId=${reply.id})}" method="post" class="inline">
+                                                            <button type="submit" class="text-gray-400 hover:text-red-500 transition-smooth" 
+                                                                    th:data-confirm="${translationService.getStaticText('delete_confirm', language)}"
+                                                                    onclick="return confirm(this.getAttribute('data-confirm'));">
+                                                                <i class="fa fa-trash-o text-xs"></i>
+                                                            </button>
+                                                        </form>
+                                                    </th:block>
+                                                </div>
+                                            </div>
+                                            <p class="text-sm text-gray-600 ml-8" th:text="${reply.body}">回复内容</p>
+                                        </div>
+                                    </th:block>
+                                </div>
+                            </th:block>
+                        </div>
+                    </th:block>
+                </div>
+
+                <!-- 评论表单 -->
+                <th:block th:if="${isAuthenticated}">
+                    <form th:action="@{/comments/content/{contentId}(contentId=${contentId})}" method="post" class="mt-6">
+                        <div class="mb-4">
+                            <textarea name="body" rows="3" th:placeholder="${translationService.getStaticText('write_comment', language)}" 
+                                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none" 
+                                      required></textarea>
+                        </div>
+                        <div class="flex justify-end">
+                            <button type="submit" class="bg-primary hover:bg-primary/90 text-white font-medium py-2 px-6 rounded-md transition-colors duration-200" th:text="${translationService.getStaticText('post_comment', language)}">
+                                发表评论
+                            </button>
+                        </div>
+                    </form>
+                </th:block>
+                <th:block th:unless="${isAuthenticated}">
+                    <div class="text-center text-gray-500 py-6 bg-gray-50 rounded-lg">
+                        <p class="mb-2" th:text="${translationService.getStaticText('please_login_to_comment', language)}">请先登录后再发表评论</p>
+                    </div>
+                </th:block>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <div th:replace="~{fragments/footer :: language-switcher-script}"></div>
+    <div th:replace="~{fragments/footer :: search-script}"></div>
+    <div th:replace="~{fragments/footer :: search-modal}"></div>
+    <div th:replace="~{fragments/footer :: like-script}"></div>
+    <div th:replace="~{fragments/footer :: message-script}"></div>
+
+    <!-- JavaScript -->
+    <script>
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 检查URL中是否有评论锚点
+            function highlightCommentFromHash() {
+                const hash = window.location.hash;
+                if (hash && hash.startsWith('#comment-')) {
+                    const commentId = hash.substring(1); // 移除#号
+                    const commentElement = document.getElementById(commentId);
+
+                    if (commentElement) {
+                        // 添加高亮样式
+                        commentElement.classList.add('comment-highlight');
+
+                        // 滚动到评论位置，考虑固定导航栏的高度
+                        const navbarHeight = document.getElementById('navbar')?.offsetHeight || 80;
+                        const elementPosition = commentElement.offsetTop - navbarHeight - 20;
+
+                        window.scrollTo({
+                            top: elementPosition,
+                            behavior: 'smooth'
+                        });
+
+                        // 3秒后移除高亮效果
+                        setTimeout(() => {
+                            commentElement.classList.remove('comment-highlight');
+                        }, 3000);
+                    }
+                }
+            }
+
+            // 初始加载时检查
+            highlightCommentFromHash();
+
+            // 监听hash变化（当用户点击浏览器前进/后退按钮时）
+            window.addEventListener('hashchange', highlightCommentFromHash);
+
+            // 初始滚动到顶部
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>

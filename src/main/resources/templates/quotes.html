@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head}" th:with="pageTitle=${language != null and language == 'en' ? 'Recommendations' : '哲学推荐'}">
+    <!-- Like Button Component -->
+    <script th:src="@{/js/like-button-component.js}"></script>
+
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .glass-effect {
+                backdrop-filter: blur(8px);
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+
+            .parchment-texture {
+                background-image:
+                    radial-gradient(circle at 25% 25%, rgba(0,0,0,0.02) 2px, transparent 2px),
+                    radial-gradient(circle at 75% 75%, rgba(0,0,0,0.02) 1px, transparent 1px);
+                background-size: 20px 20px;
+            }
+
+            .quote-shadow {
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            }
+
+            .fade-in {
+                animation: fadeIn 0.8s ease-in-out;
+            }
+
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(20px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+
+            /* Masonry helpers */
+            .break-inside-avoid {
+                break-inside: avoid;
+                -webkit-column-break-inside: avoid;
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body class="bg-secondary font-sans min-h-screen flex flex-col">
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <!-- 主要内容（flex-grow 以保证页脚贴底） -->
+    <div class="flex-1 flex flex-col">
+        <div class="w-full px-4 sm:px-6 lg:px-8 py-12" style="padding-top: calc(5rem + 2rem);">
+            <!-- Masonry container -->
+            <div id="quote-list" class="columns-1 md:columns-2 lg:columns-4 gap-4">
+                <!-- 初始名句卡片（由服务端渲染） -->
+                <div th:if="${content != null}" class="quote-card fade-in break-inside-avoid inline-block w-full max-w-full mb-6 cursor-pointer" th:attr="data-id=${content != null ? content.id : 0}" onclick="window.location.href='/comments/content/' + this.getAttribute('data-id')">
+                    <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-5 border border-gray-200/50 hover:translate-y-[-2px]">
+                        
+                        <blockquote class="text-base md:text-lg text-ink leading-relaxed mb-6 quote-shadow whitespace-pre-line break-words max-w-full">
+                            <span class="max-w-full break-words" th:text="${content != null ? translationService.getContentDisplayText(content, language != null ? language : 'zh') : (language == 'en' ? 'No content available' : '暂无内容')}"></span>
+                        </blockquote>
+                        <div class="border-t border-gray-200 pt-4">
+                            <h3 class="font-semibold text-ink text-sm md:text-base break-words max-w-full" th:text="${content != null and content.philosopher != null ? translationService.getPhilosopherDisplayName(content.philosopher, language != null ? language : 'zh') : (language == 'en' ? 'Unknown Philosopher' : '未知哲学家')}"></h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <div th:replace="~{fragments/footer :: language-switcher-script}"></div>
+    <div th:replace="~{fragments/footer :: search-script}"></div>
+    <div th:replace="~{fragments/footer :: search-modal}"></div>
+    <div th:replace="~{fragments/footer :: theme-script}"></div>
+    <div th:replace="~{fragments/footer :: like-script}"></div>
+
+    <!-- JavaScript -->
+    <script>
+        // 滚动动画效果
+        function handleScrollAnimation() {
+            const elements = document.querySelectorAll('.fade-in');
+            elements.forEach(element => {
+                const rect = element.getBoundingClientRect();
+                const isVisible = rect.top < window.innerHeight - 100;
+                if (isVisible) {
+                    element.style.opacity = '1';
+                    element.style.transform = 'translateY(0)';
+                }
+            });
+        }
+
+        // 无限滚动加载
+        let isLoading = false;
+        let isEnd = false;
+        const loadedIds = new Set();
+        const quoteList = document.getElementById('quote-list');
+
+        function initLoadedIdsFromServer() {
+            document.querySelectorAll('.quote-card').forEach(card => {
+                const id = card.getAttribute('data-id');
+                if (id) {
+                    loadedIds.add(parseInt(id));
+                }
+            });
+        }
+
+        function buildExcludeIdsParam() {
+            if (loadedIds.size === 0) return '';
+            return Array.from(loadedIds).join(',');
+        }
+
+        function createQuoteCard(item) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'quote-card fade-in break-inside-avoid inline-block w-full max-w-full mb-6 cursor-pointer';
+            wrapper.setAttribute('data-id', item.id);
+            wrapper.style.opacity = '0';
+            wrapper.style.transform = 'translateY(20px)';
+            
+            // 添加点击事件
+            wrapper.addEventListener('click', function() {
+                window.location.href = '/comments/content/' + item.id;
+            });
+
+            wrapper.innerHTML = `
+                <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-5 border border-gray-200/50 hover:translate-y-[-2px]">
+                    
+                    <blockquote class="text-base md:text-lg text-ink leading-relaxed mb-6 quote-shadow whitespace-pre-line break-words max-w-full">
+                        <span class="quote-text max-w-full break-words"></span>
+                    </blockquote>
+                    <div class="border-t border-gray-200 pt-4">
+                        <h3 class="quote-philosopher font-semibold text-ink text-sm md:text-base break-words max-w-full"></h3>
+                    </div>
+                </div>
+            `;
+
+            const textEl = wrapper.querySelector('.quote-text');
+            const philoEl = wrapper.querySelector('.quote-philosopher');
+            if (textEl) textEl.textContent = item.contentText || '';
+            if (philoEl) philoEl.textContent = item.philosopherName || '';
+            return wrapper;
+        }
+
+        async function loadMore(count = 12) {
+            if (isLoading || isEnd) return;
+            isLoading = true;
+            try {
+                const params = new URLSearchParams();
+                params.set('count', String(count));
+                const exclude = buildExcludeIdsParam();
+                if (exclude) params.set('excludeIds', exclude);
+                const resp = await fetch('/api/quotes/random?' + params.toString());
+                if (!resp.ok) {
+                    isEnd = true;
+                    return;
+                }
+                const data = await resp.json();
+                if (!Array.isArray(data) || data.length === 0) {
+                    isEnd = true;
+                    return;
+                }
+                for (const item of data) {
+                    if (!loadedIds.has(item.id)) {
+                        loadedIds.add(item.id);
+                        const card = createQuoteCard(item);
+                        quoteList.appendChild(card);
+                    }
+                }
+                // 触发动画检查
+                handleScrollAnimation();
+            } catch (e) {
+                console.error('加载随机名句失败', e);
+            } finally {
+                isLoading = false;
+            }
+        }
+
+        function handleInfiniteScroll() {
+            if (isLoading || isEnd) return;
+            const threshold = 300; // 距离底部300px开始加载
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - threshold) {
+                loadMore(12);
+            }
+        }
+
+        // 初始化
+        window.addEventListener('scroll', handleScrollAnimation);
+        window.addEventListener('load', () => {
+            initLoadedIdsFromServer();
+            handleScrollAnimation();
+            loadMore(12);
+        });
+        window.addEventListener('scroll', handleInfiniteScroll);
+
+        // 平滑滚动到顶部功能
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
