@@ -120,10 +120,31 @@ public class DataImportService {
             // 导入哲学家-学派关联（在哲学家和学派导入后）
             importPhilosopherSchoolAssociationsInTransaction(result, dataSections.get("哲学家学派关联数据"));
             
-            importContentsInTransaction(result, dataSections.get("内容数据"));
-            
-            // 在内容导入完成后，单独处理内容关联
-            updateContentAssociationsInTransaction(result, dataSections.get("内容数据"));
+            // 尝试查找内容数据段，支持可能的变体
+            List<String[]> contentData = dataSections.get("内容数据");
+            if (contentData == null) {
+                // 尝试查找可能的变体
+                contentData = dataSections.get("内容数据？");
+                if (contentData == null) {
+                    // 查找所有包含"内容"的段标题
+                    for (String key : dataSections.keySet()) {
+                        if (key.contains("内容") && key.contains("数据")) {
+                            logger.warn("找到可能的 content 数据段变体: {}", key);
+                            contentData = dataSections.get(key);
+                            break;
+                        }
+                    }
+                }
+            }
+            if (contentData == null) {
+                logger.warn("未找到'内容数据'段，跳过了内容导入。可用的数据段: {}", dataSections.keySet());
+                result.addResult("内容", 0, 0);
+            } else {
+                importContentsInTransaction(result, contentData);
+                
+                // 在内容导入完成后，单独处理内容关联
+                updateContentAssociationsInTransaction(result, contentData);
+            }
             
             // 导入其他数据
             importCommentsInTransaction(result, dataSections.get("评论数据"));
@@ -599,6 +620,11 @@ public class DataImportService {
 
                 Long userId = Long.parseLong(fields[0]);
                 
+                // 检查现有用户，以便保留版主的流派分配（如果CSV中未提供）
+                User existingUser = userRepository.findById(userId).orElse(null);
+                Long existingAssignedSchoolId = (existingUser != null && "MODERATOR".equals(existingUser.getRole())) 
+                    ? existingUser.getAssignedSchoolId() : null;
+                
                 // 直接创建新用户，不查找现有用户
                 User user = new User();
                 user.setId(userId); // 设置CSV中的ID
@@ -715,6 +741,16 @@ public class DataImportService {
                         user.setAssignedSchoolId(Long.parseLong(fields[17]));
                     } catch (NumberFormatException e) {
                         logger.warn("用户ID {}: 分配学派ID格式错误: {}", userId, fields[17]);
+                        user.setAssignedSchoolId(null);
+                    }
+                } else {
+                    // 如果字段为空或不存在，对于版主用户，尝试保留现有的流派分配
+                    // 这样可以避免重新导入时丢失版主的流派分配
+                    if (existingAssignedSchoolId != null && "MODERATOR".equals(user.getRole())) {
+                        user.setAssignedSchoolId(existingAssignedSchoolId);
+                        logger.debug("用户ID {}: CSV中未提供流派分配，保留现有流派分配: {}", userId, existingAssignedSchoolId);
+                    } else {
+                        user.setAssignedSchoolId(null);
                     }
                 }
                 
@@ -734,23 +770,37 @@ public class DataImportService {
                     user.setAvatarUrl(fields[21]);
                 }
 
-                // 解析创建时间 (字段22)
-                if (fields.length > 22 && !fields[22].equals("未知时间") && !fields[22].isEmpty() && 
-                    !fields[22].equals("null")) {
+                // 处理语言设置 (字段22)
+                if (fields.length > 22 && !fields[22].isEmpty() && !fields[22].equals("null")) {
+                    user.setLanguage(fields[22]);
+                } else {
+                    user.setLanguage("zh"); // 默认值
+                }
+
+                // 处理主题设置 (字段23)
+                if (fields.length > 23 && !fields[23].isEmpty() && !fields[23].equals("null")) {
+                    user.setTheme(fields[23]);
+                } else {
+                    user.setTheme("midnight"); // 默认值
+                }
+
+                // 解析创建时间 (字段24)
+                if (fields.length > 24 && !fields[24].equals("未知时间") && !fields[24].isEmpty() && 
+                    !fields[24].equals("null")) {
                     try {
-                        user.setCreatedAt(LocalDateTime.parse(fields[22], DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+                        user.setCreatedAt(LocalDateTime.parse(fields[24], DateTimeFormatter.ISO_LOCAL_DATE_TIME));
                     } catch (Exception e) {
-                        logger.warn("用户ID {}: 创建时间格式错误: {}", userId, fields[22]);
+                        logger.warn("用户ID {}: 创建时间格式错误: {}", userId, fields[24]);
                     }
                 }
                 
-                // 解析更新时间 (字段23)
-                if (fields.length > 23 && !fields[23].equals("未知时间") && !fields[23].isEmpty() && 
-                    !fields[23].equals("null")) {
+                // 解析更新时间 (字段25)
+                if (fields.length > 25 && !fields[25].equals("未知时间") && !fields[25].isEmpty() && 
+                    !fields[25].equals("null")) {
                     try {
-                        user.setUpdatedAt(LocalDateTime.parse(fields[23], DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+                        user.setUpdatedAt(LocalDateTime.parse(fields[25], DateTimeFormatter.ISO_LOCAL_DATE_TIME));
                     } catch (Exception e) {
-                        logger.warn("用户ID {}: 更新时间格式错误: {}", userId, fields[23]);
+                        logger.warn("用户ID {}: 更新时间格式错误: {}", userId, fields[25]);
                     }
                 }
 
@@ -817,8 +867,8 @@ public class DataImportService {
                     // 插入新记录，包含完整字段映射
                     String sql = "INSERT INTO users (id, username, email, password, first_name, last_name, role, enabled, account_locked, " +
                                 "failed_login_attempts, lock_time, lock_expire_time, comments_private, contents_private, profile_private, " +
-                                "admin_login_attempts, like_count, assigned_school_id, ip_address, device_type, user_agent, avatar_url, created_at, updated_at) " +
-                                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                                "admin_login_attempts, like_count, assigned_school_id, ip_address, device_type, user_agent, avatar_url, language, theme, created_at, updated_at) " +
+                                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                     
                     jakarta.persistence.Query query = entityManager.createNativeQuery(sql);
                     query.setParameter(1, user.getId());
@@ -843,8 +893,10 @@ public class DataImportService {
                     query.setParameter(20, user.getDeviceType());
                     query.setParameter(21, user.getUserAgent());
                     query.setParameter(22, user.getAvatarUrl());
-                    query.setParameter(23, user.getCreatedAt());
-                    query.setParameter(24, user.getUpdatedAt() != null ? user.getUpdatedAt() : java.time.LocalDateTime.now());
+                    query.setParameter(23, user.getLanguage() != null ? user.getLanguage() : "zh");
+                    query.setParameter(24, user.getTheme() != null ? user.getTheme() : "midnight");
+                    query.setParameter(25, user.getCreatedAt());
+                    query.setParameter(26, user.getUpdatedAt() != null ? user.getUpdatedAt() : java.time.LocalDateTime.now());
                     
                     int rowsAffected = query.executeUpdate();
                     if (rowsAffected > 0) {
@@ -1232,7 +1284,11 @@ public class DataImportService {
     }
 
     private void importContents(ImportResult result, List<String[]> data) {
-        if (data == null) return;
+        if (data == null) {
+            logger.warn("内容数据为null，跳过了内容导入");
+            result.addResult("内容", 0, 0);
+            return;
+        }
 
         logger.info("开始导入内容数据，共 {} 条", data.size());
         int success = 0, failed = 0;

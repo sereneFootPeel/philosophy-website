@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>验证码</title>
-    <link rel="stylesheet" th:href="@{/css/theme.css}">
+    
     <style>
         body { font-family: Arial, sans-serif; margin: 0; padding: 20px; color: #333; }
         .container { max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 8px; padding: 20px; }
@@ -13,8 +13,6 @@
     </style>
 </head>
 <body class="bg-secondary min-h-screen flex flex-col">
-
-<div th:replace="~{fragments/header :: header}"></div>
 
 <main class="flex-grow pt-16">
     <div class="container">
@@ -31,7 +29,7 @@
     </div>
 </main>
 
-<div th:replace="~{fragments/footer :: footer}"></div>
+    
 
 </body>
 </html>

@@ -16,9 +16,10 @@
         <div class="mt-6 admin-card rounded-lg p-6">
             <!-- 错误信息将通过JavaScript显示 -->
             <form th:action="@{${actionUrl}}" method="post">
-                <input type="hidden" name="id" th:value="${contentForm != null ? contentForm.id : null}" />
-                <input type="hidden" name="version" th:value="${contentForm != null ? contentForm.version : null}" />
+                <input type="hidden" name="id" th:value="${contentForm != null ? contentForm.id : ''}" />
+                <input type="hidden" name="version" th:value="${contentForm != null and contentForm.version != null ? contentForm.version : '0'}" />
                 <input type="hidden" name="redirectUrl" th:value="${param.redirectUrl != null ? param.redirectUrl[0] : ''}" />
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 
                 <div class="mb-5">
                     <label class="admin-form-label" for="philosopher">所属哲学家 (可选)</label>
@@ -38,7 +39,18 @@
 
                 <div class="mb-5">
                     <label class="admin-form-label" for="contentText">内容 <span class="admin-text-error">*</span></label>
-                    <textarea id="contentText" class="admin-form-input" name="content" placeholder="请输入内容" required style="min-height: 200px;" th:text="${contentForm != null ? contentForm.content : ''}"></textarea>
+                    <textarea id="contentText" class="admin-form-input" name="content" placeholder="请输入内容" required style="min-height: 200px;">[[${contentForm != null ? contentForm.content : ''}]]</textarea>
+                </div>
+
+                <!-- 英文翻译部分 -->
+                <div class="mb-5 border-t pt-5">
+                    <h3 class="text-lg font-semibold mb-4 admin-text-primary">英文翻译（可选）</h3>
+                    <div class="mb-4">
+                        <label class="admin-form-label" for="contentEn">英文内容</label>
+                        <textarea id="contentEn" name="contentEn" class="admin-form-input"
+                                  placeholder="Please enter English translation of the content"
+                                  style="min-height: 200px;">[[${contentEn != null ? contentEn : ''}]]</textarea>
+                    </div>
                 </div>
 
                 <div class="mt-6 flex items-center justify-between gap-3">
@@ -49,8 +61,11 @@
                             <span>保存后锁定（仅创建者可编辑）</span>
                         </label>
                     </div>
-                    <a th:href="@{${cancelUrl}}" class="admin-btn-secondary">取消</a>
-                    <button type="submit" class="admin-btn-primary">保存</button>
+                    <!-- 按钮组 -->
+                    <div class="flex items-center gap-3" th:classappend="${contentForm == null || contentForm.id == null ? '' : 'ml-auto'}">
+                        <a th:href="@{${cancelUrl}}" class="admin-btn-secondary">取消</a>
+                        <button type="submit" class="admin-btn-primary">保存</button>
+                    </div>
                 </div>
             </form>
 

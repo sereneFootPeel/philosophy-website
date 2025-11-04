@@ -14,9 +14,10 @@
         </div>
 
         <div class="mt-6 admin-card rounded-lg p-6">
-            <form th:action="@{${actionUrl}}" th:object="${philosopher}" method="post">
+            <form th:action="@{${actionUrl}}" th:object="${philosopher}" method="post" enctype="multipart/form-data">
                 <input type="hidden" th:field="*{id}" />
                 <input type="hidden" name="redirectUrl" th:value="${param.redirectUrl != null ? param.redirectUrl[0] : ''}" />
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 
                 <div class="mb-5">
                     <label class="admin-form-label" for="name">哲学家姓名 <span class="admin-text-error">*</span></label>
@@ -35,8 +36,44 @@
                 </div>
 
                 <div class="mb-5">
-                    <label class="admin-form-label" for="imageUrl">图片URL</label>
-                    <input type="text" id="imageUrl" class="admin-form-input" th:field="*{imageUrl}" placeholder="请输入哲学家图片URL" />
+                    <label class="admin-form-label" for="imageFile">哲学家照片</label>
+                    <input type="file" id="imageFile" name="imageFile" accept="image/*" 
+                           class="admin-form-input" onchange="handleFileSelect(this)" />
+                    <p class="text-xs admin-text-secondary mt-1">支持 JPG、PNG、GIF 等图片格式。每次只能上传一张新照片。</p>
+                    
+                    <!-- 当前图片预览 -->
+                    <div th:if="${philosopher.imageUrl != null and philosopher.imageUrl != ''}" id="currentImageContainer" class="mt-3">
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="admin-form-label text-sm">当前照片：</label>
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" id="deleteImage" name="deleteImage" value="true" 
+                                       class="w-4 h-4" onchange="toggleDeleteImage(this)" />
+                                <span class="text-sm admin-text-error">删除照片</span>
+                            </label>
+                        </div>
+                        <div class="mt-2" id="currentImageDisplay">
+                            <img th:src="${philosopher.imageUrl}" th:onerror="this.style.display='none'" 
+                                 alt="当前照片" 
+                                 class="max-w-xs max-h-48 object-contain border border-gray-300 rounded" 
+                                 style="max-width: 300px; max-height: 200px;" 
+                                 id="currentImage" 
+                                 onerror="this.parentElement.parentElement.style.display='none'" />
+                        </div>
+                    </div>
+                    
+                    <!-- 新图片预览 -->
+                    <div id="imagePreview" class="mt-3 hidden">
+                        <label class="admin-form-label text-sm">新上传照片预览：</label>
+                        <div class="mt-2">
+                            <img id="previewImg" src="" alt="预览图片" 
+                                 class="max-w-xs max-h-48 object-contain border border-gray-300 rounded" 
+                                 style="max-width: 300px; max-height: 200px;" />
+                        </div>
+                        <button type="button" onclick="clearImagePreview()" 
+                                class="mt-2 text-sm text-red-600 hover:text-red-800">
+                            <i class="fa fa-times"></i> 清除已选照片
+                        </button>
+                    </div>
                 </div>
 
                 <div class="mb-5">
@@ -57,7 +94,7 @@
                     <div class="mb-4">
                         <label class="admin-form-label" for="biographyEn">英文简介</label>
                         <textarea id="biographyEn" name="biographyEn" class="admin-form-input" 
-                                  th:text="${biographyEn}" placeholder="请输入哲学家英文简介"></textarea>
+                                  placeholder="请输入哲学家英文简介">[[${biographyEn != null ? biographyEn : ''}]]</textarea>
                     </div>
                 </div>
 
@@ -69,6 +106,109 @@
         </div>
     </div>
 </div>
+
+<script>
+let selectedFile = null;
+
+function handleFileSelect(input) {
+    const preview = document.getElementById('imagePreview');
+    const previewImg = document.getElementById('previewImg');
+    const deleteImageCheckbox = document.getElementById('deleteImage');
+    
+    if (input.files && input.files[0]) {
+        // 检查文件类型
+        const file = input.files[0];
+        if (!file.type.startsWith('image/')) {
+            alert('请选择图片文件！');
+            input.value = '';
+            selectedFile = null;
+            preview.classList.add('hidden');
+            return;
+        }
+        
+        // 检查文件大小（限制为10MB）
+        if (file.size > 10 * 1024 * 1024) {
+            alert('图片文件大小不能超过10MB！');
+            input.value = '';
+            selectedFile = null;
+            preview.classList.add('hidden');
+            return;
+        }
+        
+        // 保存选中的文件
+        selectedFile = file;
+        
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            previewImg.src = e.target.result;
+            preview.classList.remove('hidden');
+            
+            // 如果选择了新图片，取消删除选项
+            if (deleteImageCheckbox) {
+                deleteImageCheckbox.checked = false;
+                toggleDeleteImage(deleteImageCheckbox);
+            }
+        };
+        
+        reader.onerror = function() {
+            alert('读取文件失败，请重试！');
+            input.value = '';
+            selectedFile = null;
+            preview.classList.add('hidden');
+        };
+        
+        reader.readAsDataURL(file);
+    } else {
+        selectedFile = null;
+        preview.classList.add('hidden');
+    }
+}
+
+function clearImagePreview() {
+    const input = document.getElementById('imageFile');
+    const preview = document.getElementById('imagePreview');
+    
+    if (input) {
+        input.value = '';
+    }
+    if (preview) {
+        preview.classList.add('hidden');
+    }
+    selectedFile = null;
+    
+    // 恢复删除复选框的显示
+    const deleteImageCheckbox = document.getElementById('deleteImage');
+    const currentImageDisplay = document.getElementById('currentImageDisplay');
+    if (deleteImageCheckbox && deleteImageCheckbox.checked === false && currentImageDisplay) {
+        currentImageDisplay.style.opacity = '1';
+    }
+}
+
+function toggleDeleteImage(checkbox) {
+    const input = document.getElementById('imageFile');
+    const preview = document.getElementById('imagePreview');
+    const currentImageDisplay = document.getElementById('currentImageDisplay');
+    
+    if (checkbox.checked) {
+        // 如果选择删除，清除文件输入和新图片预览
+        if (input) {
+            input.value = '';
+            selectedFile = null;
+        }
+        if (preview) {
+            preview.classList.add('hidden');
+        }
+        if (currentImageDisplay) {
+            currentImageDisplay.style.opacity = '0.5';
+        }
+    } else {
+        if (currentImageDisplay) {
+            currentImageDisplay.style.opacity = '1';
+        }
+    }
+}
+</script>
 
 </body>
 </html>

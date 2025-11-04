@@ -97,24 +97,7 @@ public class ContentService {
     }
 
     @Transactional
-    public Content saveContentForAdmin(Content contentFromForm, User editor) {
-        Content oldContentState = null;
-        Content contentToSave;
-
-        if (contentFromForm.getId() != null) {
-            contentToSave = contentRepository.findById(contentFromForm.getId())
-                    .orElseThrow(() -> new RuntimeException("Content not found with id: " + contentFromForm.getId()));
-
-            oldContentState = new Content();
-            oldContentState.setContent(contentToSave.getContent());
-
-            contentToSave.setContent(contentFromForm.getContent());
-            contentToSave.setPhilosopher(contentFromForm.getPhilosopher());
-            contentToSave.setSchool(contentFromForm.getSchool());
-        } else {
-            contentToSave = contentFromForm;
-        }
-
+    public Content saveContentForAdmin(Content contentToSave, User editor) {
         // 新建时设置作者；编辑已有内容时保持原作者不变
         if (contentToSave.getId() == null || contentToSave.getUser() == null) {
             contentToSave.setUser(editor);

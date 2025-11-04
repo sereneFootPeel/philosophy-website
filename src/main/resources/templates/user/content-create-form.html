@@ -6,30 +6,101 @@
     <title th:text="${translationService != null ? translationService.getStaticText('create_content', language) + ' - ' + (language != null and language == 'en' ? 'Philosophy Website' : '哲学网站') : '创建内容 - 哲学网站'}">创建内容 - 哲学网站</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- 主题样式 -->
+    <link th:href="@{/css/theme.css}" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/ckeditor5-build-classic@34.2.0/build/classic.min.js"></script>
+    
+    <!-- 立即应用主题（避免闪烁） -->
+    <script th:inline="javascript">
+        (function() {
+            try {
+                const serverTheme = /*[[${savedTheme}]]*/ null;
+                const localTheme = localStorage.getItem('philosophy_theme');
+                
+                let finalTheme = 'light';
+                
+                if (localTheme && localTheme !== 'null' && localTheme !== '') {
+                    finalTheme = localTheme;
+                } 
+                else if (serverTheme && serverTheme !== 'null' && serverTheme !== '') {
+                    finalTheme = serverTheme;
+                    localStorage.setItem('philosophy_theme', serverTheme);
+                }
+                
+                document.documentElement.classList.remove(
+                    'theme-light', 'theme-dark', 'theme-forest', 
+                    'theme-sunset', 'theme-ocean', 'theme-purple',
+                    'theme-sakura', 'theme-nordic', 'theme-emerald',
+                    'theme-midnight', 'theme-carbon', 'theme-obsidian'
+                );
+                
+                if (finalTheme && finalTheme !== 'light') {
+                    document.documentElement.classList.add('theme-' + finalTheme);
+                }
+            } catch (e) {
+                console.error('Theme initialization failed:', e);
+            }
+        })();
+    </script>
+    
     <script>
-        tailwind.config = { theme: { extend: { colors: { primary: '#4B5563', secondary: '#6B7280', accent: '#F3F4F6', light: '#E5E7EB', dark: '#1F2937' }, fontFamily: { sans: ['system-ui', 'sans-serif'] } } } }
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: 'var(--color-primary)',
+                        'primary-dark': 'var(--color-primary-dark)',
+                        'primary-light': 'var(--color-primary-light)',
+                        secondary: 'var(--color-secondary)',
+                        accent: 'var(--bg-quaternary)',
+                        light: 'var(--border-primary)',
+                        parchment: 'var(--bg-secondary)',
+                        white: 'var(--bg-primary)',
+                        black: 'var(--text-primary)',
+                        gray: {
+                            50: 'var(--bg-secondary)',
+                            100: 'var(--bg-secondary)',
+                            200: 'var(--bg-tertiary)',
+                            300: 'var(--bg-quaternary)',
+                            400: 'var(--border-secondary)',
+                            500: 'var(--text-tertiary)',
+                            600: 'var(--text-secondary)',
+                            700: 'var(--text-primary)',
+                            800: 'var(--text-primary)',
+                            900: 'var(--text-primary)',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        inter: ['Inter', 'sans-serif'],
+                        'chinese': ['Noto Serif SC', 'serif'],
+                        'english': ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
     </script>
     <style type="text/tailwindcss">
         @layer utilities {
-            .sidebar-link { @apply block px-4 py-3 text-white hover:bg-primary/40 transition-colors; }
+            .sidebar-link { @apply block px-4 py-3 text-white hover:bg-primary-light transition-colors; }
             .input { @apply w-full px-3 py-2 border border-light rounded-md focus:outline-none focus:ring-2 focus:ring-primary; }
             .label { @apply block font-medium text-gray-700 mb-2; }
-            .btn-primary { @apply inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-white hover:bg-primary/90; }
+            .btn-primary { @apply inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-white hover:bg-primary-dark; }
             .btn-secondary { @apply inline-flex items-center gap-2 px-4 py-2 rounded-md border border-secondary text-gray-700 hover:bg-accent; }
             .card { @apply bg-white rounded-lg shadow overflow-hidden; }
             .form-container { @apply max-w-3xl mx-auto p-4 md:p-8; }
         }
     </style>
 </head>
-<body class="bg-secondary min-h-screen text-gray-800 flex flex-col">
+<body class="bg-parchment min-h-screen text-black flex flex-col">
     <div th:replace="~{fragments/header :: header}"></div>
 
     <main class="flex-grow pt-16">
         <div class="form-container">
         <div class="flex items-center justify-between mb-6">
             <div>
-                <h1 class="text-2xl md:text-3xl font-bold text-gray-800">
+                <h1 class="text-2xl md:text-3xl font-bold text-black">
                     <i class="fa fa-plus mr-2"></i>
                     <span th:text="${translationService != null ? translationService.getStaticText('create_content', language) : '创建内容'}">创建内容</span>
                 </h1>
@@ -85,7 +156,7 @@
 
                 <!-- 英文翻译部分 -->
                 <div class="mb-5 border-t pt-5">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4" th:text="${translationService != null ? translationService.getStaticText('english_translation_optional', language) : '英文翻译（可选）'}">英文翻译（可选）</h3>
+                    <h3 class="text-lg font-semibold text-black mb-4" th:text="${translationService != null ? translationService.getStaticText('english_translation_optional', language) : '英文翻译（可选）'}">英文翻译（可选）</h3>
 
                     <div class="mb-4">
                         <label class="label" for="contentEn" th:text="${translationService != null ? translationService.getStaticText('english_content', language) : '英文内容'}">英文内容</label>

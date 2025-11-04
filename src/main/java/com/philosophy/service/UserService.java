@@ -9,6 +9,7 @@ import com.philosophy.model.Like;
 import com.philosophy.model.UserContentEdit;
 import com.philosophy.model.UserBlock;
 import com.philosophy.model.ModeratorBlock;
+import com.philosophy.model.Philosopher;
 import com.philosophy.repository.UserRepository;
 import com.philosophy.repository.UserLoginInfoRepository;
 import com.philosophy.repository.CommentRepository;
@@ -18,6 +19,7 @@ import com.philosophy.repository.LikeRepository;
 import com.philosophy.repository.UserContentEditRepository;
 import com.philosophy.repository.UserBlockRepository;
 import com.philosophy.repository.ModeratorBlockRepository;
+import com.philosophy.repository.PhilosopherRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -40,12 +42,14 @@ public class UserService implements UserDetailsService {
     private final UserContentEditRepository userContentEditRepository;
     private final UserBlockRepository userBlockRepository;
     private final ModeratorBlockRepository moderatorBlockRepository;
+    private final PhilosopherRepository philosopherRepository;
     
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, 
                       UserLoginInfoRepository userLoginInfoRepository, CommentRepository commentRepository,
                       ContentRepository contentRepository, UserFollowRepository userFollowRepository,
                       LikeRepository likeRepository, UserContentEditRepository userContentEditRepository,
-                      UserBlockRepository userBlockRepository, ModeratorBlockRepository moderatorBlockRepository) {
+                      UserBlockRepository userBlockRepository, ModeratorBlockRepository moderatorBlockRepository,
+                      PhilosopherRepository philosopherRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.userLoginInfoRepository = userLoginInfoRepository;
@@ -56,6 +60,7 @@ public class UserService implements UserDetailsService {
         this.userContentEditRepository = userContentEditRepository;
         this.userBlockRepository = userBlockRepository;
         this.moderatorBlockRepository = moderatorBlockRepository;
+        this.philosopherRepository = philosopherRepository;
     }
 
     @Override
@@ -87,7 +92,7 @@ public class UserService implements UserDetailsService {
             User admin = new User();
             admin.setUsername("admin");
             admin.setEmail("admin@example.com");
-            admin.setPassword(passwordEncoder.encode("admin123"));
+            admin.setPassword(passwordEncoder.encode("000000000000000000000000"));
             admin.setRole("ADMIN"); // 改为String类型
             admin.setEnabled(true); // 添加enabled字段
             userRepository.save(admin);
@@ -247,7 +252,14 @@ public class UserService implements UserDetailsService {
             moderatorBlockRepository.deleteAll(moderatorBlocks);
         }
         
-        // 12. 最后删除用户记录
+        // 12. 处理Philosopher表中的外键约束 - 重置user_id为null
+        List<Philosopher> userPhilosophers = philosopherRepository.findByUserId(id);
+        for (Philosopher philosopher : userPhilosophers) {
+            philosopher.setUser(null);
+            philosopherRepository.save(philosopher);
+        }
+        
+        // 13. 最后删除用户记录
         userRepository.delete(user);
     }
     

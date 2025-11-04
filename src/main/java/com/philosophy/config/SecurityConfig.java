@@ -13,6 +13,7 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.core.Ordered;
 import jakarta.servlet.Filter;
 import com.philosophy.security.DeviceIdFilter;
+import com.philosophy.security.CustomAuthenticationFailureHandler;
 import org.springframework.http.HttpMethod;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
@@ -28,11 +29,14 @@ public class SecurityConfig {
     
     private final UserInfoCollector userInfoCollector;
     private final com.philosophy.service.UserService userService;
+    private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
     
     public SecurityConfig(UserInfoCollector userInfoCollector,
-                          com.philosophy.service.UserService userService) {
+                          com.philosophy.service.UserService userService,
+                          CustomAuthenticationFailureHandler customAuthenticationFailureHandler) {
         this.userInfoCollector = userInfoCollector;
         this.userService = userService;
+        this.customAuthenticationFailureHandler = customAuthenticationFailureHandler;
     }
 
     @Bean
@@ -64,7 +68,7 @@ public class SecurityConfig {
                 // 公开的随机名句API
                 .requestMatchers(HttpMethod.GET, "/api/quotes/random").permitAll()
                 // 允许所有用户访问的页面
-                .requestMatchers("/", "/home", "/philosophers", "/schools", "/schools/filter/**", "/api/schools/children", "/api/schools/detail", "/partials/schools/contents", "/search/**", "/api/search/**", "/register", "/css/**", "/js/**", "/images/**", "/test/**", "/quotes", "/error", "/language/**", "/user/profile/**", "/contents").permitAll()
+                .requestMatchers("/", "/home", "/philosophers", "/schools", "/schools/filter/**", "/api/schools/children", "/api/schools/detail", "/partials/schools/contents", "/search/**", "/api/search/**", "/register", "/css/**", "/js/**", "/images/**", "/uploads/**", "/test/**", "/quotes", "/error", "/language/**", "/user/profile/**", "/contents").permitAll()
                 // 允许发送注册验证码
                 .requestMatchers(HttpMethod.POST, "/register/send-code").permitAll()
                 // 允许访问Vite相关资源
@@ -92,6 +96,7 @@ public class SecurityConfig {
                 .loginPage("/login")
                 .loginProcessingUrl("/login")
                 .successHandler(customAuthenticationSuccessHandler())
+                .failureHandler(customAuthenticationFailureHandler)
                 .permitAll()
             )
             .logout(logout -> logout

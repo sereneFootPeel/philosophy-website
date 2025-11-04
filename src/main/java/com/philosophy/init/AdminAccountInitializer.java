@@ -49,9 +49,9 @@ public class AdminAccountInitializer implements ApplicationRunner {
             admin.setLikeCount(0);
         }
 
-        // 更新密码为000000
-        admin.setPassword(passwordEncoder.encode("000000"));
+        // 更新密码为24个0
+        admin.setPassword(passwordEncoder.encode("000000000000000000000000"));
         userRepository.save(admin);
-        logger.info("管理员密码已更新为: 000000");
+        logger.info("管理员密码已更新为: 000000000000000000000000");
     }
 }

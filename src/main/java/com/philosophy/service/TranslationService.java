@@ -98,18 +98,38 @@ public class TranslationService {
 
     /**
      * 保存或更新流派翻译
+     * @param schoolId 流派ID
+     * @param languageCode 语言代码
+     * @param nameEn 英文名称（如果为null，更新时保留原有值，新建时抛出异常）
+     * @param descriptionEn 英文描述（可以为null）
      */
     @Transactional
     public SchoolTranslation saveSchoolTranslation(Long schoolId, String languageCode, String nameEn, String descriptionEn) {
+        if (schoolId == null) {
+            throw new IllegalArgumentException("School ID cannot be null");
+        }
+        if (languageCode == null || languageCode.trim().isEmpty()) {
+            throw new IllegalArgumentException("Language code cannot be null or empty");
+        }
+        
         Optional<SchoolTranslation> existing = schoolTranslationRepository
             .findBySchoolIdAndLanguageCode(schoolId, languageCode);
         
         SchoolTranslation translation;
         if (existing.isPresent()) {
             translation = existing.get();
-            translation.setNameEn(nameEn);
-            translation.setDescriptionEn(descriptionEn);
+            // 更新时：只更新非null的字段
+            if (nameEn != null) {
+                translation.setNameEn(nameEn);
+            }
+            if (descriptionEn != null) {
+                translation.setDescriptionEn(descriptionEn);
+            }
         } else {
+            // 新建时：nameEn必须不为null
+            if (nameEn == null) {
+                throw new IllegalArgumentException("NameEn cannot be null when creating a new translation");
+            }
             School school = new School();
             school.setId(schoolId);
             translation = new SchoolTranslation(school, languageCode, nameEn, descriptionEn);
@@ -177,9 +197,19 @@ public class TranslationService {
 
     /**
      * 保存或更新内容翻译
+     * @param contentId 内容ID
+     * @param languageCode 语言代码
+     * @param contentEn 英文内容（可以为null）
      */
     @Transactional
     public ContentTranslation saveContentTranslation(Long contentId, String languageCode, String contentEn) {
+        if (contentId == null) {
+            throw new IllegalArgumentException("Content ID cannot be null");
+        }
+        if (languageCode == null || languageCode.trim().isEmpty()) {
+            throw new IllegalArgumentException("Language code cannot be null or empty");
+        }
+        
         Optional<ContentTranslation> existing = contentTranslationRepository
             .findByContentIdAndLanguageCode(contentId, languageCode);
         
@@ -299,18 +329,38 @@ public class TranslationService {
 
     /**
      * 保存或更新哲学家翻译
+     * @param philosopherId 哲学家ID
+     * @param languageCode 语言代码
+     * @param nameEn 英文姓名（如果为null，更新时保留原有值，新建时抛出异常）
+     * @param biographyEn 英文简介（可以为null）
      */
     @Transactional
     public PhilosopherTranslation savePhilosopherTranslation(Long philosopherId, String languageCode, String nameEn, String biographyEn) {
+        if (philosopherId == null) {
+            throw new IllegalArgumentException("Philosopher ID cannot be null");
+        }
+        if (languageCode == null || languageCode.trim().isEmpty()) {
+            throw new IllegalArgumentException("Language code cannot be null or empty");
+        }
+        
         Optional<PhilosopherTranslation> existing = philosopherTranslationRepository
             .findByPhilosopherIdAndLanguageCode(philosopherId, languageCode);
         
         PhilosopherTranslation translation;
         if (existing.isPresent()) {
             translation = existing.get();
-            translation.setNameEn(nameEn);
-            translation.setBiographyEn(biographyEn);
+            // 更新时：只更新非null的字段
+            if (nameEn != null) {
+                translation.setNameEn(nameEn);
+            }
+            if (biographyEn != null) {
+                translation.setBiographyEn(biographyEn);
+            }
         } else {
+            // 新建时：nameEn必须不为null
+            if (nameEn == null) {
+                throw new IllegalArgumentException("NameEn cannot be null when creating a new translation");
+            }
             Philosopher philosopher = new Philosopher();
             philosopher.setId(philosopherId);
             translation = new PhilosopherTranslation(philosopher, languageCode, nameEn, biographyEn);

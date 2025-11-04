@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -46,4 +47,14 @@ public interface UserContentEditRepository extends JpaRepository<UserContentEdit
     // 根据用户ID查找所有编辑记录
     @Query("SELECT uce FROM UserContentEdit uce WHERE uce.user.id = :userId")
     List<UserContentEdit> findByUserId(@Param("userId") Long userId);
+    
+    // 根据哲学家ID查找所有编辑记录
+    @Query("SELECT uce FROM UserContentEdit uce WHERE uce.philosopher.id = :philosopherId")
+    List<UserContentEdit> findByPhilosopherId(@Param("philosopherId") Long philosopherId);
+    
+    // 删除指定哲学家ID的所有编辑记录
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    @Query("DELETE FROM UserContentEdit uce WHERE uce.philosopher.id = :philosopherId")
+    void deleteByPhilosopherId(@Param("philosopherId") Long philosopherId);
 }

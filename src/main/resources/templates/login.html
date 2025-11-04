@@ -95,20 +95,70 @@
     <div th:replace="~{fragments/footer :: search-modal}"></div>
     <div th:replace="~{fragments/footer :: message-script}"></div>
 
-    <script>
+    <script th:inline="javascript">
+        // 显示登录错误提示（使用与主题切换相同的样式）
+        function showLoginErrorNotification(errorType, language) {
+            let message;
+            if (errorType === 'account') {
+                message = language === 'en' ? 'Username incorrect' : '用户名错误';
+            } else if (errorType === 'password') {
+                message = language === 'en' ? 'Password incorrect' : '密码错误';
+            } else {
+                message = language === 'en' ? 'Username or password incorrect' : '用户名或密码错误';
+            }
+            
+            // Create notification element (样式与主题切换提示相同)
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-24 left-1/2 transform -translate-x-1/2 bg-primary text-white px-6 py-3 rounded-full shadow-lg z-[9999] transition-all duration-300 text-sm font-medium';
+            notification.innerHTML = '<i class="fa fa-exclamation-circle mr-2"></i>' + message;
+            notification.style.opacity = '0';
+            notification.style.transform = 'translate(-50%, -20px)';
+            document.body.appendChild(notification);
+            
+            // 动画显示
+            setTimeout(() => {
+                notification.style.opacity = '1';
+                notification.style.transform = 'translate(-50%, 0)';
+            }, 10);
+            
+            // 动画隐藏
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translate(-50%, -20px)';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.remove();
+                    }
+                }, 300);
+            }, 2000);
+        }
+        
         // 页面加载时检查URL参数并显示消息
         document.addEventListener('DOMContentLoaded', function() {
             const urlParams = new URLSearchParams(window.location.search);
             const language = /*[[${language}]]*/ 'zh';
             
+            // 从 URL 参数获取错误类型（优先级高）
+            const errorParam = urlParams.get('error');
+            
+            // 检查是否有登录错误
+            if (errorParam === 'account' || errorParam === 'password') {
+                showLoginErrorNotification(errorParam, language);
+            } else if (urlParams.has('error')) {
+                // 兼容旧的错误参数（只是 error=true）
+                const loginError = /*[[${loginError}]]*/ null;
+                if (loginError) {
+                    showLoginErrorNotification(loginError, language);
+                } else {
+                    // 随机选择一个错误类型
+                    const randomError = Math.random() < 0.5 ? 'account' : 'password';
+                    showLoginErrorNotification(randomError, language);
+                }
+            }
+            
             if (urlParams.has('success')) {
                 const message = language === 'en' ? 'Operation successful' : '操作成功';
                 showMessage(message, 'success');
-            }
-            
-            if (urlParams.has('error')) {
-                const message = language === 'en' ? 'Username or password incorrect, please try again' : '用户名或密码错误，请重试';
-                showMessage(message, 'error');
             }
             
             if (urlParams.has('logout')) {

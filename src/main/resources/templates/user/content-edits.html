@@ -6,19 +6,75 @@
     <title>我的内容编辑 - 哲学网站</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- 主题样式 -->
+    <link th:href="@{/css/theme.css}" rel="stylesheet">
+    
+    <!-- 立即应用主题（避免闪烁） -->
+    <script th:inline="javascript">
+        (function() {
+            try {
+                const serverTheme = /*[[${savedTheme}]]*/ null;
+                const localTheme = localStorage.getItem('philosophy_theme');
+                
+                let finalTheme = 'light';
+                
+                if (localTheme && localTheme !== 'null' && localTheme !== '') {
+                    finalTheme = localTheme;
+                } 
+                else if (serverTheme && serverTheme !== 'null' && serverTheme !== '') {
+                    finalTheme = serverTheme;
+                    localStorage.setItem('philosophy_theme', serverTheme);
+                }
+                
+                document.documentElement.classList.remove(
+                    'theme-light', 'theme-dark', 'theme-forest', 
+                    'theme-sunset', 'theme-ocean', 'theme-purple',
+                    'theme-sakura', 'theme-nordic', 'theme-emerald',
+                    'theme-midnight', 'theme-carbon', 'theme-obsidian'
+                );
+                
+                if (finalTheme && finalTheme !== 'light') {
+                    document.documentElement.classList.add('theme-' + finalTheme);
+                }
+            } catch (e) {
+                console.error('Theme initialization failed:', e);
+            }
+        })();
+    </script>
+    
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        primary: '#4B5563',
-                        secondary: '#6B7280',
-                        accent: '#F3F4F6',
-                        light: '#E5E7EB',
-                        dark: '#1F2937',
+                        primary: 'var(--color-primary)',
+                        'primary-dark': 'var(--color-primary-dark)',
+                        'primary-light': 'var(--color-primary-light)',
+                        secondary: 'var(--color-secondary)',
+                        accent: 'var(--bg-quaternary)',
+                        light: 'var(--border-primary)',
+                        parchment: 'var(--bg-secondary)',
+                        white: 'var(--bg-primary)',
+                        black: 'var(--text-primary)',
+                        gray: {
+                            50: 'var(--bg-secondary)',
+                            100: 'var(--bg-secondary)',
+                            200: 'var(--bg-tertiary)',
+                            300: 'var(--bg-quaternary)',
+                            400: 'var(--border-secondary)',
+                            500: 'var(--text-tertiary)',
+                            600: 'var(--text-secondary)',
+                            700: 'var(--text-primary)',
+                            800: 'var(--text-primary)',
+                            900: 'var(--text-primary)',
+                        }
                     },
                     fontFamily: {
-                        sans: ['system-ui', 'sans-serif']
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        inter: ['Inter', 'sans-serif'],
+                        'chinese': ['Noto Serif SC', 'serif'],
+                        'english': ['Inter', 'sans-serif'],
                     }
                 }
             }
@@ -26,10 +82,10 @@
     </script>
     <style type="text/tailwindcss">
         @layer utilities {
-            .sidebar-link { @apply block px-4 py-3 text-white hover:bg-primary/40 transition-colors; }
+            .sidebar-link { @apply block px-4 py-3 text-white hover:bg-primary-light transition-colors; }
             .table-head { @apply bg-accent text-gray-700 text-left text-sm; }
             .table-cell { @apply px-4 py-3 border-b border-light; }
-            .btn-primary { @apply inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-primary text-white hover:bg-primary/90; }
+            .btn-primary { @apply inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-primary text-white hover:bg-primary-dark; }
             .btn-secondary { @apply inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-secondary text-gray-700 hover:bg-accent; }
             .btn-danger { @apply inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-red-300 text-red-700 hover:bg-red-50; }
             .btn-sm { @apply px-2.5 py-1 text-xs; }
@@ -45,7 +101,7 @@
         }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen flex flex-col m-0 p-0">
+<body class="bg-parchment min-h-screen flex flex-col m-0 p-0">
     <!-- 导航栏 -->
     <header th:replace="~{fragments/header :: header}"></header>
 
@@ -54,8 +110,8 @@
         <div class="max-w-6xl mx-auto">
             <div class="flex items-center justify-between">
                 <div>
-                    <h1 class="text-2xl md:text-3xl font-bold text-gray-800">我的内容编辑</h1>
-                    <p class="text-secondary mt-1">管理您的内容编辑</p>
+                    <h1 class="text-2xl md:text-3xl font-bold text-black">我的内容编辑</h1>
+                    <p class="text-gray-600 mt-1">管理您的内容编辑</p>
                 </div>
                 <div class="flex items-center gap-3">
                     <a href="/user/content-edits/create" class="btn-primary"><i class="fa fa-plus"></i> 编辑内容</a>
@@ -63,7 +119,7 @@
                 </div>
             </div>
 
-            <div class="mt-6 bg-white rounded-lg shadow overflow-hidden">
+            <div class="mt-6 bg-white rounded-lg shadow overflow-hidden text-black">
                 <div class="overflow-x-auto">
                     <table class="min-w-full" th:if="${edits != null and edits.content != null and !edits.content.isEmpty()}">
                         <thead class="table-head">

@@ -1111,6 +1111,7 @@
                 while (currentElement && currentElement !== this) {
                     // 如果路径中包含点赞按钮、链接或任何按钮，则不触发导航
                     if (currentElement.classList.contains('like-btn') || 
+                        currentElement.closest('.like-btn') !== null ||
                         currentElement.tagName.toLowerCase() === 'a' ||
                         currentElement.tagName.toLowerCase() === 'button' ||
                         typeof currentElement.onclick === 'function') {

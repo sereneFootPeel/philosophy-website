@@ -6,6 +6,7 @@ import com.philosophy.model.School;
 import com.philosophy.model.User;
 import com.philosophy.repository.ContentRepository;
 import com.philosophy.repository.PhilosopherRepository;
+import com.philosophy.repository.UserContentEditRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,7 +20,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.Set;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,11 +31,13 @@ public class PhilosopherService {
 
     private final PhilosopherRepository philosopherRepository;
     private final ContentRepository contentRepository;
+    private final UserContentEditRepository userContentEditRepository;
     private static final String UPLOAD_DIR = "uploads/"; // 上传目录
 
-    public PhilosopherService(PhilosopherRepository philosopherRepository, ContentRepository contentRepository) {
+    public PhilosopherService(PhilosopherRepository philosopherRepository, ContentRepository contentRepository, UserContentEditRepository userContentEditRepository) {
         this.philosopherRepository = philosopherRepository;
         this.contentRepository = contentRepository;
+        this.userContentEditRepository = userContentEditRepository;
     }
 
     @Transactional(readOnly = true)
@@ -55,7 +57,12 @@ public class PhilosopherService {
 
     @Transactional
     public void deleteById(Long id) {
-        // 首先处理引用此哲学家的内容 - 将它们断开关联
+        // 首先删除引用此哲学家的用户内容编辑记录
+        userContentEditRepository.deleteByPhilosopherId(id);
+        // 强制刷新以确保UserContentEdit的删除被提交到数据库
+        philosopherRepository.flush();
+        
+        // 然后处理引用此哲学家的内容 - 将它们断开关联
         List<Content> contents = contentRepository.findByPhilosopherId(id);
         if (!contents.isEmpty()) {
             for (Content content : contents) {
@@ -221,6 +228,33 @@ public class PhilosopherService {
 
         // 返回文件URL
         return "/" + UPLOAD_DIR + fileName;
+    }
+
+    // 删除图片文件方法
+    public void deleteImageFile(String imageUrl) {
+        if (imageUrl == null || imageUrl.isEmpty()) {
+            return;
+        }
+        
+        try {
+            // 从URL中提取文件路径
+            // URL格式应该是 /uploads/filename 或类似的格式
+            String filePath = imageUrl;
+            if (filePath.startsWith("/")) {
+                filePath = filePath.substring(1);
+            }
+            
+            Path path = Paths.get(filePath);
+            if (Files.exists(path)) {
+                Files.delete(path);
+                logger.info("Deleted image file: {}", filePath);
+            } else {
+                logger.warn("Image file not found: {}", filePath);
+            }
+        } catch (IOException e) {
+            logger.error("Error deleting image file: {}", imageUrl, e);
+            // 不抛出异常，因为文件可能已经被删除或不存在
+        }
     }
 
     // 获取精选哲学家（首页使用）

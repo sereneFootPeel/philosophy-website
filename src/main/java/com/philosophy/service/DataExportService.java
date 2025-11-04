@@ -69,10 +69,10 @@ public class DataExportService {
         try {
             // 导出用户数据
             pw.println("用户数据");
-            pw.println("ID,用户名,邮箱,密码,名字,姓氏,角色,启用状态,失败登录次数,账户锁定,锁定时间,锁定过期时间,个人资料隐私,评论隐私,内容隐私,管理员登录尝试,点赞数,分配学派ID,IP地址,设备类型,用户代理,头像URL,创建时间,更新时间");
+            pw.println("ID,用户名,邮箱,密码,名字,姓氏,角色,启用状态,失败登录次数,账户锁定,锁定时间,锁定过期时间,个人资料隐私,评论隐私,内容隐私,管理员登录尝试,点赞数,分配学派ID,IP地址,设备类型,用户代理,头像URL,语言设置,主题设置,创建时间,更新时间");
             List<User> users = userRepository.findAll();
             for (User user : users) {
-                pw.printf("%d,%s,%s,%s,%s,%s,%s,%s,%d,%s,%s,%s,%s,%s,%s,%d,%d,%s,%s,%s,%s,%s,%s,%s%n",
+                pw.printf("%d,%s,%s,%s,%s,%s,%s,%s,%d,%s,%s,%s,%s,%s,%s,%d,%d,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s%n",
                     user.getId(),
                     escapeCsv(user.getUsername()),
                     escapeCsv(user.getEmail()),
@@ -95,6 +95,8 @@ public class DataExportService {
                     escapeCsv(user.getDeviceType()),
                     escapeCsv(user.getUserAgent()),
                     escapeCsv(user.getAvatarUrl()),
+                    escapeCsv(user.getLanguage() != null ? user.getLanguage() : ""),
+                    escapeCsv(user.getTheme() != null ? user.getTheme() : ""),
                     user.getCreatedAt() != null ? user.getCreatedAt().format(formatter) : "未知时间",
                     user.getUpdatedAt() != null ? user.getUpdatedAt().format(formatter) : "未知时间"
                 );

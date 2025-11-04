@@ -105,16 +105,21 @@ class LikeButtonComponent {
                 entityId: this.entityId
             });
 
+            // 阻止事件冒泡和默认行为，确保不会触发卡片点击
             e.preventDefault();
             e.stopPropagation();
+            e.stopImmediatePropagation();
+            
             this.toggleLike();
         };
 
-        // 直接将事件绑定在图标上，确保事件目标是图标本身
+        // 将事件绑定在整个按钮容器上，而不仅仅是图标
+        // 使用捕获阶段，确保在卡片点击事件之前触发
+        this.button.addEventListener('click', this._clickHandler, true);
+        
+        // 如果图标存在，也绑定事件以确保点击图标也能触发
         if (this.icon) {
             this.icon.addEventListener('click', this._clickHandler, true);
-        } else {
-            this.button.addEventListener('click', this._clickHandler, true);
         }
 
         console.log('LikeButtonComponent: click event bound successfully');

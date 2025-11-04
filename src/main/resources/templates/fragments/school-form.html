@@ -16,6 +16,7 @@
             <form th:action="@{${actionUrl}}" th:object="${school}" method="post">
                 <input type="hidden" th:field="*{id}" />
                 <input type="hidden" name="redirectUrl" th:value="${param.redirectUrl != null ? param.redirectUrl[0] : ''}" />
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                 <div class="mb-5">
                     <label class="admin-form-label" for="name">流派名称 <span class="admin-text-error">*</span></label>
                     <input type="text" id="name" class="admin-form-input" th:field="*{name}" placeholder="请输入流派名称" required />
@@ -45,7 +46,7 @@
                     <div class="mb-4">
                         <label class="admin-form-label" for="descriptionEn">英文描述</label>
                         <textarea id="descriptionEn" name="descriptionEn" class="admin-form-input" 
-                                  th:text="${descriptionEn}" placeholder="请输入流派英文描述"></textarea>
+                                  placeholder="请输入流派英文描述">[[${descriptionEn != null ? descriptionEn : ''}]]</textarea>
                     </div>
                 </div>
                 <div class="mt-6 flex items-center justify-end gap-3">

@@ -43,4 +43,7 @@ public interface PhilosopherRepository extends JpaRepository<Philosopher, Long> 
     @Transactional
     @Query("UPDATE Philosopher p SET p.likeCount = p.likeCount + :delta WHERE p.id = :id")
     void updateLikeCount(Long id, int delta);
+    
+    @Query("SELECT p FROM Philosopher p WHERE p.user.id = :userId")
+    List<Philosopher> findByUserId(@Param("userId") Long userId);
 }

@@ -5,6 +5,7 @@ import com.philosophy.service.UserService;
 import com.philosophy.service.TranslationService;
 import com.philosophy.service.EmailService;
 import com.philosophy.service.VerificationCodeService;
+import com.philosophy.service.RateLimitingService;
 import com.philosophy.util.UserInfoCollector;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
@@ -33,13 +34,15 @@ public class AuthController {
     private final TranslationService translationService;
     private final EmailService emailService;
     private final VerificationCodeService verificationCodeService;
+    private final RateLimitingService rateLimitingService;
     
-    public AuthController(UserService userService, UserInfoCollector userInfoCollector, TranslationService translationService, EmailService emailService, VerificationCodeService verificationCodeService) {
+    public AuthController(UserService userService, UserInfoCollector userInfoCollector, TranslationService translationService, EmailService emailService, VerificationCodeService verificationCodeService, RateLimitingService rateLimitingService) {
         this.userService = userService;
         this.userInfoCollector = userInfoCollector;
         this.translationService = translationService;
         this.emailService = emailService;
         this.verificationCodeService = verificationCodeService;
+        this.rateLimitingService = rateLimitingService;
     }
 
     @GetMapping("/login")
@@ -48,6 +51,14 @@ public class AuthController {
         String language = (String) request.getSession().getAttribute("language");
         if (language == null) {
             language = "zh"; // 默认中文
+        }
+        
+        // 检查是否有登录错误信息
+        String loginError = (String) request.getSession().getAttribute("loginError");
+        if (loginError != null) {
+            model.addAttribute("loginError", loginError);
+            // 清除 session 中的错误信息，避免重复显示
+            request.getSession().removeAttribute("loginError");
         }
         
         model.addAttribute("activePage", "login");
@@ -72,7 +83,18 @@ public class AuthController {
     }
 
     @PostMapping("/register/send-code")
-    public ResponseEntity<Map<String, Object>> sendRegistrationCode(@RequestParam String email) {
+    public ResponseEntity<Map<String, Object>> sendRegistrationCode(@RequestParam String email, HttpServletRequest request) {
+        // 获取客户端IP地址
+        String clientIp = userInfoCollector.getIpAddress(request);
+        
+        // 检查速率限制（防止DDoS攻击）
+        RateLimitingService.RateLimitResult rateLimitResult = rateLimitingService.checkRateLimit(clientIp);
+        if (!rateLimitResult.isAllowed()) {
+            logger.warn("IP {} 触发速率限制，等待时间: {} 秒", clientIp, rateLimitResult.getWaitSeconds());
+            return ResponseEntity.status(429).body(Collections.singletonMap("error", 
+                rateLimitResult.getMessage() + "（剩余等待时间: " + rateLimitResult.getWaitSeconds() + "秒）"));
+        }
+        
         if (userService.existsByEmail(email)) {
             return ResponseEntity.badRequest().body(Collections.singletonMap("error", "该邮箱已被注册"));
         }
@@ -80,11 +102,12 @@ public class AuthController {
             String code = verificationCodeService.generateAndStoreCode(email);
             emailService.sendVerificationCode(email, code);
             long cooldown = verificationCodeService.getSecondsUntilResendAllowed(email);
+            logger.info("成功发送验证码到邮箱: {}, IP: {}", email, clientIp);
             return ResponseEntity.ok(Collections.singletonMap("cooldown", cooldown));
         } catch (IllegalStateException e) {
             return ResponseEntity.status(429).body(Collections.singletonMap("error", "请稍后再试"));
         } catch (Exception e) {
-            logger.error("发送验证码失败", e);
+            logger.error("发送验证码失败，邮箱: {}, IP: {}", email, clientIp, e);
             return ResponseEntity.internalServerError().body(Collections.singletonMap("error", "发送失败，请稍后再试"));
         }
     }
