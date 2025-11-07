@@ -44,10 +44,6 @@ ensure_command() {
 ensure_command git
 ensure_command java
 
-if [[ ! -x "${APP_DIR}/mvnw" && -f "${APP_DIR}/mvnw" ]]; then
-  chmod +x "${APP_DIR}/mvnw" || abort "Unable to set execute bit on mvnw"
-fi
-
 cd "${APP_DIR}" || abort "Unable to change directory to ${APP_DIR}"
 
 run_step "Fetching latest changes from ${GIT_REMOTE}/${GIT_BRANCH}" git fetch --prune "${GIT_REMOTE}"
@@ -56,9 +52,16 @@ run_step "Resetting to ${GIT_REMOTE}/${GIT_BRANCH}" git reset --hard "${GIT_REMO
 run_step "Cleaning untracked files" git clean -fd
 
 MVN_WRAPPER="${APP_DIR}/mvnw"
-if [[ -x "${MVN_WRAPPER}" ]]; then
-  MVN_CMD="${MVN_CMD:-${MVN_WRAPPER}}"
-else
+if [[ -f "${MVN_WRAPPER}" ]]; then
+  if [[ ! -x "${MVN_WRAPPER}" ]]; then
+    run_step "Setting execute permission on mvnw" chmod +x "${MVN_WRAPPER}"
+  fi
+  if [[ -x "${MVN_WRAPPER}" ]]; then
+    MVN_CMD="${MVN_CMD:-${MVN_WRAPPER}}"
+  fi
+fi
+
+if [[ -z "${MVN_CMD}" || ! -x "${MVN_CMD}" ]]; then
   ensure_command mvn
   MVN_CMD="${MVN_CMD:-mvn}"
 fi
