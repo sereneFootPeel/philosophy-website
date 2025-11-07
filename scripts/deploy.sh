@@ -66,7 +66,34 @@ fi
 
 run_step "Running Maven clean" "${MVN_CMD}" -B clean || abort "Maven clean failed"
 
-run_step "Stopping existing spring-boot:run process" pkill -f "${MVN_CMD} spring-boot:run" || true
+PID_FILE="${DEPLOY_DIR}/spring-boot-run.pid"
+
+stop_existing() {
+  local stopped=false
+  if [[ -f "${PID_FILE}" ]]; then
+    local existing_pid
+    existing_pid="$(cat "${PID_FILE}" 2>/dev/null || true)"
+    if [[ -n "${existing_pid}" ]]; then
+      if kill -0 "${existing_pid}" >/dev/null 2>&1; then
+        run_step "Stopping PID ${existing_pid} from pid file" kill "${existing_pid}" || true
+        stopped=true
+      fi
+    fi
+  fi
+
+  if pgrep -f "${MVN_CMD} spring-boot:run" >/dev/null 2>&1; then
+    run_step "Stopping existing spring-boot:run processes via pkill" pkill -f "${MVN_CMD} spring-boot:run" || true
+    stopped=true
+  fi
+
+  if [[ "${stopped}" == true ]]; then
+    sleep 2
+    pkill -9 -f "${MVN_CMD} spring-boot:run" >/dev/null 2>&1 || true
+  fi
+  : > "${PID_FILE}"
+}
+
+stop_existing
 
 mkdir -p "${DEPLOY_DIR}"
 
@@ -74,10 +101,10 @@ log "Starting Spring Boot via mvn spring-boot:run"
 (
   cd "${APP_DIR}"
   SPRING_PROFILES_ACTIVE="${SPRING_PROFILE}" nohup "${MVN_CMD}" spring-boot:run >>"${LOG_FILE}" 2>&1 &
-  echo $! > "${DEPLOY_DIR}/spring-boot-run.pid"
+  echo $! > "${PID_FILE}"
 ) || abort "Failed to start spring-boot:run"
 
-PID="$(cat "${DEPLOY_DIR}/spring-boot-run.pid" 2>/dev/null || true)"
+PID="$(cat "${PID_FILE}" 2>/dev/null || true)"
 if [[ -n "${PID}" ]]; then
   log "Spring Boot running with PID ${PID}"
 else
