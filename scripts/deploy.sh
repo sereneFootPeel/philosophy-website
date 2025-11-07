@@ -69,6 +69,8 @@ run_step "Running Maven clean" "${MVN_CMD}" -B clean || abort "Maven clean faile
 
 PID_FILE="${DEPLOY_DIR}/spring-boot-run.pid"
 
+mkdir -p "${DEPLOY_DIR}"
+
 stop_existing() {
   local stopped=false
   if [[ -f "${PID_FILE}" ]]; then
