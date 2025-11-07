@@ -8,10 +8,8 @@ PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 APP_DIR="${APP_DIR:-${PROJECT_ROOT}}"
 GIT_REMOTE="${GIT_REMOTE:-origin}"
 GIT_BRANCH="${GIT_BRANCH:-main}"
-SERVICE_NAME="${SERVICE_NAME:-philosophy-website}"
 SPRING_PROFILE="${SPRING_PROFILE:-prod}"
 MVN_CMD="${MVN_CMD:-./mvnw}"
-JAR_NAME="${JAR_NAME:-philosophy-website.jar}"
 DEPLOY_DIR="${DEPLOY_DIR:-${APP_DIR}/deploy}"
 LOG_FILE="${LOG_FILE:-${APP_DIR}/logs/deploy.log}"
 
@@ -68,26 +66,22 @@ fi
 
 run_step "Running Maven clean" "${MVN_CMD}" -B clean || abort "Maven clean failed"
 
-run_step "Building project" "${MVN_CMD}" -B package -DskipTests -Dspring.profiles.active="${SPRING_PROFILE}" || abort "Maven package failed"
-
-ARTIFACT_PATH=$(find "${APP_DIR}/target" -maxdepth 1 -type f -name '*.jar' ! -name '*sources*' ! -name '*javadoc*' | head -n 1)
-
-if [[ -z "${ARTIFACT_PATH}" ]]; then
-  abort "No JAR artifact produced in target directory"
-fi
+run_step "Stopping existing spring-boot:run process" pkill -f "${MVN_CMD} spring-boot:run" || true
 
 mkdir -p "${DEPLOY_DIR}"
-cp "${ARTIFACT_PATH}" "${DEPLOY_DIR}/${JAR_NAME}"
-log "Copied artifact to ${DEPLOY_DIR}/${JAR_NAME}"
 
-if command -v systemctl >/dev/null 2>&1; then
-  run_step "Reloading systemd units" sudo systemctl daemon-reload || abort "systemctl daemon-reload failed"
-  run_step "Restarting service ${SERVICE_NAME}" sudo systemctl restart "${SERVICE_NAME}" || abort "Failed to restart service ${SERVICE_NAME}"
+log "Starting Spring Boot via mvn spring-boot:run"
+(
+  cd "${APP_DIR}"
+  SPRING_PROFILES_ACTIVE="${SPRING_PROFILE}" nohup "${MVN_CMD}" spring-boot:run >>"${LOG_FILE}" 2>&1 &
+  echo $! > "${DEPLOY_DIR}/spring-boot-run.pid"
+) || abort "Failed to start spring-boot:run"
+
+PID="$(cat "${DEPLOY_DIR}/spring-boot-run.pid" 2>/dev/null || true)"
+if [[ -n "${PID}" ]]; then
+  log "Spring Boot running with PID ${PID}"
 else
-  log "systemctl not found; attempting to restart JAR directly"
-  pkill -f "${DEPLOY_DIR}/${JAR_NAME}" >/dev/null 2>&1 || true
-  nohup java -jar "${DEPLOY_DIR}/${JAR_NAME}" --spring.profiles.active="${SPRING_PROFILE}" >/dev/null 2>&1 &
-  log "Application restarted via nohup"
+  log "Spring Boot started (PID unknown)"
 fi
 
 log "Deployment finished successfully"
