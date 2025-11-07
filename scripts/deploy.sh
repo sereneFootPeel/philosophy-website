@@ -12,6 +12,7 @@ SPRING_PROFILE="${SPRING_PROFILE:-prod}"
 MVN_CMD="${MVN_CMD:-./mvnw}"
 DEPLOY_DIR="${DEPLOY_DIR:-${APP_DIR}/deploy}"
 LOG_FILE="${LOG_FILE:-${APP_DIR}/logs/deploy.log}"
+SERVER_PORT="${SERVER_PORT:-9999}"
 
 mkdir -p "$(dirname "${LOG_FILE}")"
 touch "${LOG_FILE}"
@@ -97,10 +98,10 @@ stop_existing
 
 mkdir -p "${DEPLOY_DIR}"
 
-log "Starting Spring Boot via mvn spring-boot:run"
+log "Starting Spring Boot via mvn spring-boot:run on port ${SERVER_PORT}"
 (
   cd "${APP_DIR}"
-  SPRING_PROFILES_ACTIVE="${SPRING_PROFILE}" nohup "${MVN_CMD}" spring-boot:run >>"${LOG_FILE}" 2>&1 &
+  SPRING_PROFILES_ACTIVE="${SPRING_PROFILE}" SERVER_PORT="${SERVER_PORT}" nohup "${MVN_CMD}" spring-boot:run >>"${LOG_FILE}" 2>&1 &
   echo $! > "${PID_FILE}"
 ) || abort "Failed to start spring-boot:run"
 
