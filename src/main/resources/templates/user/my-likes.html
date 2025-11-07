@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<html th:lang="${language != null and language == 'en' ? 'en' : 'zh-CN'}" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/header :: head}" th:with="pageTitle=${translationService != null ? translationService.getStaticText('my_likes', language) : '我的点赞'}">
     <!-- Like Button Component script is now loaded at the end of the body -->
 </head>
@@ -16,12 +16,12 @@
 
             <!-- 点赞的用户 -->
             <div class="bg-white rounded-lg shadow-md mb-8 p-6">
-                <h2 class="text-xl font-semibold text-gray-900 mb-4">点赞的用户</h2>
+                <h2 class="text-xl font-semibold text-gray-900 mb-4" th:text="${translationService != null ? translationService.getStaticText('liked_users', language) : '点赞的用户'}">点赞的用户</h2>
                 
                 
                 <div th:if="${likedUsers == null or likedUsers.empty}" class="text-center text-gray-500 py-8">
                     <i class="fa fa-users text-4xl mb-4"></i>
-                    <p class="text-lg">您还没有点赞任何用户</p>
+                    <p class="text-lg" th:text="${translationService != null ? translationService.getStaticText('no_liked_users', language) : '您还没有点赞任何用户'}">您还没有点赞任何用户</p>
                 </div>
                 <div th:if="${likedUsers != null and !likedUsers.empty}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div th:each="likedUser : ${likedUsers}" class="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
@@ -43,11 +43,11 @@
 
             <!-- 点赞的内容 -->
             <div class="bg-white rounded-lg shadow-md mb-8 p-6">
-                <h2 class="text-xl font-semibold text-gray-900 mb-4">点赞的内容</h2>
+                <h2 class="text-xl font-semibold text-gray-900 mb-4" th:text="${translationService != null ? translationService.getStaticText('liked_contents', language) : '点赞的内容'}">点赞的内容</h2>
 
                 <div th:if="${likedContents == null or likedContents.empty}" class="text-center text-gray-500 py-8">
                     <i class="fa fa-file-text text-4xl mb-4"></i>
-                    <p class="text-lg">您还没有点赞任何内容</p>
+                    <p class="text-lg" th:text="${translationService != null ? translationService.getStaticText('no_liked_contents', language) : '您还没有点赞任何内容'}">您还没有点赞任何内容</p>
                 </div>
                 <div th:if="${likedContents != null and !likedContents.empty}" class="space-y-4">
                     <div th:each="content : ${likedContents}">

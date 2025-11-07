@@ -43,19 +43,19 @@
                     
                     <!-- 当前图片预览 -->
                     <div th:if="${philosopher.imageUrl != null and philosopher.imageUrl != ''}" id="currentImageContainer" class="mt-3">
-                        <div class="flex items-center justify-between mb-2">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-2">
                             <label class="admin-form-label text-sm">当前照片：</label>
-                            <label class="flex items-center gap-2 cursor-pointer">
+                            <label class="flex items-center gap-2 cursor-pointer min-h-[44px]">
                                 <input type="checkbox" id="deleteImage" name="deleteImage" value="true" 
-                                       class="w-4 h-4" onchange="toggleDeleteImage(this)" />
+                                       class="w-5 h-5" onchange="toggleDeleteImage(this)" />
                                 <span class="text-sm admin-text-error">删除照片</span>
                             </label>
                         </div>
                         <div class="mt-2" id="currentImageDisplay">
                             <img th:src="${philosopher.imageUrl}" th:onerror="this.style.display='none'" 
                                  alt="当前照片" 
-                                 class="max-w-xs max-h-48 object-contain border border-gray-300 rounded" 
-                                 style="max-width: 300px; max-height: 200px;" 
+                                 class="w-full sm:max-w-xs max-h-48 object-contain border border-gray-300 rounded" 
+                                 style="max-height: 200px;" 
                                  id="currentImage" 
                                  onerror="this.parentElement.parentElement.style.display='none'" />
                         </div>
@@ -66,11 +66,11 @@
                         <label class="admin-form-label text-sm">新上传照片预览：</label>
                         <div class="mt-2">
                             <img id="previewImg" src="" alt="预览图片" 
-                                 class="max-w-xs max-h-48 object-contain border border-gray-300 rounded" 
-                                 style="max-width: 300px; max-height: 200px;" />
+                                 class="w-full sm:max-w-xs max-h-48 object-contain border border-gray-300 rounded" 
+                                 style="max-height: 200px;" />
                         </div>
                         <button type="button" onclick="clearImagePreview()" 
-                                class="mt-2 text-sm text-red-600 hover:text-red-800">
+                                class="mt-2 px-4 py-2 text-sm text-red-600 hover:text-red-800 min-h-[44px] rounded border border-red-300 hover:bg-red-50 transition-colors">
                             <i class="fa fa-times"></i> 清除已选照片
                         </button>
                     </div>
@@ -98,8 +98,8 @@
                     </div>
                 </div>
 
-                <div class="mt-6 flex items-center justify-end gap-3">
-                    <a th:href="@{${cancelUrl}}" class="admin-btn-secondary">取消</a>
+                <div class="mt-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3">
+                    <a th:href="@{${cancelUrl}}" class="admin-btn-secondary text-center">取消</a>
                     <button type="submit" class="admin-btn-primary">保存</button>
                 </div>
             </form>

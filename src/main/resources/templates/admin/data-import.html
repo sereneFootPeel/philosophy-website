@@ -38,10 +38,10 @@
                     <p class="mt-1 admin-text-secondary">上传CSV文件以批量导入数据</p>
                 </div>
                 <div class="btn-toolbar mb-2 mb-md-0">
-                    <a href="/admin/data-import/template" class="inline-flex items-center gap-2 px-4 py-2 rounded-md admin-btn-secondary transition-colors">
-                        <i class="fa fa-download"></i>
-                        <span>下载导入模板</span>
-                    </a>
+                    <button type="button" onclick="clearAllData()" class="inline-flex items-center gap-2 px-4 py-2 rounded-md transition-colors" style="background-color: var(--color-error); color: white;">
+                        <i class="fa fa-trash"></i>
+                        <span>清空所有数据</span>
+                    </button>
                 </div>
             </div>
 
@@ -51,10 +51,9 @@
                 <ul class="list-disc list-inside mt-2 space-y-1">
                     <li>支持上传CSV格式的文件，无文件大小限制</li>
                     <li>CSV文件必须按照指定格式组织数据，各数据段用标题分隔</li>
-                    <li><strong>默认行为：</strong>保留现有数据，只导入新数据</li>
-                    <li>可以勾选"清空现有数据"选项来清空所有现有数据后导入，实现完全覆盖</li>
+                    <li><strong>默认行为：</strong>保留现有数据，只覆盖相同ID的数据，新数据会添加</li>
+                    <li>如果CSV中的ID已存在，将更新该记录；如果ID不存在，将创建新记录</li>
                     <li>所有ID使用CSV文件中的值，不会自动生成新ID</li>
-                    <li>建议先下载导入模板作为参考</li>
                     <li>导入操作不可逆，请谨慎操作</li>
                 </ul>
             </div>
@@ -65,22 +64,6 @@
                     <h5 class="text-lg font-semibold flex items-center gap-2 admin-text-primary"><i class="fa fa-upload"></i> 上传CSV文件</h5>
                 </div>
                 <form id="uploadForm" method="post" enctype="multipart/form-data" action="/admin/data-import/upload">
-                    <!-- 清空数据选项 -->
-                    <div class="mb-6 p-4 border border-yellow-200 rounded-lg bg-yellow-50">
-                        <div class="flex items-start gap-3">
-                            <input type="checkbox" id="clearExistingData" name="clearExistingData" class="mt-1 h-4 w-4 rounded text-red-600 border-gray-300">
-                            <div>
-                                <label for="clearExistingData" class="text-sm font-medium cursor-pointer text-yellow-800">
-                                    <i class="fa fa-warning text-yellow-600"></i> 清空现有数据后导入
-                                </label>
-                                <p class="text-xs mt-1 text-yellow-700">
-                                    勾选此项将删除所有现有数据（用户、哲学家、学派、内容等），然后导入新数据。
-                                    <strong class="text-red-600">此操作不可逆，请谨慎使用！</strong>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    
                     <div class="upload-area" id="uploadArea">
                         <i class="fa fa-cloud-upload fa-3x mb-3 admin-text-secondary"></i>
                         <h4 class="text-lg font-semibold mb-2 admin-text-primary">拖拽CSV文件到此处或点击选择文件</h4>
@@ -111,7 +94,26 @@
                 </form>
             </div>
 
-            <!-- 导入结果将通过JavaScript显示 -->
+            <!-- 成功/错误消息显示 -->
+            <div th:if="${success}" class="mt-4 mb-4 p-4 rounded-lg bg-green-100 border border-green-400 text-green-800">
+                <div class="flex items-center gap-2">
+                    <i class="fa fa-check-circle text-green-600"></i>
+                    <div>
+                        <strong>导入成功！</strong>
+                        <p class="mt-1" th:text="${success}"></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div th:if="${error}" class="mt-4 mb-4 p-4 rounded-lg bg-red-100 border border-red-400 text-red-800">
+                <div class="flex items-start gap-2">
+                    <i class="fa fa-exclamation-circle text-red-600 mt-1"></i>
+                    <div class="flex-1">
+                        <strong>导入失败！</strong>
+                        <div class="mt-2 whitespace-pre-line font-mono text-sm" th:text="${error}"></div>
+                    </div>
+                </div>
+            </div>
 
             <!-- 详细导入结果 -->
             <div th:if="${importDetails}" class="mt-6 rounded-lg shadow admin-card">
@@ -208,17 +210,46 @@
 <div th:replace="~{fragments/admin-head :: admin-scripts}"></div>
 
 <script>
+    // 确保showMessage函数在页面加载时可用
     // 页面加载时显示消息
     document.addEventListener('DOMContentLoaded', function() {
+        // 确保showMessage函数已定义
+        if (typeof showMessage === 'undefined') {
+            console.error('showMessage函数未定义，消息脚本可能未正确加载');
+            // 定义一个简单的fallback函数
+            window.showMessage = function(message, type) {
+                alert((type === 'success' ? '成功：' : '错误：') + message);
+            };
+        }
+        
         const success = /*[[${success}]]*/ null;
         const error = /*[[${error}]]*/ null;
         
         if (success) {
+            console.log('显示成功消息:', success);
             showMessage('导入成功：' + success, 'success');
+            // 滚动到顶部以确保消息可见
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
         
         if (error) {
+            console.error('显示错误消息:', error);
             showMessage('导入失败：' + error, 'error');
+            // 滚动到顶部以确保消息可见
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // 如果有导入详情，显示详细信息区域
+        const importDetails = /*[[${importDetails}]]*/ null;
+        if (importDetails) {
+            console.log('导入详情:', importDetails);
+            // 滚动到详情区域
+            setTimeout(() => {
+                const detailsSection = document.querySelector('[th\\:if="${importDetails}"]');
+                if (detailsSection) {
+                    detailsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 500);
         }
     });
 
@@ -303,28 +334,92 @@
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     }
 
+    // 清空所有数据函数
+    function clearAllData() {
+        const confirmMessage = '⚠️ 警告：将清空所有数据！\n\n这将删除所有现有数据（用户、哲学家、学派、内容等）。\n\n此操作不可逆，确定要继续吗？';
+        
+        if (!confirm(confirmMessage)) {
+            return;
+        }
+        
+        // 获取CSRF token
+        const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content') || '';
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content') || 'X-CSRF-TOKEN';
+        
+        // 发送请求清空所有数据
+        fetch('/admin/data-import/clear-all', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                [csrfHeader]: csrfToken
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => {
+                    try {
+                        return JSON.parse(text);
+                    } catch (e) {
+                        throw new Error(text || '请求失败');
+                    }
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                showMessage('清空所有数据成功：' + data.message, 'success');
+                // 可选：刷新页面
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
+            } else {
+                showMessage('清空所有数据失败：' + data.message, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('清空数据失败:', error);
+            showMessage('清空所有数据失败：' + (error.message || '未知错误'), 'error');
+        });
+    }
+
     // 表单提交前确认
     const uploadForm = document.getElementById('uploadForm');
     if (uploadForm) {
         uploadForm.addEventListener('submit', function(e) {
-            const clearExistingData = document.getElementById('clearExistingData').checked;
-            
-            let confirmMessage;
-            
-            if (clearExistingData) {
-                confirmMessage = '⚠️ 警告：将清空现有数据！\n\n这将删除所有现有数据（用户、哲学家、学派、内容等），然后导入新数据。\n\n所有ID将使用CSV文件中的值。\n\n此操作不可逆，确定要继续吗？';
-            } else {
-                confirmMessage = '确定要导入这个CSV文件吗？\n\n将保留现有数据，跳过已存在的数据。\n\n导入操作不可逆，请确认数据格式正确。';
-            }
+            const confirmMessage = '确定要导入这个CSV文件吗？\n\n将保留现有数据，只覆盖相同ID的数据。\n\n如果CSV中的ID已存在，将更新该记录；如果ID不存在，将创建新记录。\n\n导入操作不可逆，请确认数据格式正确。';
             
             if (!confirm(confirmMessage)) {
                 e.preventDefault();
-            } else {
-                uploadBtn.disabled = true;
-                uploadBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> 导入中...';
+                return false;
             }
+            
+            // 禁用提交按钮并显示加载状态
+            uploadBtn.disabled = true;
+            uploadBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> 导入中，请稍候...';
+            
+            // 添加一个加载提示
+            const loadingMessage = document.createElement('div');
+            loadingMessage.id = 'loadingMessage';
+            loadingMessage.className = 'fixed top-24 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white px-6 py-3 rounded-lg shadow-lg z-[9999]';
+            loadingMessage.innerHTML = '<i class="fa fa-spinner fa-spin mr-2"></i>正在导入CSV文件，请稍候...';
+            loadingMessage.style.opacity = '0';
+            loadingMessage.style.transform = 'translate(-50%, -20px)';
+            document.body.appendChild(loadingMessage);
+            
+            // 显示加载消息
+            setTimeout(() => {
+                loadingMessage.style.transition = 'all 0.3s';
+                loadingMessage.style.opacity = '1';
+                loadingMessage.style.transform = 'translate(-50%, 0)';
+            }, 10);
+            
+            // 表单会正常提交，页面会重定向
+            // 如果导入成功，重定向后的页面会显示成功消息
+            // 如果导入失败，重定向后的页面会显示错误消息
         });
     }
 </script>
 </body>
 </html>
+

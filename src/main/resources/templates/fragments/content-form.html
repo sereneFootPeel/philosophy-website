@@ -53,17 +53,17 @@
                     </div>
                 </div>
 
-                <div class="mt-6 flex items-center justify-between gap-3">
+                <div class="mt-6 flex flex-col gap-4">
                     <!-- 创建时：允许选择保存后锁定（仅创建者可见） -->
                     <div th:if="${contentForm == null || contentForm.id == null}">
-                        <label class="inline-flex items-center gap-2 text-sm admin-text-primary">
-                            <input type="checkbox" name="lockAfterSave" value="true" class="h-4 w-4 rounded" style="border-color: var(--border-primary);">
+                        <label class="inline-flex items-center gap-2 text-sm admin-text-primary min-h-[44px] cursor-pointer">
+                            <input type="checkbox" name="lockAfterSave" value="true" class="w-5 h-5 rounded" style="border-color: var(--border-primary);">
                             <span>保存后锁定（仅创建者可编辑）</span>
                         </label>
                     </div>
                     <!-- 按钮组 -->
-                    <div class="flex items-center gap-3" th:classappend="${contentForm == null || contentForm.id == null ? '' : 'ml-auto'}">
-                        <a th:href="@{${cancelUrl}}" class="admin-btn-secondary">取消</a>
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3" th:classappend="${contentForm == null || contentForm.id == null ? '' : 'sm:ml-auto'}">
+                        <a th:href="@{${cancelUrl}}" class="admin-btn-secondary text-center">取消</a>
                         <button type="submit" class="admin-btn-primary">保存</button>
                     </div>
                 </div>
@@ -71,12 +71,12 @@
 
             <!-- 编辑时：仅创建者本人可见的锁定/解锁操作（放置在卡片内） -->
             <div class="mt-4" th:if="${contentForm != null and contentForm.id != null and contentForm.user != null and currentUserId != null and contentForm.user.id == currentUserId}">
-                <div class="flex items-center gap-2">
-                    <form th:if="${!contentForm.locked}" th:action="@{|${lockBaseUrl}/${contentForm.id}/lock|}" method="post" class="inline" onsubmit="return confirm('确定要锁定这个内容吗？锁定后只有本人可以编辑。');">
-                        <button type="submit" class="admin-btn-secondary"><i class="fa fa-lock"></i> 锁定</button>
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                    <form th:if="${!contentForm.locked}" th:action="@{|${lockBaseUrl}/${contentForm.id}/lock|}" method="post" class="inline w-full sm:w-auto" onsubmit="return confirm('确定要锁定这个内容吗？锁定后只有本人可以编辑。');">
+                        <button type="submit" class="admin-btn-secondary w-full sm:w-auto"><i class="fa fa-lock"></i> 锁定</button>
                     </form>
-                    <form th:if="${contentForm.locked}" th:action="@{|${lockBaseUrl}/${contentForm.id}/unlock|}" method="post" class="inline" onsubmit="return confirm('确定要解锁这个内容吗？');">
-                        <button type="submit" class="admin-btn-secondary"><i class="fa fa-unlock"></i> 解锁</button>
+                    <form th:if="${contentForm.locked}" th:action="@{|${lockBaseUrl}/${contentForm.id}/unlock|}" method="post" class="inline w-full sm:w-auto" onsubmit="return confirm('确定要解锁这个内容吗？');">
+                        <button type="submit" class="admin-btn-secondary w-full sm:w-auto"><i class="fa fa-unlock"></i> 解锁</button>
                     </form>
                 </div>
             </div>

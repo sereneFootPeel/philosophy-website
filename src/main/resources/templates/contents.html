@@ -53,10 +53,10 @@
 
     <main class="flex-grow pt-16">
         <section id="contents-page" class="page active bg-tertiary min-h-[50vh]">
-            <div class="container mx-auto px-4 py-8">
-                <h1 class="text-3xl font-bold text-primary mb-8 text-center" th:text="${translationService.getStaticText('all_content', language)}">所有内容</h1>
+            <div class="container mx-auto px-4 py-4 sm:py-8">
+                <h1 class="text-2xl sm:text-3xl font-bold text-primary mb-6 sm:mb-8 text-center" th:text="${translationService.getStaticText('all_content', language)}">所有内容</h1>
                 <!-- 内容卡片 -->
-                <div id="content-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div id="content-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
                     <!-- 初始内容 -->
                     <th:block th:each="content : ${contents}">
                         <div th:if="${content != null}"
@@ -95,12 +95,13 @@
 </main>
 
     <!-- 右下角固定按钮：回到顶部 -->
-    <div class="fixed bottom-6 right-6">
+    <div class="fixed bottom-4 right-4 sm:bottom-6 sm:right-6">
         <button id="back-to-top"
-                class="w-16 h-16 rounded-full bg-primary text-white shadow-lg flex items-center justify-center transition-all duration-300 hover:bg-primary/90 hover:scale-105 active:scale-95 opacity-0 pointer-events-none"
+                class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-primary text-white shadow-lg flex items-center justify-center transition-all duration-300 hover:bg-primary/90 hover:scale-105 active:scale-95 opacity-0 pointer-events-none touch-manipulation min-w-[44px] min-h-[44px]"
                 onclick="scrollToTop()"
-                th:title="${translationService.getStaticText('back_to_top', language)}">
-            <i class="fa fa-chevron-up text-xl"></i>
+                th:title="${translationService.getStaticText('back_to_top', language)}"
+                aria-label="回到顶部">
+            <i class="fa fa-chevron-up text-lg sm:text-xl"></i>
         </button>
     </div>
 

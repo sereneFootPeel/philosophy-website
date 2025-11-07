@@ -71,9 +71,11 @@ public class DataExportService {
             pw.println("用户数据");
             pw.println("ID,用户名,邮箱,密码,名字,姓氏,角色,启用状态,失败登录次数,账户锁定,锁定时间,锁定过期时间,个人资料隐私,评论隐私,内容隐私,管理员登录尝试,点赞数,分配学派ID,IP地址,设备类型,用户代理,头像URL,语言设置,主题设置,创建时间,更新时间");
             List<User> users = userRepository.findAll();
+            logger.info("导出用户数据：查询到 {} 个用户", users.size());
             for (User user : users) {
-                pw.printf("%d,%s,%s,%s,%s,%s,%s,%s,%d,%s,%s,%s,%s,%s,%s,%d,%d,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s%n",
-                    user.getId(),
+                logger.debug("导出用户: ID={}, 用户名={}, 角色={}", user.getId(), user.getUsername(), user.getRole());
+                String[] cols = new String[] {
+                    String.valueOf(user.getId()),
                     escapeCsv(user.getUsername()),
                     escapeCsv(user.getEmail()),
                     escapeCsv(user.getPassword()),
@@ -81,15 +83,15 @@ public class DataExportService {
                     escapeCsv(user.getLastName()),
                     escapeCsv(user.getRole()),
                     user.isEnabled() ? "1" : "0",
-                    user.getFailedLoginAttempts(),
+                    String.valueOf(user.getFailedLoginAttempts()),
                     user.isAccountLocked() ? "1" : "0",
                     user.getLockTime() != null ? user.getLockTime().format(formatter) : "",
                     user.getLockExpireTime() != null ? user.getLockExpireTime().format(formatter) : "",
                     user.isProfilePrivate() ? "1" : "0",
                     user.isCommentsPrivate() ? "1" : "0",
                     user.isContentsPrivate() ? "1" : "0",
-                    user.getAdminLoginAttempts(),
-                    user.getLikeCount(),
+                    String.valueOf(user.getAdminLoginAttempts()),
+                    String.valueOf(user.getLikeCount()),
                     user.getAssignedSchoolId() != null ? user.getAssignedSchoolId().toString() : "",
                     escapeCsv(user.getIpAddress()),
                     escapeCsv(user.getDeviceType()),
@@ -99,7 +101,8 @@ public class DataExportService {
                     escapeCsv(user.getTheme() != null ? user.getTheme() : ""),
                     user.getCreatedAt() != null ? user.getCreatedAt().format(formatter) : "未知时间",
                     user.getUpdatedAt() != null ? user.getUpdatedAt().format(formatter) : "未知时间"
-                );
+                };
+                pw.println(String.join(",", cols));
             }
             pw.println();
 

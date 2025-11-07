@@ -9,6 +9,7 @@ import com.philosophy.model.PhilosopherTranslation;
 import com.philosophy.repository.SchoolTranslationRepository;
 import com.philosophy.repository.ContentTranslationRepository;
 import com.philosophy.repository.PhilosopherTranslationRepository;
+import com.philosophy.repository.ContentRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,13 +25,16 @@ public class TranslationService {
     private final SchoolTranslationRepository schoolTranslationRepository;
     private final ContentTranslationRepository contentTranslationRepository;
     private final PhilosopherTranslationRepository philosopherTranslationRepository;
+    private final ContentRepository contentRepository;
 
     public TranslationService(SchoolTranslationRepository schoolTranslationRepository, 
                              ContentTranslationRepository contentTranslationRepository,
-                             PhilosopherTranslationRepository philosopherTranslationRepository) {
+                             PhilosopherTranslationRepository philosopherTranslationRepository,
+                             ContentRepository contentRepository) {
         this.schoolTranslationRepository = schoolTranslationRepository;
         this.contentTranslationRepository = contentTranslationRepository;
         this.philosopherTranslationRepository = philosopherTranslationRepository;
+        this.contentRepository = contentRepository;
     }
 
     // ==================== 流派翻译相关方法 ====================
@@ -210,6 +214,10 @@ public class TranslationService {
             throw new IllegalArgumentException("Language code cannot be null or empty");
         }
         
+        // 验证Content是否存在
+        Content content = contentRepository.findById(contentId)
+            .orElseThrow(() -> new IllegalArgumentException("Content with ID " + contentId + " does not exist"));
+        
         Optional<ContentTranslation> existing = contentTranslationRepository
             .findByContentIdAndLanguageCode(contentId, languageCode);
         
@@ -218,8 +226,6 @@ public class TranslationService {
             translation = existing.get();
             translation.setContentEn(contentEn);
         } else {
-            Content content = new Content();
-            content.setId(contentId);
             translation = new ContentTranslation(content, languageCode, contentEn);
         }
         
@@ -377,6 +383,14 @@ public class TranslationService {
         philosopherTranslationRepository.deleteByPhilosopherIdAndLanguageCode(philosopherId, languageCode);
     }
 
+    /**
+     * 检查哲学家翻译是否存在
+     */
+    @Transactional(readOnly = true)
+    public boolean existsPhilosopherTranslation(Long philosopherId, String languageCode) {
+        return philosopherTranslationRepository.existsByPhilosopherIdAndLanguageCode(philosopherId, languageCode);
+    }
+
     // ==================== 批量操作方法 ====================
 
     /**
@@ -531,6 +545,15 @@ public class TranslationService {
             case "confirm_unlock_profile": return "确定要解锁您的主页吗？所有内容和评论将变为公开。";
             case "update_failed": return "更新失败";
             case "theme_switched": return "主题已切换";
+            case "my_content_edits": return "我的内容编辑";
+            case "manage_your_content_edits": return "管理您的内容编辑";
+            case "edit_content": return "编辑内容";
+            case "delete_edit": return "删除";
+            case "delete_edit_confirm": return "确定要删除这个编辑吗?";
+            case "no_content_data": return "暂无内容数据，请添加新的内容编辑。";
+            case "id": return "ID";
+            case "actions": return "操作";
+            case "none": return "无";
             default: return key;
         }
     }
@@ -668,6 +691,15 @@ public class TranslationService {
             case "confirm_unlock_profile": return "Are you sure you want to unlock your profile? All content and comments will become public.";
             case "update_failed": return "Update failed";
             case "theme_switched": return "Theme switched";
+            case "my_content_edits": return "My Content Edits";
+            case "manage_your_content_edits": return "Manage your content edits";
+            case "edit_content": return "Edit Content";
+            case "delete_edit": return "Delete";
+            case "delete_edit_confirm": return "Are you sure you want to delete this edit?";
+            case "no_content_data": return "No content data, please add new content edits.";
+            case "id": return "ID";
+            case "actions": return "Actions";
+            case "none": return "None";
             default: return key;
         }
     }

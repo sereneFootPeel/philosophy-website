@@ -111,14 +111,61 @@ public class DataImportService {
             }
             
             logger.info("成功解析到 {} 个数据段: {}", dataSections.size(), dataSections.keySet());
+            
+            // 检查是否有任何数据段包含实际数据
+            boolean hasData = false;
+            for (Map.Entry<String, List<String[]>> entry : dataSections.entrySet()) {
+                if (entry.getValue() != null && !entry.getValue().isEmpty()) {
+                    hasData = true;
+                    logger.info("数据段 '{}' 包含 {} 行数据", entry.getKey(), entry.getValue().size());
+                    break;
+                }
+            }
+            
+            if (!hasData) {
+                result.setSuccess(false);
+                StringBuilder emptySections = new StringBuilder();
+                for (String section : dataSections.keySet()) {
+                    if (emptySections.length() > 0) emptySections.append(", ");
+                    emptySections.append(section);
+                }
+                result.setMessage("导入失败: 虽然找到了 " + dataSections.size() + " 个数据段（" + emptySections + "），但所有数据段都是空的。请检查CSV文件是否包含实际数据行。");
+                logger.warn("所有数据段都是空的。找到的数据段: {}", dataSections.keySet());
+                return result;
+            }
 
             // 按依赖顺序导入数据，将基础数据和关联更新放在同一个事务中
             importUsersInTransaction(result, dataSections.get("用户数据"));
-            importSchoolsInTransaction(result, dataSections.get("学派数据"));
+
+            // 学派数据段：兼容“流派数据”等变体
+            List<String[]> schoolData = dataSections.get("学派数据");
+            if (schoolData == null) {
+                schoolData = findSectionByKeywords(dataSections, "学派", "数据");
+            }
+            if (schoolData == null) {
+                schoolData = dataSections.get("流派数据");
+            }
+            if (schoolData == null) {
+                schoolData = findSectionByKeywords(dataSections, "流派", "数据");
+            }
+            importSchoolsInTransaction(result, schoolData);
             importPhilosophersInTransaction(result, dataSections.get("哲学家数据"));
             
-            // 导入哲学家-学派关联（在哲学家和学派导入后）
-            importPhilosopherSchoolAssociationsInTransaction(result, dataSections.get("哲学家学派关联数据"));
+            // 导入哲学家-学派关联（在哲学家和学派导入后）——兼容多种标题/同义词
+            List<String[]> assocData = dataSections.get("哲学家学派关联数据");
+            if (assocData == null) {
+                assocData = dataSections.get("哲学家-学派关联数据");
+            }
+            if (assocData == null) {
+                assocData = findSectionByKeywords(dataSections, "哲学家", "学派", "关联");
+            }
+            if (assocData == null) {
+                assocData = dataSections.get("哲学家流派关联数据");
+            }
+            if (assocData == null) {
+                assocData = findSectionByKeywords(dataSections, "哲学家", "流派", "关联");
+            }
+            importPhilosopherSchoolAssociationsInTransaction(result, assocData);
             
             // 尝试查找内容数据段，支持可能的变体
             List<String[]> contentData = dataSections.get("内容数据");
@@ -154,9 +201,31 @@ public class DataImportService {
             importModeratorBlocksInTransaction(result, dataSections.get("版主屏蔽数据"));
             importUserLoginInfoInTransaction(result, dataSections.get("用户登录信息数据"));
             importUserFollowsInTransaction(result, dataSections.get("用户关注数据"));
-            importSchoolTranslationsInTransaction(result, dataSections.get("学派翻译数据"));
-            importContentTranslationsInTransaction(result, dataSections.get("内容翻译数据"));
-            importPhilosopherTranslationsInTransaction(result, dataSections.get("哲学家翻译数据"));
+            
+            // 导入翻译数据 - 支持多种段标题格式（含“流派”同义词）
+            List<String[]> schoolTranslationData = findSectionByKeywords(dataSections, "学派", "翻译");
+            if (schoolTranslationData == null) {
+                schoolTranslationData = dataSections.get("学派翻译数据");
+            }
+            if (schoolTranslationData == null) {
+                schoolTranslationData = findSectionByKeywords(dataSections, "流派", "翻译");
+            }
+            if (schoolTranslationData == null) {
+                schoolTranslationData = dataSections.get("流派翻译数据");
+            }
+            importSchoolTranslationsInTransaction(result, schoolTranslationData);
+            
+            List<String[]> contentTranslationData = findSectionByKeywords(dataSections, "内容", "翻译");
+            if (contentTranslationData == null) {
+                contentTranslationData = dataSections.get("内容翻译数据");
+            }
+            importContentTranslationsInTransaction(result, contentTranslationData);
+            
+            List<String[]> philosopherTranslationData = findSectionByKeywords(dataSections, "哲学家", "翻译");
+            if (philosopherTranslationData == null) {
+                philosopherTranslationData = dataSections.get("哲学家翻译数据");
+            }
+            importPhilosopherTranslationsInTransaction(result, philosopherTranslationData);
 
             // 即使有部分失败，只要不是全部失败，就认为导入成功
             if (result.getTotalImported() > 0) {
@@ -165,7 +234,36 @@ public class DataImportService {
                     result.getTotalImported() + " 条记录，失败: " + result.getTotalFailed() + " 条");
             } else {
                 result.setSuccess(false);
-                result.setMessage("导入失败: 没有成功导入任何数据。请检查CSV文件格式和数据内容是否正确");
+                // 构建详细的诊断信息
+                StringBuilder diagnosticMsg = new StringBuilder("导入失败: 没有成功导入任何数据。\n\n");
+                diagnosticMsg.append("诊断信息:\n");
+                diagnosticMsg.append("- 解析到的数据段: ").append(dataSections.size()).append(" 个\n");
+                
+                for (Map.Entry<String, List<String[]>> entry : dataSections.entrySet()) {
+                    String sectionName = entry.getKey();
+                    List<String[]> sectionData = entry.getValue();
+                    int dataCount = (sectionData != null) ? sectionData.size() : 0;
+                    diagnosticMsg.append("- ").append(sectionName).append(": ").append(dataCount).append(" 行数据\n");
+                    
+                    // 显示前几行数据示例（用于调试）
+                    if (dataCount > 0 && dataCount <= 3 && sectionData != null) {
+                        for (int i = 0; i < dataCount; i++) {
+                            String[] row = sectionData.get(i);
+                            if (row != null) {
+                                diagnosticMsg.append("  示例行 ").append(i + 1).append(": ").append(row.length).append(" 个字段\n");
+                            }
+                        }
+                    }
+                }
+                
+                diagnosticMsg.append("\n可能的原因:\n");
+                diagnosticMsg.append("1. 数据格式不正确（字段数量不足或格式错误）\n");
+                diagnosticMsg.append("2. 数据验证失败（如必需字段为空、ID格式错误等）\n");
+                diagnosticMsg.append("3. 数据库约束冲突（如唯一性约束、外键约束等）\n");
+                diagnosticMsg.append("4. 请检查服务器日志获取更详细的错误信息");
+                
+                result.setMessage(diagnosticMsg.toString());
+                logger.warn("导入失败详情: {}", diagnosticMsg.toString());
             }
 
         } catch (Exception e) {
@@ -488,15 +586,33 @@ public class DataImportService {
     private Map<String, List<String[]>> parseCsvFile(MultipartFile file) {
         Map<String, List<String[]>> sections = new HashMap<>();
 
-        try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {
+        try {
+            // 读取文件开头以检测并跳过UTF-8 BOM
+            java.io.InputStream inputStream = file.getInputStream();
+            byte[] bom = new byte[3];
+            int bytesRead = inputStream.read(bom);
+            
+            // 检查是否是UTF-8 BOM (EF BB BF)
+            boolean hasBom = (bytesRead == 3 && bom[0] == (byte) 0xEF && bom[1] == (byte) 0xBB && bom[2] == (byte) 0xBF);
+            
+            // 如果没有BOM，需要将读取的字节放回去
+            if (!hasBom && bytesRead > 0) {
+                // 使用PushbackInputStream来放回已读取的字节
+                java.io.PushbackInputStream pushbackStream = new java.io.PushbackInputStream(inputStream, 3);
+                pushbackStream.unread(bom, 0, bytesRead);
+                inputStream = pushbackStream;
+            }
+            
+            try (BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
 
-            String line;
-            String currentSection = null;
-            List<String[]> currentData = null;
-            int lineNumber = 0;
+                String line;
+                String currentSection = null;
+                List<String[]> currentData = null;
+                int lineNumber = 0;
 
-            logger.info("开始解析CSV文件: {}, 大小: {} bytes", file.getOriginalFilename(), file.getSize());
+                logger.info("开始解析CSV文件: {}, 大小: {} bytes, 检测到UTF-8 BOM: {}", 
+                           file.getOriginalFilename(), file.getSize(), hasBom);
 
             while ((line = reader.readLine()) != null) {
                 lineNumber++;
@@ -512,18 +628,32 @@ public class DataImportService {
                     currentSection = line;
                     currentData = new ArrayList<>();
                     logger.info("开始解析数据段: [{}]", currentSection);
+                    continue;
                 }
-                // 跳过标题行 - 更精确的匹配
-                else if (line.contains("ID,") || line.contains("ID, ") || currentData == null) {
+                
+                // 如果还没有找到数据段，跳过所有行
+                if (currentData == null) {
+                    logger.debug("跳过行（未找到数据段）: [{}]", line);
+                    continue;
+                }
+                
+                // 跳过标题行 - 更精确的匹配：标题行应该以"ID,"开头
+                if (line.startsWith("ID,") || line.startsWith("ID, ")) {
                     logger.debug("跳过标题行: [{}]", line);
                     continue;
                 }
+                
                 // 解析数据行
-                else if (currentSection != null && currentData != null && !line.isEmpty()) {
+                if (currentSection != null && currentData != null && !line.isEmpty()) {
                     String[] fields = parseCsvLine(line);
                     if (fields.length > 0) {
+                        // 检查第一个字段是否是"ID"（标题行的另一种格式）
+                        if (fields.length > 0 && "ID".equals(fields[0].trim())) {
+                            logger.debug("跳过标题行（第一个字段是ID）: [{}]", line);
+                            continue;
+                        }
                         currentData.add(fields);
-                        logger.debug("添加数据行到段{}: [{}] -> {}", currentSection, line, Arrays.toString(fields));
+                        logger.debug("添加数据行到段{}: [{}] -> {} 个字段", currentSection, line, fields.length);
                     } else {
                         logger.warn("解析数据行失败，字段为空: [{}]", line);
                     }
@@ -533,19 +663,20 @@ public class DataImportService {
                 }
             }
 
-            // 保存最后一个数据段
-            if (currentSection != null && currentData != null) {
-                sections.put(currentSection, currentData);
-                logger.info("完成数据段: {}, 数据行数: {}", currentSection, currentData.size());
-            }
+                // 保存最后一个数据段
+                if (currentSection != null && currentData != null) {
+                    sections.put(currentSection, currentData);
+                    logger.info("完成数据段: {}, 数据行数: {}", currentSection, currentData.size());
+                }
 
-            logger.info("CSV解析完成，共解析到{}个数据段: {}", sections.size(), sections.keySet());
-            
-            // 详细记录每个数据段的内容
-            for (Map.Entry<String, List<String[]>> entry : sections.entrySet()) {
-                logger.info("数据段 '{}' 包含 {} 行数据", entry.getKey(), entry.getValue().size());
-                if (entry.getValue().size() > 0) {
-                    logger.debug("数据段 '{}' 第一行示例: {}", entry.getKey(), Arrays.toString(entry.getValue().get(0)));
+                logger.info("CSV解析完成，共解析到{}个数据段: {}", sections.size(), sections.keySet());
+                
+                // 详细记录每个数据段的内容
+                for (Map.Entry<String, List<String[]>> entry : sections.entrySet()) {
+                    logger.info("数据段 '{}' 包含 {} 行数据", entry.getKey(), entry.getValue().size());
+                    if (entry.getValue().size() > 0) {
+                        logger.debug("数据段 '{}' 第一行示例: {}", entry.getKey(), Arrays.toString(entry.getValue().get(0)));
+                    }
                 }
             }
 
@@ -555,6 +686,35 @@ public class DataImportService {
         }
 
         return sections;
+    }
+
+    /**
+     * 根据关键词查找数据段（支持模糊匹配）
+     * @param dataSections 所有数据段的映射
+     * @param keywords 关键词数组
+     * @return 找到的数据段，如果未找到则返回null
+     */
+    private List<String[]> findSectionByKeywords(Map<String, List<String[]>> dataSections, String... keywords) {
+        if (dataSections == null || keywords == null || keywords.length == 0) {
+            return null;
+        }
+        
+        for (String sectionName : dataSections.keySet()) {
+            boolean allKeywordsFound = true;
+            for (String keyword : keywords) {
+                if (!sectionName.contains(keyword)) {
+                    allKeywordsFound = false;
+                    break;
+                }
+            }
+            if (allKeywordsFound) {
+                logger.info("找到匹配的数据段: {} (关键词: {})", sectionName, Arrays.toString(keywords));
+                return dataSections.get(sectionName);
+            }
+        }
+        
+        logger.debug("未找到包含关键词 {} 的数据段", Arrays.toString(keywords));
+        return null;
     }
 
     private String[] parseCsvLine(String line) {
@@ -608,15 +768,24 @@ public class DataImportService {
     }
 
     private void importUsers(ImportResult result, List<String[]> data) {
-        if (data == null) return;
+        if (data == null || data.isEmpty()) {
+            logger.info("用户数据段为空，跳过导入");
+            result.addResult("用户", 0, 0);
+            return;
+        }
 
         logger.info("开始导入用户数据，共 {} 条", data.size());
         int success = 0, failed = 0;
 
-        for (String[] fields : data) {
+        for (int i = 0; i < data.size(); i++) {
+            String[] fields = data.get(i);
             try {
                 // 检查字段数量，支持完整字段导入
-                if (fields.length < 5) continue;
+                if (fields.length < 5) {
+                    logger.warn("用户数据第 {} 行被跳过: 字段数量不足 (需要至少5个字段，实际: {})", i + 1, fields.length);
+                    failed++;
+                    continue;
+                }
 
                 Long userId = Long.parseLong(fields[0]);
                 
@@ -770,9 +939,15 @@ public class DataImportService {
                     user.setAvatarUrl(fields[21]);
                 }
 
-                // 处理语言设置 (字段22)
+                // 处理语言设置 (字段22) - 限制长度为10个字符
                 if (fields.length > 22 && !fields[22].isEmpty() && !fields[22].equals("null")) {
-                    user.setLanguage(fields[22]);
+                    String language = fields[22];
+                    // 截断到10个字符（数据库字段限制）
+                    if (language.length() > 10) {
+                        language = language.substring(0, 10);
+                        logger.warn("用户ID {} 的language字段过长，已截断为: {}", userId, language);
+                    }
+                    user.setLanguage(language);
                 } else {
                     user.setLanguage("zh"); // 默认值
                 }
@@ -1792,12 +1967,38 @@ public class DataImportService {
                 }
 
                 // 解析创建时间
+                LocalDateTime createdAt = null;
                 if (!fields[5].equals("未知时间") && !fields[5].isEmpty() && !fields[5].equals("null")) {
-                    comment.setCreatedAt(LocalDateTime.parse(fields[5], DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+                    createdAt = LocalDateTime.parse(fields[5], DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+                    comment.setCreatedAt(createdAt);
                 }
 
-                commentRepository.save(comment);
-                success++;
+                // 使用原生SQL先删除再插入，避免乐观锁冲突
+                try {
+                    // 先删除现有记录
+                    String deleteSql = "DELETE FROM comments WHERE id = ?";
+                    jakarta.persistence.Query deleteQuery = entityManager.createNativeQuery(deleteSql);
+                    deleteQuery.setParameter(1, comment.getId());
+                    deleteQuery.executeUpdate();
+                    
+                    // 插入新记录
+                    String insertSql = "INSERT INTO comments (id, body, like_count, status, is_private, content_id, user_id, parent_id, created_at) " +
+                                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    jakarta.persistence.Query insertQuery = entityManager.createNativeQuery(insertSql);
+                    insertQuery.setParameter(1, comment.getId());
+                    insertQuery.setParameter(2, comment.getBody());
+                    insertQuery.setParameter(3, comment.getLikeCount() != null ? comment.getLikeCount() : 0);
+                    insertQuery.setParameter(4, comment.getStatus());
+                    insertQuery.setParameter(5, comment.isPrivate() ? 1 : 0);
+                    insertQuery.setParameter(6, comment.getContent().getId());
+                    insertQuery.setParameter(7, comment.getUser().getId());
+                    insertQuery.setParameter(8, comment.getParent() != null ? comment.getParent().getId() : null);
+                    insertQuery.setParameter(9, createdAt != null ? createdAt : java.time.LocalDateTime.now());
+                    insertQuery.executeUpdate();
+                    success++;
+                } catch (Exception e) {
+                    throw e; // 重新抛出异常，让外层catch处理
+                }
 
             } catch (Exception e) {
                 failed++;
@@ -2177,9 +2378,16 @@ public class DataImportService {
         logger.info("版主屏蔽数据导入完成，成功: {}, 失败: {}", success, failed);
     }
 
-    @Transactional
     public void importSchoolTranslationsInTransaction(ImportResult result, List<String[]> data) {
-        importSchoolTranslations(result, data);
+        try {
+            transactionTemplate.execute(status -> {
+                importSchoolTranslations(result, data);
+                return null;
+            });
+        } catch (Exception e) {
+            logger.error("学派翻译导入事务失败", e);
+            // 不要重新抛出异常，避免影响整体导入流程
+        }
     }
 
     private void importSchoolTranslations(ImportResult result, List<String[]> data) {
@@ -2190,7 +2398,11 @@ public class DataImportService {
 
         for (String[] fields : data) {
             try {
-                if (fields.length < 6) continue;
+                if (fields.length < 6) {
+                    logger.warn("学派翻译字段数量不足（需要至少6个字段，实际{}个），跳过: {}", fields.length, Arrays.toString(fields));
+                    failed++;
+                    continue;
+                }
 
                 SchoolTranslation translation = new SchoolTranslation();
                 translation.setId(Long.parseLong(fields[0]));
@@ -2211,12 +2423,28 @@ public class DataImportService {
                 translation.setDescriptionEn(fields[4]);
 
                 // 解析创建时间
+                LocalDateTime createdAt = null;
                 if (!fields[5].equals("未知时间") && !fields[5].isEmpty() && !fields[5].equals("null")) {
-                    translation.setCreatedAt(LocalDateTime.parse(fields[5], DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+                    createdAt = LocalDateTime.parse(fields[5], DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+                    translation.setCreatedAt(createdAt);
                 }
 
-                schoolTranslationRepository.save(translation);
-                success++;
+                // 使用REPLACE INTO来避免事务问题
+                try {
+                    String replaceSql = "REPLACE INTO schools_translation (id, school_id, language_code, name_en, description_en, created_at) " +
+                                      "VALUES (?, ?, ?, ?, ?, ?)";
+                    jakarta.persistence.Query replaceQuery = entityManager.createNativeQuery(replaceSql);
+                    replaceQuery.setParameter(1, translation.getId());
+                    replaceQuery.setParameter(2, translation.getSchool().getId());
+                    replaceQuery.setParameter(3, translation.getLanguageCode());
+                    replaceQuery.setParameter(4, translation.getNameEn());
+                    replaceQuery.setParameter(5, translation.getDescriptionEn());
+                    replaceQuery.setParameter(6, createdAt != null ? createdAt : java.time.LocalDateTime.now());
+                    replaceQuery.executeUpdate();
+                    success++;
+                } catch (Exception e) {
+                    throw e; // 重新抛出异常，让外层catch处理
+                }
 
             } catch (Exception e) {
                 failed++;
@@ -2228,9 +2456,16 @@ public class DataImportService {
         logger.info("学派翻译数据导入完成，成功: {}, 失败: {}", success, failed);
     }
 
-    @Transactional
     public void importContentTranslationsInTransaction(ImportResult result, List<String[]> data) {
-        importContentTranslations(result, data);
+        try {
+            transactionTemplate.execute(status -> {
+                importContentTranslations(result, data);
+                return null;
+            });
+        } catch (Exception e) {
+            logger.error("内容翻译导入事务失败", e);
+            // 不要重新抛出异常，避免影响整体导入流程
+        }
     }
 
     private void importContentTranslations(ImportResult result, List<String[]> data) {
@@ -2241,7 +2476,11 @@ public class DataImportService {
 
         for (String[] fields : data) {
             try {
-                if (fields.length < 5) continue;
+                if (fields.length < 5) {
+                    logger.warn("内容翻译字段数量不足（需要至少5个字段，实际{}个），跳过: {}", fields.length, Arrays.toString(fields));
+                    failed++;
+                    continue;
+                }
 
                 ContentTranslation translation = new ContentTranslation();
                 translation.setId(Long.parseLong(fields[0]));
@@ -2261,12 +2500,27 @@ public class DataImportService {
                 translation.setContentEn(fields[3]);
 
                 // 解析创建时间
+                LocalDateTime createdAt = null;
                 if (!fields[4].equals("未知时间") && !fields[4].isEmpty() && !fields[4].equals("null")) {
-                    translation.setCreatedAt(LocalDateTime.parse(fields[4], DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+                    createdAt = LocalDateTime.parse(fields[4], DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+                    translation.setCreatedAt(createdAt);
                 }
 
-                contentTranslationRepository.save(translation);
-                success++;
+                // 使用REPLACE INTO来避免事务问题
+                try {
+                    String replaceSql = "REPLACE INTO contents_translation (id, content_id, language_code, content_en, created_at) " +
+                                      "VALUES (?, ?, ?, ?, ?)";
+                    jakarta.persistence.Query replaceQuery = entityManager.createNativeQuery(replaceSql);
+                    replaceQuery.setParameter(1, translation.getId());
+                    replaceQuery.setParameter(2, translation.getContent().getId());
+                    replaceQuery.setParameter(3, translation.getLanguageCode());
+                    replaceQuery.setParameter(4, translation.getContentEn());
+                    replaceQuery.setParameter(5, createdAt != null ? createdAt : java.time.LocalDateTime.now());
+                    replaceQuery.executeUpdate();
+                    success++;
+                } catch (Exception e) {
+                    throw e; // 重新抛出异常，让外层catch处理
+                }
 
             } catch (Exception e) {
                 failed++;
@@ -2278,9 +2532,16 @@ public class DataImportService {
         logger.info("内容翻译数据导入完成，成功: {}, 失败: {}", success, failed);
     }
 
-    @Transactional
     public void importPhilosopherTranslationsInTransaction(ImportResult result, List<String[]> data) {
-        importPhilosopherTranslations(result, data);
+        try {
+            transactionTemplate.execute(status -> {
+                importPhilosopherTranslations(result, data);
+                return null;
+            });
+        } catch (Exception e) {
+            logger.error("哲学家翻译导入事务失败", e);
+            // 不要重新抛出异常，避免影响整体导入流程
+        }
     }
 
     private void importPhilosopherTranslations(ImportResult result, List<String[]> data) {
@@ -2291,7 +2552,11 @@ public class DataImportService {
 
         for (String[] fields : data) {
             try {
-                if (fields.length < 6) continue;
+                if (fields.length < 6) {
+                    logger.warn("哲学家翻译字段数量不足（需要至少6个字段，实际{}个），跳过: {}", fields.length, Arrays.toString(fields));
+                    failed++;
+                    continue;
+                }
 
                 PhilosopherTranslation translation = new PhilosopherTranslation();
                 translation.setId(Long.parseLong(fields[0]));
@@ -2312,12 +2577,28 @@ public class DataImportService {
                 translation.setBiographyEn(fields[4]);
 
                 // 解析创建时间
+                LocalDateTime createdAt = null;
                 if (!fields[5].equals("未知时间") && !fields[5].isEmpty() && !fields[5].equals("null")) {
-                    translation.setCreatedAt(LocalDateTime.parse(fields[5], DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+                    createdAt = LocalDateTime.parse(fields[5], DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+                    translation.setCreatedAt(createdAt);
                 }
 
-                philosopherTranslationRepository.save(translation);
-                success++;
+                // 使用REPLACE INTO来避免事务问题
+                try {
+                    String replaceSql = "REPLACE INTO philosophers_translation (id, philosopher_id, language_code, name_en, biography_en, created_at) " +
+                                      "VALUES (?, ?, ?, ?, ?, ?)";
+                    jakarta.persistence.Query replaceQuery = entityManager.createNativeQuery(replaceSql);
+                    replaceQuery.setParameter(1, translation.getId());
+                    replaceQuery.setParameter(2, translation.getPhilosopher().getId());
+                    replaceQuery.setParameter(3, translation.getLanguageCode());
+                    replaceQuery.setParameter(4, translation.getNameEn());
+                    replaceQuery.setParameter(5, translation.getBiographyEn());
+                    replaceQuery.setParameter(6, createdAt != null ? createdAt : java.time.LocalDateTime.now());
+                    replaceQuery.executeUpdate();
+                    success++;
+                } catch (Exception e) {
+                    throw e; // 重新抛出异常，让外层catch处理
+                }
 
             } catch (Exception e) {
                 failed++;
@@ -2410,12 +2691,74 @@ public class DataImportService {
         logger.info("开始导入哲学家学派关联数据，共 {} 条", data.size());
         int success = 0, failed = 0;
 
+        int rowIndex = 0;
         for (String[] fields : data) {
             try {
+                rowIndex++;
                 if (fields.length < 2) continue;
 
-                Long philosopherId = Long.parseLong(fields[0]);
-                Long schoolId = Long.parseLong(fields[1]);
+                String rawPhilosopher = fields[0] != null ? fields[0].trim() : "";
+                String rawSchool = fields[1] != null ? fields[1].trim() : "";
+
+                // 跳过表头或无效行
+                if (rawPhilosopher.isEmpty() || rawSchool.isEmpty() ||
+                    "哲学家ID".equals(rawPhilosopher) || "学派ID".equals(rawSchool) || "流派ID".equals(rawSchool)) {
+                    logger.debug("跳过关联表头/空行: {}", java.util.Arrays.toString(fields));
+                    continue;
+                }
+
+                Long philosopherId = null;
+                Long schoolId = null;
+
+                // 解析哲学家：优先按ID，否则按名称/英文名称回退
+                try {
+                    philosopherId = Long.parseLong(rawPhilosopher);
+                } catch (NumberFormatException nf) {
+                    try {
+                        String findPhilosopherSql = "SELECT id FROM philosophers WHERE name = ? OR name_en = ? LIMIT 1";
+                        jakarta.persistence.Query pq = entityManager.createNativeQuery(findPhilosopherSql);
+                        pq.setParameter(1, rawPhilosopher);
+                        pq.setParameter(2, rawPhilosopher);
+                        java.util.List<?> pr = pq.getResultList();
+                        if (!pr.isEmpty()) {
+                            philosopherId = ((Number) pr.get(0)).longValue();
+                            logger.debug("通过名称匹配到哲学家: '{}' -> {}", rawPhilosopher, philosopherId);
+                        } else {
+                            logger.warn("第{}行: 无法解析哲学家 '{}' 为有效ID或名称，跳过", rowIndex, rawPhilosopher);
+                            failed++;
+                            continue;
+                        }
+                    } catch (Exception ex) {
+                        logger.warn("第{}行: 查找哲学家 '{}' 发生错误: {}", rowIndex, rawPhilosopher, ex.getMessage());
+                        failed++;
+                        continue;
+                    }
+                }
+
+                // 解析学派：优先按ID，否则按名称/英文名称回退
+                try {
+                    schoolId = Long.parseLong(rawSchool);
+                } catch (NumberFormatException nf) {
+                    try {
+                        String findSchoolSql = "SELECT id FROM schools WHERE name = ? OR name_en = ? LIMIT 1";
+                        jakarta.persistence.Query sq = entityManager.createNativeQuery(findSchoolSql);
+                        sq.setParameter(1, rawSchool);
+                        sq.setParameter(2, rawSchool);
+                        java.util.List<?> sr = sq.getResultList();
+                        if (!sr.isEmpty()) {
+                            schoolId = ((Number) sr.get(0)).longValue();
+                            logger.debug("通过名称匹配到学派: '{}' -> {}", rawSchool, schoolId);
+                        } else {
+                            logger.warn("第{}行: 无法解析学派 '{}' 为有效ID或名称，跳过", rowIndex, rawSchool);
+                            failed++;
+                            continue;
+                        }
+                    } catch (Exception ex) {
+                        logger.warn("第{}行: 查找学派 '{}' 发生错误: {}", rowIndex, rawSchool, ex.getMessage());
+                        failed++;
+                        continue;
+                    }
+                }
 
                 // 查找哲学家
                 Optional<Philosopher> philosopherOpt = philosopherRepository.findById(philosopherId);

@@ -13,9 +13,40 @@
                 text-wrap: balance;
             }
         }
+        
+        /* 移动端适配优化 */
+        @media (max-width: 767px) {
+            /* 使用动态视口高度，适配iOS Safari地址栏 */
+            body {
+                height: 100vh;
+                height: 100dvh; /* 动态视口高度，支持现代浏览器 */
+                overflow: hidden;
+                position: fixed;
+                width: 100%;
+            }
+            
+            main {
+                height: 100vh;
+                height: 100dvh;
+            }
+            
+            /* 确保按钮在移动端有足够的底部间距 */
+            .welcome-button {
+                bottom: max(1rem, env(safe-area-inset-bottom, 1rem));
+                padding: 0.875rem 1.25rem;
+                min-height: 44px; /* iOS推荐的最小触摸目标 */
+            }
+        }
+        
+        /* 桌面端保持原有样式 */
+        @media (min-width: 768px) {
+            body {
+                overflow: hidden;
+            }
+        }
     </style>
 </head>
-<body class="min-h-screen flex flex-col" style="margin: 0; padding: 0; overflow: hidden;">
+<body class="min-h-screen flex flex-col" style="margin: 0; padding: 0;">
 
 <main class="flex-grow w-full h-screen">
     <!-- 主容器 -->
@@ -23,10 +54,13 @@
         <!-- 画布容器 -->
         <canvas id="geometryCanvas" class="absolute inset-0 w-full h-full"></canvas>
 
-        <!-- 整块玻璃就是按钮 -->
+        <!-- 整块玻璃就是按钮 - 移动端优化 -->
         <div onclick="window.location.href='/quotes'"
              style="background-color: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border-primary);"
-             class="rounded-lg px-4 py-3 fixed bottom-4 left-1/2 -translate-x-1/2 text-sm sm:px-7 sm:py-5 sm:text-lg text-base cursor-pointer z-50 transition-colors duration-300 hover:shadow-lg backdrop-blur-sm">
+             class="welcome-button rounded-lg px-4 py-3 sm:px-7 sm:py-5 fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 text-sm sm:text-lg cursor-pointer z-50 transition-colors duration-300 hover:shadow-lg active:scale-95 backdrop-blur-sm touch-manipulation"
+             role="button"
+             tabindex="0"
+             aria-label="欢迎游览">
             <i class="fa fa-arrow-right"></i> <span th:text="${translationService.getStaticText('welcome_tour', language)}">欢迎游览</span>
         </div>
 
@@ -36,18 +70,56 @@
             const canvas = document.getElementById('geometryCanvas');
             const ctx = canvas.getContext('2d');
 
-            // 设置画布尺寸
+            // 设置画布尺寸 - 移动端适配
             function resizeCanvas() {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
+                // 使用实际视口尺寸，适配移动端
+                const width = window.innerWidth;
+                const height = window.innerHeight;
+                
+                // 对于移动设备，使用实际视口高度
+                // 对于iOS Safari，考虑动态视口高度
+                const isMobile = window.innerWidth < 768;
+                const actualHeight = isMobile ? Math.max(window.innerHeight, window.visualViewport?.height || window.innerHeight) : height;
+                
+                canvas.width = width;
+                canvas.height = actualHeight;
+                
+                // 更新容器的实际高度
+                const container = canvas.parentElement;
+                if (container) {
+                    container.style.height = actualHeight + 'px';
+                }
             }
 
             resizeCanvas();
+            
+            // 处理窗口大小变化
             window.addEventListener('resize', () => {
                 resizeCanvas();
                 if (typeof updateResponsive === 'function') {
                     updateResponsive();
                 }
+            });
+            
+            // 处理移动端视口变化（iOS Safari地址栏显示/隐藏）
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('resize', () => {
+                    resizeCanvas();
+                    if (typeof updateResponsive === 'function') {
+                        updateResponsive();
+                    }
+                });
+            }
+            
+            // 处理移动端方向变化
+            window.addEventListener('orientationchange', () => {
+                // 延迟执行，等待方向变化完成
+                setTimeout(() => {
+                    resizeCanvas();
+                    if (typeof updateResponsive === 'function') {
+                        updateResponsive();
+                    }
+                }, 100);
             });
 
             // 获取当前主题的线条颜色
@@ -329,7 +401,7 @@
                 isDragging = false;
             });
 
-            // 触摸支持
+            // 触摸支持 - 移动端优化
             canvas.addEventListener('touchstart', (e) => {
                 if (e.touches.length === 1) {
                     isDragging = true;
@@ -337,12 +409,20 @@
                     lastMouseY = e.touches[0].clientY;
                     initialRotationX = geometry.rotationX;
                     initialRotationY = geometry.rotationY;
-                    e.preventDefault();
+                    // 只在非按钮区域阻止默认行为
+                    if (!e.target.closest('.welcome-button')) {
+                        e.preventDefault();
+                    }
                 }
-            });
+            }, { passive: false });
 
             window.addEventListener('touchmove', (e) => {
                 if (!isDragging || e.touches.length !== 1) return;
+                
+                // 如果触摸的是按钮，不阻止默认行为
+                if (e.target.closest('.welcome-button')) {
+                    return;
+                }
 
                 const deltaX = e.touches[0].clientX - lastMouseX;
                 const deltaY = e.touches[0].clientY - lastMouseY;
@@ -350,11 +430,22 @@
                 geometry.rotationY = initialRotationY + deltaX * 0.005;
                 geometry.rotationX = initialRotationX + deltaY * 0.005;
                 e.preventDefault();
-            });
+            }, { passive: false });
 
             window.addEventListener('touchend', () => {
                 isDragging = false;
             });
+            
+            // 为按钮添加键盘支持（无障碍访问）
+            const welcomeButton = document.querySelector('.welcome-button');
+            if (welcomeButton) {
+                welcomeButton.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        window.location.href = '/quotes';
+                    }
+                });
+            }
         </script>
         
         <!-- 点赞按钮功能 -->

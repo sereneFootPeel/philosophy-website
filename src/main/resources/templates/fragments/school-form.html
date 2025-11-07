@@ -49,8 +49,8 @@
                                   placeholder="请输入流派英文描述">[[${descriptionEn != null ? descriptionEn : ''}]]</textarea>
                     </div>
                 </div>
-                <div class="mt-6 flex items-center justify-end gap-3">
-                    <a th:href="@{${cancelUrl}}" class="admin-btn-secondary">取消</a>
+                <div class="mt-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3">
+                    <a th:href="@{${cancelUrl}}" class="admin-btn-secondary text-center">取消</a>
                     <button type="submit" class="admin-btn-primary">保存</button>
                 </div>
             </form>

@@ -452,10 +452,30 @@ public class ModeratorController {
             boolean hasNameEn = !nameEnTrimmed.isEmpty();
             boolean hasBioEn = !biographyEnTrimmed.isEmpty();
             if (hasNameEn || hasBioEn) {
+                // 如果 nameEn 为空但 biographyEn 不为空，且翻译不存在，使用中文名称作为默认值
+                String finalNameEn;
+                if (hasNameEn) {
+                    // 如果用户提供了 nameEn，使用它
+                    finalNameEn = nameEnTrimmed;
+                } else if (hasBioEn) {
+                    // 如果用户没有提供 nameEn 但提供了 biographyEn
+                    // 检查翻译是否存在
+                    boolean translationExists = translationService.existsPhilosopherTranslation(savedPhilosopher.getId(), "en");
+                    if (!translationExists) {
+                        // 如果翻译不存在，使用哲学家的中文名称作为默认的 nameEn（创建新翻译需要 nameEn）
+                        finalNameEn = savedPhilosopher.getName();
+                    } else {
+                        // 如果翻译已存在，传递 null 以保留原有的 nameEn（更新时不修改 nameEn）
+                        finalNameEn = null;
+                    }
+                } else {
+                    // 这种情况不应该发生（hasNameEn || hasBioEn 为 true）
+                    finalNameEn = null;
+                }
                 translationService.savePhilosopherTranslation(
                     savedPhilosopher.getId(),
                     "en",
-                    hasNameEn ? nameEnTrimmed : null,
+                    finalNameEn,
                     hasBioEn ? biographyEnTrimmed : null
                 );
             } else {

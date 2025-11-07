@@ -37,7 +37,7 @@ public class DataExportController {
         ExportData exportData = generateExportData();
         
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.parseMediaType("text/csv"));
+        headers.setContentType(MediaType.parseMediaType("text/csv; charset=UTF-8"));
         headers.setContentDispositionFormData("attachment", exportData.filename);
         headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
 
@@ -69,11 +69,18 @@ public class DataExportController {
 
     private ExportData generateExportData() {
         String csvData = dataExportService.exportAllDataToCsv();
+        
+        // 添加UTF-8 BOM以便Windows Excel正确识别编码
+        byte[] bom = {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF};
         byte[] csvBytes = csvData.getBytes(StandardCharsets.UTF_8);
+        byte[] csvBytesWithBom = new byte[bom.length + csvBytes.length];
+        System.arraycopy(bom, 0, csvBytesWithBom, 0, bom.length);
+        System.arraycopy(csvBytes, 0, csvBytesWithBom, bom.length, csvBytes.length);
+        
         String timestamp = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
         String filename = "philosophy_data_export_" + timestamp + ".csv";
         
-        return new ExportData(csvBytes, filename, timestamp);
+        return new ExportData(csvBytesWithBom, filename, timestamp);
     }
 
     private static class ExportData {

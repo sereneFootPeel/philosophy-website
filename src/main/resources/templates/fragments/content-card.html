@@ -43,9 +43,9 @@
                      th:data-entity-type="CONTENT"
                      th:data-entity-id="${content != null ? content.id : ''}"
                      th:data-is-authenticated="${isAuthenticated != null and isAuthenticated ? 'true' : 'false'}"
-                     class="like-btn opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center w-8 h-8 rounded-md cursor-pointer hover:bg-gray-100 pointer-events-auto z-20 bg-white/90 backdrop-blur-sm"
+                     class="like-btn opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center w-8 h-8 rounded-md cursor-pointer hover:bg-red-50 pointer-events-auto z-20 bg-white shadow-md border border-gray-200"
                      th:title="${isAuthenticated != null and isAuthenticated ? '点赞/取消点赞' : '请先登录'}">
-                    <i class="fa fa-heart-o text-gray-600 hover:text-red-500 text-base transition-colors duration-200"></i>
+                    <i class="fa fa-heart-o text-gray-700 hover:text-red-600 text-base transition-colors duration-200"></i>
                 </div>
             </th:block>
 

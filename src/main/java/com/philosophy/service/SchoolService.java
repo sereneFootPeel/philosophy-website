@@ -8,6 +8,7 @@ import com.philosophy.repository.SchoolRepository;
 import com.philosophy.repository.PhilosopherRepository;
 import com.philosophy.repository.ContentRepository;
 import com.philosophy.repository.UserContentEditRepository;
+import com.philosophy.repository.SchoolTranslationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,14 +31,16 @@ public class SchoolService {
     private final UserContentEditRepository userContentEditRepository;
     private final TranslationService translationService;
     private final UserFollowService userFollowService;
+    private final SchoolTranslationRepository schoolTranslationRepository;
 
-    public SchoolService(SchoolRepository schoolRepository, PhilosopherRepository philosopherRepository, ContentRepository contentRepository, UserContentEditRepository userContentEditRepository, TranslationService translationService, UserFollowService userFollowService) {
+    public SchoolService(SchoolRepository schoolRepository, PhilosopherRepository philosopherRepository, ContentRepository contentRepository, UserContentEditRepository userContentEditRepository, TranslationService translationService, UserFollowService userFollowService, SchoolTranslationRepository schoolTranslationRepository) {
         this.schoolRepository = schoolRepository;
         this.philosopherRepository = philosopherRepository;
         this.contentRepository = contentRepository;
         this.userContentEditRepository = userContentEditRepository;
         this.translationService = translationService;
         this.userFollowService = userFollowService;
+        this.schoolTranslationRepository = schoolTranslationRepository;
     }
 
     @Transactional(readOnly = true)
@@ -164,10 +167,14 @@ public class SchoolService {
                 }
             }
             
-            // 4. 注意：由于在实体类中设置了cascade = CascadeType.ALL, orphanRemoval = true
+            // 4. 删除关联的翻译记录
+            schoolTranslationRepository.deleteBySchoolId(id);
+            logger.info("Deleted all translations for school {}", school.getName());
+            
+            // 5. 注意：由于在实体类中设置了cascade = CascadeType.ALL, orphanRemoval = true
             // 子学派会自动被删除，不需要手动处理
             
-            // 5. 最后删除流派
+            // 6. 最后删除流派
             schoolRepository.delete(school);
         }
     }

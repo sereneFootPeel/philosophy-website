@@ -45,18 +45,18 @@
 
     <!-- 主要内容（flex-grow 以保证页脚贴底） -->
     <div class="flex-1 flex flex-col">
-        <div class="w-full px-4 sm:px-6 lg:px-8 py-12" style="padding-top: calc(5rem + 2rem);">
+        <div class="w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-12" style="padding-top: calc(3.5rem + 1rem);">
             <!-- Masonry container -->
-            <div id="quote-list" class="columns-1 md:columns-2 lg:columns-4 gap-4">
+            <div id="quote-list" class="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-3 sm:gap-4">
                 <!-- 初始名句卡片（由服务端渲染） -->
-                <div th:if="${content != null}" class="quote-card fade-in break-inside-avoid inline-block w-full max-w-full mb-6 cursor-pointer" th:attr="data-id=${content != null ? content.id : 0}" onclick="window.location.href='/comments/content/' + this.getAttribute('data-id')">
-                    <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-5 border border-gray-200/50 hover:translate-y-[-2px]">
+                <div th:if="${content != null}" class="quote-card fade-in break-inside-avoid inline-block w-full max-w-full mb-4 sm:mb-6 cursor-pointer touch-manipulation" th:attr="data-id=${content != null ? content.id : 0}" onclick="window.location.href='/comments/content/' + this.getAttribute('data-id')">
+                    <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-4 sm:p-5 border border-gray-200/50 hover:translate-y-[-2px] active:scale-[0.98]">
                         
-                        <blockquote class="text-base md:text-lg text-ink leading-relaxed mb-6 quote-shadow whitespace-pre-line break-words max-w-full">
+                        <blockquote class="text-sm sm:text-base lg:text-lg text-ink leading-relaxed mb-4 sm:mb-6 quote-shadow whitespace-pre-line break-words max-w-full">
                             <span class="max-w-full break-words" th:text="${content != null ? translationService.getContentDisplayText(content, language != null ? language : 'zh') : (language == 'en' ? 'No content available' : '暂无内容')}"></span>
                         </blockquote>
-                        <div class="border-t border-gray-200 pt-4">
-                            <h3 class="font-semibold text-ink text-sm md:text-base break-words max-w-full" th:text="${content != null and content.philosopher != null ? translationService.getPhilosopherDisplayName(content.philosopher, language != null ? language : 'zh') : (language == 'en' ? 'Unknown Philosopher' : '未知哲学家')}"></h3>
+                        <div class="border-t border-gray-200 pt-3 sm:pt-4">
+                            <h3 class="font-semibold text-ink text-xs sm:text-sm lg:text-base break-words max-w-full" th:text="${content != null and content.philosopher != null ? translationService.getPhilosopherDisplayName(content.philosopher, language != null ? language : 'zh') : (language == 'en' ? 'Unknown Philosopher' : '未知哲学家')}"></h3>
                         </div>
                     </div>
                 </div>

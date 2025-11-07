@@ -6,6 +6,7 @@ import com.philosophy.model.School;
 import com.philosophy.model.User;
 import com.philosophy.repository.ContentRepository;
 import com.philosophy.repository.PhilosopherRepository;
+import com.philosophy.repository.PhilosopherTranslationRepository;
 import com.philosophy.repository.UserContentEditRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,12 +33,14 @@ public class PhilosopherService {
     private final PhilosopherRepository philosopherRepository;
     private final ContentRepository contentRepository;
     private final UserContentEditRepository userContentEditRepository;
+    private final PhilosopherTranslationRepository philosopherTranslationRepository;
     private static final String UPLOAD_DIR = "uploads/"; // 上传目录
 
-    public PhilosopherService(PhilosopherRepository philosopherRepository, ContentRepository contentRepository, UserContentEditRepository userContentEditRepository) {
+    public PhilosopherService(PhilosopherRepository philosopherRepository, ContentRepository contentRepository, UserContentEditRepository userContentEditRepository, PhilosopherTranslationRepository philosopherTranslationRepository) {
         this.philosopherRepository = philosopherRepository;
         this.contentRepository = contentRepository;
         this.userContentEditRepository = userContentEditRepository;
+        this.philosopherTranslationRepository = philosopherTranslationRepository;
     }
 
     @Transactional(readOnly = true)
@@ -60,6 +63,11 @@ public class PhilosopherService {
         // 首先删除引用此哲学家的用户内容编辑记录
         userContentEditRepository.deleteByPhilosopherId(id);
         // 强制刷新以确保UserContentEdit的删除被提交到数据库
+        philosopherRepository.flush();
+        
+        // 删除哲学家的翻译记录
+        philosopherTranslationRepository.deleteByPhilosopherId(id);
+        // 强制刷新以确保翻译记录的删除被提交到数据库
         philosopherRepository.flush();
         
         // 然后处理引用此哲学家的内容 - 将它们断开关联

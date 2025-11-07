@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的内容编辑 - 哲学网站</title>
+    <title th:text="${translationService != null ? (translationService.getStaticText('my_content_edits', language) + ' - ' + translationService.getStaticText('philosophy_website', language)) : '我的内容编辑 - 哲学网站'}">我的内容编辑 - 哲学网站</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
@@ -110,12 +110,12 @@
         <div class="max-w-6xl mx-auto">
             <div class="flex items-center justify-between">
                 <div>
-                    <h1 class="text-2xl md:text-3xl font-bold text-black">我的内容编辑</h1>
-                    <p class="text-gray-600 mt-1">管理您的内容编辑</p>
+                    <h1 class="text-2xl md:text-3xl font-bold text-black" th:text="${translationService != null ? translationService.getStaticText('my_content_edits', language) : '我的内容编辑'}">我的内容编辑</h1>
+                    <p class="text-gray-600 mt-1" th:text="${translationService != null ? translationService.getStaticText('manage_your_content_edits', language) : '管理您的内容编辑'}">管理您的内容编辑</p>
                 </div>
                 <div class="flex items-center gap-3">
-                    <a href="/user/content-edits/create" class="btn-primary"><i class="fa fa-plus"></i> 编辑内容</a>
-                    <a href="/user/profile" class="btn-secondary"><i class="fa fa-user"></i> 返回个人主页</a>
+                    <a href="/user/content-edits/create" class="btn-primary"><i class="fa fa-plus"></i> <span th:text="${translationService != null ? translationService.getStaticText('edit_content', language) : '编辑内容'}">编辑内容</span></a>
+                    <a href="/user/profile" class="btn-secondary"><i class="fa fa-user"></i> <span th:text="${translationService != null ? translationService.getStaticText('back_to_profile', language) : '返回个人主页'}">返回个人主页</span></a>
                 </div>
             </div>
 
@@ -124,12 +124,12 @@
                     <table class="min-w-full" th:if="${edits != null and edits.content != null and !edits.content.isEmpty()}">
                         <thead class="table-head">
                             <tr>
-                                <th class="table-cell">ID</th>
-                                <th class="table-cell">标题</th>
-                                <th class="table-cell">内容</th>
-                                <th class="table-cell">哲学家</th>
-                                <th class="table-cell">流派</th>
-                                <th class="table-cell">操作</th>
+                                <th class="table-cell" th:text="${translationService != null ? translationService.getStaticText('id', language) : 'ID'}">ID</th>
+                                <th class="table-cell" th:text="${translationService != null ? translationService.getStaticText('title', language) : '标题'}">标题</th>
+                                <th class="table-cell" th:text="${translationService != null ? translationService.getStaticText('content', language) : '内容'}">内容</th>
+                                <th class="table-cell" th:text="${translationService != null ? translationService.getStaticText('philosophers', language) : '哲学家'}">哲学家</th>
+                                <th class="table-cell" th:text="${translationService != null ? translationService.getStaticText('schools', language) : '流派'}">流派</th>
+                                <th class="table-cell" th:text="${translationService != null ? translationService.getStaticText('actions', language) : '操作'}">操作</th>
                             </tr>
                         </thead>
                         <tbody class="text-sm">
@@ -139,13 +139,18 @@
                                 <td class="table-cell">
                                     <div class="max-w-xs truncate" th:text="${edit.content}" th:title="${edit.content}"></div>
                                 </td>
-                                <td class="table-cell" th:text="${edit.philosopher != null ? edit.philosopher.name : '无'}"></td>
-                                <td class="table-cell" th:text="${edit.school != null ? edit.school.name : '无'}"></td>
+                                <td class="table-cell" th:text="${edit.philosopher != null ? (translationService != null ? translationService.getPhilosopherDisplayName(edit.philosopher, language) : edit.philosopher.name) : (translationService != null ? translationService.getStaticText('none', language) : '无')}"></td>
+                                <td class="table-cell" th:text="${edit.school != null ? (translationService != null ? translationService.getSchoolDisplayName(edit.school, language) : edit.school.name) : (translationService != null ? translationService.getStaticText('none', language) : '无')}"></td>
                                 <td class="table-cell">
                                     <div class="flex items-center gap-2">
-                                        <a th:href="'/user/content-edits/edit/' + ${edit.id}" class="btn-secondary btn-sm"><i class="fa fa-pencil"></i> 编辑</a>
-                                        <form th:action="'/user/content-edits/delete/' + ${edit.id}" method="post" class="inline" onsubmit="return confirm('确定要删除这个编辑吗?');">
-                                            <button type="submit" class="btn-danger btn-sm"><i class="fa fa-trash"></i> 删除</button>
+                                        <a th:href="'/user/content-edits/edit/' + ${edit.id}" class="btn-secondary btn-sm"><i class="fa fa-pencil"></i> <span th:text="${translationService != null ? translationService.getStaticText('edit', language) : '编辑'}">编辑</span></a>
+                                        <form th:action="'/user/content-edits/delete/' + ${edit.id}" method="post" class="inline">
+                                            <button type="submit" 
+                                                    class="btn-danger btn-sm"
+                                                    th:data-confirm="${translationService != null ? translationService.getStaticText('delete_edit_confirm', language) : '确定要删除这个编辑吗?'}"
+                                                    onclick="return confirm(this.getAttribute('data-confirm'));">
+                                                <i class="fa fa-trash"></i> <span th:text="${translationService != null ? translationService.getStaticText('delete_edit', language) : '删除'}">删除</span>
+                                            </button>
                                         </form>
                                     </div>
                                 </td>
@@ -153,7 +158,7 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="text-center p-4 text-secondary" th:if="${edits == null or edits.content == null or edits.content.isEmpty()}">
+                <div class="text-center p-4 text-secondary" th:if="${edits == null or edits.content == null or edits.content.isEmpty()}" th:text="${translationService != null ? translationService.getStaticText('no_content_data', language) : '暂无内容数据，请添加新的内容编辑。'}">
                     暂无内容数据，请添加新的内容编辑。
                 </div>
             </div>
