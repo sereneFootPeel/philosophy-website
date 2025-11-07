@@ -29,6 +29,13 @@ abort() {
   exit 1
 }
 
+run_step() {
+  local description="$1"
+  shift
+  log "${description}"
+  "$@" 2>&1 | tee -a "${LOG_FILE}"
+}
+
 ensure_command() {
   local cmd="$1"
   command -v "${cmd}" >/dev/null 2>&1 || abort "Command '${cmd}' is required but not found in PATH"
@@ -37,19 +44,28 @@ ensure_command() {
 ensure_command git
 ensure_command java
 
+if [[ ! -x "${APP_DIR}/mvnw" && -f "${APP_DIR}/mvnw" ]]; then
+  chmod +x "${APP_DIR}/mvnw" || abort "Unable to set execute bit on mvnw"
+fi
+
 cd "${APP_DIR}" || abort "Unable to change directory to ${APP_DIR}"
 
-log "Fetching latest changes from ${GIT_REMOTE}/${GIT_BRANCH}";
-git fetch --prune "${GIT_REMOTE}" || abort "git fetch failed"
-git checkout "${GIT_BRANCH}" || abort "Unable to checkout branch ${GIT_BRANCH}"
-git reset --hard "${GIT_REMOTE}/${GIT_BRANCH}" || abort "git reset failed"
-git clean -fd || abort "git clean failed"
+run_step "Fetching latest changes from ${GIT_REMOTE}/${GIT_BRANCH}" git fetch --prune "${GIT_REMOTE}"
+run_step "Checking out ${GIT_BRANCH}" git checkout "${GIT_BRANCH}"
+run_step "Resetting to ${GIT_REMOTE}/${GIT_BRANCH}" git reset --hard "${GIT_REMOTE}/${GIT_BRANCH}"
+run_step "Cleaning untracked files" git clean -fd
 
-log "Cleaning previous build artifacts"
-${MVN_CMD} clean || abort "Maven clean failed"
+MVN_WRAPPER="${APP_DIR}/mvnw"
+if [[ -x "${MVN_WRAPPER}" ]]; then
+  MVN_CMD="${MVN_CMD:-${MVN_WRAPPER}}"
+else
+  ensure_command mvn
+  MVN_CMD="${MVN_CMD:-mvn}"
+fi
 
-log "Building project"
-${MVN_CMD} package -DskipTests -Dspring.profiles.active="${SPRING_PROFILE}" || abort "Maven package failed"
+run_step "Running Maven clean" "${MVN_CMD}" -B clean || abort "Maven clean failed"
+
+run_step "Building project" "${MVN_CMD}" -B package -DskipTests -Dspring.profiles.active="${SPRING_PROFILE}" || abort "Maven package failed"
 
 ARTIFACT_PATH=$(find "${APP_DIR}/target" -maxdepth 1 -type f -name '*.jar' ! -name '*sources*' ! -name '*javadoc*' | head -n 1)
 
@@ -62,9 +78,8 @@ cp "${ARTIFACT_PATH}" "${DEPLOY_DIR}/${JAR_NAME}"
 log "Copied artifact to ${DEPLOY_DIR}/${JAR_NAME}"
 
 if command -v systemctl >/dev/null 2>&1; then
-  log "Restarting systemd service ${SERVICE_NAME}"
-  sudo systemctl daemon-reload || abort "systemctl daemon-reload failed"
-  sudo systemctl restart "${SERVICE_NAME}" || abort "Failed to restart service ${SERVICE_NAME}"
+  run_step "Reloading systemd units" sudo systemctl daemon-reload || abort "systemctl daemon-reload failed"
+  run_step "Restarting service ${SERVICE_NAME}" sudo systemctl restart "${SERVICE_NAME}" || abort "Failed to restart service ${SERVICE_NAME}"
 else
   log "systemctl not found; attempting to restart JAR directly"
   pkill -f "${DEPLOY_DIR}/${JAR_NAME}" >/dev/null 2>&1 || true
