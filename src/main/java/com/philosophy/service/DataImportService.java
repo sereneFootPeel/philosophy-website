@@ -755,6 +755,27 @@ public class DataImportService {
         return result;
     }
 
+    private void recordFailureDetail(ImportResult result, String sectionName, int rowIndex, String[] fields, String reason, Exception e) {
+        if (result == null || sectionName == null) {
+            return;
+        }
+        StringBuilder message = new StringBuilder();
+        message.append("第").append(rowIndex + 1).append("行");
+        if (fields != null && fields.length > 0) {
+            String idValue = fields[0];
+            if (idValue != null && !idValue.isBlank() && !"null".equalsIgnoreCase(idValue.trim())) {
+                message.append(" (ID=").append(idValue.trim()).append(")");
+            }
+        }
+        if (reason != null && !reason.isBlank()) {
+            message.append(": ").append(reason.trim());
+        }
+        if (e != null && e.getMessage() != null && !e.getMessage().isBlank()) {
+            message.append(" - ").append(e.getMessage().trim());
+        }
+        result.addFailureDetail(sectionName, message.toString());
+    }
+
     public void importUsersInTransaction(ImportResult result, List<String[]> data) {
         try {
             transactionTemplate.execute(status -> {
@@ -775,6 +796,7 @@ public class DataImportService {
         }
 
         logger.info("开始导入用户数据，共 {} 条", data.size());
+        final String sectionName = "用户";
         int success = 0, failed = 0;
 
         for (int i = 0; i < data.size(); i++) {
@@ -784,6 +806,9 @@ public class DataImportService {
                 if (fields.length < 5) {
                     logger.warn("用户数据第 {} 行被跳过: 字段数量不足 (需要至少5个字段，实际: {})", i + 1, fields.length);
                     failed++;
+                    recordFailureDetail(result, sectionName, i, fields,
+                        "字段数量不足，至少需要 5 列，实际为 " + fields.length + " 列",
+                        null);
                     continue;
                 }
 
@@ -989,6 +1014,7 @@ public class DataImportService {
                     } else {
                         logger.warn("用户ID {} 插入失败", user.getId());
                         failed++;
+                        recordFailureDetail(result, sectionName, i, fields, "数据库未插入任何记录", null);
                     }
 
                 } catch (Exception saveException) {
@@ -999,10 +1025,11 @@ public class DataImportService {
             } catch (Exception e) {
                 failed++;
                 logger.warn("导入用户失败: " + Arrays.toString(fields), e);
+                recordFailureDetail(result, sectionName, i, fields, "导入失败", e);
             }
         }
 
-        result.addResult("用户", success, failed);
+        result.addResult(sectionName, success, failed);
         logger.info("用户数据导入完成，成功: {}, 失败: {}", success, failed);
     }
 
@@ -1136,11 +1163,19 @@ public class DataImportService {
         if (data == null) return;
 
         logger.info("开始导入学派数据，共 {} 条", data.size());
+        final String sectionName = "学派";
         int success = 0, failed = 0;
 
-        for (String[] fields : data) {
+        for (int index = 0; index < data.size(); index++) {
+            String[] fields = data.get(index);
             try {
-                if (fields.length < 5) continue;
+                if (fields.length < 5) {
+                    failed++;
+                    recordFailureDetail(result, sectionName, index, fields,
+                        "字段数量不足，至少需要 5 列，实际为 " + fields.length + " 列",
+                        null);
+                    continue;
+                }
 
                 Long schoolId = Long.parseLong(fields[0]);
                 
@@ -1265,6 +1300,7 @@ public class DataImportService {
                         } else {
                             logger.warn("学派ID {} 插入失败", school.getId());
                             failed++;
+                            recordFailureDetail(result, sectionName, index, fields, "数据库未插入任何记录", null);
                         }
                     } else {
                         success++;
@@ -1278,10 +1314,11 @@ public class DataImportService {
             } catch (Exception e) {
                 failed++;
                 logger.warn("导入学派失败: " + Arrays.toString(fields), e);
+                recordFailureDetail(result, sectionName, index, fields, "导入失败", e);
             }
         }
 
-        result.addResult("学派", success, failed);
+        result.addResult(sectionName, success, failed);
         logger.info("学派数据导入完成，成功: {}, 失败: {}", success, failed);
     }
 
@@ -1301,12 +1338,18 @@ public class DataImportService {
         if (data == null) return;
 
         logger.info("开始导入哲学家数据，共 {} 条", data.size());
+        final String sectionName = "哲学家";
         int success = 0, failed = 0;
 
-        for (String[] fields : data) {
+        for (int index = 0; index < data.size(); index++) {
+            String[] fields = data.get(index);
             try {
                 if (fields.length < 5) {
                     logger.warn("哲学家字段数量不足，跳过: {}", Arrays.toString(fields));
+                    failed++;
+                    recordFailureDetail(result, sectionName, index, fields,
+                        "字段数量不足，至少需要 5 列，实际为 " + fields.length + " 列",
+                        null);
                     continue;
                 }
 
@@ -1446,6 +1489,7 @@ public class DataImportService {
                         } else {
                             logger.warn("哲学家ID {} 插入失败", philosopher.getId());
                             failed++;
+                            recordFailureDetail(result, sectionName, index, fields, "数据库未插入任何记录", null);
                         }
                     } else {
                         success++;
@@ -1459,10 +1503,11 @@ public class DataImportService {
             } catch (Exception e) {
                 failed++;
                 logger.error("导入哲学家失败: " + Arrays.toString(fields), e);
+                recordFailureDetail(result, sectionName, index, fields, "导入失败", e);
             }
         }
 
-        result.addResult("哲学家", success, failed);
+        result.addResult(sectionName, success, failed);
         logger.info("哲学家数据导入完成，成功: {}, 失败: {}", success, failed);
     }
 
@@ -1489,12 +1534,18 @@ public class DataImportService {
         }
 
         logger.info("开始导入内容数据，共 {} 条", data.size());
+        final String sectionName = "内容";
         int success = 0, failed = 0;
 
-        for (String[] fields : data) {
+        for (int index = 0; index < data.size(); index++) {
+            String[] fields = data.get(index);
             try {
                 if (fields.length < 5) {
                     logger.warn("内容字段数量不足，跳过: {}", Arrays.toString(fields));
+                    failed++;
+                    recordFailureDetail(result, sectionName, index, fields,
+                        "字段数量不足，至少需要 5 列，实际为 " + fields.length + " 列",
+                        null);
                     continue;
                 }
 
@@ -1587,6 +1638,7 @@ public class DataImportService {
                         } else {
                             logger.warn("内容ID {} 插入失败", contentId);
                             failed++;
+                            recordFailureDetail(result, sectionName, index, fields, "数据库未插入任何记录", null);
                         }
                     } else {
                         logger.debug("内容更新成功: ID={}", contentId);
@@ -1600,10 +1652,11 @@ public class DataImportService {
             } catch (Exception e) {
                 failed++;
                 logger.error("导入内容失败: " + Arrays.toString(fields), e);
+                recordFailureDetail(result, sectionName, index, fields, "导入失败", e);
             }
         }
 
-        result.addResult("内容", success, failed);
+        result.addResult(sectionName, success, failed);
         logger.info("内容数据导入完成，成功: {}, 失败: {}", success, failed);
     }
 
@@ -2918,6 +2971,7 @@ public class DataImportService {
         private boolean success;
         private String message;
         private Map<String, ImportStats> results = new LinkedHashMap<>();
+        private Map<String, List<String>> failureDetails = new LinkedHashMap<>();
         private int totalImported = 0;
         private int totalFailed = 0;
 
@@ -2935,6 +2989,21 @@ public class DataImportService {
         public void setMessage(String message) { this.message = message; }
 
         public Map<String, ImportStats> getResults() { return results; }
+
+        public Map<String, List<String>> getFailureDetails() { return failureDetails; }
+
+        private static final int MAX_FAILURE_DETAILS_PER_SECTION = 50;
+
+        public void addFailureDetail(String tableName, String detail) {
+            if (detail == null || detail.trim().isEmpty()) {
+                return;
+            }
+            List<String> list = failureDetails.computeIfAbsent(tableName, key -> new ArrayList<>());
+            if (list.size() >= MAX_FAILURE_DETAILS_PER_SECTION) {
+                return;
+            }
+            list.add(detail);
+        }
 
         public int getTotalImported() { return totalImported; }
         public int getTotalFailed() { return totalFailed; }

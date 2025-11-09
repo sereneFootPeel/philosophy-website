@@ -68,12 +68,22 @@ public class DataImportController {
                 importDetails.put("results", result.getResults());
                 importDetails.put("totalImported", result.getTotalImported());
                 importDetails.put("totalFailed", result.getTotalFailed());
+                importDetails.put("failureDetails", result.getFailureDetails());
                 redirectAttributes.addFlashAttribute("importDetails", importDetails);
                 logger.info("设置导入详情: {}", importDetails);
 
             } else {
                 redirectAttributes.addFlashAttribute("error", result.getMessage());
                 logger.warn("设置失败消息: {}", result.getMessage());
+                if (result.getFailureDetails() != null && !result.getFailureDetails().isEmpty()) {
+                    Map<String, Object> importDetails = new HashMap<>();
+                    importDetails.put("results", result.getResults());
+                    importDetails.put("totalImported", result.getTotalImported());
+                    importDetails.put("totalFailed", result.getTotalFailed());
+                    importDetails.put("failureDetails", result.getFailureDetails());
+                    redirectAttributes.addFlashAttribute("importDetails", importDetails);
+                    logger.info("设置失败详情: {}", importDetails);
+                }
             }
 
         } catch (Exception e) {
@@ -112,6 +122,7 @@ public class DataImportController {
             response.put("results", result.getResults());
             response.put("totalImported", result.getTotalImported());
             response.put("totalFailed", result.getTotalFailed());
+            response.put("failureDetails", result.getFailureDetails());
 
             if (result.isSuccess()) {
                 return ResponseEntity.ok(response);
@@ -166,9 +177,18 @@ public class DataImportController {
                 details.put("results", result.getResults());
                 details.put("totalImported", result.getTotalImported());
                 details.put("totalFailed", result.getTotalFailed());
+                details.put("failureDetails", result.getFailureDetails());
                 redirectAttributes.addFlashAttribute("importDetails", details);
             } else {
                 redirectAttributes.addFlashAttribute("error", result.getMessage());
+                if (result.getFailureDetails() != null && !result.getFailureDetails().isEmpty()) {
+                    Map<String, Object> details = new HashMap<>();
+                    details.put("results", result.getResults());
+                    details.put("totalImported", result.getTotalImported());
+                    details.put("totalFailed", result.getTotalFailed());
+                    details.put("failureDetails", result.getFailureDetails());
+                    redirectAttributes.addFlashAttribute("importDetails", details);
+                }
             }
         } catch (Exception e) {
             logger.error("作者修复失败", e);
@@ -194,6 +214,7 @@ public class DataImportController {
             response.put("results", result.getResults());
             response.put("totalImported", result.getTotalImported());
             response.put("totalFailed", result.getTotalFailed());
+            response.put("failureDetails", result.getFailureDetails());
             return result.isSuccess() ? ResponseEntity.ok(response) : ResponseEntity.badRequest().body(response);
         } catch (Exception e) {
             logger.error("作者修复失败", e);
