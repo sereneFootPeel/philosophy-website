@@ -979,101 +979,10 @@ public class DataImportService {
                     }
                 }
 
-                // 使用原生SQL插入，先删除现有记录再插入新记录
+                // 使用原生SQL执行清理并插入，兼容线上已有账号导致的唯一约束冲突
                 try {
-                    // 按正确顺序删除依赖记录，避免外键约束冲突
-                    // 1. 删除用户登录信息
-                    String deleteLoginSql = "DELETE FROM user_login_info WHERE user_id = ?";
-                    jakarta.persistence.Query deleteLoginQuery = entityManager.createNativeQuery(deleteLoginSql);
-                    deleteLoginQuery.setParameter(1, user.getId());
-                    deleteLoginQuery.executeUpdate();
-                    
-                    // 2. 删除用户关注记录
-                    String deleteFollowSql = "DELETE FROM user_follows WHERE follower_id = ? OR following_id = ?";
-                    jakarta.persistence.Query deleteFollowQuery = entityManager.createNativeQuery(deleteFollowSql);
-                    deleteFollowQuery.setParameter(1, user.getId());
-                    deleteFollowQuery.setParameter(2, user.getId());
-                    deleteFollowQuery.executeUpdate();
-                    
-                    // 4. 删除用户屏蔽记录
-                    String deleteBlockSql = "DELETE FROM user_blocks WHERE blocker_id = ? OR blocked_id = ?";
-                    jakarta.persistence.Query deleteBlockQuery = entityManager.createNativeQuery(deleteBlockSql);
-                    deleteBlockQuery.setParameter(1, user.getId());
-                    deleteBlockQuery.setParameter(2, user.getId());
-                    deleteBlockQuery.executeUpdate();
-                    
-                    // 5. 删除版主屏蔽记录
-                    String deleteModeratorBlockSql = "DELETE FROM moderator_blocks WHERE moderator_id = ? OR blocked_user_id = ?";
-                    jakarta.persistence.Query deleteModeratorBlockQuery = entityManager.createNativeQuery(deleteModeratorBlockSql);
-                    deleteModeratorBlockQuery.setParameter(1, user.getId());
-                    deleteModeratorBlockQuery.setParameter(2, user.getId());
-                    deleteModeratorBlockQuery.executeUpdate();
-                    
-                    // 6. 删除用户内容编辑记录
-                    String deleteUserContentEditSql = "DELETE FROM user_content_edits WHERE user_id = ?";
-                    jakarta.persistence.Query deleteUserContentEditQuery = entityManager.createNativeQuery(deleteUserContentEditSql);
-                    deleteUserContentEditQuery.setParameter(1, user.getId());
-                    deleteUserContentEditQuery.executeUpdate();
-                    
-                    // 7. 删除点赞记录
-                    String deleteLikeSql = "DELETE FROM likes WHERE user_id = ?";
-                    jakarta.persistence.Query deleteLikeQuery = entityManager.createNativeQuery(deleteLikeSql);
-                    deleteLikeQuery.setParameter(1, user.getId());
-                    deleteLikeQuery.executeUpdate();
-                    
-                    // 8. 删除评论记录
-                    String deleteCommentSql = "DELETE FROM comments WHERE user_id = ?";
-                    jakarta.persistence.Query deleteCommentQuery = entityManager.createNativeQuery(deleteCommentSql);
-                    deleteCommentQuery.setParameter(1, user.getId());
-                    deleteCommentQuery.executeUpdate();
-                    
-                    // 9. 删除内容记录（引用user_id）
-                    String deleteContentSql = "DELETE FROM contents WHERE user_id = ?";
-                    jakarta.persistence.Query deleteContentQuery = entityManager.createNativeQuery(deleteContentSql);
-                    deleteContentQuery.setParameter(1, user.getId());
-                    deleteContentQuery.executeUpdate();
-                    
-                    // 10. 最后删除用户记录
-                    String deleteUserSql = "DELETE FROM users WHERE id = ?";
-                    jakarta.persistence.Query deleteUserQuery = entityManager.createNativeQuery(deleteUserSql);
-                    deleteUserQuery.setParameter(1, user.getId());
-                    deleteUserQuery.executeUpdate();
-                    
-                    // 插入新记录，包含完整字段映射
-                    String sql = "INSERT INTO users (id, username, email, password, first_name, last_name, role, enabled, account_locked, " +
-                                "failed_login_attempts, lock_time, lock_expire_time, comments_private, contents_private, profile_private, " +
-                                "admin_login_attempts, like_count, assigned_school_id, ip_address, device_type, user_agent, avatar_url, language, theme, created_at, updated_at) " +
-                                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-                    
-                    jakarta.persistence.Query query = entityManager.createNativeQuery(sql);
-                    query.setParameter(1, user.getId());
-                    query.setParameter(2, user.getUsername());
-                    query.setParameter(3, user.getEmail());
-                    query.setParameter(4, user.getPassword());
-                    query.setParameter(5, user.getFirstName());
-                    query.setParameter(6, user.getLastName());
-                    query.setParameter(7, user.getRole());
-                    query.setParameter(8, user.isEnabled());
-                    query.setParameter(9, user.isAccountLocked());
-                    query.setParameter(10, user.getFailedLoginAttempts());
-                    query.setParameter(11, user.getLockTime());
-                    query.setParameter(12, user.getLockExpireTime());
-                    query.setParameter(13, user.isCommentsPrivate());
-                    query.setParameter(14, user.isContentsPrivate());
-                    query.setParameter(15, user.isProfilePrivate());
-                    query.setParameter(16, user.getAdminLoginAttempts());
-                    query.setParameter(17, user.getLikeCount());
-                    query.setParameter(18, user.getAssignedSchoolId());
-                    query.setParameter(19, user.getIpAddress());
-                    query.setParameter(20, user.getDeviceType());
-                    query.setParameter(21, user.getUserAgent());
-                    query.setParameter(22, user.getAvatarUrl());
-                    query.setParameter(23, user.getLanguage() != null ? user.getLanguage() : "zh");
-                    query.setParameter(24, user.getTheme() != null ? user.getTheme() : "midnight");
-                    query.setParameter(25, user.getCreatedAt());
-                    query.setParameter(26, user.getUpdatedAt() != null ? user.getUpdatedAt() : java.time.LocalDateTime.now());
-                    
-                    int rowsAffected = query.executeUpdate();
+                    handleUserConflictsBeforeInsert(user);
+                    int rowsAffected = insertUserRecord(user);
                     if (rowsAffected > 0) {
                         success++;
                         logger.debug("用户保存成功: ID={}, username={}", user.getId(), user.getUsername());
@@ -1095,6 +1004,120 @@ public class DataImportService {
 
         result.addResult("用户", success, failed);
         logger.info("用户数据导入完成，成功: {}, 失败: {}", success, failed);
+    }
+
+    private void handleUserConflictsBeforeInsert(User user) {
+        if (user == null || user.getId() == null) {
+            return;
+        }
+
+        Long userId = user.getId();
+        Set<Long> conflictUserIds = new LinkedHashSet<>();
+
+        userRepository.findByUsername(user.getUsername()).ifPresent(existing -> conflictUserIds.add(existing.getId()));
+        if (user.getEmail() != null && !user.getEmail().isEmpty()) {
+            userRepository.findByEmail(user.getEmail()).ifPresent(existing -> conflictUserIds.add(existing.getId()));
+        }
+
+        // 避免删除与当前ID相同的记录（后续会统一清理）
+        conflictUserIds.remove(userId);
+
+        for (Long conflictId : conflictUserIds) {
+            logger.warn("用户导入: CSV中用户ID {} 与现有用户ID {} 在用户名/邮箱上冲突，清理旧数据以避免唯一约束错误", userId, conflictId);
+            deleteUserCascade(conflictId);
+        }
+
+        // 清理同ID旧数据，确保插入不会违反外键约束
+        deleteUserCascade(userId);
+    }
+
+    private void deleteUserCascade(Long userId) {
+        if (userId == null) {
+            return;
+        }
+
+        logger.debug("清理用户依赖数据并删除旧记录: userId={}", userId);
+
+        try {
+            jakarta.persistence.Query deleteLoginQuery = entityManager.createNativeQuery("DELETE FROM user_login_info WHERE user_id = ?");
+            deleteLoginQuery.setParameter(1, userId);
+            deleteLoginQuery.executeUpdate();
+
+            jakarta.persistence.Query deleteFollowQuery = entityManager.createNativeQuery("DELETE FROM user_follows WHERE follower_id = ? OR following_id = ?");
+            deleteFollowQuery.setParameter(1, userId);
+            deleteFollowQuery.setParameter(2, userId);
+            deleteFollowQuery.executeUpdate();
+
+            jakarta.persistence.Query deleteBlockQuery = entityManager.createNativeQuery("DELETE FROM user_blocks WHERE blocker_id = ? OR blocked_id = ?");
+            deleteBlockQuery.setParameter(1, userId);
+            deleteBlockQuery.setParameter(2, userId);
+            deleteBlockQuery.executeUpdate();
+
+            jakarta.persistence.Query deleteModeratorBlockQuery = entityManager.createNativeQuery("DELETE FROM moderator_blocks WHERE moderator_id = ? OR blocked_user_id = ?");
+            deleteModeratorBlockQuery.setParameter(1, userId);
+            deleteModeratorBlockQuery.setParameter(2, userId);
+            deleteModeratorBlockQuery.executeUpdate();
+
+            jakarta.persistence.Query deleteUserContentEditQuery = entityManager.createNativeQuery("DELETE FROM user_content_edits WHERE user_id = ?");
+            deleteUserContentEditQuery.setParameter(1, userId);
+            deleteUserContentEditQuery.executeUpdate();
+
+            jakarta.persistence.Query deleteLikeQuery = entityManager.createNativeQuery("DELETE FROM likes WHERE user_id = ?");
+            deleteLikeQuery.setParameter(1, userId);
+            deleteLikeQuery.executeUpdate();
+
+            jakarta.persistence.Query deleteCommentQuery = entityManager.createNativeQuery("DELETE FROM comments WHERE user_id = ?");
+            deleteCommentQuery.setParameter(1, userId);
+            deleteCommentQuery.executeUpdate();
+
+            jakarta.persistence.Query deleteContentQuery = entityManager.createNativeQuery("DELETE FROM contents WHERE user_id = ?");
+            deleteContentQuery.setParameter(1, userId);
+            deleteContentQuery.executeUpdate();
+
+            jakarta.persistence.Query deleteUserQuery = entityManager.createNativeQuery("DELETE FROM users WHERE id = ?");
+            deleteUserQuery.setParameter(1, userId);
+            deleteUserQuery.executeUpdate();
+        } catch (Exception cleanupException) {
+            logger.error("清理用户依赖数据时发生异常: userId={}, 错误={}", userId, cleanupException.getMessage(), cleanupException);
+            throw cleanupException;
+        }
+    }
+
+    private int insertUserRecord(User user) {
+        String sql = "INSERT INTO users (id, username, email, password, first_name, last_name, role, enabled, account_locked, " +
+                "failed_login_attempts, lock_time, lock_expire_time, comments_private, contents_private, profile_private, " +
+                "admin_login_attempts, like_count, assigned_school_id, ip_address, device_type, user_agent, avatar_url, language, theme, created_at, updated_at) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        jakarta.persistence.Query query = entityManager.createNativeQuery(sql);
+        query.setParameter(1, user.getId());
+        query.setParameter(2, user.getUsername());
+        query.setParameter(3, user.getEmail());
+        query.setParameter(4, user.getPassword());
+        query.setParameter(5, user.getFirstName());
+        query.setParameter(6, user.getLastName());
+        query.setParameter(7, user.getRole());
+        query.setParameter(8, user.isEnabled());
+        query.setParameter(9, user.isAccountLocked());
+        query.setParameter(10, user.getFailedLoginAttempts());
+        query.setParameter(11, user.getLockTime());
+        query.setParameter(12, user.getLockExpireTime());
+        query.setParameter(13, user.isCommentsPrivate());
+        query.setParameter(14, user.isContentsPrivate());
+        query.setParameter(15, user.isProfilePrivate());
+        query.setParameter(16, user.getAdminLoginAttempts());
+        query.setParameter(17, user.getLikeCount());
+        query.setParameter(18, user.getAssignedSchoolId());
+        query.setParameter(19, user.getIpAddress());
+        query.setParameter(20, user.getDeviceType());
+        query.setParameter(21, user.getUserAgent());
+        query.setParameter(22, user.getAvatarUrl());
+        query.setParameter(23, user.getLanguage() != null ? user.getLanguage() : "zh");
+        query.setParameter(24, user.getTheme() != null ? user.getTheme() : "midnight");
+        query.setParameter(25, user.getCreatedAt());
+        query.setParameter(26, user.getUpdatedAt() != null ? user.getUpdatedAt() : java.time.LocalDateTime.now());
+
+        return query.executeUpdate();
     }
 
     public void importSchoolsInTransaction(ImportResult result, List<String[]> data) {
