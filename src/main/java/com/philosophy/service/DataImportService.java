@@ -20,6 +20,8 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 @Service
 public class DataImportService {
@@ -77,6 +79,9 @@ public class DataImportService {
 
     @Autowired
     private TransactionTemplate transactionTemplate;
+
+    private final ConcurrentMap<String, Boolean> columnExistenceCache = new ConcurrentHashMap<>();
+    private final Set<String> missingColumnWarnings = ConcurrentHashMap.newKeySet();
 
     public ImportResult importCsvData(MultipartFile file) {
         return importCsvData(file, false);
@@ -799,6 +804,15 @@ public class DataImportService {
         final String sectionName = "用户";
         int success = 0, failed = 0;
 
+        final String usersTable = "users";
+        final String usersContext = "用户导入";
+        ensureColumnExists(usersTable, "id", true, usersContext);
+        ensureColumnExists(usersTable, "username", true, usersContext);
+        ensureColumnExists(usersTable, "email", true, usersContext);
+        ensureColumnExists(usersTable, "password", true, usersContext);
+        ensureColumnExists(usersTable, "role", true, usersContext);
+        ensureColumnExists(usersTable, "enabled", true, usersContext);
+
         for (int i = 0; i < data.size(); i++) {
             String[] fields = data.get(i);
             try {
@@ -1097,6 +1111,11 @@ public class DataImportService {
             deleteCommentQuery.setParameter(1, userId);
             deleteCommentQuery.executeUpdate();
 
+            jakarta.persistence.Query deleteContentTranslationQuery = entityManager.createNativeQuery(
+                    "DELETE FROM contents_translation WHERE content_id IN (SELECT id FROM contents WHERE user_id = ?)");
+            deleteContentTranslationQuery.setParameter(1, userId);
+            deleteContentTranslationQuery.executeUpdate();
+
             jakarta.persistence.Query deleteContentQuery = entityManager.createNativeQuery("DELETE FROM contents WHERE user_id = ?");
             deleteContentQuery.setParameter(1, userId);
             deleteContentQuery.executeUpdate();
@@ -1110,39 +1129,122 @@ public class DataImportService {
         }
     }
 
+    private boolean tableColumnExists(String tableName, String columnName) {
+        String cacheKey = tableName + "." + columnName;
+        return columnExistenceCache.computeIfAbsent(cacheKey, key -> {
+            try {
+                jakarta.persistence.Query query = entityManager.createNativeQuery(
+                        "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = ? AND column_name = ?");
+                query.setParameter(1, tableName);
+                query.setParameter(2, columnName);
+                Number count = (Number) query.getSingleResult();
+                return count != null && count.intValue() > 0;
+            } catch (Exception e) {
+                logger.warn("检测数据表列存在性失败: {}.{}, 错误: {}", tableName, columnName, e.getMessage());
+                return false;
+            }
+        });
+    }
+
+    private boolean ensureColumnExists(String tableName, String columnName, boolean required, String context) {
+        boolean exists = tableColumnExists(tableName, columnName);
+        if (!exists) {
+            String key = tableName + "." + columnName;
+            if (missingColumnWarnings.add(key)) {
+                String message = String.format("检测到表 %s 缺少列 %s，导入上下文: %s", tableName, columnName, context);
+                if (required) {
+                    logger.error("{}。该列为必需列，相关数据将无法导入。", message);
+                } else {
+                    logger.warn("{}。该列将在导入过程中被跳过。", message);
+                }
+            }
+            if (required) {
+                throw new IllegalStateException(
+                        String.format("数据库表 %s 缺少必需列 %s（上下文: %s）", tableName, columnName, context));
+            }
+        }
+        return exists;
+    }
+
+    private boolean addUpdateColumn(List<String> assignments, List<Object> params,
+                                    String tableName, String columnName, Object value,
+                                    String context, boolean required) {
+        if (!ensureColumnExists(tableName, columnName, required, context)) {
+            return false;
+        }
+        assignments.add(columnName + " = ?");
+        params.add(value);
+        return true;
+    }
+
+    private boolean addInsertColumn(List<String> columns, List<Object> params,
+                                    String tableName, String columnName, Object value,
+                                    String context, boolean required) {
+        if (!ensureColumnExists(tableName, columnName, required, context)) {
+            return false;
+        }
+        columns.add(columnName);
+        params.add(value);
+        return true;
+    }
+
+    private String resolvePhilosopherBioColumn() {
+        if (tableColumnExists("philosophers", "bio")) {
+            return "bio";
+        }
+        if (tableColumnExists("philosophers", "biography")) {
+            return "biography";
+        }
+        return null;
+    }
+
     private int insertUserRecord(User user) {
-        String sql = "INSERT INTO users (id, username, email, password, first_name, last_name, role, enabled, account_locked, " +
-                "failed_login_attempts, lock_time, lock_expire_time, comments_private, contents_private, profile_private, " +
-                "admin_login_attempts, like_count, assigned_school_id, ip_address, device_type, user_agent, avatar_url, language, theme, created_at, updated_at) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        final String tableName = "users";
+        final String context = "用户导入";
+
+        List<String> columns = new ArrayList<>();
+        List<Object> params = new ArrayList<>();
+
+        addInsertColumn(columns, params, tableName, "id", user.getId(), context, true);
+        addInsertColumn(columns, params, tableName, "username", user.getUsername(), context, true);
+        addInsertColumn(columns, params, tableName, "email", user.getEmail(), context, true);
+        addInsertColumn(columns, params, tableName, "password", user.getPassword(), context, true);
+
+        addInsertColumn(columns, params, tableName, "first_name", user.getFirstName(), context, false);
+        addInsertColumn(columns, params, tableName, "last_name", user.getLastName(), context, false);
+
+        addInsertColumn(columns, params, tableName, "role", user.getRole(), context, true);
+        addInsertColumn(columns, params, tableName, "enabled", user.isEnabled(), context, true);
+        addInsertColumn(columns, params, tableName, "account_locked", user.isAccountLocked(), context, false);
+        addInsertColumn(columns, params, tableName, "failed_login_attempts", user.getFailedLoginAttempts(), context, false);
+        addInsertColumn(columns, params, tableName, "lock_time", user.getLockTime(), context, false);
+        addInsertColumn(columns, params, tableName, "lock_expire_time", user.getLockExpireTime(), context, false);
+
+        addInsertColumn(columns, params, tableName, "profile_private", user.isProfilePrivate(), context, false);
+        addInsertColumn(columns, params, tableName, "comments_private", user.isCommentsPrivate(), context, false);
+        addInsertColumn(columns, params, tableName, "contents_private", user.isContentsPrivate(), context, false);
+
+        addInsertColumn(columns, params, tableName, "admin_login_attempts", user.getAdminLoginAttempts(), context, false);
+        addInsertColumn(columns, params, tableName, "like_count", user.getLikeCount(), context, false);
+        addInsertColumn(columns, params, tableName, "assigned_school_id", user.getAssignedSchoolId(), context, false);
+
+        addInsertColumn(columns, params, tableName, "ip_address", user.getIpAddress(), context, false);
+        addInsertColumn(columns, params, tableName, "device_type", user.getDeviceType(), context, false);
+        addInsertColumn(columns, params, tableName, "user_agent", user.getUserAgent(), context, false);
+        addInsertColumn(columns, params, tableName, "avatar_url", user.getAvatarUrl(), context, false);
+
+        addInsertColumn(columns, params, tableName, "language", user.getLanguage(), context, false);
+        addInsertColumn(columns, params, tableName, "theme", user.getTheme(), context, false);
+        addInsertColumn(columns, params, tableName, "created_at", user.getCreatedAt(), context, false);
+        addInsertColumn(columns, params, tableName, "updated_at", user.getUpdatedAt(), context, false);
+
+        String placeholders = String.join(", ", Collections.nCopies(columns.size(), "?"));
+        String sql = "INSERT INTO " + tableName + " (" + String.join(", ", columns) + ") VALUES (" + placeholders + ")";
 
         jakarta.persistence.Query query = entityManager.createNativeQuery(sql);
-        query.setParameter(1, user.getId());
-        query.setParameter(2, user.getUsername());
-        query.setParameter(3, user.getEmail());
-        query.setParameter(4, user.getPassword());
-        query.setParameter(5, user.getFirstName());
-        query.setParameter(6, user.getLastName());
-        query.setParameter(7, user.getRole());
-        query.setParameter(8, user.isEnabled());
-        query.setParameter(9, user.isAccountLocked());
-        query.setParameter(10, user.getFailedLoginAttempts());
-        query.setParameter(11, user.getLockTime());
-        query.setParameter(12, user.getLockExpireTime());
-        query.setParameter(13, user.isCommentsPrivate());
-        query.setParameter(14, user.isContentsPrivate());
-        query.setParameter(15, user.isProfilePrivate());
-        query.setParameter(16, user.getAdminLoginAttempts());
-        query.setParameter(17, user.getLikeCount());
-        query.setParameter(18, user.getAssignedSchoolId());
-        query.setParameter(19, user.getIpAddress());
-        query.setParameter(20, user.getDeviceType());
-        query.setParameter(21, user.getUserAgent());
-        query.setParameter(22, user.getAvatarUrl());
-        query.setParameter(23, user.getLanguage() != null ? user.getLanguage() : "zh");
-        query.setParameter(24, user.getTheme() != null ? user.getTheme() : "midnight");
-        query.setParameter(25, user.getCreatedAt());
-        query.setParameter(26, user.getUpdatedAt() != null ? user.getUpdatedAt() : java.time.LocalDateTime.now());
+        for (int i = 0; i < params.size(); i++) {
+            query.setParameter(i + 1, params.get(i));
+        }
 
         return query.executeUpdate();
     }
@@ -1266,33 +1368,70 @@ public class DataImportService {
                         }
                     }
 
-                    String updateSql = "UPDATE schools SET name = ?, name_en = ?, description = ?, description_en = ?, parent_id = ?, like_count = ?, updated_at = ?, user_id = COALESCE(?, user_id) WHERE id = ?";
+                    final String tableName = "schools";
+                    final String context = "学派导入";
+
+                    List<String> updateAssignments = new ArrayList<>();
+                    List<Object> updateParams = new ArrayList<>();
+
+                    addUpdateColumn(updateAssignments, updateParams, tableName, "name", school.getName(), context, true);
+                    addUpdateColumn(updateAssignments, updateParams, tableName, "name_en", school.getNameEn(), context, false);
+                    addUpdateColumn(updateAssignments, updateParams, tableName, "description", school.getDescription(), context, false);
+                    addUpdateColumn(updateAssignments, updateParams, tableName, "description_en", school.getDescriptionEn(), context, false);
+                    addUpdateColumn(updateAssignments, updateParams, tableName, "parent_id",
+                            school.getParent() != null ? school.getParent().getId() : null, context, false);
+                    addUpdateColumn(updateAssignments, updateParams, tableName, "like_count", school.getLikeCount(), context, false);
+
+                    if (ensureColumnExists(tableName, "updated_at", false, context)) {
+                        updateAssignments.add("updated_at = ?");
+                        updateParams.add(school.getUpdatedAt() != null ? school.getUpdatedAt() : java.time.LocalDateTime.now());
+                    }
+                    if (ensureColumnExists(tableName, "user_id", false, context)) {
+                        updateAssignments.add("user_id = COALESCE(?, user_id)");
+                        updateParams.add(creatorUserId);
+                    }
+
+                    String updateSql = "UPDATE " + tableName + " SET " + String.join(", ", updateAssignments) + " WHERE id = ?";
+                    updateParams.add(school.getId());
+
                     jakarta.persistence.Query updateQ = entityManager.createNativeQuery(updateSql);
-                    updateQ.setParameter(1, school.getName());
-                    updateQ.setParameter(2, school.getNameEn());
-                    updateQ.setParameter(3, school.getDescription());
-                    updateQ.setParameter(4, school.getDescriptionEn());
-                    updateQ.setParameter(5, school.getParent() != null ? school.getParent().getId() : null);
-                    updateQ.setParameter(6, school.getLikeCount());
-                    updateQ.setParameter(7, school.getUpdatedAt() != null ? school.getUpdatedAt() : java.time.LocalDateTime.now());
-                    updateQ.setParameter(8, creatorUserId);
-                    updateQ.setParameter(9, school.getId());
+                    for (int p = 0; p < updateParams.size(); p++) {
+                        updateQ.setParameter(p + 1, updateParams.get(p));
+                    }
                     int updated = updateQ.executeUpdate();
 
                     if (updated == 0) {
-                        String insertSql = "INSERT INTO schools (id, name, name_en, description, description_en, parent_id, like_count, user_id, created_at, updated_at) " +
-                                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                        List<String> insertColumns = new ArrayList<>();
+                        List<Object> insertParams = new ArrayList<>();
+
+                        addInsertColumn(insertColumns, insertParams, tableName, "id", school.getId(), context, true);
+                        addInsertColumn(insertColumns, insertParams, tableName, "name", school.getName(), context, true);
+                        addInsertColumn(insertColumns, insertParams, tableName, "name_en", school.getNameEn(), context, false);
+                        addInsertColumn(insertColumns, insertParams, tableName, "description", school.getDescription(), context, false);
+                        addInsertColumn(insertColumns, insertParams, tableName, "description_en", school.getDescriptionEn(), context, false);
+                        addInsertColumn(insertColumns, insertParams, tableName, "parent_id",
+                                school.getParent() != null ? school.getParent().getId() : null, context, false);
+                        addInsertColumn(insertColumns, insertParams, tableName, "like_count", school.getLikeCount(), context, false);
+
+                        if (ensureColumnExists(tableName, "user_id", false, context)) {
+                            insertColumns.add("user_id");
+                            insertParams.add(creatorUserId);
+                        }
+                        if (ensureColumnExists(tableName, "created_at", false, context)) {
+                            insertColumns.add("created_at");
+                            insertParams.add(school.getCreatedAt());
+                        }
+                        if (ensureColumnExists(tableName, "updated_at", false, context)) {
+                            insertColumns.add("updated_at");
+                            insertParams.add(school.getUpdatedAt() != null ? school.getUpdatedAt() : java.time.LocalDateTime.now());
+                        }
+
+                        String insertSql = "INSERT INTO " + tableName + " (" + String.join(", ", insertColumns) + ") VALUES (" +
+                                String.join(", ", Collections.nCopies(insertColumns.size(), "?")) + ")";
                         jakarta.persistence.Query insertQ = entityManager.createNativeQuery(insertSql);
-                        insertQ.setParameter(1, school.getId());
-                        insertQ.setParameter(2, school.getName());
-                        insertQ.setParameter(3, school.getNameEn());
-                        insertQ.setParameter(4, school.getDescription());
-                        insertQ.setParameter(5, school.getDescriptionEn());
-                        insertQ.setParameter(6, school.getParent() != null ? school.getParent().getId() : null);
-                        insertQ.setParameter(7, school.getLikeCount());
-                        insertQ.setParameter(8, creatorUserId);
-                        insertQ.setParameter(9, school.getCreatedAt());
-                        insertQ.setParameter(10, school.getUpdatedAt() != null ? school.getUpdatedAt() : java.time.LocalDateTime.now());
+                        for (int p = 0; p < insertParams.size(); p++) {
+                            insertQ.setParameter(p + 1, insertParams.get(p));
+                        }
                         int rows = insertQ.executeUpdate();
                         if (rows > 0) {
                             success++;
@@ -1339,6 +1478,9 @@ public class DataImportService {
 
         logger.info("开始导入哲学家数据，共 {} 条", data.size());
         final String sectionName = "哲学家";
+        final String philosopherBioColumn = resolvePhilosopherBioColumn();
+        final boolean philosopherBioColumnExists = philosopherBioColumn != null;
+        final boolean philosopherBioEnColumnExists = tableColumnExists("philosophers", "bio_en");
         int success = 0, failed = 0;
 
         for (int index = 0; index < data.size(); index++) {
@@ -1448,40 +1590,92 @@ public class DataImportService {
                         }
                     }
 
-                    String updateSql = "UPDATE philosophers SET name = ?, name_en = ?, birth_year = ?, death_year = ?, era = ?, nationality = ?, bio = ?, bio_en = ?, image_url = ?, like_count = ?, updated_at = ?, user_id = COALESCE(?, user_id) WHERE id = ?";
+                    final String tableName = "philosophers";
+                    final String context = "哲学家导入";
+
+                    List<String> updateAssignments = new ArrayList<>();
+                    List<Object> updateParams = new ArrayList<>();
+
+                    addUpdateColumn(updateAssignments, updateParams, tableName, "name", philosopher.getName(), context, true);
+                    addUpdateColumn(updateAssignments, updateParams, tableName, "name_en", philosopher.getNameEn(), context, false);
+                    addUpdateColumn(updateAssignments, updateParams, tableName, "birth_year", philosopher.getBirthYear(), context, false);
+                    addUpdateColumn(updateAssignments, updateParams, tableName, "death_year", philosopher.getDeathYear(), context, false);
+                    addUpdateColumn(updateAssignments, updateParams, tableName, "era", philosopher.getEra(), context, false);
+                    addUpdateColumn(updateAssignments, updateParams, tableName, "nationality", philosopher.getNationality(), context, false);
+
+                    if (philosopherBioColumnExists) {
+                        updateAssignments.add(philosopherBioColumn + " = ?");
+                        updateParams.add(philosopher.getBio());
+                    }
+                    if (philosopherBioEnColumnExists) {
+                        addUpdateColumn(updateAssignments, updateParams, tableName, "bio_en", philosopher.getBioEn(), context, false);
+                    }
+
+                    addUpdateColumn(updateAssignments, updateParams, tableName, "image_url", philosopher.getImageUrl(), context, false);
+                    addUpdateColumn(updateAssignments, updateParams, tableName, "like_count",
+                            philosopher.getLikeCount() != null ? philosopher.getLikeCount() : 0, context, false);
+
+                    if (ensureColumnExists(tableName, "updated_at", false, context)) {
+                        updateAssignments.add("updated_at = ?");
+                        updateParams.add(philosopher.getUpdatedAt() != null ? philosopher.getUpdatedAt() : java.time.LocalDateTime.now());
+                    }
+                    if (ensureColumnExists(tableName, "user_id", false, context)) {
+                        updateAssignments.add("user_id = COALESCE(?, user_id)");
+                        updateParams.add(creatorUserId);
+                    }
+
+                    String updateSql = "UPDATE " + tableName + " SET " + String.join(", ", updateAssignments) + " WHERE id = ?";
+                    updateParams.add(philosopher.getId());
+
                     jakarta.persistence.Query updateQ = entityManager.createNativeQuery(updateSql);
-                    updateQ.setParameter(1, philosopher.getName());
-                    updateQ.setParameter(2, philosopher.getNameEn());
-                    updateQ.setParameter(3, philosopher.getBirthYear());
-                    updateQ.setParameter(4, philosopher.getDeathYear());
-                    updateQ.setParameter(5, philosopher.getEra());
-                    updateQ.setParameter(6, philosopher.getNationality());
-                    updateQ.setParameter(7, philosopher.getBio());
-                    updateQ.setParameter(8, philosopher.getBioEn());
-                    updateQ.setParameter(9, philosopher.getImageUrl());
-                    updateQ.setParameter(10, philosopher.getLikeCount() != null ? philosopher.getLikeCount() : 0);
-                    updateQ.setParameter(11, philosopher.getUpdatedAt() != null ? philosopher.getUpdatedAt() : java.time.LocalDateTime.now());
-                    updateQ.setParameter(12, creatorUserId);
-                    updateQ.setParameter(13, philosopher.getId());
+                    for (int p = 0; p < updateParams.size(); p++) {
+                        updateQ.setParameter(p + 1, updateParams.get(p));
+                    }
                     int updated = updateQ.executeUpdate();
 
                     if (updated == 0) {
-                        String insertSql = "INSERT INTO philosophers (id, name, name_en, birth_year, death_year, era, nationality, bio, bio_en, image_url, like_count, user_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                        List<String> insertColumns = new ArrayList<>();
+                        List<Object> insertParams = new ArrayList<>();
+
+                        addInsertColumn(insertColumns, insertParams, tableName, "id", philosopher.getId(), context, true);
+                        addInsertColumn(insertColumns, insertParams, tableName, "name", philosopher.getName(), context, true);
+                        addInsertColumn(insertColumns, insertParams, tableName, "name_en", philosopher.getNameEn(), context, false);
+                        addInsertColumn(insertColumns, insertParams, tableName, "birth_year", philosopher.getBirthYear(), context, false);
+                        addInsertColumn(insertColumns, insertParams, tableName, "death_year", philosopher.getDeathYear(), context, false);
+                        addInsertColumn(insertColumns, insertParams, tableName, "era", philosopher.getEra(), context, false);
+                        addInsertColumn(insertColumns, insertParams, tableName, "nationality", philosopher.getNationality(), context, false);
+
+                        if (philosopherBioColumnExists) {
+                            insertColumns.add(philosopherBioColumn);
+                            insertParams.add(philosopher.getBio());
+                        }
+                        if (philosopherBioEnColumnExists) {
+                            addInsertColumn(insertColumns, insertParams, tableName, "bio_en", philosopher.getBioEn(), context, false);
+                        }
+
+                        addInsertColumn(insertColumns, insertParams, tableName, "image_url", philosopher.getImageUrl(), context, false);
+                        addInsertColumn(insertColumns, insertParams, tableName, "like_count",
+                                philosopher.getLikeCount() != null ? philosopher.getLikeCount() : 0, context, false);
+
+                        if (ensureColumnExists(tableName, "user_id", false, context)) {
+                            insertColumns.add("user_id");
+                            insertParams.add(creatorUserId);
+                        }
+                        if (ensureColumnExists(tableName, "created_at", false, context)) {
+                            insertColumns.add("created_at");
+                            insertParams.add(philosopher.getCreatedAt());
+                        }
+                        if (ensureColumnExists(tableName, "updated_at", false, context)) {
+                            insertColumns.add("updated_at");
+                            insertParams.add(philosopher.getUpdatedAt() != null ? philosopher.getUpdatedAt() : java.time.LocalDateTime.now());
+                        }
+
+                        String insertSql = "INSERT INTO " + tableName + " (" + String.join(", ", insertColumns) + ") VALUES (" +
+                                String.join(", ", Collections.nCopies(insertColumns.size(), "?")) + ")";
                         jakarta.persistence.Query insertQ = entityManager.createNativeQuery(insertSql);
-                        insertQ.setParameter(1, philosopher.getId());
-                        insertQ.setParameter(2, philosopher.getName());
-                        insertQ.setParameter(3, philosopher.getNameEn());
-                        insertQ.setParameter(4, philosopher.getBirthYear());
-                        insertQ.setParameter(5, philosopher.getDeathYear());
-                        insertQ.setParameter(6, philosopher.getEra());
-                        insertQ.setParameter(7, philosopher.getNationality());
-                        insertQ.setParameter(8, philosopher.getBio());
-                        insertQ.setParameter(9, philosopher.getBioEn());
-                        insertQ.setParameter(10, philosopher.getImageUrl());
-                        insertQ.setParameter(11, philosopher.getLikeCount() != null ? philosopher.getLikeCount() : 0);
-                        insertQ.setParameter(12, creatorUserId);
-                        insertQ.setParameter(13, philosopher.getCreatedAt());
-                        insertQ.setParameter(14, philosopher.getUpdatedAt() != null ? philosopher.getUpdatedAt() : java.time.LocalDateTime.now());
+                        for (int p = 0; p < insertParams.size(); p++) {
+                            insertQ.setParameter(p + 1, insertParams.get(p));
+                        }
                         int rows = insertQ.executeUpdate();
                         if (rows > 0) {
                             success++;
@@ -1596,40 +1790,81 @@ public class DataImportService {
 
                 // 优先尝试更新已有内容，避免删除后丢失既有作者等关联
                 try {
-                    String updateSql = "UPDATE contents SET content = ?, content_en = ?, title = ?, order_index = ?, " +
-                            "like_count = ?, is_private = ?, status = ?, is_blocked = ?, version = ?, updated_at = NOW() " +
-                            "WHERE id = ?";
+                    final String tableName = "contents";
+                    final String context = "内容导入";
+
+                    List<String> updateAssignments = new ArrayList<>();
+                    List<Object> updateParams = new ArrayList<>();
+
+                    addUpdateColumn(updateAssignments, updateParams, tableName, "content", content.getContent(), context, true);
+                    addUpdateColumn(updateAssignments, updateParams, tableName, "content_en", content.getContentEn(), context, false);
+                    addUpdateColumn(updateAssignments, updateParams, tableName, "title", content.getTitle(), context, false);
+                    addUpdateColumn(updateAssignments, updateParams, tableName, "order_index", content.getOrderIndex(), context, false);
+                    addUpdateColumn(updateAssignments, updateParams, tableName, "like_count", content.getLikeCount(), context, false);
+                    addUpdateColumn(updateAssignments, updateParams, tableName, "is_private", content.isPrivate(), context, false);
+                    addUpdateColumn(updateAssignments, updateParams, tableName, "status", content.getStatus(), context, false);
+                    addUpdateColumn(updateAssignments, updateParams, tableName, "is_blocked", content.isBlocked(), context, false);
+                    addUpdateColumn(updateAssignments, updateParams, tableName, "version", content.getVersion(), context, false);
+
+                    if (ensureColumnExists(tableName, "updated_at", false, context)) {
+                        updateAssignments.add("updated_at = ?");
+                        updateParams.add(java.time.LocalDateTime.now());
+                    }
+
+                    String updateSql = "UPDATE " + tableName + " SET " + String.join(", ", updateAssignments) + " WHERE id = ?";
+                    updateParams.add(contentId);
+
                     jakarta.persistence.Query updateQuery = entityManager.createNativeQuery(updateSql);
-                    updateQuery.setParameter(1, content.getContent());
-                    updateQuery.setParameter(2, content.getContentEn());
-                    updateQuery.setParameter(3, content.getTitle());
-                    updateQuery.setParameter(4, content.getOrderIndex());
-                    updateQuery.setParameter(5, content.getLikeCount());
-                    updateQuery.setParameter(6, content.isPrivate());
-                    updateQuery.setParameter(7, content.getStatus());
-                    updateQuery.setParameter(8, content.isBlocked());
-                    updateQuery.setParameter(9, content.getVersion());
-                    updateQuery.setParameter(10, contentId);
+                    for (int p = 0; p < updateParams.size(); p++) {
+                        updateQuery.setParameter(p + 1, updateParams.get(p));
+                    }
 
                     int updatedRows = updateQuery.executeUpdate();
 
                     if (updatedRows == 0) {
-                        // 不存在则插入新记录（关联字段先置空，后续步骤再用 COALESCE 更新）
-                        String insertSql = "INSERT INTO contents (id, content, content_en, title, order_index, " +
-                                "like_count, is_private, status, is_blocked, version, " +
-                                "philosopher_id, school_id, user_id, created_at, updated_at) " +
-                                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, NULL, NULL, NOW(), NOW())";
+                        List<String> insertColumns = new ArrayList<>();
+                        List<Object> insertParams = new ArrayList<>();
+
+                        addInsertColumn(insertColumns, insertParams, tableName, "id", contentId, context, true);
+                        addInsertColumn(insertColumns, insertParams, tableName, "content", content.getContent(), context, true);
+                        addInsertColumn(insertColumns, insertParams, tableName, "content_en", content.getContentEn(), context, false);
+                        addInsertColumn(insertColumns, insertParams, tableName, "title", content.getTitle(), context, false);
+                        addInsertColumn(insertColumns, insertParams, tableName, "order_index", content.getOrderIndex(), context, false);
+                        addInsertColumn(insertColumns, insertParams, tableName, "like_count", content.getLikeCount(), context, false);
+                        addInsertColumn(insertColumns, insertParams, tableName, "is_private", content.isPrivate(), context, false);
+                        addInsertColumn(insertColumns, insertParams, tableName, "status", content.getStatus(), context, false);
+                        addInsertColumn(insertColumns, insertParams, tableName, "is_blocked", content.isBlocked(), context, false);
+                        addInsertColumn(insertColumns, insertParams, tableName, "version", content.getVersion(), context, false);
+
+                        if (ensureColumnExists(tableName, "philosopher_id", false, context)) {
+                            insertColumns.add("philosopher_id");
+                            insertParams.add(null);
+                        }
+                        if (ensureColumnExists(tableName, "school_id", false, context)) {
+                            insertColumns.add("school_id");
+                            insertParams.add(null);
+                        }
+                        if (ensureColumnExists(tableName, "user_id", false, context)) {
+                            insertColumns.add("user_id");
+                            insertParams.add(null);
+                        }
+
+                        java.time.LocalDateTime now = java.time.LocalDateTime.now();
+                        if (ensureColumnExists(tableName, "created_at", false, context)) {
+                            insertColumns.add("created_at");
+                            insertParams.add(now);
+                        }
+                        if (ensureColumnExists(tableName, "updated_at", false, context)) {
+                            insertColumns.add("updated_at");
+                            insertParams.add(now);
+                        }
+
+                        String insertSql = "INSERT INTO " + tableName + " (" + String.join(", ", insertColumns) + ") VALUES (" +
+                                String.join(", ", Collections.nCopies(insertColumns.size(), "?")) + ")";
                         jakarta.persistence.Query insertQuery = entityManager.createNativeQuery(insertSql);
-                        insertQuery.setParameter(1, contentId);
-                        insertQuery.setParameter(2, content.getContent());
-                        insertQuery.setParameter(3, content.getContentEn());
-                        insertQuery.setParameter(4, content.getTitle());
-                        insertQuery.setParameter(5, content.getOrderIndex());
-                        insertQuery.setParameter(6, content.getLikeCount());
-                        insertQuery.setParameter(7, content.isPrivate());
-                        insertQuery.setParameter(8, content.getStatus());
-                        insertQuery.setParameter(9, content.isBlocked());
-                        insertQuery.setParameter(10, content.getVersion());
+                        for (int p = 0; p < insertParams.size(); p++) {
+                            insertQuery.setParameter(p + 1, insertParams.get(p));
+                        }
 
                         int rowsAffected = insertQuery.executeUpdate();
                         if (rowsAffected > 0) {
@@ -1686,9 +1921,7 @@ public class DataImportService {
                 
                 // 使用原生SQL更新关联，避免JPA实体加载
                 // 注意：当哲学家/学派/作者列为空或为“已注销”时，不覆盖原值（COALESCE 使 NULL 不改变原值）
-                String sql = "UPDATE contents SET philosopher_id = COALESCE(?, philosopher_id), school_id = COALESCE(?, school_id), user_id = COALESCE(?, user_id) WHERE id = ?";
-                jakarta.persistence.Query query = entityManager.createNativeQuery(sql);
-                
+
                 // 查找哲学家ID（字段索引3）- 修复：CSV导出的是哲学家ID，不是名称
                 Long philosopherId = null;
                 if (fields.length > 3 && !fields[3].isEmpty() && !fields[3].equals("null")) {
@@ -1889,11 +2122,38 @@ public class DataImportService {
                     userId = null;
                 }
                 
-                query.setParameter(1, philosopherId);
-                query.setParameter(2, schoolId);
-                query.setParameter(3, userId);
-                query.setParameter(4, contentId);
-                
+                final String assocTable = "contents";
+                final String assocContext = "内容关联更新";
+                List<String> associationClauses = new ArrayList<>();
+                List<Object> associationParams = new ArrayList<>();
+
+                if (ensureColumnExists(assocTable, "philosopher_id", false, assocContext)) {
+                    associationClauses.add("philosopher_id = COALESCE(?, philosopher_id)");
+                    associationParams.add(philosopherId);
+                }
+                if (ensureColumnExists(assocTable, "school_id", false, assocContext)) {
+                    associationClauses.add("school_id = COALESCE(?, school_id)");
+                    associationParams.add(schoolId);
+                }
+                if (ensureColumnExists(assocTable, "user_id", false, assocContext)) {
+                    associationClauses.add("user_id = COALESCE(?, user_id)");
+                    associationParams.add(userId);
+                }
+
+                if (associationClauses.isEmpty()) {
+                    logger.warn("内容ID {}: 数据库缺少内容关联列，跳过该记录的关联更新", contentId);
+                    failed++;
+                    continue;
+                }
+
+                String sql = "UPDATE " + assocTable + " SET " + String.join(", ", associationClauses) + " WHERE id = ?";
+                associationParams.add(contentId);
+
+                jakarta.persistence.Query query = entityManager.createNativeQuery(sql);
+                for (int p = 0; p < associationParams.size(); p++) {
+                    query.setParameter(p + 1, associationParams.get(p));
+                }
+
                 int updated = query.executeUpdate();
                 if (updated > 0) {
                     success++;
@@ -2057,19 +2317,43 @@ public class DataImportService {
                     deleteQuery.setParameter(1, comment.getId());
                     deleteQuery.executeUpdate();
                     
-                    // 插入新记录
-                    String insertSql = "INSERT INTO comments (id, body, like_count, status, is_private, content_id, user_id, parent_id, created_at) " +
-                                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    final String tableName = "comments";
+                    final String context = "评论导入";
+
+                    List<String> insertColumns = new ArrayList<>();
+                    List<Object> insertParams = new ArrayList<>();
+
+                    addInsertColumn(insertColumns, insertParams, tableName, "id", comment.getId(), context, true);
+                    addInsertColumn(insertColumns, insertParams, tableName, "body", comment.getBody(), context, true);
+                    addInsertColumn(insertColumns, insertParams, tableName, "like_count",
+                            comment.getLikeCount() != null ? comment.getLikeCount() : 0, context, false);
+                    addInsertColumn(insertColumns, insertParams, tableName, "status", comment.getStatus(), context, false);
+
+                    if (ensureColumnExists(tableName, "is_private", false, context)) {
+                        insertColumns.add("is_private");
+                        insertParams.add(comment.isPrivate() ? 1 : 0);
+                    }
+                    addInsertColumn(insertColumns, insertParams, tableName, "content_id", comment.getContent().getId(), context, false);
+                    addInsertColumn(insertColumns, insertParams, tableName, "user_id", comment.getUser().getId(), context, false);
+                    addInsertColumn(insertColumns, insertParams, tableName, "parent_id",
+                            comment.getParent() != null ? comment.getParent().getId() : null, context, false);
+
+                    java.time.LocalDateTime createdValue = createdAt != null ? createdAt : java.time.LocalDateTime.now();
+                    if (ensureColumnExists(tableName, "created_at", false, context)) {
+                        insertColumns.add("created_at");
+                        insertParams.add(createdValue);
+                    }
+                    if (ensureColumnExists(tableName, "updated_at", false, context)) {
+                        insertColumns.add("updated_at");
+                        insertParams.add(createdValue);
+                    }
+
+                    String insertSql = "INSERT INTO " + tableName + " (" + String.join(", ", insertColumns) + ") VALUES (" +
+                            String.join(", ", Collections.nCopies(insertColumns.size(), "?")) + ")";
                     jakarta.persistence.Query insertQuery = entityManager.createNativeQuery(insertSql);
-                    insertQuery.setParameter(1, comment.getId());
-                    insertQuery.setParameter(2, comment.getBody());
-                    insertQuery.setParameter(3, comment.getLikeCount() != null ? comment.getLikeCount() : 0);
-                    insertQuery.setParameter(4, comment.getStatus());
-                    insertQuery.setParameter(5, comment.isPrivate() ? 1 : 0);
-                    insertQuery.setParameter(6, comment.getContent().getId());
-                    insertQuery.setParameter(7, comment.getUser().getId());
-                    insertQuery.setParameter(8, comment.getParent() != null ? comment.getParent().getId() : null);
-                    insertQuery.setParameter(9, createdAt != null ? createdAt : java.time.LocalDateTime.now());
+                    for (int p = 0; p < insertParams.size(); p++) {
+                        insertQuery.setParameter(p + 1, insertParams.get(p));
+                    }
                     insertQuery.executeUpdate();
                     success++;
                 } catch (Exception e) {
@@ -2142,24 +2426,31 @@ public class DataImportService {
                     deleteQuery.setParameter(1, loginInfoId);
                     deleteQuery.executeUpdate();
                     
-                    // 插入新记录
-                    String sql = "INSERT INTO user_login_info (id, user_id, ip_address, browser, operating_system, device_type, login_time) " +
-                                "VALUES (?, ?, ?, ?, ?, ?, ?)";
+                    final String tableName = "user_login_info";
+                    final String context = "用户登录信息导入";
+
+                    List<String> insertColumns = new ArrayList<>();
+                    List<Object> insertParams = new ArrayList<>();
+
+                    addInsertColumn(insertColumns, insertParams, tableName, "id", loginInfoId, context, true);
+                    addInsertColumn(insertColumns, insertParams, tableName, "user_id", userId, context, true);
+                    addInsertColumn(insertColumns, insertParams, tableName, "ip_address", ipAddress, context, true);
+                    addInsertColumn(insertColumns, insertParams, tableName, "browser", browser, context, false);
+                    addInsertColumn(insertColumns, insertParams, tableName, "operating_system", operatingSystem, context, false);
+                    addInsertColumn(insertColumns, insertParams, tableName, "device_type", deviceType, context, false);
+
+                    LocalDateTime loginTime = null;
+                    if (!loginTimeStr.equals("未知时间") && !loginTimeStr.isEmpty() && !loginTimeStr.equals("null")) {
+                        loginTime = LocalDateTime.parse(loginTimeStr, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+                    }
+                    addInsertColumn(insertColumns, insertParams, tableName, "login_time", loginTime, context, false);
+
+                    String sql = "INSERT INTO " + tableName + " (" + String.join(", ", insertColumns) + ") VALUES (" +
+                            String.join(", ", Collections.nCopies(insertColumns.size(), "?")) + ")";
                     
                     jakarta.persistence.Query query = entityManager.createNativeQuery(sql);
-                    query.setParameter(1, loginInfoId);
-                    query.setParameter(2, userId);
-                    query.setParameter(3, ipAddress);
-                    query.setParameter(4, browser);
-                    query.setParameter(5, operatingSystem);
-                    query.setParameter(6, deviceType);
-                    
-                    // 解析登录时间
-                    if (!loginTimeStr.equals("未知时间") && !loginTimeStr.isEmpty() && !loginTimeStr.equals("null")) {
-                        LocalDateTime loginTime = LocalDateTime.parse(loginTimeStr, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-                        query.setParameter(7, loginTime);
-                    } else {
-                        query.setParameter(7, null);
+                    for (int p = 0; p < insertParams.size(); p++) {
+                        query.setParameter(p + 1, insertParams.get(p));
                     }
                     
                     int rowsAffected = query.executeUpdate();
@@ -2505,17 +2796,36 @@ public class DataImportService {
                     translation.setCreatedAt(createdAt);
                 }
 
-                // 使用REPLACE INTO来避免事务问题
+                // 使用 REPLACE INTO 并动态适配列
                 try {
-                    String replaceSql = "REPLACE INTO schools_translation (id, school_id, language_code, name_en, description_en, created_at) " +
-                                      "VALUES (?, ?, ?, ?, ?, ?)";
+                    final String tableName = "schools_translation";
+                    final String context = "学派翻译导入";
+
+                    List<String> replaceColumns = new ArrayList<>();
+                    List<Object> replaceParams = new ArrayList<>();
+
+                    addInsertColumn(replaceColumns, replaceParams, tableName, "id", translation.getId(), context, true);
+                    addInsertColumn(replaceColumns, replaceParams, tableName, "school_id", translation.getSchool().getId(), context, true);
+                    addInsertColumn(replaceColumns, replaceParams, tableName, "language_code", translation.getLanguageCode(), context, true);
+                    addInsertColumn(replaceColumns, replaceParams, tableName, "name_en", translation.getNameEn(), context, false);
+                    addInsertColumn(replaceColumns, replaceParams, tableName, "description_en", translation.getDescriptionEn(), context, false);
+
+                    java.time.LocalDateTime createdValue = createdAt != null ? createdAt : java.time.LocalDateTime.now();
+                    if (ensureColumnExists(tableName, "created_at", false, context)) {
+                        replaceColumns.add("created_at");
+                        replaceParams.add(createdValue);
+                    }
+                    if (ensureColumnExists(tableName, "updated_at", false, context)) {
+                        replaceColumns.add("updated_at");
+                        replaceParams.add(createdValue);
+                    }
+
+                    String replaceSql = "REPLACE INTO " + tableName + " (" + String.join(", ", replaceColumns) + ") VALUES (" +
+                            String.join(", ", Collections.nCopies(replaceColumns.size(), "?")) + ")";
                     jakarta.persistence.Query replaceQuery = entityManager.createNativeQuery(replaceSql);
-                    replaceQuery.setParameter(1, translation.getId());
-                    replaceQuery.setParameter(2, translation.getSchool().getId());
-                    replaceQuery.setParameter(3, translation.getLanguageCode());
-                    replaceQuery.setParameter(4, translation.getNameEn());
-                    replaceQuery.setParameter(5, translation.getDescriptionEn());
-                    replaceQuery.setParameter(6, createdAt != null ? createdAt : java.time.LocalDateTime.now());
+                    for (int p = 0; p < replaceParams.size(); p++) {
+                        replaceQuery.setParameter(p + 1, replaceParams.get(p));
+                    }
                     replaceQuery.executeUpdate();
                     success++;
                 } catch (Exception e) {
@@ -2582,16 +2892,35 @@ public class DataImportService {
                     translation.setCreatedAt(createdAt);
                 }
 
-                // 使用REPLACE INTO来避免事务问题
+                // 使用 REPLACE INTO 并动态适配列
                 try {
-                    String replaceSql = "REPLACE INTO contents_translation (id, content_id, language_code, content_en, created_at) " +
-                                      "VALUES (?, ?, ?, ?, ?)";
+                    final String tableName = "contents_translation";
+                    final String context = "内容翻译导入";
+
+                    List<String> replaceColumns = new ArrayList<>();
+                    List<Object> replaceParams = new ArrayList<>();
+
+                    addInsertColumn(replaceColumns, replaceParams, tableName, "id", translation.getId(), context, true);
+                    addInsertColumn(replaceColumns, replaceParams, tableName, "content_id", translation.getContent().getId(), context, true);
+                    addInsertColumn(replaceColumns, replaceParams, tableName, "language_code", translation.getLanguageCode(), context, true);
+                    addInsertColumn(replaceColumns, replaceParams, tableName, "content_en", translation.getContentEn(), context, false);
+
+                    java.time.LocalDateTime createdValue = createdAt != null ? createdAt : java.time.LocalDateTime.now();
+                    if (ensureColumnExists(tableName, "created_at", false, context)) {
+                        replaceColumns.add("created_at");
+                        replaceParams.add(createdValue);
+                    }
+                    if (ensureColumnExists(tableName, "updated_at", false, context)) {
+                        replaceColumns.add("updated_at");
+                        replaceParams.add(createdValue);
+                    }
+
+                    String replaceSql = "REPLACE INTO " + tableName + " (" + String.join(", ", replaceColumns) + ") VALUES (" +
+                            String.join(", ", Collections.nCopies(replaceColumns.size(), "?")) + ")";
                     jakarta.persistence.Query replaceQuery = entityManager.createNativeQuery(replaceSql);
-                    replaceQuery.setParameter(1, translation.getId());
-                    replaceQuery.setParameter(2, translation.getContent().getId());
-                    replaceQuery.setParameter(3, translation.getLanguageCode());
-                    replaceQuery.setParameter(4, translation.getContentEn());
-                    replaceQuery.setParameter(5, createdAt != null ? createdAt : java.time.LocalDateTime.now());
+                    for (int p = 0; p < replaceParams.size(); p++) {
+                        replaceQuery.setParameter(p + 1, replaceParams.get(p));
+                    }
                     replaceQuery.executeUpdate();
                     success++;
                 } catch (Exception e) {
@@ -2659,17 +2988,36 @@ public class DataImportService {
                     translation.setCreatedAt(createdAt);
                 }
 
-                // 使用REPLACE INTO来避免事务问题
+                // 使用 REPLACE INTO 并动态适配列
                 try {
-                    String replaceSql = "REPLACE INTO philosophers_translation (id, philosopher_id, language_code, name_en, biography_en, created_at) " +
-                                      "VALUES (?, ?, ?, ?, ?, ?)";
+                    final String tableName = "philosophers_translation";
+                    final String context = "哲学家翻译导入";
+
+                    List<String> replaceColumns = new ArrayList<>();
+                    List<Object> replaceParams = new ArrayList<>();
+
+                    addInsertColumn(replaceColumns, replaceParams, tableName, "id", translation.getId(), context, true);
+                    addInsertColumn(replaceColumns, replaceParams, tableName, "philosopher_id", translation.getPhilosopher().getId(), context, true);
+                    addInsertColumn(replaceColumns, replaceParams, tableName, "language_code", translation.getLanguageCode(), context, true);
+                    addInsertColumn(replaceColumns, replaceParams, tableName, "name_en", translation.getNameEn(), context, false);
+                    addInsertColumn(replaceColumns, replaceParams, tableName, "biography_en", translation.getBiographyEn(), context, false);
+
+                    java.time.LocalDateTime createdValue = createdAt != null ? createdAt : java.time.LocalDateTime.now();
+                    if (ensureColumnExists(tableName, "created_at", false, context)) {
+                        replaceColumns.add("created_at");
+                        replaceParams.add(createdValue);
+                    }
+                    if (ensureColumnExists(tableName, "updated_at", false, context)) {
+                        replaceColumns.add("updated_at");
+                        replaceParams.add(createdValue);
+                    }
+
+                    String replaceSql = "REPLACE INTO " + tableName + " (" + String.join(", ", replaceColumns) + ") VALUES (" +
+                            String.join(", ", Collections.nCopies(replaceColumns.size(), "?")) + ")";
                     jakarta.persistence.Query replaceQuery = entityManager.createNativeQuery(replaceSql);
-                    replaceQuery.setParameter(1, translation.getId());
-                    replaceQuery.setParameter(2, translation.getPhilosopher().getId());
-                    replaceQuery.setParameter(3, translation.getLanguageCode());
-                    replaceQuery.setParameter(4, translation.getNameEn());
-                    replaceQuery.setParameter(5, translation.getBiographyEn());
-                    replaceQuery.setParameter(6, createdAt != null ? createdAt : java.time.LocalDateTime.now());
+                    for (int p = 0; p < replaceParams.size(); p++) {
+                        replaceQuery.setParameter(p + 1, replaceParams.get(p));
+                    }
                     replaceQuery.executeUpdate();
                     success++;
                 } catch (Exception e) {
