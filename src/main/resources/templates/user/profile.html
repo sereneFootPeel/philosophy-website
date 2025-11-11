@@ -188,7 +188,7 @@
                                             class="like-btn cursor-pointer transition-all duration-200 p-2 rounded-full hover:bg-gray-100"
                                             title="点赞用户"
                                             th:onclick="'handleUserLike(this, ' + ${user.id} + ')'">
-                                        <i class="fa fa-heart-o text-gray-400 hover:text-red-500 text-xl transition-colors duration-200"></i>
+                                        <i class="fa-regular fa-heart text-gray-400 hover:text-red-500 text-xl transition-colors duration-200"></i>
                                     </button>
                                 </div>
                                 
@@ -662,7 +662,7 @@
             
             // 显示加载状态
             button.disabled = true;
-            icon.className = 'fa fa-spinner fa-spin text-gray-500';
+            icon.className = 'fa-solid fa-spinner fa-spin text-gray-500';
             
             // 发送点赞请求
             fetch('/likes/toggle', {
@@ -677,9 +677,10 @@
                 if (data.success) {
                     // 更新按钮状态
                     if (data.isLiked) {
-                        icon.className = 'fa fa-heart text-red-500';
+                        icon.className = 'fa-solid fa-heart text-red-500';
+                        button.classList.add('bg-red-50');
                     } else {
-                        icon.className = 'fa fa-heart-o text-gray-400 hover:text-red-500';
+                        icon.className = 'fa-regular fa-heart text-gray-400 hover:text-red-500';
                         button.classList.remove('bg-red-50');
                     }
                     showMessage(data.message, 'success');
@@ -780,10 +781,10 @@
                     
                     if (button && icon) {
                         if (data.isLiked) {
-                            icon.className = 'fa fa-heart text-red-500';
+                            icon.className = 'fa-solid fa-heart text-red-500';
                             button.classList.add('bg-red-50');
                         } else {
-                            icon.className = 'fa fa-heart-o text-gray-400 hover:text-red-500';
+                            icon.className = 'fa-regular fa-heart text-gray-400 hover:text-red-500';
                             button.classList.remove('bg-red-50');
                         }
                     }

@@ -155,7 +155,7 @@ public class UserService implements UserDetailsService {
         }
         
         // 2. 处理Comment表中的外键约束
-        // 需要处理以下外键字段：user_id, deleted_by, privacy_set_by, blocked_by
+        // 需要处理以下外键字段：user_id, privacy_set_by, blocked_by
         
         // 2.1 删除用户创建的所有评论
         List<Comment> userComments = commentRepository.findByUserIdWithContent(id);
@@ -163,15 +163,7 @@ public class UserService implements UserDetailsService {
             commentRepository.deleteAll(userComments);
         }
         
-        // 2.2 处理用户删除的评论 - 重置删除者
-        List<Comment> deletedByUserComments = commentRepository.findByDeletedByUserId(id);
-        for (Comment comment : deletedByUserComments) {
-            comment.setDeletedBy(null);
-            comment.setDeletedAt(null);
-            commentRepository.save(comment);
-        }
-        
-        // 2.3 处理用户设置隐私的评论 - 重置隐私设置者
+        // 2.2 处理用户设置隐私的评论 - 重置隐私设置者
         List<Comment> privacySetComments = commentRepository.findByPrivacySetByUserId(id);
         for (Comment comment : privacySetComments) {
             comment.setPrivacySetBy(null);
@@ -179,7 +171,7 @@ public class UserService implements UserDetailsService {
             commentRepository.save(comment);
         }
         
-        // 2.4 处理用户封禁的评论 - 解除封禁
+        // 2.3 处理用户封禁的评论 - 解除封禁
         List<Comment> blockedComments = commentRepository.findByBlockedByUserId(id);
         for (Comment comment : blockedComments) {
             comment.setBlockedBy(null);

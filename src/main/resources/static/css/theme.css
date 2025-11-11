@@ -305,6 +305,16 @@
     background-color: #FAFAFA !important;
 }
 
+.theme-midnight button.bg-secondary,
+.theme-midnight button.bg-secondary:hover,
+.theme-midnight .btn.bg-secondary,
+.theme-midnight .btn-secondary,
+.theme-midnight .hover\:bg-secondary\/90:hover {
+    background-color: var(--color-primary) !important;
+    color: var(--text-on-primary) !important;
+    border-color: var(--color-primary) !important;
+}
+
 .theme-midnight .theme-card.active {
     background: #FAFAFA !important;
 }
@@ -398,6 +408,21 @@ body {
 }
 
 /* Cards */
+.like-button-parent .like-btn {
+    opacity: 1;
+    transition: opacity var(--transition-normal, 300ms ease-in-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .like-button-parent .like-btn {
+        opacity: 0;
+    }
+
+    .like-button-parent:hover .like-btn {
+        opacity: 1;
+    }
+}
+
 .card {
     background-color: var(--bg-primary);
     border: 1px solid var(--border-primary);

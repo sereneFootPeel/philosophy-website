@@ -183,23 +183,8 @@ public class SecurityConfig {
                 return;
             }
 
-            // 检查用户角色
-            boolean isAdmin = authentication.getAuthorities().stream()
-                    .map(org.springframework.security.core.GrantedAuthority::getAuthority)
-                    .anyMatch("ROLE_ADMIN"::equals);
-            
-            boolean isModerator = authentication.getAuthorities().stream()
-                    .map(org.springframework.security.core.GrantedAuthority::getAuthority)
-                    .anyMatch("ROLE_MODERATOR"::equals);
-
-            // 根据角色重定向到不同页面
-            if (isAdmin) {
-                response.sendRedirect("/admin");
-            } else if (isModerator) {
-                response.sendRedirect("/moderator");
-            } else {
-                response.sendRedirect("/");
-            }
+            // 无论角色，默认重定向到首页，保持与普通用户一致
+            response.sendRedirect("/");
         };
     }
 }

@@ -15,7 +15,6 @@ import com.philosophy.service.UserContentEditService;
 import com.philosophy.service.SchoolService;
 import com.philosophy.service.UserBlockService;
 import com.philosophy.model.School;
-import com.philosophy.model.Philosopher;
 import com.philosophy.util.UserInfoCollector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,12 +97,6 @@ public class UserProfileController {
         List<Comment> comments = commentService.findByUserIdWithPrivacyFilter(id, currentUser);
         long commentCount = commentService.countByUserId(id);
         
-        // 如果是管理员，获取所有评论（包括软删除的）
-        List<Comment> allComments = null;
-        if (isAdmin) {
-            allComments = commentService.findByUserIdIncludingDeleted(id);
-        }
-
         // 获取用户的IP地址和设备信息
         String userIpAddress = userInfoCollector.getUserIpAddress(id);
         String userDevice = userInfoCollector.getUserDevice(id);
@@ -135,7 +128,6 @@ public class UserProfileController {
         model.addAttribute("user", user);
         model.addAttribute("comments", comments);
         model.addAttribute("commentCount", commentCount);
-        model.addAttribute("allComments", allComments);
         model.addAttribute("userIpAddress", userIpAddress);
         model.addAttribute("userDevice", userDevice);
         model.addAttribute("allUserIpAddresses", allUserIpAddresses);
@@ -342,8 +334,7 @@ public class UserProfileController {
             // 检查用户是否有权限删除评论（评论所有者或管理员）
             if (comment.getUser().getId().equals(currentUser.getId()) ||
                     authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
-                // 使用软删除而不是硬删除
-                commentService.softDeleteComment(commentId, currentUser);
+                commentService.deleteComment(commentId);
             }
 
             return "redirect:/user/profile/" + userId;

@@ -6,6 +6,7 @@ import com.philosophy.model.User;
 import com.philosophy.service.CommentService;
 import com.philosophy.service.ContentService;
 import com.philosophy.service.UserService;
+import com.philosophy.service.SchoolService;
 import com.philosophy.service.TranslationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Collections;
 
@@ -30,12 +30,14 @@ public class CommentController {
     private final UserService userService;
     private final ContentService contentService;
     private final TranslationService translationService;
+    private final SchoolService schoolService;
 
-    public CommentController(CommentService commentService, UserService userService, ContentService contentService, TranslationService translationService) {
+    public CommentController(CommentService commentService, UserService userService, ContentService contentService, TranslationService translationService, SchoolService schoolService) {
         this.commentService = commentService;
         this.userService = userService;
         this.contentService = contentService;
         this.translationService = translationService;
+        this.schoolService = schoolService;
     }
 
     // 查看指定内容的评论
@@ -98,8 +100,19 @@ public class CommentController {
                 // 检查是否是管理员
                 boolean isAdmin = authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
                 model.addAttribute("isAdmin", isAdmin);
+                boolean isModerator = currentUser != null && "MODERATOR".equals(currentUser.getRole());
+                model.addAttribute("isModerator", isModerator);
+                Long assignedSchoolId = currentUser != null ? currentUser.getAssignedSchoolId() : null;
+                if (isModerator && assignedSchoolId != null) {
+                    model.addAttribute("moderatorSchoolIds", schoolService.getModeratorManageableSchoolIds(assignedSchoolId));
+                } else {
+                    model.addAttribute("moderatorSchoolIds", Collections.emptyList());
+                }
             } else {
                 model.addAttribute("isAuthenticated", false);
+                model.addAttribute("isAdmin", false);
+                model.addAttribute("isModerator", false);
+                model.addAttribute("moderatorSchoolIds", Collections.emptyList());
             }
         } catch (Exception e) {
             // 记录错误日志
@@ -159,18 +172,32 @@ public class CommentController {
         }
         
         Comment comment = commentService.getCommentById(commentId);
+        Long redirectContentId = null;
         if (comment != null) {
+            redirectContentId = comment.getContent() != null ? comment.getContent().getId() : null;
             User currentUser = userService.findByUsername(authentication.getName());
             
             // 检查用户是否有权限删除评论（评论所有者或管理员）
-            if (comment.getUser().getId().equals(currentUser.getId()) || 
-                authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
-                // 使用软删除而不是硬删除
-                commentService.softDeleteComment(commentId, currentUser);
+            boolean isOwner = comment.getUser().getId().equals(currentUser.getId());
+            boolean isAdmin = authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+            boolean isModeratorWithAccess = false;
+            if (!isOwner && !isAdmin && currentUser != null && "MODERATOR".equals(currentUser.getRole())) {
+                Long assignedSchoolId = currentUser.getAssignedSchoolId();
+                Long commentSchoolId = comment.getContent() != null && comment.getContent().getSchool() != null
+                        ? comment.getContent().getSchool().getId()
+                        : null;
+                if (assignedSchoolId != null && commentSchoolId != null) {
+                    isModeratorWithAccess = schoolService.canModeratorManageSchool(assignedSchoolId, commentSchoolId);
+                }
+            }
+            if (isOwner || isAdmin || isModeratorWithAccess) {
+                commentService.deleteComment(commentId);
             }
         }
         
-        return "redirect:/comments/content/" + comment.getContent().getId();
+        return redirectContentId != null
+            ? "redirect:/comments/content/" + redirectContentId
+            : "redirect:/";
     }
 
     // 屏蔽评论

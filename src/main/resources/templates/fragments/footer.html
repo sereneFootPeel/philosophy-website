@@ -921,6 +921,53 @@
      * 点赞按钮功能 - 使用LikeButtonComponent
      */
 
+    const LIKE_COMPONENT_SRC = /*[[@{/js/like-button-component.js}]]*/ '/js/like-button-component.js';
+    let likeComponentPromise = null;
+
+    function ensureLikeButtonComponent() {
+        if (window.LikeButtonComponent) {
+            return Promise.resolve();
+        }
+
+        if (likeComponentPromise) {
+            return likeComponentPromise;
+        }
+
+        likeComponentPromise = new Promise((resolve, reject) => {
+            console.log('LikeButtonComponent未加载，开始动态加载脚本:', LIKE_COMPONENT_SRC);
+
+            // 防止重复插入相同脚本
+            const existingScript = Array.from(document.getElementsByTagName('script'))
+                .find(script => script.src && script.src.includes('/js/like-button-component.js'));
+            if (existingScript) {
+                if (window.LikeButtonComponent) {
+                    resolve();
+                    return;
+                }
+                existingScript.addEventListener('load', () => resolve());
+                existingScript.addEventListener('error', (err) => reject(err));
+                return;
+            }
+
+            const script = document.createElement('script');
+            script.src = LIKE_COMPONENT_SRC;
+            script.async = false;
+            script.onload = () => {
+                console.log('LikeButtonComponent脚本加载完成');
+                resolve();
+            };
+            script.onerror = (err) => {
+                console.error('LikeButtonComponent脚本加载失败:', err);
+                likeComponentPromise = null;
+                reject(err);
+            };
+
+            document.head.appendChild(script);
+        });
+
+        return likeComponentPromise;
+    }
+
     /**
      * 初始化页面中的所有点赞按钮
      */
@@ -929,11 +976,19 @@
 
         // 检查LikeButtonComponent是否可用
         if (!window.LikeButtonComponent) {
-            console.error('LikeButtonComponent不可用！请检查like-button-component.js是否正确加载');
+            console.warn('LikeButtonComponent尚未加载，延迟初始化');
+            ensureLikeButtonComponent()
+                .then(() => {
+                    console.log('LikeButtonComponent加载成功，重新初始化点赞按钮');
+                    initLikeButtons();
+                })
+                .catch(err => {
+                    console.error('LikeButtonComponent加载失败，无法初始化点赞按钮:', err);
+                });
             return;
-        } else {
-            console.log('LikeButtonComponent已加载');
         }
+
+        console.log('LikeButtonComponent已加载');
 
         // 查找所有点赞按钮容器 - 改进选择器逻辑
         let likeElements = [];
@@ -1081,10 +1136,34 @@
     }
 
     // 页面加载完成后初始化点赞按钮和内容卡片点击事件
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('DOM加载完成，开始初始化点赞按钮');
-        initLikeButtons();
-        initContentCardClickHandlers();
+    function initializeLikeFeatures() {
+        console.log('触发点赞/卡片初始化流程，readyState:', document.readyState);
+        ensureLikeButtonComponent()
+            .then(() => {
+                initLikeButtons();
+                initContentCardClickHandlers();
+            })
+            .catch(err => {
+                console.error('加载LikeButtonComponent失败，点赞功能无法启用:', err);
+            });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM加载完成事件触发');
+            initializeLikeFeatures();
+        });
+    } else {
+        // 若脚本在DOMContentLoaded之后加载，立即执行一次
+        initializeLikeFeatures();
+    }
+
+    // 支持浏览器前进/后退缓存（pageshow）场景
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted) {
+            console.log('pageshow事件触发（从缓存恢复），重新初始化点赞功能');
+            initializeLikeFeatures();
+        }
     });
 
     /**

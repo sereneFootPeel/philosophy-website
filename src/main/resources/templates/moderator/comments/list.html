@@ -124,33 +124,31 @@
                                         </a>
                                         
                                         <!-- 屏蔽按钮 -->
-                                        <th:block th:if="${comment.deletedAt == null}">
-                                            <th:block th:if="${!comment.isBlocked}">
-                                                <form th:action="@{/comments/block/{commentId}(commentId=${comment.id})}" method="post" class="inline" onclick="event.stopPropagation()">
-                                                    <button type="submit" 
-                                                            class="transition-smooth" 
-                                                            style="color: var(--text-tertiary);"
-                                                            onmouseover="this.style.color='var(--color-error)'"
-                                                            onmouseout="this.style.color='var(--text-tertiary)'"
-                                                            onclick="return confirm('确定要屏蔽这条评论吗？屏蔽后只有作者和管理员可见。');"
-                                                            title="屏蔽评论">
-                                                        <i class="fa fa-ban"></i>
-                                                    </button>
-                                                </form>
-                                            </th:block>
-                                            <th:block th:if="${comment.isBlocked}">
-                                                <form th:action="@{/comments/unblock/{commentId}(commentId=${comment.id})}" method="post" class="inline" onclick="event.stopPropagation()">
-                                                    <button type="submit" 
-                                                            class="transition-smooth" 
-                                                            style="color: var(--color-error);"
-                                                            onmouseover="this.style.color='var(--color-error-dark)'"
-                                                            onmouseout="this.style.color='var(--color-error)'"
-                                                            onclick="return confirm('确定要取消屏蔽这条评论吗？');"
-                                                            title="取消屏蔽评论">
-                                                        <i class="fa fa-ban"></i>
-                                                    </button>
-                                                </form>
-                                            </th:block>
+                                        <th:block th:if="${!comment.isBlocked}">
+                                            <form th:action="@{/comments/block/{commentId}(commentId=${comment.id})}" method="post" class="inline" onclick="event.stopPropagation()">
+                                                <button type="submit" 
+                                                        class="transition-smooth" 
+                                                        style="color: var(--text-tertiary);"
+                                                        onmouseover="this.style.color='var(--color-error)'"
+                                                        onmouseout="this.style.color='var(--text-tertiary)'"
+                                                        onclick="return confirm('确定要屏蔽这条评论吗？屏蔽后只有作者和管理员可见。');"
+                                                        title="屏蔽评论">
+                                                    <i class="fa fa-ban"></i>
+                                                </button>
+                                            </form>
+                                        </th:block>
+                                        <th:block th:if="${comment.isBlocked}">
+                                            <form th:action="@{/comments/unblock/{commentId}(commentId=${comment.id})}" method="post" class="inline" onclick="event.stopPropagation()">
+                                                <button type="submit" 
+                                                        class="transition-smooth" 
+                                                        style="color: var(--color-error);"
+                                                        onmouseover="this.style.color='var(--color-error-dark)'"
+                                                        onmouseout="this.style.color='var(--color-error)'"
+                                                        onclick="return confirm('确定要取消屏蔽这条评论吗？');"
+                                                        title="取消屏蔽评论">
+                                                    <i class="fa fa-ban"></i>
+                                                </button>
+                                            </form>
                                         </th:block>
                                     </div>
                                     <p class="ml-13 mb-3 moderator-text-primary" th:text="${comment.body}">评论内容</p>
@@ -208,33 +206,31 @@
                                                         </a>
                                                         
                                                         <!-- 屏蔽按钮 -->
-                                                        <th:block th:if="${reply.deletedAt == null}">
-                                                            <th:block th:if="${!reply.isBlocked}">
-                                                                <form th:action="@{/comments/block/{commentId}(commentId=${reply.id})}" method="post" class="inline" onclick="event.stopPropagation()">
-                                                                    <button type="submit" 
-                                                                            class="transition-smooth" 
-                                                                            style="color: var(--text-tertiary);"
-                                                                            onmouseover="this.style.color='var(--color-error)'"
-                                                                            onmouseout="this.style.color='var(--text-tertiary)'"
-                                                                            onclick="return confirm('确定要屏蔽这条回复吗？屏蔽后只有作者和管理员可见。');"
-                                                                            title="屏蔽回复">
-                                                                        <i class="fa fa-ban text-xs"></i>
-                                                                    </button>
-                                                                </form>
-                                                            </th:block>
-                                                            <th:block th:if="${reply.isBlocked}">
-                                                                <form th:action="@{/comments/unblock/{commentId}(commentId=${reply.id})}" method="post" class="inline" onclick="event.stopPropagation()">
-                                                                    <button type="submit" 
-                                                                            class="transition-smooth" 
-                                                                            style="color: var(--color-error);"
-                                                                            onmouseover="this.style.color='var(--color-error-dark)'"
-                                                                            onmouseout="this.style.color='var(--color-error)'"
-                                                                            onclick="return confirm('确定要取消屏蔽这条回复吗？');"
-                                                                            title="取消屏蔽回复">
-                                                                        <i class="fa fa-ban text-xs"></i>
-                                                                    </button>
-                                                                </form>
-                                                            </th:block>
+                                                        <th:block th:if="${!reply.isBlocked}">
+                                                            <form th:action="@{/comments/block/{commentId}(commentId=${reply.id})}" method="post" class="inline" onclick="event.stopPropagation()">
+                                                                <button type="submit" 
+                                                                        class="transition-smooth" 
+                                                                        style="color: var(--text-tertiary);"
+                                                                        onmouseover="this.style.color='var(--color-error)'"
+                                                                        onmouseout="this.style.color='var(--text-tertiary)'"
+                                                                        onclick="return confirm('确定要屏蔽这条回复吗？屏蔽后只有作者和管理员可见。');"
+                                                                        title="屏蔽回复">
+                                                                    <i class="fa fa-ban text-xs"></i>
+                                                                </button>
+                                                            </form>
+                                                        </th:block>
+                                                        <th:block th:if="${reply.isBlocked}">
+                                                            <form th:action="@{/comments/unblock/{commentId}(commentId=${reply.id})}" method="post" class="inline" onclick="event.stopPropagation()">
+                                                                <button type="submit" 
+                                                                        class="transition-smooth" 
+                                                                        style="color: var(--color-error);"
+                                                                        onmouseover="this.style.color='var(--color-error-dark)'"
+                                                                        onmouseout="this.style.color='var(--color-error)'"
+                                                                        onclick="return confirm('确定要取消屏蔽这条回复吗？');"
+                                                                        title="取消屏蔽回复">
+                                                                    <i class="fa fa-ban text-xs"></i>
+                                                                </button>
+                                                            </form>
                                                         </th:block>
                                                     </div>
                                                     <p class="text-sm ml-8 moderator-text-secondary" th:text="${reply.body}">回复内容</p>

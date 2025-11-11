@@ -39,13 +39,6 @@
     <!-- 导航栏 -->
     <div th:replace="~{fragments/header :: header}"></div>
 
-    <!-- [TEMP DEBUG] 显示当前用户名 -->
-    <div class="bg-red-500 text-white text-center p-2">
-        Current User: <span sec:authentication="name"></span>
-        | Is Authenticated: <span sec:authorize="isAuthenticated()">TRUE</span>
-        <span sec:authorize="!isAuthenticated()">FALSE</span>
-    </div>
-
     <!-- 主要内容 -->
     <main class="flex-grow container mx-auto px-4 py-4 sm:py-8 pt-20 sm:pt-24">
         

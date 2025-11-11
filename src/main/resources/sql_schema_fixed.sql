@@ -143,8 +143,6 @@ CREATE TABLE IF NOT EXISTS comments (
     parent_id BIGINT DEFAULT NULL,
     created_at DATETIME(6) DEFAULT NULL,
     updated_at DATETIME(6) DEFAULT NULL,
-    deleted_at DATETIME(6) DEFAULT NULL,
-    deleted_by BIGINT DEFAULT NULL,
     is_private BIT(1) NOT NULL DEFAULT 0,
     privacy_set_at DATETIME(6) DEFAULT NULL,
     privacy_set_by BIGINT DEFAULT NULL,
@@ -153,14 +151,11 @@ CREATE TABLE IF NOT EXISTS comments (
     INDEX idx_user_id (user_id),
     INDEX idx_parent_id (parent_id),
     INDEX idx_created_at (created_at),
-    INDEX idx_deleted_at (deleted_at),
-    INDEX idx_deleted_by (deleted_by),
     INDEX idx_comments_is_private (is_private),
     INDEX idx_comments_privacy_set_by (privacy_set_by),
     INDEX idx_comments_like_count (like_count),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (parent_id) REFERENCES comments(id) ON DELETE CASCADE,
-    FOREIGN KEY (deleted_by) REFERENCES users(id) ON DELETE SET NULL,
     FOREIGN KEY (privacy_set_by) REFERENCES users(id) ON DELETE SET NULL
 );
 

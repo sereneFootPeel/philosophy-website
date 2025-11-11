@@ -45,13 +45,6 @@ public class Comment {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "deleted_by")
-    private User deletedBy;
-
     @Column(name = "is_private", nullable = false)
     private boolean isPrivate = false;
 
@@ -151,22 +144,6 @@ public class Comment {
 
     public void setReplies(List<Comment> replies) {
         this.replies = replies;
-    }
-
-    public LocalDateTime getDeletedAt() {
-        return deletedAt;
-    }
-
-    public void setDeletedAt(LocalDateTime deletedAt) {
-        this.deletedAt = deletedAt;
-    }
-
-    public User getDeletedBy() {
-        return deletedBy;
-    }
-
-    public void setDeletedBy(User deletedBy) {
-        this.deletedBy = deletedBy;
     }
 
     public boolean isPrivate() {

@@ -54,9 +54,9 @@
     <main class="flex-grow pt-16">
         <section id="contents-page" class="page active bg-tertiary min-h-[50vh]">
             <div class="container mx-auto px-4 py-4 sm:py-8">
-                <h1 class="text-2xl sm:text-3xl font-bold text-primary mb-6 sm:mb-8 text-center" th:text="${translationService.getStaticText('all_content', language)}">所有内容</h1>
+                <h1 class="text-2xl sm:text-3xl font-bold text-primary mb-6 sm:mb-8 text-center" th:text="${translationService.getStaticText('all_contents', language)}">所有内容</h1>
                 <!-- 内容卡片 -->
-                <div id="content-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+                <div id="content-container" class="flex flex-col gap-4">
                     <!-- 初始内容 -->
                     <th:block th:each="content : ${contents}">
                         <div th:if="${content != null}"
@@ -65,7 +65,7 @@
                                  showPhilosopherInfo=true,
                                  showActions='hover-only',
                                  clickable=true,
-                                 customClasses='block bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px] hover:bg-tertiary cursor-pointer relative group',
+                                 customClasses='content-card bg-white rounded-lg shadow-sm p-4 hover:shadow-md transition-all duration-300 relative group',
                                  isAuthenticated=${isAuthenticated},
                                  showLikeButton=true,
                                  showViewMoreButton=true,
@@ -185,7 +185,7 @@
                     const language = document.documentElement.lang || 'zh';
                     
                     // 渲染新的内容卡片（静默追加到末尾）
-                    const contentsEl = document.getElementById('school-contents');
+                    const contentsEl = document.getElementById('content-container');
                     
                     data.contents.forEach(content => {
                         const contentCard = createContentCard(content, language);
@@ -216,7 +216,7 @@
         // 创建内容卡片HTML
         function createContentCard(content, language) {
             const div = document.createElement('div');
-            div.className = 'block bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px] hover:bg-tertiary cursor-pointer relative group';
+            div.className = 'content-card bg-white rounded-lg shadow-sm p-4 hover:shadow-md transition-all duration-300 cursor-pointer relative group';
             div.setAttribute('data-content-id', content.id);
             div.onclick = function() {
                 if (content.philosopher && content.school) {

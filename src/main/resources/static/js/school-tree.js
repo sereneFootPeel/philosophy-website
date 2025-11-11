@@ -263,12 +263,18 @@ document.addEventListener('DOMContentLoaded', function () {
             if (data.success && data.contents && data.contents.length > 0) {
                 // 获取当前语言
                 const language = document.documentElement.lang || 'zh';
-                
+
+                // 尝试从已存在的内容卡片中推断鉴权状态
+                const existingLikeBtn = document.querySelector('.like-btn[data-entity-type="CONTENT"][data-is-authenticated]');
+                const isAuthenticated = existingLikeBtn
+                    ? existingLikeBtn.getAttribute('data-is-authenticated') === 'true'
+                    : false;
+
                 // 渲染新的内容卡片（静默追加到末尾）
                 const contentsEl = document.getElementById('school-contents');
-                
+
                 data.contents.forEach(content => {
-                    const contentCard = createContentCard(content, language);
+                    const contentCard = createContentCard(content, language, isAuthenticated);
                     contentsEl.appendChild(contentCard);
                 });
 
@@ -294,56 +300,128 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // 创建内容卡片HTML
-    function createContentCard(content, language) {
+    function createContentCard(content, language, isAuthenticated) {
         const div = document.createElement('div');
-        div.className = 'content-card bg-white rounded-lg shadow-sm p-4 mb-4 cursor-pointer hover:shadow-md transition-shadow';
+        div.className = 'content-card bg-white rounded-lg shadow-sm p-4 hover:shadow-md transition-all duration-300 relative group cursor-pointer hover:bg-tertiary content-card-clickable like-button-parent mb-4';
         div.setAttribute('data-content-id', content.id);
-        
-        // 获取哲学家名称
-        const philosopherName = content.philosopher ? 
-            (language === 'en' && content.philosopher.nameEn ? content.philosopher.nameEn : content.philosopher.name) : '';
-        
-        // 获取流派名称
-        const schoolName = content.school ? 
-            (language === 'en' && content.school.nameEn ? content.school.nameEn : content.school.name) : '';
-        
-        // 获取作者信息
-        const authorName = content.user ? content.user.username : '匿名';
-        const authorRole = content.user ? content.user.role : '';
-        let roleTag = '';
-        if (authorRole === 'ADMIN') {
-            roleTag = '<span class="ml-2 px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded">管理员</span>';
-        } else if (authorRole === 'MODERATOR') {
-            roleTag = '<span class="ml-2 px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded">版主</span>';
+        div.setAttribute('data-clickable', 'true');
+
+        const school = content.school || null;
+        const parentSchool = school && school.parent ? school.parent : null;
+        const philosopher = content.philosopher || null;
+
+        // 语言敏感内容
+        const schoolName = getLocalizedName(school, language);
+        const parentSchoolName = getLocalizedName(parentSchool, language);
+        const philosopherName = getLocalizedName(philosopher, language);
+        const philosopherEra = philosopher && philosopher.era ? philosopher.era : '';
+        const title = content.title ? content.title : '';
+        const displayText = getContentDisplayText(content, language);
+
+        const likeTitle = language === 'en' ? 'Like / Unlike' : '点赞/取消点赞';
+        const viewMoreTitle = language === 'en' ? 'View more' : '查看更多';
+
+        const likeButtonHtml = isAuthenticated ? `
+            <div id="like-container-${content.id}"
+                 data-like="like-container-${content.id}"
+                 data-entity-type="CONTENT"
+                 data-entity-id="${content.id}"
+                 data-is-authenticated="true"
+                 class="like-btn group-hover:opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-auto z-20"
+                 title="${likeTitle}">
+                <i class="fa-regular fa-heart text-red-500 text-base transition-colors duration-200"></i>
+            </div>
+        ` : '';
+
+        const schoolLink = school ? `
+            <a href="/schools/filter/${school.id}"
+               class="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs hover:bg-primary/20 transition-smooth">
+                ${escapeHtml(schoolName)}
+            </a>
+        ` : '';
+
+        const parentSchoolLink = parentSchool ? `
+            <a href="/schools/filter/${parentSchool.id}"
+               class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs hover:bg-gray-200 transition-smooth">
+                ${escapeHtml(parentSchoolName)}
+            </a>
+        ` : '';
+
+        const philosopherInfo = philosopherName ? `
+            <div class="flex items-center">
+                <a href="/philosophers?philosopherId=${philosopher.id}"
+                   class="flex items-center text-secondary hover:text-primary transition-colors duration-200">
+                    <span class="text-xs font-medium">${escapeHtml(philosopherName)}</span>
+                    ${philosopherEra ? `<span class="text-gray-400 mx-1 text-xs">|</span>` : ''}
+                    ${philosopherEra ? `<span class="text-xs text-gray-500">${escapeHtml(philosopherEra)}</span>` : ''}
+                </a>
+            </div>
+        ` : '';
+
+        const viewMoreUrlParams = [];
+        if (school && school.id) {
+            viewMoreUrlParams.push(`schoolId=${school.id}`);
         }
-        
-        // 内容预览（限制长度）
-        const contentText = content.content || '';
-        const contentPreview = contentText.length > 200 ? contentText.substring(0, 200) + '...' : contentText;
-        
+        if (philosopher && philosopher.id) {
+            viewMoreUrlParams.push(`philosopherId=${philosopher.id}`);
+        }
+        const viewMoreUrl = `/contents${viewMoreUrlParams.length ? `?${viewMoreUrlParams.join('&')}` : ''}`;
+
         div.innerHTML = `
-            <div class="flex justify-between items-start mb-2">
-                <div class="flex-1">
-                    <h3 class="text-lg font-semibold text-primary mb-1">${escapeHtml(content.title || philosopherName)}</h3>
-                    <div class="text-sm text-gray-500">
-                        <span>${escapeHtml(philosopherName)}</span>
-                        ${schoolName ? `<span class="mx-2">•</span><span>${escapeHtml(schoolName)}</span>` : ''}
-                    </div>
-                </div>
-                <div class="flex items-center space-x-2">
-                    <like-button entity-type="content" entity-id="${content.id}" like-count="${content.likeCount || 0}"></like-button>
+            <div class="absolute top-3 right-3 z-10 transition-opacity duration-300">
+                ${likeButtonHtml}
+                <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <a href="${viewMoreUrl}"
+                       onclick="event.stopPropagation()"
+                       title="${viewMoreTitle}"
+                       class="flex items-center justify-center w-8 h-8 hover:bg-gray-100 rounded-md transition-colors duration-200">
+                        <i class="fa fa-external-link text-gray-600 text-sm"></i>
+                    </a>
                 </div>
             </div>
-            <p class="text-gray-700 mb-3">${escapeHtml(contentPreview)}</p>
-            <div class="flex justify-between items-center text-sm text-gray-500">
-                <span>
-                    作者: ${escapeHtml(authorName)}${roleTag}
-                </span>
-                ${content.commentCount ? `<span><i class="fa fa-comment mr-1"></i>${content.commentCount} 条评论</span>` : ''}
+            <div class="flex flex-wrap gap-2 mb-3">
+                ${parentSchoolLink}
+                ${schoolLink}
             </div>
+            ${title ? `
+                <div class="mb-2">
+                    <h3 class="text-lg font-semibold text-gray-900">${escapeHtml(title)}</h3>
+                </div>
+            ` : ''}
+            <div class="prose prose-gray max-w-none mb-4">
+                <p class="text-gray-800">${escapeHtml(displayText)}</p>
+            </div>
+            ${philosopherInfo ? `
+                <div class="flex items-center justify-between pt-3 border-t border-gray-100">
+                    ${philosopherInfo}
+                </div>
+            ` : ''}
         `;
-        
+
         return div;
+    }
+
+    function getLocalizedName(entity, language) {
+        if (!entity) {
+            return '';
+        }
+        if (language === 'en' && entity.nameEn) {
+            return entity.nameEn;
+        }
+        if (entity.displayName) {
+            return entity.displayName;
+        }
+        return entity.name || entity.title || '';
+    }
+
+    function getContentDisplayText(content, language) {
+        if (!content) {
+            return '';
+        }
+        if (language === 'en' && content.contentEn) {
+            return content.contentEn;
+        }
+        return content.content || content.contentEn || '';
     }
 });
 

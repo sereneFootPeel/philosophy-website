@@ -78,16 +78,6 @@ public class CommentService {
     }
 
     @Transactional
-    public void softDeleteComment(Long id, User deletedBy) {
-        Comment comment = commentRepository.findById(id).orElse(null);
-        if (comment != null) {
-            comment.setDeletedAt(java.time.LocalDateTime.now());
-            comment.setDeletedBy(deletedBy);
-            commentRepository.save(comment);
-        }
-    }
-
-    @Transactional
     public void blockComment(Long id, User blockedBy) {
         Comment comment = commentRepository.findById(id).orElse(null);
         if (comment != null) {
@@ -138,22 +128,7 @@ public class CommentService {
     @Transactional(readOnly = true)
     public List<Comment> findByContentIdWithPrivacyFilter(Long contentId, User currentUser) {
         List<Comment> allComments = commentRepository.findByContentIdAndParentIsNullOrderByCreatedAtDesc(contentId);
-        
-        // 检查是否是管理员
-        boolean isAdmin = currentUser != null && "ADMIN".equals(currentUser.getRole());
-        
-        List<Comment> commentsToFilter;
-        if (isAdmin) {
-            // 管理员可以看到所有评论（包括已删除的）
-            commentsToFilter = allComments;
-        } else {
-            // 普通用户只能看到未删除的评论
-            commentsToFilter = allComments.stream()
-                    .filter(comment -> comment.getDeletedAt() == null)
-                    .collect(java.util.stream.Collectors.toList());
-        }
-        
-        return filterCommentsByPrivacy(commentsToFilter, currentUser);
+        return filterCommentsByPrivacy(allComments, currentUser);
     }
 
     /**
@@ -165,11 +140,7 @@ public class CommentService {
     @Transactional(readOnly = true)
     public List<Comment> findByUserIdWithPrivacyFilter(Long userId, User currentUser) {
         List<Comment> allComments = commentRepository.findByUserIdWithContent(userId);
-        // 过滤掉软删除的评论
-        List<Comment> activeComments = allComments.stream()
-                .filter(comment -> comment.getDeletedAt() == null)
-                .collect(java.util.stream.Collectors.toList());
-        return filterCommentsByPrivacy(activeComments, currentUser);
+        return filterCommentsByPrivacy(allComments, currentUser);
     }
 
     /**
@@ -181,11 +152,7 @@ public class CommentService {
     @Transactional(readOnly = true)
     public List<Comment> findRepliesByParentIdWithPrivacyFilter(Long parentId, User currentUser) {
         List<Comment> allReplies = commentRepository.findRepliesByParentId(parentId);
-        // 过滤掉软删除的回复
-        List<Comment> activeReplies = allReplies.stream()
-                .filter(comment -> comment.getDeletedAt() == null)
-                .collect(java.util.stream.Collectors.toList());
-        return filterCommentsByPrivacy(activeReplies, currentUser);
+        return filterCommentsByPrivacy(allReplies, currentUser);
     }
 
     /**
@@ -203,21 +170,7 @@ public class CommentService {
         // 获取这些流派下的所有评论
         List<Comment> allComments = commentRepository.findBySchoolIdsOrderByCreatedAtDesc(schoolIds);
         
-        // 检查是否是管理员
-        boolean isAdmin = currentUser != null && "ADMIN".equals(currentUser.getRole());
-        
-        List<Comment> commentsToFilter;
-        if (isAdmin) {
-            // 管理员可以看到所有评论（包括已删除的）
-            commentsToFilter = allComments;
-        } else {
-            // 普通用户只能看到未删除的评论
-            commentsToFilter = allComments.stream()
-                    .filter(comment -> comment.getDeletedAt() == null)
-                    .collect(java.util.stream.Collectors.toList());
-        }
-        
-        return filterCommentsByPrivacy(commentsToFilter, currentUser);
+        return filterCommentsByPrivacy(allComments, currentUser);
     }
 
 
@@ -338,7 +291,7 @@ public class CommentService {
      */
     @Transactional(readOnly = true)
     public List<Comment> findByUserIdIncludingDeleted(Long userId) {
-        return commentRepository.findByUserIdWithContentAndDeletedByIncludingDeleted(userId);
+        return commentRepository.findByUserIdWithContent(userId);
     }
 
     /**
@@ -389,19 +342,15 @@ public class CommentService {
             throw new SecurityException("You don't have permission to modify this user's comment privacy settings");
         }
 
-        // 获取用户的所有评论（包括软删除的）
-        List<Comment> userComments = commentRepository.findByUserIdWithContentAndDeletedByIncludingDeleted(userId);
+        List<Comment> userComments = commentRepository.findByUserIdWithContent(userId);
         
         int updatedCount = 0;
         for (Comment comment : userComments) {
-            // 只更新未删除的评论
-            if (comment.getDeletedAt() == null) {
-                comment.setPrivate(isPrivate);
-                comment.setPrivacySetBy(currentUser);
-                comment.setPrivacySetAt(java.time.LocalDateTime.now());
-                commentRepository.save(comment);
-                updatedCount++;
-            }
+            comment.setPrivate(isPrivate);
+            comment.setPrivacySetBy(currentUser);
+            comment.setPrivacySetAt(java.time.LocalDateTime.now());
+            commentRepository.save(comment);
+            updatedCount++;
         }
         
         return updatedCount;
@@ -441,6 +390,6 @@ public class CommentService {
         if (schoolIds == null || schoolIds.isEmpty()) {
             return new ArrayList<>();
         }
-        return commentRepository.findBySchoolIdsIncludingDeletedOrderByCreatedAtDesc(schoolIds);
+        return commentRepository.findBySchoolIdsOrderByCreatedAtDesc(schoolIds);
     }
 }

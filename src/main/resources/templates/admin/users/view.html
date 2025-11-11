@@ -104,8 +104,8 @@
                     </div>
                 </div>
 
-                <!-- 评论历史 - 分成两个卡片 -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+                <!-- 评论历史 -->
+                <div class="grid grid-cols-1 lg:grid-cols-1 gap-6 mt-6">
                     <!-- 未删除评论卡片 -->
                     <div class="admin-card rounded-xl overflow-hidden">
                         <div class="px-5 py-3 border-b admin-table-head font-semibold">
@@ -135,39 +135,6 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 已删除评论卡片 -->
-                    <div class="admin-card rounded-xl overflow-hidden">
-                        <div class="px-5 py-3 border-b admin-table-head font-semibold">
-                            <span>已删除评论 (共 <span th:text="${allComments != null ? allComments.size() - (comments != null ? comments.size() : 0) : 0}"></span> 条)</span>
-                        </div>
-                        <div class="p-5">
-                            <div th:if="${allComments == null or allComments.isEmpty() or (allComments.size() == (comments != null ? comments.size() : 0))}">
-                                <p class="admin-text-secondary text-center">暂无已删除评论</p>
-                            </div>
-                            <div th:if="${allComments != null and !allComments.isEmpty() and allComments.size() > (comments != null ? comments.size() : 0)}">
-                                <div th:each="comment : ${allComments}" th:if="${comment.deletedAt != null and comment.content != null}" class="border-b last:border-b-0 py-4 admin-border admin-table-row cursor-pointer" th:onclick="'window.location.href=\'/comments/content/' + ${comment.content.id} + '#comment-' + ${comment.id} + '\''">
-                                    <div class="text-sm admin-text-secondary mb-1 flex items-center justify-between">
-                                        <div>
-                                            <span th:text="${comment.createdAt != null ? #temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm:ss') : '未知时间'}"></span>
-                                            <span> | 所属文章： </span>
-                                            <span class="italic" th:text="${comment.content != null and comment.content.content != null ? #strings.abbreviate(comment.content.content, 60) : '内容不可用'}"></span>
-                                        </div>
-                                        <div class="flex items-center space-x-2">
-                                            <span class="admin-badge-error inline-flex items-center">
-                                                <i class="fa fa-trash mr-1"></i>已删除
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div class="text-xs admin-text-error mb-2">
-                                        <span th:text="'删除时间: ' + ${comment.deletedAt != null ? #temporals.format(comment.deletedAt, 'yyyy-MM-dd HH:mm:ss') : '未知时间'}"></span>
-                                        <span th:if="${comment.deletedBy != null}" th:text="' | 删除者: ' + ${comment.deletedBy.username}"></span>
-                                    </div>
-                                    <div th:text="${comment.body}" class="admin-text-primary"></div>
                                 </div>
                             </div>
                         </div>

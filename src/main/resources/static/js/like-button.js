@@ -26,20 +26,22 @@ class LikeButton {
         if (isFloatingButton) {
             // 右上角悬浮按钮样式
             container.innerHTML = `
-                <div id="like-btn-${this.entityId}" 
-                     class="like-btn cursor-pointer transition-all duration-200">
-                    <i class="fa fa-heart-o text-gray-400 hover:text-red-500 text-sm transition-colors duration-200"></i>
-                </div>
+                <button id="like-btn-${this.entityId}" 
+                        type="button"
+                        class="like-btn flex items-center justify-center w-9 h-9 rounded-full transition-colors duration-200 
+                               hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-200 focus:ring-offset-0">
+                    <i class="fa-regular fa-heart text-red-500 text-lg transition-colors duration-200"></i>
+                </button>
             `;
         } else {
             // 传统按钮样式
             container.innerHTML = `
                 <button id="like-btn-${this.entityId}" 
-                        class="like-btn flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-200 
-                               border border-gray-300 hover:border-red-300 hover:bg-red-50 
-                               focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50">
-                    <i class="fa fa-heart-o text-gray-500"></i>
-                    <span class="like-count text-sm text-gray-600">0</span>
+                        type="button"
+                        class="like-btn flex items-center space-x-2 px-3 py-2 rounded-full transition-all duration-200 
+                               hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-200 focus:ring-offset-0">
+                    <i class="fa-regular fa-heart text-red-500"></i>
+                    <span class="like-count text-sm text-gray-700">0</span>
                 </button>
             `;
         }
@@ -83,7 +85,7 @@ class LikeButton {
 
         // 显示加载状态
         button.disabled = true;
-        icon.className = 'fa fa-spinner fa-spin text-gray-500';
+        icon.className = 'fa-solid fa-spinner fa-spin text-gray-500';
 
         try {
             const response = await fetch('/likes/toggle', {
@@ -125,30 +127,24 @@ class LikeButton {
 
     updateButton() {
         const button = document.getElementById(`like-btn-${this.entityId}`);
+        if (!button) {
+            return;
+        }
         const icon = button.querySelector('i');
+        if (!icon) {
+            return;
+        }
         const countSpan = button.querySelector('.like-count');
 
         // 检查是否是悬浮按钮（通过父容器类名判断）
         const isFloatingButton = button.closest('.absolute') !== null;
 
         if (this.isLiked) {
-            icon.className = 'fa fa-heart text-red-500';
-            if (isFloatingButton) {
-                // 悬浮按钮不需要背景色
-                button.classList.remove('hover:bg-red-50', 'bg-red-50');
-            } else {
-                button.classList.remove('border-gray-300', 'hover:border-red-300', 'hover:bg-red-50');
-                button.classList.add('border-red-300');
-            }
+            icon.className = 'fa-solid fa-heart text-red-500';
+            button.classList.add('bg-red-50');
         } else {
-            icon.className = isFloatingButton ? 'fa fa-heart-o text-gray-400 hover:text-red-500' : 'fa fa-heart-o text-gray-500';
-            if (isFloatingButton) {
-                // 悬浮按钮不需要背景色
-                button.classList.remove('bg-red-50', 'hover:bg-red-50');
-            } else {
-                button.classList.remove('border-red-300', 'bg-red-50');
-                button.classList.add('border-gray-300', 'hover:border-red-300', 'hover:bg-red-50');
-            }
+            icon.className = 'fa-regular fa-heart text-red-500';
+            button.classList.remove('bg-red-50');
         }
 
         // 只有传统按钮才显示计数

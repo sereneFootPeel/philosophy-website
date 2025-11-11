@@ -18,10 +18,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class DataImportService {
@@ -82,6 +86,18 @@ public class DataImportService {
 
     private final ConcurrentMap<String, Boolean> columnExistenceCache = new ConcurrentHashMap<>();
     private final Set<String> missingColumnWarnings = ConcurrentHashMap.newKeySet();
+    private static final Pattern ID_IN_OBJECT_PATTERN = Pattern.compile("\\b(?:id|ID)=(\\d+)");
+    private static final Pattern PURE_NUMBER_PATTERN = Pattern.compile("^-?\\d+$");
+    private static final List<DateTimeFormatter> SUPPORTED_COMMENT_DATE_FORMATS = List.of(
+            DateTimeFormatter.ISO_LOCAL_DATE_TIME,
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"),
+            DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"),
+            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS"),
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+    );
+    private static final Pattern ANY_NUMBER_PATTERN = Pattern.compile("(\\d+)");
+    private static final Set<String> TRUE_STRING_VALUES = Set.of("1", "true", "yes", "y", "t", "on", "是", "私密", "屏蔽");
+    private static final Set<String> FALSE_STRING_VALUES = Set.of("0", "false", "no", "n", "f", "off", "否", "公开");
 
     public ImportResult importCsvData(MultipartFile file) {
         return importCsvData(file, false);
@@ -2233,141 +2249,487 @@ public class DataImportService {
     }
 
 
-    @Transactional
     public void importCommentsInTransaction(ImportResult result, List<String[]> data) {
-        importComments(result, data);
+        try {
+            transactionTemplate.execute(status -> {
+                importComments(result, data);
+                return null;
+            });
+        } catch (Exception e) {
+            logger.error("评论导入事务失败", e);
+            // 不要重新抛出异常，避免影响整体导入流程
+        }
     }
 
     private void importComments(ImportResult result, List<String[]> data) {
-        if (data == null) return;
+        final String sectionName = "评论";
+        if (data == null || data.isEmpty()) {
+            logger.info("评论数据段为空，跳过导入");
+            result.addResult(sectionName, 0, 0);
+            return;
+        }
 
         logger.info("开始导入评论数据，共 {} 条", data.size());
-        int success = 0, failed = 0;
 
-        for (String[] fields : data) {
+        Map<String, Integer> headerIndex = Collections.emptyMap();
+        int startIndex = 0;
+        String[] firstRow = data.get(0);
+        if (isHeaderRow(firstRow)) {
+            headerIndex = buildHeaderIndex(firstRow);
+            startIndex = 1;
+            logger.debug("识别到评论数据表头: {}", headerIndex.keySet());
+        }
+
+        if (data.size() <= startIndex) {
+            logger.warn("评论数据段仅包含表头，未找到可导入的数据行");
+            result.addResult(sectionName, 0, 0);
+            return;
+        }
+
+        Map<Long, Boolean> contentExistsCache = new HashMap<>();
+        Map<Long, Boolean> commentExistsCache = new HashMap<>();
+        Map<Long, Boolean> userIdExistsCache = new HashMap<>();
+        Map<String, Optional<Long>> userLookupCache = new HashMap<>();
+        Set<Long> importedCommentIds = new HashSet<>();
+        List<long[]> deferredParentUpdates = new ArrayList<>();
+
+        int success = 0;
+        int failed = 0;
+
+        for (int rowIndex = startIndex; rowIndex < data.size(); rowIndex++) {
+            String[] fields = data.get(rowIndex);
+            if (fields == null || isRowEmpty(fields)) {
+                logger.debug("跳过空白评论数据行: {}", Arrays.toString(fields));
+                continue;
+            }
+
             try {
-                if (fields.length < 6) continue;
+                ParsedCommentRow row = buildCommentRow(fields, headerIndex, contentExistsCache,
+                        userLookupCache, userIdExistsCache);
 
-                Comment comment = new Comment();
-                comment.setId(Long.parseLong(fields[0]));
-                comment.setBody(fields[1]);
-                comment.setLikeCount(0);
-                comment.setStatus(0);
-                comment.setPrivate(false);
-
-                // 解析内容关联
-                if (!fields[3].isEmpty() && !fields[3].equals("null")) {
-                    Optional<Content> content = contentRepository.findById(Long.parseLong(fields[3]));
-                    if (content.isPresent()) {
-                        comment.setContent(content.get());
-                    } else {
-                        logger.warn("内容ID '{}' 不存在，跳过评论", fields[3]);
-                        continue;
-                    }
-                } else {
-                    logger.warn("评论缺少内容关联，跳过");
-                    continue;
+                Long parentIdForInsert = row.parentId;
+                if (parentIdForInsert != null && !commentExists(parentIdForInsert, commentExistsCache)) {
+                    deferredParentUpdates.add(new long[]{row.id, parentIdForInsert});
+                    parentIdForInsert = null;
+                    logger.debug("父评论 {} 暂未存在，延迟关联评论 {}", row.parentId, row.id);
                 }
 
-                // 解析用户关联（支持用户名或用户ID）
-                if (!fields[2].isEmpty() && !fields[2].equals("null")) {
-                    Optional<User> user;
-                    try {
-                        // 尝试作为用户ID解析
-                        Long userId = Long.parseLong(fields[2]);
-                        user = userRepository.findById(userId);
-                    } catch (NumberFormatException e) {
-                        // 如果解析失败，则作为用户名查找
-                        user = userRepository.findByUsername(fields[2]);
-                    }
-                    
-                    if (user.isPresent()) {
-                        comment.setUser(user.get());
-                    } else {
-                        logger.warn("用户 '{}' 不存在，跳过评论", fields[2]);
-                        continue;
-                    }
-                } else {
-                    logger.warn("评论缺少用户关联，跳过");
-                    continue;
+                String deleteSql = "DELETE FROM comments WHERE id = ?";
+                jakarta.persistence.Query deleteQuery = entityManager.createNativeQuery(deleteSql);
+                deleteQuery.setParameter(1, row.id);
+                deleteQuery.executeUpdate();
+
+                final String tableName = "comments";
+                final String context = "评论导入";
+
+                List<String> insertColumns = new ArrayList<>();
+                List<Object> insertParams = new ArrayList<>();
+
+                addInsertColumn(insertColumns, insertParams, tableName, "id", row.id, context, true);
+                addInsertColumn(insertColumns, insertParams, tableName, "body", row.body, context, true);
+                addInsertColumn(insertColumns, insertParams, tableName, "like_count",
+                        row.likeCount != null ? row.likeCount : 0, context, false);
+                addInsertColumn(insertColumns, insertParams, tableName, "status",
+                        row.status != null ? row.status : 0, context, false);
+
+                if (ensureColumnExists(tableName, "is_private", false, context)) {
+                    insertColumns.add("is_private");
+                    insertParams.add(row.isPrivate != null ? (row.isPrivate ? 1 : 0) : 0);
+                }
+                if (ensureColumnExists(tableName, "is_blocked", false, context)) {
+                    insertColumns.add("is_blocked");
+                    insertParams.add(row.isBlocked != null ? (row.isBlocked ? 1 : 0) : 0);
                 }
 
-                // 解析父评论关联（可选）
-                if (!fields[4].isEmpty() && !fields[4].equals("null")) {
-                    Optional<Comment> parent = commentRepository.findById(Long.parseLong(fields[4]));
-                    if (parent.isPresent()) {
-                        comment.setParent(parent.get());
-                    } else {
-                        logger.warn("父评论ID '{}' 不存在，跳过父评论关联", fields[4]);
-                    }
+                addInsertColumn(insertColumns, insertParams, tableName, "content_id", row.contentId, context, true);
+                addInsertColumn(insertColumns, insertParams, tableName, "user_id", row.userId, context, true);
+                addInsertColumn(insertColumns, insertParams, tableName, "parent_id", parentIdForInsert, context, false);
+                addInsertColumn(insertColumns, insertParams, tableName, "blocked_at", row.blockedAt, context, false);
+                addInsertColumn(insertColumns, insertParams, tableName, "blocked_by", row.blockedById, context, false);
+                addInsertColumn(insertColumns, insertParams, tableName, "privacy_set_at", row.privacySetAt, context, false);
+                addInsertColumn(insertColumns, insertParams, tableName, "privacy_set_by", row.privacySetById, context, false);
+
+                LocalDateTime createdValue = (row.createdAt != null) ? row.createdAt : LocalDateTime.now();
+                LocalDateTime updatedValue = (row.updatedAt != null) ? row.updatedAt : createdValue;
+
+                if (ensureColumnExists(tableName, "created_at", false, context)) {
+                    insertColumns.add("created_at");
+                    insertParams.add(createdValue);
+                }
+                if (ensureColumnExists(tableName, "updated_at", false, context)) {
+                    insertColumns.add("updated_at");
+                    insertParams.add(updatedValue);
                 }
 
-                // 解析创建时间
-                LocalDateTime createdAt = null;
-                if (!fields[5].equals("未知时间") && !fields[5].isEmpty() && !fields[5].equals("null")) {
-                    createdAt = LocalDateTime.parse(fields[5], DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-                    comment.setCreatedAt(createdAt);
+                String insertSql = "INSERT INTO " + tableName + " (" + String.join(", ", insertColumns) + ") VALUES (" +
+                        String.join(", ", Collections.nCopies(insertColumns.size(), "?")) + ")";
+                jakarta.persistence.Query insertQuery = entityManager.createNativeQuery(insertSql);
+                for (int p = 0; p < insertParams.size(); p++) {
+                    insertQuery.setParameter(p + 1, insertParams.get(p));
                 }
+                insertQuery.executeUpdate();
 
-                // 使用原生SQL先删除再插入，避免乐观锁冲突
-                try {
-                    // 先删除现有记录
-                    String deleteSql = "DELETE FROM comments WHERE id = ?";
-                    jakarta.persistence.Query deleteQuery = entityManager.createNativeQuery(deleteSql);
-                    deleteQuery.setParameter(1, comment.getId());
-                    deleteQuery.executeUpdate();
-                    
-                    final String tableName = "comments";
-                    final String context = "评论导入";
-
-                    List<String> insertColumns = new ArrayList<>();
-                    List<Object> insertParams = new ArrayList<>();
-
-                    addInsertColumn(insertColumns, insertParams, tableName, "id", comment.getId(), context, true);
-                    addInsertColumn(insertColumns, insertParams, tableName, "body", comment.getBody(), context, true);
-                    addInsertColumn(insertColumns, insertParams, tableName, "like_count",
-                            comment.getLikeCount() != null ? comment.getLikeCount() : 0, context, false);
-                    addInsertColumn(insertColumns, insertParams, tableName, "status", comment.getStatus(), context, false);
-
-                    if (ensureColumnExists(tableName, "is_private", false, context)) {
-                        insertColumns.add("is_private");
-                        insertParams.add(comment.isPrivate() ? 1 : 0);
-                    }
-                    addInsertColumn(insertColumns, insertParams, tableName, "content_id", comment.getContent().getId(), context, false);
-                    addInsertColumn(insertColumns, insertParams, tableName, "user_id", comment.getUser().getId(), context, false);
-                    addInsertColumn(insertColumns, insertParams, tableName, "parent_id",
-                            comment.getParent() != null ? comment.getParent().getId() : null, context, false);
-
-                    java.time.LocalDateTime createdValue = createdAt != null ? createdAt : java.time.LocalDateTime.now();
-                    if (ensureColumnExists(tableName, "created_at", false, context)) {
-                        insertColumns.add("created_at");
-                        insertParams.add(createdValue);
-                    }
-                    if (ensureColumnExists(tableName, "updated_at", false, context)) {
-                        insertColumns.add("updated_at");
-                        insertParams.add(createdValue);
-                    }
-
-                    String insertSql = "INSERT INTO " + tableName + " (" + String.join(", ", insertColumns) + ") VALUES (" +
-                            String.join(", ", Collections.nCopies(insertColumns.size(), "?")) + ")";
-                    jakarta.persistence.Query insertQuery = entityManager.createNativeQuery(insertSql);
-                    for (int p = 0; p < insertParams.size(); p++) {
-                        insertQuery.setParameter(p + 1, insertParams.get(p));
-                    }
-                    insertQuery.executeUpdate();
-                    success++;
-                } catch (Exception e) {
-                    throw e; // 重新抛出异常，让外层catch处理
-                }
-
+                success++;
+                importedCommentIds.add(row.id);
+                commentExistsCache.put(row.id, true);
+            } catch (IllegalArgumentException parseException) {
+                failed++;
+                logger.warn("解析评论数据失败: {}", parseException.getMessage());
+                recordFailureDetail(result, sectionName, rowIndex, fields, parseException.getMessage(), null);
             } catch (Exception e) {
                 failed++;
-                logger.warn("导入评论失败: " + Arrays.toString(fields), e);
+                logger.warn("导入评论失败: {}", Arrays.toString(fields), e);
+                recordFailureDetail(result, sectionName, rowIndex, fields, "导入失败", e);
             }
         }
 
-        result.addResult("评论", success, failed);
+        if (!deferredParentUpdates.isEmpty() && !importedCommentIds.isEmpty()) {
+            logger.info("开始处理 {} 条延迟的父评论关联", deferredParentUpdates.size());
+            for (long[] pair : deferredParentUpdates) {
+                long commentId = pair[0];
+                long parentId = pair[1];
+                if (!importedCommentIds.contains(commentId)) {
+                    continue;
+                }
+                if (!commentExists(parentId, commentExistsCache)) {
+                    logger.warn("评论 {} 的父评论 {} 仍不存在，跳过延迟关联", commentId, parentId);
+                    continue;
+                }
+                try {
+                    String updateSql = "UPDATE comments SET parent_id = ? WHERE id = ?";
+                    jakarta.persistence.Query updateQuery = entityManager.createNativeQuery(updateSql);
+                    updateQuery.setParameter(1, parentId);
+                    updateQuery.setParameter(2, commentId);
+                    int updated = updateQuery.executeUpdate();
+                    if (updated > 0) {
+                        logger.debug("延迟更新评论 {} 的父评论为 {}", commentId, parentId);
+                    }
+                } catch (Exception e) {
+                    logger.warn("延迟更新父评论关联失败: commentId={}, parentId={}", commentId, parentId, e);
+                }
+            }
+        }
+
+        result.addResult(sectionName, success, failed);
         logger.info("评论数据导入完成，成功: {}, 失败: {}", success, failed);
+    }
+
+    private ParsedCommentRow buildCommentRow(String[] fields,
+                                             Map<String, Integer> headerIndex,
+                                             Map<Long, Boolean> contentExistsCache,
+                                             Map<String, Optional<Long>> userLookupCache,
+                                             Map<Long, Boolean> userIdExistsCache) {
+        ParsedCommentRow row = new ParsedCommentRow();
+
+        String idRaw = extractField(fields, headerIndex, 0, "id", "comment_id", "评论id", "评论编号");
+        Long commentId = parseIdFromValue(idRaw);
+        if (commentId == null) {
+            throw new IllegalArgumentException("缺少或无法解析评论ID: " + idRaw);
+        }
+        row.id = commentId;
+
+        String bodyRaw = extractField(fields, headerIndex, 1, "body", "comment", "内容", "text", "评论内容", "comment_body");
+        if (bodyRaw == null || bodyRaw.isBlank()) {
+            throw new IllegalArgumentException("评论ID " + commentId + " 缺少正文内容");
+        }
+        row.body = bodyRaw;
+
+        String contentRaw = extractField(fields, headerIndex, 3, "content_id", "content", "内容id", "关联内容", "归属内容");
+        Long contentId = parseIdFromValue(contentRaw);
+        if (contentId == null) {
+            throw new IllegalArgumentException("评论ID " + commentId + " 缺少内容ID");
+        }
+        if (!contentExists(contentId, contentExistsCache)) {
+            throw new IllegalArgumentException("评论ID " + commentId + " 指向的内容ID " + contentId + " 不存在");
+        }
+        row.contentId = contentId;
+
+        String userRaw = extractField(fields, headerIndex, 2, "user_id", "user", "username", "作者", "用户");
+        Long userId = resolveUserIdentifier(userRaw, true, "用户", userLookupCache, userIdExistsCache);
+        if (userId == null) {
+            throw new IllegalArgumentException("评论ID " + commentId + " 的用户 '" + userRaw + "' 不存在");
+        }
+        row.userId = userId;
+
+        String parentRaw = extractField(fields, headerIndex, 4, "parent_id", "parent", "父评论id", "reply_to");
+        row.parentId = parseIdFromValue(parentRaw);
+
+        String likeRaw = extractField(fields, headerIndex, -1, "like_count", "likes", "点赞数");
+        row.likeCount = parseInteger(likeRaw);
+
+        String statusRaw = extractField(fields, headerIndex, -1, "status", "状态");
+        row.status = parseInteger(statusRaw);
+
+        String privateRaw = extractField(fields, headerIndex, -1, "is_private", "private", "是否私密");
+        row.isPrivate = parseBooleanFlexible(privateRaw);
+
+        String blockedRaw = extractField(fields, headerIndex, -1, "is_blocked", "blocked", "是否屏蔽");
+        row.isBlocked = parseBooleanFlexible(blockedRaw);
+
+        String createdRaw = extractField(fields, headerIndex, 5, "created_at", "create_time", "创建时间", "时间");
+        row.createdAt = parseDateTimeFlexible(createdRaw);
+
+        String updatedRaw = extractField(fields, headerIndex, -1, "updated_at", "update_time", "更新时间");
+        row.updatedAt = parseDateTimeFlexible(updatedRaw);
+
+        String blockedAtRaw = extractField(fields, headerIndex, -1, "blocked_at", "屏蔽时间");
+        row.blockedAt = parseDateTimeFlexible(blockedAtRaw);
+
+        String blockedByRaw = extractField(fields, headerIndex, -1, "blocked_by", "屏蔽者", "屏蔽用户");
+        row.blockedById = resolveUserIdentifier(blockedByRaw, false, "屏蔽操作用户", userLookupCache, userIdExistsCache);
+
+        String privacyAtRaw = extractField(fields, headerIndex, -1, "privacy_set_at", "私密设置时间");
+        row.privacySetAt = parseDateTimeFlexible(privacyAtRaw);
+
+        String privacyByRaw = extractField(fields, headerIndex, -1, "privacy_set_by", "私密设置用户");
+        row.privacySetById = resolveUserIdentifier(privacyByRaw, false, "私密设置用户", userLookupCache, userIdExistsCache);
+
+        return row;
+    }
+
+    private boolean isHeaderRow(String[] fields) {
+        if (fields == null || fields.length == 0) {
+            return false;
+        }
+        String first = sanitizeField(fields[0]);
+        if (first == null || first.isBlank()) {
+            return false;
+        }
+        return !PURE_NUMBER_PATTERN.matcher(first).matches();
+    }
+
+    private boolean isRowEmpty(String[] fields) {
+        for (String field : fields) {
+            String value = sanitizeField(field);
+            if (value != null && !value.isBlank() && !"null".equalsIgnoreCase(value)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private Map<String, Integer> buildHeaderIndex(String[] header) {
+        Map<String, Integer> index = new HashMap<>();
+        if (header == null) {
+            return index;
+        }
+        for (int i = 0; i < header.length; i++) {
+            String key = header[i];
+            if (key == null) {
+                continue;
+            }
+            index.put(normalizeHeaderKey(key), i);
+        }
+        return index;
+    }
+
+    private String normalizeHeaderKey(String header) {
+        return header == null ? "" : header.trim().toLowerCase(Locale.ROOT);
+    }
+
+    private String extractField(String[] fields, Map<String, Integer> headerIndex, int fallbackIndex, String... keys) {
+        if (fields == null) {
+            return null;
+        }
+
+        if (headerIndex != null && !headerIndex.isEmpty() && keys != null) {
+            for (String key : keys) {
+                if (key == null) continue;
+                Integer idx = headerIndex.get(normalizeHeaderKey(key));
+                if (idx != null && idx >= 0 && idx < fields.length) {
+                    return sanitizeField(fields[idx]);
+                }
+            }
+        }
+
+        if (fallbackIndex >= 0 && fallbackIndex < fields.length) {
+            return sanitizeField(fields[fallbackIndex]);
+        }
+
+        return null;
+    }
+
+    private String sanitizeField(String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        if (trimmed.startsWith("\"") && trimmed.endsWith("\"") && trimmed.length() >= 2) {
+            trimmed = trimmed.substring(1, trimmed.length() - 1);
+        }
+        return trimmed;
+    }
+
+    private Long parseIdFromValue(String raw) {
+        if (raw == null) {
+            return null;
+        }
+        String value = raw.trim();
+        if (value.isEmpty() || "null".equalsIgnoreCase(value)) {
+            return null;
+        }
+        if (PURE_NUMBER_PATTERN.matcher(value).matches()) {
+            try {
+                return Long.parseLong(value);
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        Matcher matcher = ID_IN_OBJECT_PATTERN.matcher(value);
+        if (matcher.find()) {
+            try {
+                return Long.parseLong(matcher.group(1));
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        matcher = ANY_NUMBER_PATTERN.matcher(value);
+        Long candidate = null;
+        while (matcher.find()) {
+            candidate = Long.parseLong(matcher.group(1));
+        }
+        return candidate;
+    }
+
+    private Integer parseInteger(String raw) {
+        Long value = parseIdFromValue(raw);
+        return value == null ? null : value.intValue();
+    }
+
+    private Boolean parseBooleanFlexible(String raw) {
+        if (raw == null || raw.isBlank()) {
+            return null;
+        }
+        String value = raw.trim().toLowerCase(Locale.ROOT);
+        if (TRUE_STRING_VALUES.contains(value)) {
+            return Boolean.TRUE;
+        }
+        if (FALSE_STRING_VALUES.contains(value)) {
+            return Boolean.FALSE;
+        }
+        return null;
+    }
+
+    private LocalDateTime parseDateTimeFlexible(String raw) {
+        if (raw == null) {
+            return null;
+        }
+        String value = raw.trim();
+        if (value.isEmpty() || "null".equalsIgnoreCase(value) || "未知时间".equals(value)) {
+            return null;
+        }
+        for (DateTimeFormatter formatter : SUPPORTED_COMMENT_DATE_FORMATS) {
+            try {
+                return LocalDateTime.parse(value, formatter);
+            } catch (DateTimeParseException ignored) {
+            }
+        }
+        try {
+            return OffsetDateTime.parse(value).toLocalDateTime();
+        } catch (DateTimeParseException ignored) {
+        }
+        try {
+            return LocalDateTime.parse(value.replace(" ", "T"));
+        } catch (DateTimeParseException ignored) {
+        }
+        logger.debug("无法解析日期时间字段: {}", value);
+        return null;
+    }
+
+    private boolean contentExists(Long id, Map<Long, Boolean> cache) {
+        if (id == null) {
+            return false;
+        }
+        return cache.computeIfAbsent(id, key -> contentRepository.existsById(key));
+    }
+
+    private boolean commentExists(Long id, Map<Long, Boolean> cache) {
+        if (id == null) {
+            return false;
+        }
+        return cache.computeIfAbsent(id, key -> commentRepository.existsById(key));
+    }
+
+    private boolean userExists(Long id, Map<Long, Boolean> cache) {
+        if (id == null) {
+            return false;
+        }
+        return cache.computeIfAbsent(id, key -> userRepository.existsById(key));
+    }
+
+    private Long resolveUserIdentifier(String raw,
+                                       boolean required,
+                                       String fieldName,
+                                       Map<String, Optional<Long>> userLookupCache,
+                                       Map<Long, Boolean> userIdExistsCache) {
+        if (raw == null || raw.isBlank() || "null".equalsIgnoreCase(raw.trim()) || "已注销".equals(raw.trim())) {
+            if (required) {
+                throw new IllegalArgumentException(fieldName + "缺失");
+            }
+            return null;
+        }
+
+        String value = raw.trim();
+        Long userId = resolveUserIdentifierInternal(value, userLookupCache, userIdExistsCache);
+        if (userId == null && required) {
+            throw new IllegalArgumentException(fieldName + " '" + raw + "' 不存在");
+        }
+        return userId;
+    }
+
+    private Long resolveUserIdentifierInternal(String raw,
+                                               Map<String, Optional<Long>> userLookupCache,
+                                               Map<Long, Boolean> userIdExistsCache) {
+        Optional<Long> cached = userLookupCache.get(raw);
+        if (cached != null) {
+            return cached.orElse(null);
+        }
+
+        Long numeric = parseIdFromValue(raw);
+        if (numeric != null) {
+            if (userExists(numeric, userIdExistsCache)) {
+                userLookupCache.put(raw, Optional.of(numeric));
+                return numeric;
+            } else {
+                userLookupCache.put(raw, Optional.empty());
+                return null;
+            }
+        }
+
+        Optional<User> byUsername = userRepository.findByUsername(raw);
+        if (byUsername.isPresent()) {
+            Long id = byUsername.get().getId();
+            userIdExistsCache.put(id, true);
+            userLookupCache.put(raw, Optional.of(id));
+            return id;
+        }
+
+        Optional<User> byEmail = userRepository.findByEmail(raw);
+        if (byEmail.isPresent()) {
+            Long id = byEmail.get().getId();
+            userIdExistsCache.put(id, true);
+            userLookupCache.put(raw, Optional.of(id));
+            return id;
+        }
+
+        userLookupCache.put(raw, Optional.empty());
+        return null;
+    }
+
+    private static class ParsedCommentRow {
+        Long id;
+        String body;
+        Long contentId;
+        Long userId;
+        Long parentId;
+        Integer likeCount;
+        Integer status;
+        Boolean isPrivate;
+        Boolean isBlocked;
+        LocalDateTime createdAt;
+        LocalDateTime updatedAt;
+        LocalDateTime blockedAt;
+        Long blockedById;
+        LocalDateTime privacySetAt;
+        Long privacySetById;
     }
 
     // 用户登录信息导入方法

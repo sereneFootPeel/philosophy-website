@@ -366,4 +366,70 @@
             </div>
         </div>
         <script th:src="@{/js/header-cubes.js}"></script>
+        <script>
+            (function() {
+                function initMobileMenu() {
+                    const menuToggle = document.getElementById('menu-toggle');
+                    const mobileMenu = document.getElementById('mobile-menu');
+
+                    if (!menuToggle || !mobileMenu) {
+                        return;
+                    }
+
+                    let isMenuOpen = !mobileMenu.classList.contains('hidden');
+
+                    function updateIcon(open) {
+                        const icon = menuToggle.querySelector('i');
+                        if (!icon) {
+                            return;
+                        }
+                        icon.classList.toggle('fa-bars', !open);
+                        icon.classList.toggle('fa-times', open);
+                    }
+
+                    function toggleMenu(forceOpen) {
+                        const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : !isMenuOpen;
+                        isMenuOpen = shouldOpen;
+
+                        mobileMenu.classList.toggle('hidden', !shouldOpen);
+                        menuToggle.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
+                        updateIcon(shouldOpen);
+                    }
+
+                    menuToggle.addEventListener('click', (event) => {
+                        event.stopPropagation();
+                        toggleMenu();
+                    });
+
+                    // 支持触控设备
+                    menuToggle.addEventListener('touchstart', (event) => {
+                        event.stopPropagation();
+                        toggleMenu();
+                    }, { passive: true });
+
+                    document.addEventListener('click', (event) => {
+                        if (isMenuOpen && !mobileMenu.contains(event.target) && event.target !== menuToggle && !menuToggle.contains(event.target)) {
+                            toggleMenu(false);
+                        }
+                    });
+
+                    document.addEventListener('touchstart', (event) => {
+                        if (isMenuOpen && !mobileMenu.contains(event.target) && event.target !== menuToggle && !menuToggle.contains(event.target)) {
+                            toggleMenu(false);
+                        }
+                    }, { passive: true });
+
+                    // 初始化状态
+                    menuToggle.setAttribute('aria-controls', 'mobile-menu');
+                    menuToggle.setAttribute('aria-expanded', isMenuOpen ? 'true' : 'false');
+                    updateIcon(isMenuOpen);
+                }
+
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', initMobileMenu);
+                } else {
+                    initMobileMenu();
+                }
+            })();
+        </script>
     </header>

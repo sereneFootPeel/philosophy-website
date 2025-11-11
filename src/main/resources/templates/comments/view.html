@@ -50,9 +50,18 @@
     <main class="min-h-screen pb-16" style="padding-top: calc(5rem + 2rem);">
         <div class="container mx-auto px-4">
             <!-- 内容卡片部分 -->
-            <div class="relative">
-                <div th:replace="~{fragments/content-card :: content-card(content=${content}, showPhilosopherInfo=true, showActions='hover-only', clickable=false, customClasses='bg-white rounded-xl p-6 shadow-md mb-8', isAuthenticated=${isAuthenticated}, showLikeButton=true, showViewMoreButton=false, isContentOwner=false, showParentSchool=true)}">
-                </div>
+            <div th:replace="~{fragments/content-card :: content-card(
+                    content=${content},
+                    showPhilosopherInfo=true,
+                    showActions='hover-only',
+                    clickable=true,
+                    customClasses='bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px] relative group mb-8',
+                    isAuthenticated=${isAuthenticated},
+                    showLikeButton=true,
+                    showViewMoreButton=true,
+                    isContentOwner=false,
+                    showParentSchool=true
+                )}">
             </div>
 
             <!-- 评论部分 -->
@@ -65,12 +74,6 @@
                         </span>
                     </h3>
 
-                    <!-- 查看更多按钮 -->
-                    <a th:href="@{/content/{contentId}(contentId=${content.id})}"
-                       class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors duration-200">
-                        <i class="fa fa-external-link text-gray-600 text-sm"></i>
-                        <span class="text-sm text-gray-700">查看更多</span>
-                    </a>
                 </div>
 
                 <!-- 评论列表 -->
@@ -92,27 +95,20 @@
                                     <div class="ml-3">
                                         <div class="flex items-center gap-2">
                                             <p class="font-medium text-dark hover:text-primary" th:text="${comment.user != null ? comment.user.username : '未知用户'}">用户名</p>
-                                            <!-- 已删除提示 -->
-                                            <th:block th:if="${comment.deletedAt != null and isAdmin}">
-                                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                                    <i class="fa fa-trash mr-1"></i><span th:text="${translationService.getStaticText('deleted', language)}">已删除</span>
-                                                </span>
-                                            </th:block>
                                         </div>
                                         <p class="text-xs text-gray-500" th:text="${comment.createdAt != null ? #temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm') : '未知时间'}">
                                             2023-01-01 12:00
                                         </p>
                                     </div>
                                 </a>
-                                <div class="flex space-x-2">
-                                    <!-- 只有未删除的评论才显示操作按钮 -->
-                                    <th:block th:if="${comment.deletedAt == null and isAuthenticated and (currentUsername == comment.user.username or isAdmin)}">
+                                <div class="flex space-x-2 comment-actions">
+                                    <th:block th:if="${isAuthenticated and (currentUsername == comment.user.username or isAdmin or (isModerator and comment.content != null and comment.content.school != null and #lists.contains(moderatorSchoolIds, comment.content.school.id)))}">
                                         <!-- 删除按钮 -->
                                         <form th:action="@{/comments/delete/{commentId}(commentId=${comment.id})}" method="post" class="inline">
                                             <button type="submit" class="text-gray-400 hover:text-red-500 transition-smooth" 
                                                     th:data-confirm="${translationService.getStaticText('delete_confirm', language)}"
                                                     onclick="return confirm(this.getAttribute('data-confirm'));">
-                                                <i class="fa fa-trash-o"></i>
+                                                <i class="fa-solid fa-trash"></i>
                                             </button>
                                         </form>
                                     </th:block>
@@ -124,7 +120,7 @@
                             <th:block th:if="${comment.replies != null and !comment.replies.isEmpty()}">
                                 <div class="ml-8 mt-4 space-y-3">
                                     <th:block th:each="reply : ${comment.replies}">
-                                        <div th:id="'reply-' + ${reply.id}" class="border-l-2 border-gray-200 pl-4 py-2 relative group">
+                                        <div th:id="'reply-' + ${reply.id}" class="border-l-2 border-gray-200 pl-4 py-2 relative group comment-reply">
                                             
                                             <div class="flex justify-between items-start mb-1">
                                                 <a th:href="@{/user/profile/{id}(id=${reply.user.id})}" class="flex items-center hover:bg-gray-50 p-1 rounded-lg transition-smooth">
@@ -134,27 +130,20 @@
                                                     <div class="ml-2">
                                                         <div class="flex items-center gap-2">
                                                             <p class="text-sm font-medium text-gray-700 hover:text-primary" th:text="${reply.user != null ? reply.user.username : '未知用户'}">用户名</p>
-                                                            <!-- 已删除提示 -->
-                                                            <th:block th:if="${reply.deletedAt != null and isAdmin}">
-                                                                <span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                                                    <i class="fa fa-trash mr-1"></i><span th:text="${translationService.getStaticText('deleted', language)}">已删除</span>
-                                                                </span>
-                                                            </th:block>
                                                         </div>
                                                         <p class="text-xs text-gray-500" th:text="${#temporals.format(reply.createdAt, 'yyyy-MM-dd HH:mm')}">
                                                             2023-01-01 12:00
                                                         </p>
                                                     </div>
                                                 </a>
-                                                <div class="flex space-x-2">
-                                                    <!-- 只有未删除的回复才显示操作按钮 -->
-                                                    <th:block th:if="${reply.deletedAt == null and isAuthenticated and (currentUsername == reply.user.username or isAdmin)}">
+                                                <div class="flex space-x-2 comment-actions">
+                                                    <th:block th:if="${isAuthenticated and (currentUsername == reply.user.username or isAdmin or (isModerator and reply.content != null and reply.content.school != null and #lists.contains(moderatorSchoolIds, reply.content.school.id)))}">
                                                         <!-- 删除按钮 -->
                                                         <form th:action="@{/comments/delete/{commentId}(commentId=${reply.id})}" method="post" class="inline">
                                                             <button type="submit" class="text-gray-400 hover:text-red-500 transition-smooth" 
                                                                     th:data-confirm="${translationService.getStaticText('delete_confirm', language)}"
                                                                     onclick="return confirm(this.getAttribute('data-confirm'));">
-                                                                <i class="fa fa-trash-o text-xs"></i>
+                                                                <i class="fa-solid fa-trash text-xs"></i>
                                                             </button>
                                                         </form>
                                                     </th:block>

@@ -44,30 +44,14 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     // 查找最新的评论
     List<Comment> findTop10ByOrderByCreatedAtDesc();
     
-    // 根据用户ID查找所有评论（包括软删除的），用于管理员查看
-    @Query("SELECT c FROM Comment c JOIN FETCH c.content WHERE c.user.id = :userId ORDER BY c.createdAt DESC")
-    List<Comment> findByUserIdWithContentIncludingDeleted(Long userId);
-    
-    // 根据用户ID查找所有评论（包括软删除的），用于管理员查看，支持隐私过滤
-    @Query("SELECT c FROM Comment c JOIN FETCH c.content LEFT JOIN FETCH c.deletedBy WHERE c.user.id = :userId ORDER BY c.createdAt DESC")
-    List<Comment> findByUserIdWithContentAndDeletedByIncludingDeleted(Long userId);
-    
     // 根据流派ID列表查找评论，按照创建时间降序排序
     @Query("SELECT c FROM Comment c JOIN FETCH c.user JOIN FETCH c.content WHERE c.content.school.id IN :schoolIds ORDER BY c.createdAt DESC")
     List<Comment> findBySchoolIdsOrderByCreatedAtDesc(List<Long> schoolIds);
     
-    // 根据流派ID列表查找评论（包括软删除的），按照创建时间降序排序
-    @Query("SELECT c FROM Comment c JOIN FETCH c.user JOIN FETCH c.content WHERE c.content.school.id IN :schoolIds ORDER BY c.createdAt DESC")
-    List<Comment> findBySchoolIdsIncludingDeletedOrderByCreatedAtDesc(List<Long> schoolIds);
-
     @Modifying
     @Transactional
     @Query("UPDATE Comment c SET c.likeCount = c.likeCount + :delta WHERE c.id = :id")
     void updateLikeCount(Long id, int delta);
-    
-    // 根据删除者用户ID查找评论
-    @Query("SELECT c FROM Comment c WHERE c.deletedBy.id = :userId")
-    List<Comment> findByDeletedByUserId(@Param("userId") Long userId);
     
     // 根据隐私设置者用户ID查找评论
     @Query("SELECT c FROM Comment c WHERE c.privacySetBy.id = :userId")

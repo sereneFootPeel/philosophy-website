@@ -75,7 +75,7 @@ class LikeButtonComponent {
         button.className = 'like-button-component';
         button.innerHTML = `
             <div class="like-btn cursor-pointer transition-all duration-200 p-2 rounded-full" title="点赞用户">
-                <i class="fa fa-heart-o text-gray-400 hover:text-red-500 text-xl transition-colors duration-200"></i>
+                <i class="fa-regular fa-heart text-gray-400 hover:text-red-500 text-xl transition-colors duration-200"></i>
             </div>
         `;
         
@@ -139,21 +139,45 @@ class LikeButtonComponent {
 
             console.log('检查点赞状态请求:', checkUrl);
 
-            const response = await fetch(checkUrl, {
+            const fetchOptions = {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
                 },
-                credentials: 'same-origin', // 确保发送session cookie
-                // 添加超时处理
-                signal: AbortSignal.timeout(5000)
-            });
+                credentials: 'same-origin' // 确保发送session cookie
+            };
+
+            let controller = null;
+            let timeoutId = null;
+            if (typeof AbortController !== 'undefined') {
+                controller = new AbortController();
+                fetchOptions.signal = controller.signal;
+                timeoutId = setTimeout(() => controller.abort(), 5000);
+            }
+
+            const response = await fetch(checkUrl, fetchOptions);
+            if (timeoutId) {
+                clearTimeout(timeoutId);
+            }
             
             
             if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+                try {
+                    const errorData = await response.json();
+                    if (errorData && typeof errorData === 'object' && 'message' in errorData) {
+                        errorMessage = errorData.message;
+                    }
+                } catch (parseError) {
+                    try {
+                        errorMessage = await response.text();
+                    } catch (_) {
+                        // ignore
+                    }
+                }
+                throw new Error(errorMessage);
             }
-            
+
             const data = await response.json();
             
             this.isLiked = data.isLiked || false;
@@ -169,6 +193,7 @@ class LikeButtonComponent {
             if (this.onError) {
                 this.onError('检查点赞状态失败', error);
             }
+            console.error('检查点赞状态失败:', error);
         }
     }
     
@@ -194,7 +219,7 @@ class LikeButtonComponent {
 
         // 显示加载状态
         this.button.style.pointerEvents = 'none';
-        this.icon.className = 'fa fa-spinner fa-spin text-gray-500';
+        this.icon.className = 'fa-solid fa-spinner fa-spin text-gray-500';
         
         try {
             // 使用绝对路径确保在任何页面都能正确访问
@@ -207,23 +232,46 @@ class LikeButtonComponent {
                 entityId: this.entityId
             });
 
-            const response = await fetch(toggleUrl, {
+            const fetchOptions = {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 credentials: 'same-origin', // 确保发送session cookie
-                body: `entityType=${this.entityType}&entityId=${this.entityId}`,
-                // 添加超时处理
-                signal: AbortSignal.timeout(10000)
-            });
+                body: `entityType=${this.entityType}&entityId=${this.entityId}`
+            };
+
+            let controller = null;
+            let timeoutId = null;
+            if (typeof AbortController !== 'undefined') {
+                controller = new AbortController();
+                fetchOptions.signal = controller.signal;
+                timeoutId = setTimeout(() => controller.abort(), 10000);
+            }
+
+            const response = await fetch(toggleUrl, fetchOptions);
+            if (timeoutId) {
+                clearTimeout(timeoutId);
+            }
 
             console.log('响应状态:', response.status, response.statusText);
 
             if (!response.ok) {
-                const errorText = await response.text();
-                console.error('HTTP错误响应:', errorText);
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                let message = `HTTP ${response.status}: ${response.statusText}`;
+                try {
+                    const errorData = await response.json();
+                    if (errorData && typeof errorData === 'object') {
+                        message = errorData.message || message;
+                    }
+                } catch (parseErr) {
+                    try {
+                        message = await response.text();
+                    } catch (_) {
+                        // ignore
+                    }
+                }
+                console.error('HTTP错误响应:', message);
+                throw new Error(message);
             }
 
             const data = await response.json();
@@ -254,17 +302,16 @@ class LikeButtonComponent {
             }
         } catch (error) {
             
-            let errorMessage = '网络错误，请重试';
-            if (error.name === 'TimeoutError') {
+            let errorMessage = error && error.message ? error.message : '网络错误，请重试';
+            if (error.name === 'AbortError') {
                 errorMessage = '请求超时，请重试';
-            } else if (error.name === 'AbortError') {
-                errorMessage = '请求被取消';
             }
             
             this.showMessage(errorMessage, 'error');
             if (this.onError) {
                 this.onError(errorMessage, error);
             }
+            console.error('点赞操作失败:', error);
         } finally {
             this.button.style.pointerEvents = 'auto';
         }
@@ -274,11 +321,11 @@ class LikeButtonComponent {
         if (!this.button || !this.icon) return;
         
         if (this.isLiked) {
-            this.icon.className = 'fa fa-heart text-red-500';
+            this.icon.className = 'fa-solid fa-heart text-red-500';
             // 移除所有背景色类
             this.button.classList.remove('hover:bg-red-50', 'bg-red-50');
         } else {
-            this.icon.className = 'fa fa-heart-o text-gray-400 hover:text-red-500';
+            this.icon.className = 'fa-regular fa-heart text-gray-400 hover:text-red-500';
             // 移除所有背景色类
             this.button.classList.remove('bg-red-50', 'hover:bg-red-50');
         }

@@ -10,7 +10,7 @@
          th:class="${customClasses != null} ? ${customClasses} : 'bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px] relative group'"
          th:data-content-id="${content != null ? content.id : ''}"
          th:data-clickable="${clickable != null and clickable}"
-         th:classappend="${clickable != null and clickable} ? 'cursor-pointer hover:bg-tertiary content-card-clickable' : ''">
+         th:classappend="(${clickable != null and clickable} ? ' cursor-pointer hover:bg-tertiary content-card-clickable' : '') + ' like-button-parent'">
 
         <!-- 编辑图标 (仅管理员可见) -->
         <div sec:authorize="hasRole('ADMIN')"
@@ -38,14 +38,14 @@
         <div class="absolute top-3 right-3 z-10 transition-opacity duration-300">
             <!-- 点赞按钮 -->
             <th:block th:if="${showLikeButton != null and showLikeButton and isAuthenticated != null and isAuthenticated}">
-                <div th:id="'like-container-' + ${content != null ? content.id : ''}"
-                     th:data-like="'like-container-' + ${content != null ? content.id : ''}"
-                     th:data-entity-type="CONTENT"
-                     th:data-entity-id="${content != null ? content.id : ''}"
-                     th:data-is-authenticated="${isAuthenticated != null and isAuthenticated ? 'true' : 'false'}"
-                     class="like-btn opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center w-8 h-8 rounded-md cursor-pointer hover:bg-red-50 pointer-events-auto z-20 bg-white shadow-md border border-gray-200"
-                     th:title="${isAuthenticated != null and isAuthenticated ? '点赞/取消点赞' : '请先登录'}">
-                    <i class="fa fa-heart-o text-gray-700 hover:text-red-600 text-base transition-colors duration-200"></i>
+                    <div th:id="'like-container-' + ${content != null ? content.id : ''}"
+                         th:data-like="'like-container-' + ${content != null ? content.id : ''}"
+                         th:data-entity-type="CONTENT"
+                         th:data-entity-id="${content != null ? content.id : ''}"
+                         th:data-is-authenticated="${isAuthenticated != null and isAuthenticated ? 'true' : 'false'}"
+                         class="like-btn group-hover:opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-auto z-20"
+                         th:title="${isAuthenticated != null and isAuthenticated ? '点赞/取消点赞' : '请先登录'}">
+                    <i class="fa-regular fa-heart text-gray-400 hover:text-red-500 text-base transition-colors duration-200"></i>
                 </div>
             </th:block>
 
