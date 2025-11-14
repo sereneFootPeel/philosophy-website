@@ -358,11 +358,6 @@
                     <i class="fa fa-university mr-2"></i>
                     <span th:text="${language != null and language == 'en'} ? 'Schools' : '学派'">学派</span>
                 </a>
-                <a th:href="${isAuthenticated} ? '/user/profile' : '/login'" class="text-gray-600 hover:text-gray-900 px-3 py-3 rounded-md text-sm font-medium">
-                    <i th:class="${isAuthenticated} ? 'fa fa-user mr-2' : 'fa fa-sign-in mr-2'"></i>
-                    <span th:if="${isAuthenticated}" th:text="${language != null and language == 'en'} ? 'Profile' : '用户主页'">用户主页</span>
-                    <span th:unless="${isAuthenticated}" th:text="${language != null and language == 'en'} ? 'Login' : '登录'">登录</span>
-                </a>
             </div>
         </div>
         <script th:src="@{/js/header-cubes.js}"></script>
@@ -396,14 +391,24 @@
                         updateIcon(shouldOpen);
                     }
 
+                    let touchTriggered = false;
+
                     menuToggle.addEventListener('click', (event) => {
                         event.stopPropagation();
+                        if (touchTriggered) {
+                            touchTriggered = false;
+                            return;
+                        }
                         toggleMenu();
                     });
 
                     // 支持触控设备
                     menuToggle.addEventListener('touchstart', (event) => {
                         event.stopPropagation();
+                        touchTriggered = true;
+                        setTimeout(() => {
+                            touchTriggered = false;
+                        }, 500);
                         toggleMenu();
                     }, { passive: true });
 

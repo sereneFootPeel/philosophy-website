@@ -370,7 +370,6 @@ public class ModeratorController {
     @PostMapping("/philosophers/save")
     public String savePhilosopher(@ModelAttribute Philosopher philosopher,
                                  @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
-                                 @RequestParam(value = "deleteImage", required = false) String deleteImage,
                                  @RequestParam(value = "nameEn", required = false) String nameEn,
                                  @RequestParam(value = "biographyEn", required = false) String biographyEn) throws IOException {
         User moderator = getCurrentModerator();
@@ -416,10 +415,7 @@ public class ModeratorController {
         // 设置哲学家的创建者为当前版主
         philosopher.setUser(moderator);
 
-        // 检查是否要删除照片
-        boolean shouldDeleteImage = deleteImage != null && "true".equals(deleteImage);
-
-        // 处理文件上传和删除
+        // 处理文件上传
         Philosopher savedPhilosopher;
         if (imageFile != null && !imageFile.isEmpty()) {
             // 如果上传了新图片，先删除旧图片（如果存在）
@@ -430,18 +426,15 @@ public class ModeratorController {
                 }
             }
             savedPhilosopher = philosopherService.savePhilosopherWithImage(philosopher, imageFile);
-        } else if (shouldDeleteImage) {
-            // 如果选择删除照片但不上传新照片
+        } else {
+            // 如果没有上传新图片，保留原有的 imageUrl
             if (philosopher.getId() != null) {
                 Philosopher existingPhilosopher = philosopherService.getPhilosopherById(philosopher.getId());
                 if (existingPhilosopher != null && existingPhilosopher.getImageUrl() != null) {
-                    philosopherService.deleteImageFile(existingPhilosopher.getImageUrl());
+                    // 设置原有的 imageUrl，确保不会被清除
+                    philosopher.setImageUrl(existingPhilosopher.getImageUrl());
                 }
             }
-            philosopher.setImageUrl(null);
-            savedPhilosopher = philosopherService.savePhilosopher(philosopher);
-        } else {
-            // 如果没有上传新图片也不删除，使用原来的方法（会保留原有的 imageUrl）
             savedPhilosopher = philosopherService.savePhilosopher(philosopher);
         }
 

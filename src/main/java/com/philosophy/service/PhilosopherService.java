@@ -139,9 +139,13 @@ public class PhilosopherService {
 
             philosopherToSave.setName(philosopherFromForm.getName());
             philosopherToSave.setBio(philosopherFromForm.getBio());
+            philosopherToSave.setEra(philosopherFromForm.getEra());
             philosopherToSave.setBirthYear(philosopherFromForm.getBirthYear());
             philosopherToSave.setDeathYear(philosopherFromForm.getDeathYear());
-            philosopherToSave.setImageUrl(philosopherFromForm.getImageUrl());
+            // 只有在明确提供了新的 imageUrl 时才更新，否则保留原有的照片
+            if (philosopherFromForm.getImageUrl() != null) {
+                philosopherToSave.setImageUrl(philosopherFromForm.getImageUrl());
+            }
             // 如果是新创建（用户字段为空），设置创建者
             if (philosopherToSave.getUser() == null) {
                 philosopherToSave.setUser(editor);

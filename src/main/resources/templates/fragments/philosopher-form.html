@@ -43,14 +43,7 @@
                     
                     <!-- 当前图片预览 -->
                     <div th:if="${philosopher.imageUrl != null and philosopher.imageUrl != ''}" id="currentImageContainer" class="mt-3">
-                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-2">
-                            <label class="admin-form-label text-sm">当前照片：</label>
-                            <label class="flex items-center gap-2 cursor-pointer min-h-[44px]">
-                                <input type="checkbox" id="deleteImage" name="deleteImage" value="true" 
-                                       class="w-5 h-5" onchange="toggleDeleteImage(this)" />
-                                <span class="text-sm admin-text-error">删除照片</span>
-                            </label>
-                        </div>
+                        <label class="admin-form-label text-sm">当前照片：</label>
                         <div class="mt-2" id="currentImageDisplay">
                             <img th:src="${philosopher.imageUrl}" th:onerror="this.style.display='none'" 
                                  alt="当前照片" 
@@ -59,6 +52,7 @@
                                  id="currentImage" 
                                  onerror="this.parentElement.parentElement.style.display='none'" />
                         </div>
+                        <p class="text-xs admin-text-secondary mt-2">上传新照片将自动替换当前照片。</p>
                     </div>
                     
                     <!-- 新图片预览 -->
@@ -113,7 +107,6 @@ let selectedFile = null;
 function handleFileSelect(input) {
     const preview = document.getElementById('imagePreview');
     const previewImg = document.getElementById('previewImg');
-    const deleteImageCheckbox = document.getElementById('deleteImage');
     
     if (input.files && input.files[0]) {
         // 检查文件类型
@@ -143,12 +136,6 @@ function handleFileSelect(input) {
         reader.onload = function(e) {
             previewImg.src = e.target.result;
             preview.classList.remove('hidden');
-            
-            // 如果选择了新图片，取消删除选项
-            if (deleteImageCheckbox) {
-                deleteImageCheckbox.checked = false;
-                toggleDeleteImage(deleteImageCheckbox);
-            }
         };
         
         reader.onerror = function() {
@@ -176,37 +163,6 @@ function clearImagePreview() {
         preview.classList.add('hidden');
     }
     selectedFile = null;
-    
-    // 恢复删除复选框的显示
-    const deleteImageCheckbox = document.getElementById('deleteImage');
-    const currentImageDisplay = document.getElementById('currentImageDisplay');
-    if (deleteImageCheckbox && deleteImageCheckbox.checked === false && currentImageDisplay) {
-        currentImageDisplay.style.opacity = '1';
-    }
-}
-
-function toggleDeleteImage(checkbox) {
-    const input = document.getElementById('imageFile');
-    const preview = document.getElementById('imagePreview');
-    const currentImageDisplay = document.getElementById('currentImageDisplay');
-    
-    if (checkbox.checked) {
-        // 如果选择删除，清除文件输入和新图片预览
-        if (input) {
-            input.value = '';
-            selectedFile = null;
-        }
-        if (preview) {
-            preview.classList.add('hidden');
-        }
-        if (currentImageDisplay) {
-            currentImageDisplay.style.opacity = '0.5';
-        }
-    } else {
-        if (currentImageDisplay) {
-            currentImageDisplay.style.opacity = '1';
-        }
-    }
 }
 </script>
 
