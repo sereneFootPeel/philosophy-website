@@ -95,8 +95,14 @@ public class SchoolService {
     public School saveSchoolForAdmin(School schoolFromForm, User editor) {
         School oldSchoolState = null;
         School schoolToSave;
+        String newName = schoolFromForm.getName() != null ? schoolFromForm.getName().trim() : null;
+
+        if (newName == null || newName.isEmpty()) {
+            throw new IllegalArgumentException("学派名称不能为空");
+        }
 
         if (schoolFromForm.getId() != null) {
+            // 更新现有学校
             schoolToSave = schoolRepository.findById(schoolFromForm.getId())
                     .orElseThrow(() -> new RuntimeException("School not found with id: " + schoolFromForm.getId()));
 
@@ -104,7 +110,15 @@ public class SchoolService {
             oldSchoolState.setName(schoolToSave.getName());
             oldSchoolState.setDescription(schoolToSave.getDescription());
 
-            schoolToSave.setName(schoolFromForm.getName());
+            // 检查名称是否已更改，如果更改了，检查新名称是否已存在
+            if (!newName.equals(schoolToSave.getName())) {
+                Optional<School> existingSchool = schoolRepository.findByName(newName);
+                if (existingSchool.isPresent() && !existingSchool.get().getId().equals(schoolFromForm.getId())) {
+                    throw new IllegalArgumentException("学派名称 '" + newName + "' 已存在，请使用其他名称");
+                }
+            }
+
+            schoolToSave.setName(newName);
             schoolToSave.setDescription(schoolFromForm.getDescription());
             schoolToSave.setParent(schoolFromForm.getParent());
             // 如果是新创建（用户字段为空），设置创建者
@@ -112,7 +126,14 @@ public class SchoolService {
                 schoolToSave.setUser(editor);
             }
         } else {
+            // 创建新学校
+            // 检查名称是否已存在
+            if (schoolRepository.existsByName(newName)) {
+                throw new IllegalArgumentException("学派名称 '" + newName + "' 已存在，请使用其他名称");
+            }
+            
             schoolToSave = schoolFromForm;
+            schoolToSave.setName(newName);
             // 为新创建的流派设置创建者
             schoolToSave.setUser(editor);
         }

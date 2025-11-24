@@ -1284,6 +1284,10 @@ public class DataImportService {
         final String sectionName = "学派";
         int success = 0, failed = 0;
 
+        // 第一阶段：存储学派ID和父学派ID的映射关系
+        Map<Long, Long> schoolParentMap = new HashMap<>();
+
+        // 第一阶段：导入所有学派，但不设置parent_id
         for (int index = 0; index < data.size(); index++) {
             String[] fields = data.get(index);
             try {
@@ -1317,16 +1321,12 @@ public class DataImportService {
                     school.setDescriptionEn(fields[4]);
                 }
 
-                // 解析父学派ID (字段5)
+                // 解析父学派ID (字段5)，但不立即设置，先保存到Map中
                 if (fields.length > 5 && !fields[5].isEmpty() && !fields[5].equals("null")) {
                     try {
                         Long parentId = Long.parseLong(fields[5]);
-                        School parent = schoolRepository.findById(parentId).orElse(null);
-                        if (parent != null) {
-                            school.setParent(parent);
-                        } else {
-                            logger.warn("父学派ID {} 不存在，跳过设置父学派", parentId);
-                        }
+                        // 保存到Map中，第二阶段再处理
+                        schoolParentMap.put(schoolId, parentId);
                     } catch (NumberFormatException e) {
                         logger.warn("父学派ID格式错误: {}", fields[5]);
                     }
@@ -1394,8 +1394,7 @@ public class DataImportService {
                     addUpdateColumn(updateAssignments, updateParams, tableName, "name_en", school.getNameEn(), context, false);
                     addUpdateColumn(updateAssignments, updateParams, tableName, "description", school.getDescription(), context, false);
                     addUpdateColumn(updateAssignments, updateParams, tableName, "description_en", school.getDescriptionEn(), context, false);
-                    addUpdateColumn(updateAssignments, updateParams, tableName, "parent_id",
-                            school.getParent() != null ? school.getParent().getId() : null, context, false);
+                    // 第一阶段不设置parent_id，第二阶段再处理
                     addUpdateColumn(updateAssignments, updateParams, tableName, "like_count", school.getLikeCount(), context, false);
 
                     if (ensureColumnExists(tableName, "updated_at", false, context)) {
@@ -1425,8 +1424,7 @@ public class DataImportService {
                         addInsertColumn(insertColumns, insertParams, tableName, "name_en", school.getNameEn(), context, false);
                         addInsertColumn(insertColumns, insertParams, tableName, "description", school.getDescription(), context, false);
                         addInsertColumn(insertColumns, insertParams, tableName, "description_en", school.getDescriptionEn(), context, false);
-                        addInsertColumn(insertColumns, insertParams, tableName, "parent_id",
-                                school.getParent() != null ? school.getParent().getId() : null, context, false);
+                        // 第一阶段不设置parent_id，第二阶段再处理
                         addInsertColumn(insertColumns, insertParams, tableName, "like_count", school.getLikeCount(), context, false);
 
                         if (ensureColumnExists(tableName, "user_id", false, context)) {
@@ -1474,7 +1472,50 @@ public class DataImportService {
         }
 
         result.addResult(sectionName, success, failed);
-        logger.info("学派数据导入完成，成功: {}, 失败: {}", success, failed);
+        logger.info("学派数据第一阶段导入完成，成功: {}, 失败: {}", success, failed);
+
+        // 第二阶段：设置父学派关联
+        if (!schoolParentMap.isEmpty()) {
+            logger.info("开始第二阶段：设置父学派关联，共 {} 个关联", schoolParentMap.size());
+            int parentLinkSuccess = 0;
+            int parentLinkFailed = 0;
+
+            for (Map.Entry<Long, Long> entry : schoolParentMap.entrySet()) {
+                Long schoolId = entry.getKey();
+                Long parentId = entry.getValue();
+                
+                try {
+                    // 检查父学派是否存在（可能在数据库中已存在，或在本次导入中已创建）
+                    School parent = schoolRepository.findById(parentId).orElse(null);
+                    if (parent != null) {
+                        // 更新学派的parent_id
+                        String updateParentSql = "UPDATE schools SET parent_id = ? WHERE id = ?";
+                        jakarta.persistence.Query updateParentQ = entityManager.createNativeQuery(updateParentSql);
+                        updateParentQ.setParameter(1, parentId);
+                        updateParentQ.setParameter(2, schoolId);
+                        int updated = updateParentQ.executeUpdate();
+                        
+                        if (updated > 0) {
+                            parentLinkSuccess++;
+                            logger.debug("学派ID {} 的父学派关联设置成功，父学派ID: {}", schoolId, parentId);
+                        } else {
+                            parentLinkFailed++;
+                            logger.warn("学派ID {} 不存在，无法设置父学派关联", schoolId);
+                        }
+                    } else {
+                        parentLinkFailed++;
+                        logger.warn("父学派ID {} 不存在，无法为学派ID {} 设置父学派关联", parentId, schoolId);
+                    }
+                } catch (Exception e) {
+                    parentLinkFailed++;
+                    logger.error("设置学派ID {} 的父学派关联时发生异常: {}", schoolId, e.getMessage(), e);
+                }
+            }
+
+            logger.info("父学派关联设置完成，成功: {}, 失败: {}", parentLinkSuccess, parentLinkFailed);
+        }
+
+        logger.info("学派数据导入全部完成");
     }
 
     public void importPhilosophersInTransaction(ImportResult result, List<String[]> data) {

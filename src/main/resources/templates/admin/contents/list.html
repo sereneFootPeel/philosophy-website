@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>内容管理 - 哲学网站</title>
-    <div th:replace="~{fragments/admin-head :: admin-head}"></div>
+    <th:block th:replace="~{fragments/admin-head :: admin-head}"></th:block>
 </head>
 <body class="min-h-screen">
     <div class="flex min-h-screen">
@@ -52,7 +52,7 @@
                             <tbody class="text-sm">
                                 <tr th:each="content : ${contents}">
                                     <td class="admin-table-cell" th:text="${content.id}"></td>
-                                    <td class="admin-table-cell" th:text="${#strings.abbreviate(content.content, 50)}"></td>
+                                    <td class="admin-table-cell" th:text="${#strings.abbreviate(content.content, 20)}"></td>
                                     <td class="admin-table-cell" th:text="${content.philosopher != null ? content.philosopher.name : ''}"></td>
                                     <td class="admin-table-cell" th:text="${content.school != null ? content.school.name : ''}"></td>
                                     <td class="admin-table-cell">
@@ -95,6 +95,6 @@
     <div th:replace="~{fragments/admin-sidebar :: mobile-drawer}"></div>
     
     <!-- Admin Scripts -->
-    <div th:replace="~{fragments/admin-head :: admin-scripts}"></div>
+    <th:block th:replace="~{fragments/admin-head :: admin-scripts}"></th:block>
 </body>
 </html>

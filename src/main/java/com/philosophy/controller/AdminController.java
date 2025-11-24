@@ -325,7 +325,24 @@ public class AdminController {
         }
         
         User currentUser = (User) authentication.getPrincipal();
-        School savedSchool = schoolService.saveSchoolForAdmin(school, currentUser);
+        School savedSchool;
+        try {
+            savedSchool = schoolService.saveSchoolForAdmin(school, currentUser);
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            if (school.getId() != null) {
+                return "redirect:/admin/schools/edit/" + school.getId();
+            } else {
+                return "redirect:/admin/schools/new";
+            }
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            redirectAttributes.addFlashAttribute("error", "学派名称已存在，请使用其他名称");
+            if (school.getId() != null) {
+                return "redirect:/admin/schools/edit/" + school.getId();
+            } else {
+                return "redirect:/admin/schools/new";
+            }
+        }
 
         // 保存或删除英文翻译
         if (savedSchool.getId() != null) {

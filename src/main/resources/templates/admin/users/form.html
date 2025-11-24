@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${user.id != null ? '编辑用户' : '添加用户'} + ' - 哲学网站'">添加用户 - 哲学网站</title>
-    <div th:replace="~{fragments/admin-head :: admin-head}"></div>
+    <th:block th:replace="~{fragments/admin-head :: admin-head}"></th:block>
     <script>
         function confirmRoleChange() {
             const select = document.getElementById('role');
