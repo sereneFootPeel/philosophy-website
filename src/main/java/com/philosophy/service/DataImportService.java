@@ -17,6 +17,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
@@ -86,6 +88,8 @@ public class DataImportService {
 
     private final ConcurrentMap<String, Boolean> columnExistenceCache = new ConcurrentHashMap<>();
     private final Set<String> missingColumnWarnings = ConcurrentHashMap.newKeySet();
+    private final ConcurrentMap<Long, Long> pendingUserSchoolAssignments = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, Long> symbolicContentIdCache = new ConcurrentHashMap<>();
     private static final Pattern ID_IN_OBJECT_PATTERN = Pattern.compile("\\b(?:id|ID)=(\\d+)");
     private static final Pattern PURE_NUMBER_PATTERN = Pattern.compile("^-?\\d+$");
     private static final List<DateTimeFormatter> SUPPORTED_COMMENT_DATE_FORMATS = List.of(
@@ -96,6 +100,9 @@ public class DataImportService {
             DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
     );
     private static final Pattern ANY_NUMBER_PATTERN = Pattern.compile("(\\d+)");
+    private static final int USER_SECTION_MIN_COLUMNS = 26;
+    private static final int SCHOOL_SECTION_MIN_COLUMNS = 10;
+    private static final int PHILOSOPHER_SECTION_MIN_COLUMNS = 14;
     private static final Set<String> TRUE_STRING_VALUES = Set.of("1", "true", "yes", "y", "t", "on", "是", "私密", "屏蔽");
     private static final Set<String> FALSE_STRING_VALUES = Set.of("0", "false", "no", "n", "f", "off", "否", "公开");
 
@@ -105,6 +112,7 @@ public class DataImportService {
 
     public ImportResult importCsvData(MultipartFile file, boolean clearExistingData) {
         ImportResult result = new ImportResult();
+        pendingUserSchoolAssignments.clear();
         
         try {
             // 如果需要清空现有数据
@@ -170,6 +178,7 @@ public class DataImportService {
                 schoolData = findSectionByKeywords(dataSections, "流派", "数据");
             }
             importSchoolsInTransaction(result, schoolData);
+            applyPendingUserSchoolAssignments();
             importPhilosophersInTransaction(result, dataSections.get("哲学家数据"));
             
             // 导入哲学家-学派关联（在哲学家和学派导入后）——兼容多种标题/同义词
@@ -627,62 +636,89 @@ public class DataImportService {
             try (BufferedReader reader = new BufferedReader(
                     new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
 
-                String line;
+                String rawLine;
                 String currentSection = null;
                 List<String[]> currentData = null;
-                int lineNumber = 0;
+                int physicalLineNumber = 0;
+                int logicalLineNumber = 0;
+                StringBuilder recordBuilder = new StringBuilder();
+                boolean insideQuotes = false;
 
                 logger.info("开始解析CSV文件: {}, 大小: {} bytes, 检测到UTF-8 BOM: {}", 
                            file.getOriginalFilename(), file.getSize(), hasBom);
 
-            while ((line = reader.readLine()) != null) {
-                lineNumber++;
-                line = line.trim();
-                logger.debug("解析第{}行: [{}]", lineNumber, line);
+                while ((rawLine = reader.readLine()) != null) {
+                    physicalLineNumber++;
+                    logger.debug("读取物理第{}行: [{}]", physicalLineNumber, rawLine);
 
-                // 检测新的数据段 - 更宽松的匹配条件，支持问号结尾
-                if ((line.endsWith("数据") || line.endsWith("数据？")) && !line.contains(",")) {
-                    if (currentSection != null && currentData != null) {
-                        sections.put(currentSection, currentData);
-                        logger.info("完成数据段: {}, 数据行数: {}", currentSection, currentData.size());
+                    if (recordBuilder.length() > 0) {
+                        recordBuilder.append("\n");
                     }
-                    currentSection = line;
-                    currentData = new ArrayList<>();
-                    logger.info("开始解析数据段: [{}]", currentSection);
-                    continue;
-                }
-                
-                // 如果还没有找到数据段，跳过所有行
-                if (currentData == null) {
-                    logger.debug("跳过行（未找到数据段）: [{}]", line);
-                    continue;
-                }
-                
-                // 跳过标题行 - 更精确的匹配：标题行应该以"ID,"开头
-                if (line.startsWith("ID,") || line.startsWith("ID, ")) {
-                    logger.debug("跳过标题行: [{}]", line);
-                    continue;
-                }
-                
-                // 解析数据行
-                if (currentSection != null && currentData != null && !line.isEmpty()) {
-                    String[] fields = parseCsvLine(line);
+                    recordBuilder.append(rawLine);
+
+                    insideQuotes = updateQuoteState(insideQuotes, rawLine);
+                    if (insideQuotes) {
+                        logger.debug("检测到跨行字段，继续累积: 当前缓冲长度 {}", recordBuilder.length());
+                        continue;
+                    }
+
+                    String logicalLine = recordBuilder.toString();
+                    recordBuilder.setLength(0);
+                    logicalLineNumber++;
+
+                    String trimmedLine = logicalLine.trim();
+                    logger.debug("解析逻辑第{}行: [{}]", logicalLineNumber, trimmedLine);
+
+                    // 检测新的数据段 - 更宽松的匹配条件，支持问号结尾
+                    if ((trimmedLine.endsWith("数据") || trimmedLine.endsWith("数据？")) && !trimmedLine.contains(",")) {
+                        if (currentSection != null && currentData != null) {
+                            sections.put(currentSection, currentData);
+                            logger.info("完成数据段: {}, 数据行数: {}", currentSection, currentData.size());
+                        }
+                        currentSection = trimmedLine;
+                        currentData = new ArrayList<>();
+                        logger.info("开始解析数据段: [{}]", currentSection);
+                        continue;
+                    }
+
+                    // 如果还没有找到数据段，跳过所有行
+                    if (currentData == null) {
+                        if (!trimmedLine.isEmpty()) {
+                            logger.debug("跳过行（未找到数据段）: [{}]", trimmedLine);
+                        }
+                        continue;
+                    }
+
+                    // 跳过标题行 - 更精确的匹配：标题行应该以"ID,"开头
+                    if (trimmedLine.startsWith("ID,")) {
+                        logger.debug("跳过标题行: [{}]", trimmedLine);
+                        continue;
+                    }
+
+                    if (trimmedLine.isEmpty()) {
+                        logger.debug("跳过空行（逻辑行）");
+                        continue;
+                    }
+
+                    String[] fields = parseCsvLine(logicalLine);
                     if (fields.length > 0) {
-                        // 检查第一个字段是否是"ID"（标题行的另一种格式）
-                        if (fields.length > 0 && "ID".equals(fields[0].trim())) {
-                            logger.debug("跳过标题行（第一个字段是ID）: [{}]", line);
+                        if ("ID".equals(fields[0].trim())) {
+                            logger.debug("跳过标题行（第一个字段是ID）: [{}]", trimmedLine);
                             continue;
                         }
                         currentData.add(fields);
-                        logger.debug("添加数据行到段{}: [{}] -> {} 个字段", currentSection, line, fields.length);
+                        logger.debug("添加数据行到段{}: [{}] -> {} 个字段", currentSection, trimmedLine, fields.length);
                     } else {
-                        logger.warn("解析数据行失败，字段为空: [{}]", line);
+                        logger.warn("解析数据行失败，字段为空: [{}]", trimmedLine);
                     }
-                } else {
-                    logger.debug("跳过行: [{}] (currentSection={}, currentData={}, isEmpty={})", 
-                               line, currentSection, currentData != null, line.isEmpty());
                 }
-            }
+
+                if (recordBuilder.length() > 0) {
+                    String dangling = recordBuilder.toString().trim();
+                    if (!dangling.isEmpty()) {
+                        logger.warn("检测到未闭合的CSV记录，剩余内容: [{}]", dangling);
+                    }
+                }
 
                 // 保存最后一个数据段
                 if (currentSection != null && currentData != null) {
@@ -736,6 +772,23 @@ public class DataImportService {
         
         logger.debug("未找到包含关键词 {} 的数据段", Arrays.toString(keywords));
         return null;
+    }
+
+    private boolean updateQuoteState(boolean inQuotes, String line) {
+        if (line == null || line.isEmpty()) {
+            return inQuotes;
+        }
+        for (int i = 0; i < line.length(); i++) {
+            char c = line.charAt(i);
+            if (c == '"') {
+                if (inQuotes && i + 1 < line.length() && line.charAt(i + 1) == '"') {
+                    i++;
+                } else {
+                    inQuotes = !inQuotes;
+                }
+            }
+        }
+        return inQuotes;
     }
 
     private String[] parseCsvLine(String line) {
@@ -832,17 +885,30 @@ public class DataImportService {
         for (int i = 0; i < data.size(); i++) {
             String[] fields = data.get(i);
             try {
-                // 检查字段数量，支持完整字段导入
-                if (fields.length < 5) {
-                    logger.warn("用户数据第 {} 行被跳过: 字段数量不足 (需要至少5个字段，实际: {})", i + 1, fields.length);
-                    failed++;
-                    recordFailureDetail(result, sectionName, i, fields,
-                        "字段数量不足，至少需要 5 列，实际为 " + fields.length + " 列",
-                        null);
+                if (fields == null || fields.length == 0 || isRowEmpty(fields)) {
+                    logger.debug("跳过空行: 行号 {}", i + 1);
                     continue;
                 }
 
-                Long userId = Long.parseLong(fields[0]);
+                if (isUserHeaderRow(fields)) {
+                    logger.debug("跳过用户标题行: {}", Arrays.toString(fields));
+                    continue;
+                }
+
+                fields = ensureMinimumColumns(fields, USER_SECTION_MIN_COLUMNS);
+
+                Long userId = parseIdFromValue(fields[0]);
+                if (userId == null) {
+                    if (shouldSilentlySkipNonUserRow(fields)) {
+                        logger.debug("用户数据第 {} 行看起来不是用户记录，已兼容性跳过: {}", i + 1, Arrays.toString(fields));
+                        continue;
+                    }
+                    failed++;
+                    recordFailureDetail(result, sectionName, i, fields,
+                        "无法解析用户ID: '" + fields[0] + "'",
+                        null);
+                    continue;
+                }
                 
                 // 检查现有用户，以便保留版主的流派分配（如果CSV中未提供）
                 User existingUser = userRepository.findById(userId).orElse(null);
@@ -977,6 +1043,7 @@ public class DataImportService {
                         user.setAssignedSchoolId(null);
                     }
                 }
+                deferAssignedSchoolAssignment(user, sectionName, i);
                 
                 // 处理IP地址和设备信息 (字段18-20: IP地址,设备类型,用户代理)
                 if (fields.length > 18 && !fields[18].isEmpty() && !fields[18].equals("null")) {
@@ -1063,6 +1130,64 @@ public class DataImportService {
         logger.info("用户数据导入完成，成功: {}, 失败: {}", success, failed);
     }
 
+    private void deferAssignedSchoolAssignment(User user, String sectionName, int rowIndex) {
+        if (user == null || user.getId() == null) {
+            return;
+        }
+
+        Long targetSchoolId = user.getAssignedSchoolId();
+        if (targetSchoolId == null) {
+            pendingUserSchoolAssignments.remove(user.getId());
+            return;
+        }
+
+        pendingUserSchoolAssignments.put(user.getId(), targetSchoolId);
+        user.setAssignedSchoolId(null);
+        logger.debug("用户ID {}: 分配学派 {} 将在学派导入后应用 ({} 第 {} 行)", user.getId(), targetSchoolId, sectionName, rowIndex + 1);
+    }
+
+    private void applyPendingUserSchoolAssignments() {
+        if (pendingUserSchoolAssignments.isEmpty()) {
+            return;
+        }
+
+        Map<Long, Long> assignments = new LinkedHashMap<>(pendingUserSchoolAssignments);
+        pendingUserSchoolAssignments.clear();
+
+        try {
+            transactionTemplate.execute(status -> {
+                for (Map.Entry<Long, Long> entry : assignments.entrySet()) {
+                    Long userId = entry.getKey();
+                    Long schoolId = entry.getValue();
+                    if (userId == null || schoolId == null) {
+                        continue;
+                    }
+
+                    if (!schoolRepository.existsById(schoolId)) {
+                        logger.warn("用户ID {}: 目标学派 {} 在导入完成后仍不存在，保持为空", userId, schoolId);
+                        continue;
+                    }
+
+                    try {
+                        jakarta.persistence.Query update = entityManager.createNativeQuery(
+                                "UPDATE users SET assigned_school_id = ? WHERE id = ?");
+                        update.setParameter(1, schoolId);
+                        update.setParameter(2, userId);
+                        int affected = update.executeUpdate();
+                        if (affected == 0) {
+                            logger.warn("用户ID {}: 更新分配学派 {} 未影响任何行", userId, schoolId);
+                        }
+                    } catch (Exception e) {
+                        logger.error("用户ID {}: 更新分配学派 {} 失败", userId, schoolId, e);
+                    }
+                }
+                return null;
+            });
+        } catch (Exception e) {
+            logger.error("批量更新用户分配学派失败: {}", e.getMessage(), e);
+        }
+    }
+
     private void handleUserConflictsBeforeInsert(User user) {
         if (user == null || user.getId() == null) {
             return;
@@ -1119,6 +1244,11 @@ public class DataImportService {
             deleteUserContentEditQuery.setParameter(1, userId);
             deleteUserContentEditQuery.executeUpdate();
 
+            jakarta.persistence.Query deleteUserContentEditsByOriginalContentQuery = entityManager.createNativeQuery(
+                    "DELETE FROM user_content_edits WHERE original_content_id IN (SELECT id FROM contents WHERE user_id = ?)");
+            deleteUserContentEditsByOriginalContentQuery.setParameter(1, userId);
+            deleteUserContentEditsByOriginalContentQuery.executeUpdate();
+
             jakarta.persistence.Query deleteLikeQuery = entityManager.createNativeQuery("DELETE FROM likes WHERE user_id = ?");
             deleteLikeQuery.setParameter(1, userId);
             deleteLikeQuery.executeUpdate();
@@ -1127,14 +1257,127 @@ public class DataImportService {
             deleteCommentQuery.setParameter(1, userId);
             deleteCommentQuery.executeUpdate();
 
+            jakarta.persistence.Query resetContentLockQuery = entityManager.createNativeQuery(
+                    "UPDATE contents SET locked_by_user_id = NULL WHERE locked_by_user_id = ?");
+            resetContentLockQuery.setParameter(1, userId);
+            resetContentLockQuery.executeUpdate();
+
+            jakarta.persistence.Query resetContentPrivacyQuery = entityManager.createNativeQuery(
+                    "UPDATE contents SET privacy_set_by = NULL WHERE privacy_set_by = ?");
+            resetContentPrivacyQuery.setParameter(1, userId);
+            resetContentPrivacyQuery.executeUpdate();
+
+            jakarta.persistence.Query resetContentBlockedQuery = entityManager.createNativeQuery(
+                    "UPDATE contents SET blocked_by = NULL WHERE blocked_by = ?");
+            resetContentBlockedQuery.setParameter(1, userId);
+            resetContentBlockedQuery.executeUpdate();
+
+            jakarta.persistence.Query resetCommentPrivacyQuery = entityManager.createNativeQuery(
+                    "UPDATE comments SET privacy_set_by = NULL WHERE privacy_set_by = ?");
+            resetCommentPrivacyQuery.setParameter(1, userId);
+            resetCommentPrivacyQuery.executeUpdate();
+
             jakarta.persistence.Query deleteContentTranslationQuery = entityManager.createNativeQuery(
                     "DELETE FROM contents_translation WHERE content_id IN (SELECT id FROM contents WHERE user_id = ?)");
             deleteContentTranslationQuery.setParameter(1, userId);
             deleteContentTranslationQuery.executeUpdate();
 
+            // 在删除 contents 之前，先删除所有引用这些 contents 的 comments（通过 content_id 外键）
+            jakarta.persistence.Query deleteCommentsByContentQuery = entityManager.createNativeQuery(
+                    "DELETE FROM comments WHERE content_id IN (SELECT id FROM contents WHERE user_id = ?)");
+            deleteCommentsByContentQuery.setParameter(1, userId);
+            deleteCommentsByContentQuery.executeUpdate();
+
             jakarta.persistence.Query deleteContentQuery = entityManager.createNativeQuery("DELETE FROM contents WHERE user_id = ?");
             deleteContentQuery.setParameter(1, userId);
             deleteContentQuery.executeUpdate();
+
+            // 清理与该用户关联的哲学家数据，避免外键阻止用户删除
+            jakarta.persistence.Query deleteContentTranslationByPhilosopherQuery = entityManager.createNativeQuery(
+                    "DELETE FROM contents_translation WHERE content_id IN (SELECT id FROM contents WHERE philosopher_id IN (SELECT id FROM philosophers WHERE user_id = ?))");
+            deleteContentTranslationByPhilosopherQuery.setParameter(1, userId);
+            deleteContentTranslationByPhilosopherQuery.executeUpdate();
+
+            jakarta.persistence.Query deleteCommentsByPhilosopherContentQuery = entityManager.createNativeQuery(
+                    "DELETE FROM comments WHERE content_id IN (SELECT id FROM contents WHERE philosopher_id IN (SELECT id FROM philosophers WHERE user_id = ?))");
+            deleteCommentsByPhilosopherContentQuery.setParameter(1, userId);
+            deleteCommentsByPhilosopherContentQuery.executeUpdate();
+
+            jakarta.persistence.Query deleteUserContentEditsByOriginalContentPhilosopherQuery = entityManager.createNativeQuery(
+                    "DELETE FROM user_content_edits WHERE original_content_id IN (SELECT id FROM contents WHERE philosopher_id IN (SELECT id FROM philosophers WHERE user_id = ?))");
+            deleteUserContentEditsByOriginalContentPhilosopherQuery.setParameter(1, userId);
+            deleteUserContentEditsByOriginalContentPhilosopherQuery.executeUpdate();
+
+            jakarta.persistence.Query deleteUserContentEditsByPhilosopherQuery = entityManager.createNativeQuery(
+                    "DELETE FROM user_content_edits WHERE philosopher_id IN (SELECT id FROM philosophers WHERE user_id = ?)");
+            deleteUserContentEditsByPhilosopherQuery.setParameter(1, userId);
+            deleteUserContentEditsByPhilosopherQuery.executeUpdate();
+
+            jakarta.persistence.Query deleteContentByPhilosopherQuery = entityManager.createNativeQuery(
+                    "DELETE FROM contents WHERE philosopher_id IN (SELECT id FROM philosophers WHERE user_id = ?)");
+            deleteContentByPhilosopherQuery.setParameter(1, userId);
+            deleteContentByPhilosopherQuery.executeUpdate();
+
+            jakarta.persistence.Query deletePhilosopherTranslationsQuery = entityManager.createNativeQuery(
+                    "DELETE FROM philosophers_translation WHERE philosopher_id IN (SELECT id FROM philosophers WHERE user_id = ?)");
+            deletePhilosopherTranslationsQuery.setParameter(1, userId);
+            deletePhilosopherTranslationsQuery.executeUpdate();
+
+            jakarta.persistence.Query deletePhilosopherSchoolByPhilosopherQuery = entityManager.createNativeQuery(
+                    "DELETE FROM philosopher_school WHERE philosopher_id IN (SELECT id FROM philosophers WHERE user_id = ?)");
+            deletePhilosopherSchoolByPhilosopherQuery.setParameter(1, userId);
+            deletePhilosopherSchoolByPhilosopherQuery.executeUpdate();
+
+            jakarta.persistence.Query deletePhilosophersQuery = entityManager.createNativeQuery(
+                    "DELETE FROM philosophers WHERE user_id = ?");
+            deletePhilosophersQuery.setParameter(1, userId);
+            deletePhilosophersQuery.executeUpdate();
+
+            // 清理与该用户关联的学派数据，避免外键阻止用户删除
+            jakarta.persistence.Query deleteContentTranslationBySchoolQuery = entityManager.createNativeQuery(
+                    "DELETE FROM contents_translation WHERE content_id IN (SELECT id FROM contents WHERE school_id IN (SELECT id FROM schools WHERE user_id = ?))");
+            deleteContentTranslationBySchoolQuery.setParameter(1, userId);
+            deleteContentTranslationBySchoolQuery.executeUpdate();
+
+            jakarta.persistence.Query deleteCommentsBySchoolContentQuery = entityManager.createNativeQuery(
+                    "DELETE FROM comments WHERE content_id IN (SELECT id FROM contents WHERE school_id IN (SELECT id FROM schools WHERE user_id = ?))");
+            deleteCommentsBySchoolContentQuery.setParameter(1, userId);
+            deleteCommentsBySchoolContentQuery.executeUpdate();
+
+            jakarta.persistence.Query deleteUserContentEditsByOriginalContentSchoolQuery = entityManager.createNativeQuery(
+                    "DELETE FROM user_content_edits WHERE original_content_id IN (SELECT id FROM contents WHERE school_id IN (SELECT id FROM schools WHERE user_id = ?))");
+            deleteUserContentEditsByOriginalContentSchoolQuery.setParameter(1, userId);
+            deleteUserContentEditsByOriginalContentSchoolQuery.executeUpdate();
+
+            jakarta.persistence.Query deleteUserContentEditsBySchoolQuery = entityManager.createNativeQuery(
+                    "DELETE FROM user_content_edits WHERE school_id IN (SELECT id FROM schools WHERE user_id = ?)");
+            deleteUserContentEditsBySchoolQuery.setParameter(1, userId);
+            deleteUserContentEditsBySchoolQuery.executeUpdate();
+
+            jakarta.persistence.Query deleteModeratorBlocksBySchoolQuery = entityManager.createNativeQuery(
+                    "DELETE FROM moderator_blocks WHERE school_id IN (SELECT id FROM schools WHERE user_id = ?)");
+            deleteModeratorBlocksBySchoolQuery.setParameter(1, userId);
+            deleteModeratorBlocksBySchoolQuery.executeUpdate();
+
+            jakarta.persistence.Query deleteContentBySchoolQuery = entityManager.createNativeQuery(
+                    "DELETE FROM contents WHERE school_id IN (SELECT id FROM schools WHERE user_id = ?)");
+            deleteContentBySchoolQuery.setParameter(1, userId);
+            deleteContentBySchoolQuery.executeUpdate();
+
+            jakarta.persistence.Query deletePhilosopherSchoolBySchoolQuery = entityManager.createNativeQuery(
+                    "DELETE FROM philosopher_school WHERE school_id IN (SELECT id FROM schools WHERE user_id = ?)");
+            deletePhilosopherSchoolBySchoolQuery.setParameter(1, userId);
+            deletePhilosopherSchoolBySchoolQuery.executeUpdate();
+
+            jakarta.persistence.Query deleteSchoolTranslationsQuery = entityManager.createNativeQuery(
+                    "DELETE FROM schools_translation WHERE school_id IN (SELECT id FROM schools WHERE user_id = ?)");
+            deleteSchoolTranslationsQuery.setParameter(1, userId);
+            deleteSchoolTranslationsQuery.executeUpdate();
+
+            jakarta.persistence.Query deleteSchoolsQuery = entityManager.createNativeQuery(
+                    "DELETE FROM schools WHERE user_id = ?");
+            deleteSchoolsQuery.setParameter(1, userId);
+            deleteSchoolsQuery.executeUpdate();
 
             jakarta.persistence.Query deleteUserQuery = entityManager.createNativeQuery("DELETE FROM users WHERE id = ?");
             deleteUserQuery.setParameter(1, userId);
@@ -1291,15 +1534,26 @@ public class DataImportService {
         for (int index = 0; index < data.size(); index++) {
             String[] fields = data.get(index);
             try {
-                if (fields.length < 5) {
-                    failed++;
-                    recordFailureDetail(result, sectionName, index, fields,
-                        "字段数量不足，至少需要 5 列，实际为 " + fields.length + " 列",
-                        null);
+                if (fields == null || fields.length == 0 || isRowEmpty(fields)) {
+                    logger.debug("跳过空学派行: 行号 {}", index + 1);
                     continue;
                 }
 
-                Long schoolId = Long.parseLong(fields[0]);
+                if (isHeaderRow(fields)) {
+                    logger.debug("跳过学派标题行: {}", Arrays.toString(fields));
+                    continue;
+                }
+
+                fields = ensureMinimumColumns(fields, SCHOOL_SECTION_MIN_COLUMNS);
+
+                Long schoolId = parseIdFromValue(fields[0]);
+                if (schoolId == null) {
+                    failed++;
+                    recordFailureDetail(result, sectionName, index, fields,
+                        "无法解析学派ID: '" + fields[0] + "'",
+                        null);
+                    continue;
+                }
                 
                 // 直接创建新学派，不查找现有学派
                 School school = new School();
@@ -1543,16 +1797,27 @@ public class DataImportService {
         for (int index = 0; index < data.size(); index++) {
             String[] fields = data.get(index);
             try {
-                if (fields.length < 5) {
-                    logger.warn("哲学家字段数量不足，跳过: {}", Arrays.toString(fields));
+                if (fields == null || fields.length == 0 || isRowEmpty(fields)) {
+                    logger.debug("跳过空哲学家行: 行号 {}", index + 1);
+                    continue;
+                }
+
+                if (isHeaderRow(fields)) {
+                    logger.debug("跳过哲学家标题行: {}", Arrays.toString(fields));
+                    continue;
+                }
+
+                fields = ensureMinimumColumns(fields, PHILOSOPHER_SECTION_MIN_COLUMNS);
+
+                Long philosopherId = parseIdFromValue(fields[0]);
+                if (philosopherId == null) {
                     failed++;
                     recordFailureDetail(result, sectionName, index, fields,
-                        "字段数量不足，至少需要 5 列，实际为 " + fields.length + " 列",
+                        "无法解析哲学家ID: '" + fields[0] + "'",
                         null);
                     continue;
                 }
 
-                Long philosopherId = Long.parseLong(fields[0]);
                 logger.debug("处理哲学家ID: {}, 字段: {}", philosopherId, Arrays.toString(fields));
                 
                 // 直接创建新哲学家，不查找现有哲学家
@@ -1791,16 +2056,31 @@ public class DataImportService {
         for (int index = 0; index < data.size(); index++) {
             String[] fields = data.get(index);
             try {
-                if (fields.length < 5) {
-                    logger.warn("内容字段数量不足，跳过: {}", Arrays.toString(fields));
+                // 跳过空行
+                if (fields == null || fields.length == 0 || isRowEmpty(fields)) {
+                    logger.debug("跳过空行: 行号 {}", index + 1);
+                    continue;
+                }
+                
+                // 跳过标题行
+                if (fields.length > 0 && ("ID".equals(fields[0].trim()) || "id".equals(fields[0].trim().toLowerCase()))) {
+                    logger.debug("跳过标题行: {}", Arrays.toString(fields));
+                    continue;
+                }
+                
+                // 旧版导出依赖至少5列，这里为兼容性补齐缺失列
+                fields = ensureMinimumColumns(fields, 5);
+
+                // 使用更灵活的ID解析方法
+                Long contentId = parseContentIdentifier(fields[0]);
+                if (contentId == null) {
+                    logger.warn("无法解析内容ID，跳过: 第一个字段 = '{}'", fields[0]);
                     failed++;
                     recordFailureDetail(result, sectionName, index, fields,
-                        "字段数量不足，至少需要 5 列，实际为 " + fields.length + " 列",
+                        "无法解析内容ID: '" + fields[0] + "'",
                         null);
                     continue;
                 }
-
-                Long contentId = Long.parseLong(fields[0]);
                 logger.debug("处理内容ID: {}, 字段: {}", contentId, Arrays.toString(fields));
                 
                 // 直接创建新内容，不查找现有内容
@@ -1809,7 +2089,8 @@ public class DataImportService {
                 logger.debug("创建新内容，使用CSV中的ID: {}", contentId);
                 
                 // 设置内容文本
-                content.setContent(fields[1]);
+                String contentText = fields[1] == null ? "" : fields[1];
+                content.setContent(contentText);
                 
                 // 设置英文内容（如果存在）
                 if (fields.length > 2 && !fields[2].isEmpty() && !fields[2].equals("null")) {
@@ -1843,7 +2124,7 @@ public class DataImportService {
                 content.setBlocked(false);
                 content.setVersion(1L); // 设置初始版本号为1，避免乐观锁冲突
 
-                logger.debug("准备保存内容: ID={}, content={}", contentId, fields[1]);
+                logger.debug("准备保存内容: ID={}, content={}", contentId, contentText);
 
                 // 优先尝试更新已有内容，避免删除后丢失既有作者等关联
                 try {
@@ -1941,6 +2222,11 @@ public class DataImportService {
                     throw saveException; // 重新抛出异常以便上层捕获
                 }
 
+            } catch (NumberFormatException nfe) {
+                failed++;
+                logger.warn("导入内容失败（数字格式错误）: {}", Arrays.toString(fields), nfe);
+                recordFailureDetail(result, sectionName, index, fields, 
+                    "数字格式错误: " + nfe.getMessage(), nfe);
             } catch (Exception e) {
                 failed++;
                 logger.error("导入内容失败: " + Arrays.toString(fields), e);
@@ -1969,12 +2255,34 @@ public class DataImportService {
 
         logger.info("开始更新内容关联，共 {} 条", data.size());
         int success = 0, failed = 0;
+        final String sectionName = "内容关联";
 
-        for (String[] fields : data) {
+        for (int index = 0; index < data.size(); index++) {
+            String[] fields = data.get(index);
             try {
-                if (fields.length < 5) continue;
+                // 跳过空行
+                if (fields == null || fields.length == 0 || isRowEmpty(fields)) {
+                    continue;
+                }
+                
+                // 跳过标题行
+                if (fields.length > 0 && ("ID".equals(fields[0].trim()) || "id".equals(fields[0].trim().toLowerCase()))) {
+                    continue;
+                }
+                
+                if (fields.length < 5) {
+                    logger.warn("内容关联字段数量不足，跳过: {}", Arrays.toString(fields));
+                    failed++;
+                    continue;
+                }
 
-                Long contentId = Long.parseLong(fields[0]);
+                // 使用更灵活的ID解析方法
+                Long contentId = parseContentIdentifier(fields[0]);
+                if (contentId == null) {
+                    logger.warn("无法解析内容ID，跳过: 第一个字段 = '{}'", fields[0]);
+                    failed++;
+                    continue;
+                }
                 
                 // 使用原生SQL更新关联，避免JPA实体加载
                 // 注意：当哲学家/学派/作者列为空或为“已注销”时，不覆盖原值（COALESCE 使 NULL 不改变原值）
@@ -1983,8 +2291,12 @@ public class DataImportService {
                 Long philosopherId = null;
                 if (fields.length > 3 && !fields[3].isEmpty() && !fields[3].equals("null")) {
                     try {
-                        // 直接解析哲学家ID，因为CSV导出的是哲学家ID
-                        philosopherId = Long.parseLong(fields[3]);
+                        // 使用更灵活的ID解析方法
+                        philosopherId = parseIdFromValue(fields[3]);
+                        if (philosopherId == null) {
+                            // 如果解析失败，尝试作为名称查找（向后兼容）
+                            throw new NumberFormatException("无法解析哲学家ID: " + fields[3]);
+                        }
                         
                         // 验证哲学家是否存在 - 添加重试机制处理事务隔离问题
                         String checkPhilosopherSql = "SELECT id FROM philosophers WHERE id = ? LIMIT 1";
@@ -2041,8 +2353,12 @@ public class DataImportService {
                 Long schoolId = null;
                 if (fields.length > 4 && !fields[4].isEmpty() && !fields[4].equals("null")) {
                     try {
-                        // 直接解析学派ID，因为CSV导出的是学派ID
-                        schoolId = Long.parseLong(fields[4]);
+                        // 使用更灵活的ID解析方法
+                        schoolId = parseIdFromValue(fields[4]);
+                        if (schoolId == null) {
+                            // 如果解析失败，尝试作为名称查找（向后兼容）
+                            throw new NumberFormatException("无法解析学派ID: " + fields[4]);
+                        }
                         
                         // 验证学派是否存在 - 添加重试机制处理事务隔离问题
                         String checkSchoolSql = "SELECT id FROM schools WHERE id = ? LIMIT 1";
@@ -2221,13 +2537,19 @@ public class DataImportService {
                     logger.warn("内容关联更新失败: ID={} (内容不存在)", contentId);
                 }
 
+            } catch (NumberFormatException nfe) {
+                failed++;
+                logger.warn("更新内容关联失败（数字格式错误）: {}", Arrays.toString(fields), nfe);
+                recordFailureDetail(result, sectionName, index, fields, 
+                    "数字格式错误: " + nfe.getMessage(), nfe);
             } catch (Exception e) {
                 failed++;
                 logger.warn("更新内容关联失败: " + Arrays.toString(fields), e);
+                recordFailureDetail(result, sectionName, index, fields, "更新关联失败", e);
             }
         }
 
-        result.addResult("内容关联", success, failed);
+        result.addResult(sectionName, success, failed);
         logger.info("内容关联更新完成，成功: {}, 失败: {}", success, failed);
     }
 
@@ -2476,7 +2798,7 @@ public class DataImportService {
         row.body = bodyRaw;
 
         String contentRaw = extractField(fields, headerIndex, 3, "content_id", "content", "内容id", "关联内容", "归属内容");
-        Long contentId = parseIdFromValue(contentRaw);
+        Long contentId = parseContentIdentifier(contentRaw);
         if (contentId == null) {
             throw new IllegalArgumentException("评论ID " + commentId + " 缺少内容ID");
         }
@@ -2549,6 +2871,50 @@ public class DataImportService {
         return true;
     }
 
+    private boolean isUserHeaderRow(String[] fields) {
+        if (fields == null || fields.length == 0) {
+            return false;
+        }
+        String first = sanitizeField(fields[0]);
+        if (first == null || first.isBlank()) {
+            return false;
+        }
+        String normalized = first.toLowerCase(Locale.ROOT);
+        if ("id".equals(normalized) || "用户id".equals(normalized) || "编号".equals(normalized)) {
+            return true;
+        }
+        if (normalized.contains("id") && fields.length > 1) {
+            String second = sanitizeField(fields[1]);
+            if (second != null) {
+                String normalizedSecond = second.toLowerCase(Locale.ROOT);
+                return normalizedSecond.contains("username") || normalizedSecond.contains("用户");
+            }
+        }
+        return false;
+    }
+
+    private boolean shouldSilentlySkipNonUserRow(String[] fields) {
+        if (fields == null || fields.length == 0) {
+            return true;
+        }
+        String first = sanitizeField(fields[0]);
+        if (first == null || first.isBlank()) {
+            return true;
+        }
+        if (parseIdFromValue(first) != null) {
+            return false;
+        }
+        String usernameCandidate = fields.length > 1 ? sanitizeField(fields[1]) : null;
+        String emailCandidate = fields.length > 2 ? sanitizeField(fields[2]) : null;
+        if (emailCandidate != null && emailCandidate.contains("@")) {
+            return false;
+        }
+        if (usernameCandidate != null && usernameCandidate.length() >= 3) {
+            return false;
+        }
+        return true;
+    }
+
     private Map<String, Integer> buildHeaderIndex(String[] header) {
         Map<String, Integer> index = new HashMap<>();
         if (header == null) {
@@ -2601,6 +2967,23 @@ public class DataImportService {
         return trimmed;
     }
 
+    /**
+     * 兼容旧CSV：补齐缺失的列，避免下游访问越界。
+     */
+    private String[] ensureMinimumColumns(String[] fields, int minColumns) {
+        if (fields == null) {
+            return new String[minColumns];
+        }
+        if (fields.length >= minColumns) {
+            return fields;
+        }
+        String[] expanded = Arrays.copyOf(fields, minColumns);
+        for (int i = fields.length; i < minColumns; i++) {
+            expanded[i] = "";
+        }
+        return expanded;
+    }
+
     private Long parseIdFromValue(String raw) {
         if (raw == null) {
             return null;
@@ -2628,6 +3011,64 @@ public class DataImportService {
             candidate = Long.parseLong(matcher.group(1));
         }
         return candidate;
+    }
+
+    private Long parseContentIdentifier(String raw) {
+        Long numeric = parseIdFromValue(raw);
+        if (numeric != null) {
+            return numeric;
+        }
+        String normalized = normalizeSymbolicContentId(raw);
+        if (normalized == null) {
+            return null;
+        }
+        return symbolicContentIdCache.computeIfAbsent(normalized, key -> {
+            long synthetic = generateSyntheticContentId(key);
+            logger.debug("为符号内容标识'{}'生成合成ID {}", key, synthetic);
+            return synthetic;
+        });
+    }
+
+    private String normalizeSymbolicContentId(String raw) {
+        String sanitized = sanitizeField(raw);
+        if (sanitized == null) {
+            return null;
+        }
+        String normalized = sanitized.replaceAll("\\s+", " ").trim();
+        if (normalized.isEmpty()) {
+            return null;
+        }
+        boolean hasLetter = normalized.codePoints().anyMatch(Character::isLetter);
+        if (!hasLetter) {
+            return null;
+        }
+        return normalized;
+    }
+
+    private long generateSyntheticContentId(String normalizedKey) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(normalizedKey.getBytes(StandardCharsets.UTF_8));
+            long value = 0L;
+            for (int i = 0; i < Math.min(8, hash.length); i++) {
+                value = (value << 8) | (hash[i] & 0xFF);
+            }
+            if (value == Long.MIN_VALUE) {
+                value = Long.MAX_VALUE;
+            }
+            long positive = Math.abs(value);
+            if (positive == 0L) {
+                positive = 1L;
+            }
+            return -positive;
+        } catch (NoSuchAlgorithmException e) {
+            long fallback = normalizedKey.hashCode();
+            long positive = Math.abs(fallback);
+            if (positive == 0L) {
+                positive = 1L;
+            }
+            return -positive;
+        }
     }
 
     private Integer parseInteger(String raw) {
