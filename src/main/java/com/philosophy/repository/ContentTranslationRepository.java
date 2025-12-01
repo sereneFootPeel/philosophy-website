@@ -2,9 +2,11 @@ package com.philosophy.repository;
 
 import com.philosophy.model.ContentTranslation;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -35,12 +37,18 @@ public interface ContentTranslationRepository extends JpaRepository<ContentTrans
     /**
      * 根据内容ID删除所有翻译
      */
-    void deleteByContentId(Long contentId);
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM ContentTranslation ct WHERE ct.content.id = :contentId")
+    void deleteByContentId(@Param("contentId") Long contentId);
 
     /**
      * 根据内容ID和语言代码删除翻译
      */
-    void deleteByContentIdAndLanguageCode(Long contentId, String languageCode);
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM ContentTranslation ct WHERE ct.content.id = :contentId AND ct.languageCode = :languageCode")
+    void deleteByContentIdAndLanguageCode(@Param("contentId") Long contentId, @Param("languageCode") String languageCode);
 
     /**
      * 查找所有内容的英文翻译（包括没有翻译的内容）

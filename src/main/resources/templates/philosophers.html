@@ -241,20 +241,364 @@
         });
 
 
-        // 显示特定哲学家的信息
-        function showPhilosopher(philosopherId) {
+        // 哲学家数据缓存
+        const philosopherCache = new Map();
+        
+        // 显示特定哲学家的信息（使用AJAX加载）
+        async function showPhilosopher(philosopherId) {
             // 添加详细的调试信息
             console.log('尝试切换到哲学家ID:', philosopherId);
             
             // 确保philosopherId有效
-            if (philosopherId && !isNaN(philosopherId)) {
-                console.log('准备导航到:', '/philosophers?philosopherId=' + philosopherId);
-                // 使用页面刷新来切换哲学家
-                window.location.href = '/philosophers?philosopherId=' + philosopherId;
-            } else {
+            if (!philosopherId || isNaN(philosopherId)) {
                 console.error('无效的哲学家ID:', philosopherId);
+                return;
+            }
+            
+            // 检查缓存
+            if (philosopherCache.has(philosopherId)) {
+                console.log('从缓存加载哲学家:', philosopherId);
+                renderPhilosopherData(philosopherCache.get(philosopherId), philosopherId);
+                updateUrlAndUI(philosopherId);
+                // 预加载相邻的哲学家
+                preloadAdjacentPhilosophers(philosopherId);
+                return;
+            }
+            
+            // 显示加载状态
+            showLoadingState();
+            
+            try {
+                // 使用AJAX加载哲学家数据
+                console.log('开始请求API:', `/api/philosophers/${philosopherId}`);
+                const response = await fetch(`/api/philosophers/${philosopherId}`);
+                
+                console.log('响应状态:', response.status, response.statusText);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('HTTP错误响应:', errorText);
+                    throw new Error(`加载失败 (${response.status}): ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log('收到响应数据:', data);
+                
+                if (!data.success) {
+                    console.error('API返回失败:', data.message);
+                    throw new Error(data.message || '加载失败');
+                }
+                
+                if (!data.philosopher) {
+                    console.error('响应中缺少哲学家数据');
+                    throw new Error('响应数据格式错误');
+                }
+                
+                // 缓存数据
+                philosopherCache.set(philosopherId, data);
+                console.log('数据已缓存');
+                
+                // 渲染数据
+                renderPhilosopherData(data, philosopherId);
+                
+                // 更新URL和UI状态
+                updateUrlAndUI(philosopherId);
+                
+                // 预加载相邻的哲学家
+                preloadAdjacentPhilosophers(philosopherId);
+                
+            } catch (error) {
+                console.error('加载哲学家数据失败:', error);
+                console.error('错误详情:', {
+                    message: error.message,
+                    stack: error.stack,
+                    philosopherId: philosopherId
+                });
+                showErrorState(`加载失败: ${error.message}。请刷新页面重试或检查控制台获取更多信息。`);
             }
         }
+        
+        // 预加载相邻的哲学家（上一个和下一个）
+        async function preloadAdjacentPhilosophers(currentPhilosopherId) {
+            const philosopherLinks = document.querySelectorAll('.philosopher-link');
+            let currentIndex = -1;
+            const allPhilosopherIds = [];
+            
+            // 找出当前哲学家的索引
+            philosopherLinks.forEach((link, index) => {
+                const id = link.getAttribute('data-id');
+                allPhilosopherIds.push(id);
+                if (id === currentPhilosopherId.toString()) {
+                    currentIndex = index;
+                }
+            });
+            
+            if (currentIndex === -1) return;
+            
+            // 计算上一个和下一个哲学家的ID
+            const prevIndex = currentIndex > 0 ? currentIndex - 1 : allPhilosopherIds.length - 1;
+            const nextIndex = currentIndex < allPhilosopherIds.length - 1 ? currentIndex + 1 : 0;
+            
+            const prevPhilosopherId = allPhilosopherIds[prevIndex];
+            const nextPhilosopherId = allPhilosopherIds[nextIndex];
+            
+            // 预加载上一个哲学家（如果尚未缓存）
+            if (prevPhilosopherId && !philosopherCache.has(prevPhilosopherId)) {
+                console.log('预加载上一个哲学家:', prevPhilosopherId);
+                loadPhilosopherData(prevPhilosopherId).catch(err => {
+                    console.error('预加载上一个哲学家失败:', err);
+                });
+            }
+            
+            // 预加载下一个哲学家（如果尚未缓存）
+            if (nextPhilosopherId && !philosopherCache.has(nextPhilosopherId)) {
+                console.log('预加载下一个哲学家:', nextPhilosopherId);
+                loadPhilosopherData(nextPhilosopherId).catch(err => {
+                    console.error('预加载下一个哲学家失败:', err);
+                });
+            }
+        }
+        
+        // 异步加载哲学家数据（用于预加载）
+        async function loadPhilosopherData(philosopherId) {
+            try {
+                const response = await fetch(`/api/philosophers/${philosopherId}`);
+                if (!response.ok) {
+                    throw new Error('加载失败');
+                }
+                
+                const data = await response.json();
+                if (data.success) {
+                    philosopherCache.set(philosopherId, data);
+                    console.log('预加载成功:', philosopherId);
+                }
+            } catch (error) {
+                console.error('预加载哲学家数据失败:', philosopherId, error);
+            }
+        }
+        
+        // 渲染哲学家数据到页面
+        function renderPhilosopherData(data, philosopherId) {
+            const contentArea = document.getElementById('philosopher-content');
+            if (!contentArea) return;
+            
+            const philosopher = data.philosopher;
+            const language = document.documentElement.lang || 'zh';
+            
+            // 构建HTML内容
+            let html = `
+                <div class="mb-8 relative group">
+                    <div sec:authorize="hasAnyRole('ADMIN', 'MODERATOR')"
+                         class="absolute top-0 right-0 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <a href="/admin/philosophers/edit/${philosopher.id}"
+                           title="编辑ID: ${philosopher.id}"
+                           onclick="event.stopPropagation()"
+                           class="flex items-center justify-center w-10 h-10 bg-white/80 backdrop-blur-sm rounded-md shadow-md hover:bg-primary hover:text-white text-gray-700 transition-all duration-200">
+                            <i class="fa fa-pencil"></i>
+                        </a>
+                    </div>
+                    
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex-1 pr-2">
+                            <h1 class="text-2xl sm:text-3xl font-bold text-dark mb-2">${escapeHtml(philosopher.displayName)}</h1>
+                            <p class="text-base sm:text-lg text-gray-600 mb-4">${escapeHtml(philosopher.era || '')}</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap gap-2 mb-4">
+            `;
+            
+            // 添加流派标签
+            if (philosopher.contents && philosopher.contents.length > 0) {
+                const displayedSchools = new Set();
+                const displayedParents = new Set();
+                
+                philosopher.contents.forEach(content => {
+                    if (content.school) {
+                        if (content.school.parent && !displayedParents.has(content.school.parent.id)) {
+                            html += `
+                                <a href="/schools/filter/${content.school.parent.id}"
+                                   class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-200 transition-smooth">
+                                    ${escapeHtml(content.school.parent.displayName)}
+                                </a>
+                            `;
+                            displayedParents.add(content.school.parent.id);
+                        }
+                        if (!displayedSchools.has(content.school.id)) {
+                            html += `
+                                <a href="/schools/filter/${content.school.id}"
+                                   class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm hover:bg-primary/20 transition-smooth">
+                                    ${escapeHtml(content.school.displayName)}
+                                </a>
+                            `;
+                            displayedSchools.add(content.school.id);
+                        }
+                    }
+                });
+            } else if (philosopher.schools && philosopher.schools.length > 0) {
+                philosopher.schools.forEach(school => {
+                    html += `
+                        <a href="/schools/filter/${school.id}"
+                           class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm hover:bg-primary/20 transition-smooth">
+                            ${escapeHtml(school.displayName)}
+                        </a>
+                    `;
+                });
+            }
+            
+            html += `
+                    </div>
+                </div>
+                
+                <!-- 左图右文：肖像 + 生平简介 -->
+                <div class="flex flex-col md:flex-row gap-6 mb-8">
+                    <div class="w-full md:w-1/3">
+                        <div class="aspect-square bg-gray-200 rounded-lg overflow-hidden relative group cursor-pointer transition-transform duration-500 ease-out max-w-xs mx-auto md:mx-0" 
+                             data-image-url="${philosopher.imageUrl || ''}"
+                             onclick="openImageModal(this)">
+                            ${philosopher.imageUrl ? 
+                                `<img src="${escapeHtml(philosopher.imageUrl)}" alt="${escapeHtml(philosopher.displayName)}" class="w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-105">` :
+                                `<i class="fa fa-user-circle text-6xl text-gray-400"></i>`
+                            }
+                        </div>
+                    </div>
+                    <div class="w-full md:w-2/3">
+                        <h2 class="text-xl md:text-2xl font-bold text-dark mb-4">${language === 'en' ? 'Biography' : '生平简介'}</h2>
+                        <p class="text-gray-700 leading-relaxed text-sm md:text-base">${escapeHtml(philosopher.displayBiography || '')}</p>
+                    </div>
+                </div>
+                
+                <!-- 思想卡片 -->
+                <div class="space-y-4 sm:space-y-6">
+                    <h2 class="text-xl sm:text-2xl font-bold text-dark mb-4">${language === 'en' ? 'Main Thoughts' : '主要思想'}</h2>
+            `;
+            
+            // 添加思想卡片
+            if (philosopher.contents && philosopher.contents.length > 0) {
+                philosopher.contents.forEach(content => {
+                    html += createPhilosopherContentCardHTML(content, language);
+                });
+            } else {
+                html += `
+                    <div class="bg-accent rounded-xl p-6 text-center text-gray-500">
+                        ${language === 'en' ? 'No thoughts available' : '暂无相关思想内容'}
+                    </div>
+                `;
+            }
+            
+            html += `
+                </div>
+            `;
+            
+            // 更新内容区域
+            contentArea.innerHTML = html;
+            
+            // 重新初始化点赞按钮和卡片点击事件
+            if (typeof initLikeButtons === 'function') {
+                initLikeButtons();
+            }
+            if (typeof initContentCardClickHandlers === 'function') {
+                initContentCardClickHandlers();
+            }
+            
+            // 重置无限滚动状态
+            currentPhilosopherId = parseInt(philosopherId);
+            currentPage = 0;
+            hasMore = data.hasMore;
+            isLoading = false;
+        }
+        
+        // 更新URL和UI状态
+        function updateUrlAndUI(philosopherId) {
+            // 更新URL（不刷新页面）
+            const newUrl = `/philosophers?philosopherId=${philosopherId}`;
+            window.history.pushState({philosopherId: philosopherId}, '', newUrl);
+            
+            // 更新移动端选择器
+            const mobileSelect = document.getElementById('mobile-philosopher-select');
+            if (mobileSelect) {
+                mobileSelect.value = philosopherId;
+            }
+            
+            // 更新左侧列表的选中状态
+            const philosopherLinks = document.querySelectorAll('.philosopher-link');
+            philosopherLinks.forEach(link => {
+                link.classList.remove('bg-primary', 'text-white');
+                link.classList.add('text-gray-700');
+                if (link.getAttribute('data-id') === philosopherId.toString()) {
+                    link.classList.add('bg-primary', 'text-white');
+                    link.classList.remove('text-gray-700');
+                }
+            });
+            
+            // 更新导航按钮状态
+            updateNavigationButtons(philosopherId);
+        }
+        
+        // 更新导航按钮的启用/禁用状态
+        function updateNavigationButtons(currentPhilosopherId) {
+            const philosopherLinks = document.querySelectorAll('.philosopher-link');
+            let currentIndex = -1;
+            
+            philosopherLinks.forEach((link, index) => {
+                if (link.getAttribute('data-id') === currentPhilosopherId.toString()) {
+                    currentIndex = index;
+                }
+            });
+            
+            const prevButton = document.getElementById('prev-philosopher');
+            const nextButton = document.getElementById('next-philosopher');
+            
+            // 按钮始终可用（因为有循环）
+            if (prevButton) prevButton.disabled = false;
+            if (nextButton) nextButton.disabled = false;
+        }
+        
+        // 显示加载状态
+        function showLoadingState() {
+            const contentArea = document.getElementById('philosopher-content');
+            if (contentArea) {
+                contentArea.innerHTML = `
+                    <div class="text-center py-12">
+                        <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                        <p class="text-gray-500 mt-4">加载中...</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // 显示错误状态
+        function showErrorState(message) {
+            const contentArea = document.getElementById('philosopher-content');
+            if (contentArea) {
+                contentArea.innerHTML = `
+                    <div class="text-center py-12">
+                        <p class="text-red-500">${escapeHtml(message)}</p>
+                        <button onclick="location.reload()" class="mt-4 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90">
+                            刷新页面
+                        </button>
+                    </div>
+                `;
+            }
+        }
+        
+        // HTML 转义函数（确保在所有使用之前定义）
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+        
+        // 监听浏览器前进/后退按钮
+        window.addEventListener('popstate', function(event) {
+            const philosopherId = getUrlParameter('philosopherId');
+            if (philosopherId) {
+                showPhilosopher(philosopherId);
+            }
+        });
 
         // 导航到上一个或下一个哲学家
         function navigatePhilosopher(direction) {
@@ -309,12 +653,19 @@
             
             // 检查URL参数中是否有philosopherId
             const philosopherIdParam = getUrlParameter('philosopherId');
-            if (philosopherIdParam) {
-                console.log('从URL参数获取到哲学家ID:', philosopherIdParam);
+            
+            // 获取当前显示的哲学家ID（优先使用URL参数，否则使用Thymeleaf注入的值）
+            let initialPhilosopherId = philosopherIdParam;
+            if (!initialPhilosopherId && typeof currentPhilosopherId !== 'undefined' && currentPhilosopherId) {
+                initialPhilosopherId = currentPhilosopherId.toString();
+            }
+            
+            if (initialPhilosopherId) {
+                console.log('初始化哲学家ID:', initialPhilosopherId);
+                
                 // 确保哲学家ID存在于下拉列表中
-                const mobileSelect = document.getElementById('mobile-philosopher-select');
                 if (mobileSelect) {
-                    mobileSelect.value = philosopherIdParam;
+                    mobileSelect.value = initialPhilosopherId;
                 }
                 
                 // 更新左侧列表的选中状态
@@ -322,11 +673,16 @@
                 philosopherLinks.forEach(link => {
                     link.classList.remove('bg-primary', 'text-white');
                     link.classList.add('text-gray-700');
-                    if (link.getAttribute('data-id') === philosopherIdParam) {
+                    if (link.getAttribute('data-id') === initialPhilosopherId) {
                         link.classList.add('bg-primary', 'text-white');
                         link.classList.remove('text-gray-700');
                     }
                 });
+                
+                // 在页面加载完成后预加载相邻的哲学家（延迟执行，避免影响初始渲染）
+                setTimeout(() => {
+                    preloadAdjacentPhilosophers(initialPhilosopherId);
+                }, 1000); // 延迟1秒，确保页面渲染完成后再预加载
             }
             
             // 检查URL中是否有思想ID参数，如果有则滚动到对应的思想卡片
@@ -335,6 +691,13 @@
             // 检查语言设置
             checkLanguageSetting();
         });
+        
+        // 缓存当前哲学家数据（从页面已有的Thymeleaf数据构建）
+        function cacheCurrentPhilosopherData() {
+            // 如果页面已经渲染了当前哲学家，我们可以从DOM中提取数据并缓存
+            // 但这需要额外的逻辑，暂时跳过，因为首次加载时数据已经在页面上了
+            // 预加载功能会在用户切换哲学家时生效
+        }
         
         // 检查URL中是否有思想ID参数并滚动到对应卡片
         function checkAndScrollToIdea() {
@@ -433,7 +796,66 @@
             }
         }
 
-        // 创建哲学家内容卡片HTML
+        // 创建哲学家内容卡片HTML字符串（用于AJAX加载）
+        function createPhilosopherContentCardHTML(content, language) {
+            // 获取流派名称（支持API格式的displayName或原始格式）
+            const schoolName = content.school ? 
+                (content.school.displayName || (language === 'en' && content.school.nameEn ? content.school.nameEn : content.school.name)) : '';
+            
+            // 获取作者信息
+            const authorName = content.user ? content.user.username : (language === 'en' ? 'Anonymous' : '匿名');
+            const authorRole = content.user ? content.user.role : '';
+            let roleTag = '';
+            if (authorRole === 'ADMIN') {
+                roleTag = '<span class="ml-2 px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded">管理员</span>';
+            } else if (authorRole === 'MODERATOR') {
+                roleTag = '<span class="ml-2 px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded">版主</span>';
+            }
+            
+            // 内容预览（限制长度）
+            const contentText = content.content || '';
+            const contentPreview = contentText.length > 200 ? contentText.substring(0, 200) + '...' : contentText;
+            
+            // 显示父流派（如果有）
+            const parentSchoolTag = content.school && content.school.parent ? 
+                `<a href="/schools/filter/${content.school.parent.id}" class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-200 transition-smooth" onclick="event.stopPropagation()">
+                    ${escapeHtml(content.school.parent.displayName || (language === 'en' && content.school.parent.nameEn ? content.school.parent.nameEn : content.school.parent.name))}
+                </a>` : '';
+            
+            const philosopherId = content.philosopherId || (content.philosopher ? content.philosopher.id : '');
+            
+            return `
+                <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px] relative group" 
+                     data-content-id="${content.id}"
+                     onclick="window.location.href='/contents?schoolId=${content.school ? content.school.id : ''}&philosopherId=${philosopherId}'">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex-1">
+                            ${schoolName ? `
+                            <div class="flex flex-wrap gap-2 mb-2">
+                                ${parentSchoolTag}
+                                <a href="/schools/filter/${content.school.id}" class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm hover:bg-primary/20 transition-smooth" onclick="event.stopPropagation()">
+                                    ${escapeHtml(schoolName)}
+                                </a>
+                            </div>
+                            ` : ''}
+                            <h3 class="text-xl font-bold text-primary">${escapeHtml(content.title || (language === 'en' ? 'No Title' : '无标题'))}</h3>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <like-button entity-type="content" entity-id="${content.id}" like-count="${content.likeCount || 0}"></like-button>
+                        </div>
+                    </div>
+                    <p class="text-gray-700 mb-4">${escapeHtml(contentPreview)}</p>
+                    <div class="flex justify-between items-center text-sm text-gray-500">
+                        <span>
+                            ${language === 'en' ? 'Author' : '作者'}: ${escapeHtml(authorName)}${roleTag}
+                        </span>
+                        ${content.commentCount ? `<span><i class="fa fa-comment mr-1"></i>${content.commentCount} ${language === 'en' ? 'comments' : '条评论'}</span>` : ''}
+                    </div>
+                </div>
+            `;
+        }
+        
+        // 创建哲学家内容卡片DOM元素（用于无限滚动）
         function createPhilosopherContentCard(content, language) {
             const div = document.createElement('div');
             div.className = 'bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px] relative group';
@@ -497,16 +919,6 @@
             return div;
         }
 
-        // HTML 转义函数
-        function escapeHtml(str) {
-            if (!str) return '';
-            return String(str)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;');
-        }
 
         // 当切换哲学家时，重置无限滚动状态
         const originalShowPhilosopher = window.showPhilosopher;

@@ -5,6 +5,7 @@ import com.philosophy.model.School;
 import com.philosophy.model.User;
 import com.philosophy.model.UserContentEdit;
 import com.philosophy.repository.ContentRepository;
+import com.philosophy.repository.ContentTranslationRepository;
 import com.philosophy.repository.UserContentEditRepository;
 import com.philosophy.service.ModeratorBlockService;
 import org.slf4j.Logger;
@@ -23,6 +24,7 @@ public class ContentService {
     private final ContentRepository contentRepository;
     private final PhilosopherService philosopherService;
     private final UserContentEditRepository userContentEditRepository;
+    private final ContentTranslationRepository contentTranslationRepository;
     private final UserBlockService userBlockService;
     private final ModeratorBlockService moderatorBlockService;
     private final SchoolService schoolService;
@@ -30,12 +32,15 @@ public class ContentService {
     private static final Logger logger = LoggerFactory.getLogger(ContentService.class);
 
     public ContentService(ContentRepository contentRepository, PhilosopherService philosopherService,
-                         UserContentEditRepository userContentEditRepository, UserBlockService userBlockService,
+                         UserContentEditRepository userContentEditRepository, 
+                         ContentTranslationRepository contentTranslationRepository,
+                         UserBlockService userBlockService,
                          ModeratorBlockService moderatorBlockService,
                          SchoolService schoolService) {
         this.contentRepository = contentRepository;
         this.philosopherService = philosopherService;
         this.userContentEditRepository = userContentEditRepository;
+        this.contentTranslationRepository = contentTranslationRepository;
         this.userBlockService = userBlockService;
         this.moderatorBlockService = moderatorBlockService;
         this.schoolService = schoolService;
@@ -142,6 +147,9 @@ public class ContentService {
 
         // 先删除相关的用户内容编辑记录，避免外键约束错误
         userContentEditRepository.deleteByOriginalContentId(id);
+        
+        // 先删除相关的翻译记录，避免外键约束错误
+        contentTranslationRepository.deleteByContentId(id);
 
         // 使用不依赖版本字段的删除方法
         contentRepository.deleteByIdWithoutVersion(id);
@@ -231,6 +239,9 @@ public class ContentService {
         if (content != null) {
             // 先删除相关的用户内容编辑记录
             userContentEditRepository.deleteByOriginalContentId(id);
+            
+            // 先删除相关的翻译记录，避免外键约束错误
+            contentTranslationRepository.deleteByContentId(id);
             
             Long philosopherId = null;
             if (content.getPhilosopher() != null) {

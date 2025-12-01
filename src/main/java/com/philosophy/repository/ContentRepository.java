@@ -153,7 +153,7 @@ public interface ContentRepository extends JpaRepository<Content, Long> {
     org.springframework.data.domain.Page<Content> findAllWithPriorityPaged(org.springframework.data.domain.Pageable pageable);
     
     // 获取指定哲学家的内容并按优先级排序（分页）- 用于哲学家页面
-    @Query("SELECT c FROM Content c LEFT JOIN FETCH c.user u LEFT JOIN FETCH c.philosopher p LEFT JOIN FETCH c.school s WHERE c.philosopher.id = :philosopherId ORDER BY " +
+    @Query("SELECT DISTINCT c FROM Content c LEFT JOIN FETCH c.user u LEFT JOIN FETCH c.philosopher p LEFT JOIN FETCH c.school s LEFT JOIN FETCH s.parent WHERE c.philosopher.id = :philosopherId ORDER BY " +
            "CASE WHEN u.role = 'ADMIN' THEN 1 " +
            "WHEN u.role = 'MODERATOR' THEN 2 " +
            "ELSE 3 END, " +

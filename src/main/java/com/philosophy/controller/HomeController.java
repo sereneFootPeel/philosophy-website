@@ -1023,6 +1023,161 @@ public class HomeController {
         }
     }
 
+    // API 端点：获取单个哲学家的完整数据（用于AJAX加载和预加载）
+    @GetMapping("/api/philosophers/{id}")
+    @ResponseBody
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public ResponseEntity<Map<String, Object>> getPhilosopherData(
+            @PathVariable("id") Long philosopherId,
+            Authentication authentication,
+            HttpServletRequest request) {
+        
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            // 获取当前语言设置
+            HttpSession session = request.getSession();
+            String language = (String) session.getAttribute("language");
+            if (language == null) {
+                language = "zh"; // 默认中文
+            }
+            
+            Philosopher philosopher = philosopherService.getPhilosopherById(philosopherId);
+            if (philosopher == null) {
+                response.put("success", false);
+                response.put("message", "Philosopher not found");
+                return ResponseEntity.notFound().build();
+            }
+
+            // 获取当前用户信息用于隐私过滤
+            boolean isAuthenticated = authentication != null && authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken);
+            User currentUser = null;
+            if (isAuthenticated) {
+                currentUser = (User) authentication.getPrincipal();
+            }
+
+            // 构建哲学家基本信息
+            Map<String, Object> philosopherData = new HashMap<>();
+            philosopherData.put("id", philosopher.getId());
+            philosopherData.put("name", philosopher.getName());
+            philosopherData.put("nameEn", philosopher.getNameEn());
+            philosopherData.put("era", philosopher.getEra());
+            philosopherData.put("bio", philosopher.getBio());
+            philosopherData.put("bioEn", philosopher.getBioEn());
+            philosopherData.put("imageUrl", philosopher.getImageUrl());
+            philosopherData.put("birthYear", philosopher.getBirthYear());
+            philosopherData.put("deathYear", philosopher.getDeathYear());
+            
+            // 添加翻译后的显示名称和传记
+            philosopherData.put("displayName", translationService.getPhilosopherDisplayName(philosopher, language));
+            philosopherData.put("displayBiography", translationService.getPhilosopherDisplayBiography(philosopher, language));
+            
+            // 获取关联的流派信息
+            List<Map<String, Object>> schools = new ArrayList<>();
+            if (philosopher.getSchools() != null) {
+                for (School school : philosopher.getSchools()) {
+                    Map<String, Object> schoolData = new HashMap<>();
+                    schoolData.put("id", school.getId());
+                    schoolData.put("name", school.getName());
+                    schoolData.put("nameEn", school.getNameEn());
+                    schoolData.put("displayName", translationService.getSchoolDisplayName(school, language));
+                    schools.add(schoolData);
+                }
+            }
+            philosopherData.put("schools", schools);
+            
+            // 获取前12条内容数据（按优先级排序）
+            Map<String, Object> result = philosopherService.getContentsByPhilosopherIdWithPriorityPaged(philosopherId, 0, 12);
+            
+            @SuppressWarnings("unchecked")
+            List<Content> contents = (List<Content>) result.get("contents");
+            
+            // 应用隐私和屏蔽过滤
+            contents = contentService.filterContentsByPrivacy(contents, currentUser);
+            
+                // 构建内容数据
+            List<Map<String, Object>> contentList = new ArrayList<>();
+            for (Content content : contents) {
+                try {
+                    Map<String, Object> contentData = new HashMap<>();
+                    contentData.put("id", content.getId());
+                    contentData.put("title", content.getTitle());
+                    contentData.put("content", content.getContent());
+                    contentData.put("likeCount", content.getLikeCount() != null ? content.getLikeCount() : 0);
+                    contentData.put("commentCount", commentService.countByContentId(content.getId()));
+                    
+                    // 流派信息
+                    try {
+                        if (content.getSchool() != null) {
+                            Map<String, Object> schoolData = new HashMap<>();
+                            School school = content.getSchool();
+                            schoolData.put("id", school.getId());
+                            schoolData.put("name", school.getName());
+                            schoolData.put("nameEn", school.getNameEn());
+                            schoolData.put("displayName", translationService.getSchoolDisplayName(school, language));
+                            
+                            // 父流派信息
+                            try {
+                                if (school.getParent() != null) {
+                                    Map<String, Object> parentSchoolData = new HashMap<>();
+                                    School parent = school.getParent();
+                                    parentSchoolData.put("id", parent.getId());
+                                    parentSchoolData.put("name", parent.getName());
+                                    parentSchoolData.put("nameEn", parent.getNameEn());
+                                    parentSchoolData.put("displayName", translationService.getSchoolDisplayName(parent, language));
+                                    schoolData.put("parent", parentSchoolData);
+                                }
+                            } catch (Exception e) {
+                                logger.warn("Error accessing school parent for content {}: {}", content.getId(), e.getMessage());
+                                // 继续处理，不添加parent
+                            }
+                            
+                            contentData.put("school", schoolData);
+                        }
+                    } catch (Exception e) {
+                        logger.warn("Error processing school for content {}: {}", content.getId(), e.getMessage());
+                        // 继续处理，不添加school
+                    }
+                    
+                    // 作者信息
+                    try {
+                        if (content.getUser() != null) {
+                            Map<String, Object> userData = new HashMap<>();
+                            User user = content.getUser();
+                            userData.put("id", user.getId());
+                            userData.put("username", user.getUsername());
+                            userData.put("role", user.getRole());
+                            contentData.put("user", userData);
+                        }
+                    } catch (Exception e) {
+                        logger.warn("Error processing user for content {}: {}", content.getId(), e.getMessage());
+                        // 继续处理，不添加user
+                    }
+                    
+                    contentData.put("philosopherId", philosopherId);
+                    contentList.add(contentData);
+                } catch (Exception e) {
+                    logger.error("Error processing content {}: {}", content.getId(), e.getMessage(), e);
+                    // 跳过这个内容，继续处理下一个
+                }
+            }
+            
+            philosopherData.put("contents", contentList);
+            
+            response.put("success", true);
+            response.put("philosopher", philosopherData);
+            response.put("hasMore", result.get("hasMore"));
+            response.put("totalElements", result.get("totalElements"));
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            logger.error("Error loading philosopher data: {}", e.getMessage(), e);
+            response.put("success", false);
+            response.put("message", "Error loading philosopher data: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
+
     // API 端点：加载更多哲学家的内容（用于哲学家页面的无限滚动）
     @GetMapping("/api/philosophers/contents/more")
     @ResponseBody
