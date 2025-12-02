@@ -493,7 +493,7 @@
                     
                     <!-- 内容正文 -->
                     <div class="prose prose-gray max-w-none mb-4">
-                        <p class="text-gray-800">${escapeHtml(contentText)}</p>
+                        <p class="text-gray-800 whitespace-pre-line">${escapeHtml(contentText).replace(/\n/g, '<br>')}</p>
                     </div>
                     
                     <!-- 哲学家信息 -->

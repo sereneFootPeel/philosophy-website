@@ -804,9 +804,10 @@
             
             // 注意：哲学家页面的content卡片不显示标题和作者信息
             
-            // 内容预览（限制长度）
+            // 内容全文（不限制长度）
             const contentText = content.content || '';
-            const contentPreview = contentText.length > 200 ? contentText.substring(0, 200) + '...' : contentText;
+            // 将换行符转换为<br>标签以保留换行显示
+            const contentWithBreaks = escapeHtml(contentText).replace(/\n/g, '<br>');
             
             // 显示父流派（如果有）
             const parentSchoolTag = content.school && content.school.parent ? 
@@ -835,7 +836,7 @@
                             <like-button entity-type="content" entity-id="${content.id}" like-count="${content.likeCount || 0}"></like-button>
                         </div>
                     </div>
-                    <p class="text-gray-700 mb-4">${escapeHtml(contentPreview)}</p>
+                    <p class="text-gray-700 mb-4 whitespace-pre-line">${contentWithBreaks}</p>
                 </div>
             `;
         }
@@ -857,9 +858,10 @@
             
             // 注意：哲学家页面的content卡片不显示标题和作者信息
             
-            // 内容预览（限制长度）
+            // 内容全文（不限制长度）
             const contentText = content.content || '';
-            const contentPreview = contentText.length > 200 ? contentText.substring(0, 200) + '...' : contentText;
+            // 将换行符转换为<br>标签以保留换行显示
+            const contentWithBreaks = escapeHtml(contentText).replace(/\n/g, '<br>');
             
             // 显示父流派（如果有）
             const parentSchoolTag = content.school && content.school.parent ? 
@@ -883,7 +885,7 @@
                         <like-button entity-type="content" entity-id="${content.id}" like-count="${content.likeCount || 0}"></like-button>
                     </div>
                 </div>
-                <p class="text-gray-700 mb-4">${escapeHtml(contentPreview)}</p>
+                <p class="text-gray-700 mb-4 whitespace-pre-line">${contentWithBreaks}</p>
             `;
             
             return div;

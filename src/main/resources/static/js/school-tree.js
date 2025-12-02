@@ -389,7 +389,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
             ` : ''}
             <div class="prose prose-gray max-w-none mb-4">
-                <p class="text-gray-800">${escapeHtml(displayText)}</p>
+                <p class="text-gray-800 whitespace-pre-line">${escapeHtml(displayText).replace(/\n/g, '<br>')}</p>
             </div>
             ${philosopherInfo ? `
                 <div class="flex items-center justify-between pt-3 border-t border-gray-100">

@@ -84,7 +84,7 @@
         
         <!-- 显示内容 -->
         <div class="prose prose-gray max-w-none mb-4">
-            <p class="text-gray-800" th:text="${translationService.getContentDisplayText(content, language != null ? language : 'zh')}">内容正文...</p>
+            <p class="text-gray-800 whitespace-pre-line" th:text="${translationService.getContentDisplayText(content, language != null ? language : 'zh')}">内容正文...</p>
         </div>
         
         <!-- 底部操作栏（可选显示，主要用于非悬浮模式） -->
@@ -130,7 +130,7 @@
                 </div>
                 
                 <div class="prose prose-gray max-w-none">
-                    <p class="text-gray-700 leading-relaxed" th:text="${content.content != null ? translationService.getContentDisplayText(content, language != null ? language : 'zh') : '内容加载中...'}">内容正文...</p>
+                    <p class="text-gray-700 leading-relaxed whitespace-pre-line" th:text="${content.content != null ? translationService.getContentDisplayText(content, language != null ? language : 'zh') : '内容加载中...'}">内容正文...</p>
                 </div>
             </div>
         </div>
@@ -165,7 +165,7 @@
                 
                 <!-- 显示内容 -->
                 <div class="prose prose-gray max-w-none mb-3">
-                    <p class="text-gray-700 leading-relaxed" th:text="${edit.content != null ? edit.content : '内容加载中...'}">编辑内容...</p>
+                    <p class="text-gray-700 leading-relaxed whitespace-pre-line" th:text="${edit.content != null ? edit.content : '内容加载中...'}">编辑内容...</p>
                 </div>
                 
                 <!-- 显示哲学家信息 -->
