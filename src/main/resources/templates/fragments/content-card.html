@@ -80,10 +80,6 @@
             </th:block>
         </div>
         
-        <!-- 显示标题（仅对UserContentEdit显示） -->
-        <div th:if="${content.title != null}" class="mb-2">
-            <h3 class="text-lg font-semibold text-gray-900" th:text="${content.title != null ? content.title : '无标题'}">编辑标题</h3>
-        </div>
         
         <!-- 显示内容 -->
         <div class="prose prose-gray max-w-none mb-4">
