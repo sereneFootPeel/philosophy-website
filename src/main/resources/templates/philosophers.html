@@ -802,15 +802,7 @@
             const schoolName = content.school ? 
                 (content.school.displayName || (language === 'en' && content.school.nameEn ? content.school.nameEn : content.school.name)) : '';
             
-            // 获取作者信息
-            const authorName = content.user ? content.user.username : (language === 'en' ? 'Anonymous' : '匿名');
-            const authorRole = content.user ? content.user.role : '';
-            let roleTag = '';
-            if (authorRole === 'ADMIN') {
-                roleTag = '<span class="ml-2 px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded">管理员</span>';
-            } else if (authorRole === 'MODERATOR') {
-                roleTag = '<span class="ml-2 px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded">版主</span>';
-            }
+            // 注意：哲学家页面的content卡片不显示标题和作者信息
             
             // 内容预览（限制长度）
             const contentText = content.content || '';
@@ -863,15 +855,7 @@
             const schoolName = content.school ? 
                 (language === 'en' && content.school.nameEn ? content.school.nameEn : content.school.name) : '';
             
-            // 获取作者信息
-            const authorName = content.user ? content.user.username : '匿名';
-            const authorRole = content.user ? content.user.role : '';
-            let roleTag = '';
-            if (authorRole === 'ADMIN') {
-                roleTag = '<span class="ml-2 px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded">管理员</span>';
-            } else if (authorRole === 'MODERATOR') {
-                roleTag = '<span class="ml-2 px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded">版主</span>';
-            }
+            // 注意：哲学家页面的content卡片不显示标题和作者信息
             
             // 内容预览（限制长度）
             const contentText = content.content || '';
