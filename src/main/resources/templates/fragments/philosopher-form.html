@@ -25,14 +25,12 @@
                 </div>
 
                 <div class="mb-5">
-                    <label class="admin-form-label" for="era">时代</label>
-                    <input type="text" id="era" class="admin-form-input" th:field="*{era}" placeholder="请输入哲学家所处时代" />
-                </div>
-
-                <div class="mb-5">
-                    <label class="admin-form-label" for="birthYear">出生年份</label>
-                    <input type="number" id="birthYear" class="admin-form-input" th:field="*{birthYear}" placeholder="请输入哲学家出生年份（整数）" />
-                    <p class="text-xs admin-text-secondary mt-1">输入整数年份（如：公元前551年请输入-551），用于前端自动排序。</p>
+                    <label class="admin-form-label" for="birthDeathDate">出生死亡日期</label>
+                    <input type="text" id="birthDeathDate" name="birthDeathDate" class="admin-form-input" 
+                           th:value="${birthDeathDateRange != null ? birthDeathDateRange : ''}" 
+                           placeholder="1999.1.1 - 2000.1.1" />
+                    <p class="text-xs admin-text-secondary mt-1">格式：1999.1.1 - 2000.1.1（出生日期会自动计算用于排序）</p>
+                    <input type="hidden" id="birthYear" name="birthYear" />
                 </div>
 
                 <div class="mb-5">

@@ -12,6 +12,7 @@ import com.philosophy.service.TranslationService;
 import com.philosophy.service.ModeratorBlockService;
 import com.philosophy.util.UserInfoCollector;
 import com.philosophy.util.InputValidator;
+import com.philosophy.util.DateUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -135,6 +136,7 @@ public class AdminController {
     @GetMapping("/philosophers/new")
     public String newPhilosopher(Model model, HttpServletRequest request) {
         model.addAttribute("philosopher", new Philosopher());
+        model.addAttribute("birthDeathDateRange", "");
         return "admin/philosophers/form";
     }
 
@@ -143,6 +145,7 @@ public class AdminController {
                                  @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
                                  @RequestParam(value = "nameEn", required = false) String nameEn,
                                  @RequestParam(value = "biographyEn", required = false) String biographyEn,
+                                 @RequestParam(value = "birthDeathDate", required = false) String birthDeathDate,
                                  @RequestParam(value = "redirectUrl", required = false) String redirectUrl,
                                  org.springframework.security.core.Authentication authentication,
                                  RedirectAttributes redirectAttributes) throws IOException {
@@ -178,6 +181,19 @@ public class AdminController {
         }
         
         User currentUser = (User) authentication.getPrincipal();
+        
+        // 解析出生死亡日期范围，自动计算出生日期（格式19990101）用于排序
+        if (birthDeathDate != null && !birthDeathDate.trim().isEmpty()) {
+            Integer birthDateInt = DateUtils.parseBirthDateFromRange(birthDeathDate);
+            if (birthDateInt != null) {
+                philosopher.setBirthYear(birthDateInt);
+            }
+            // 解析死亡日期
+            Integer deathDateInt = DateUtils.parseDeathYearFromRange(birthDeathDate);
+            if (deathDateInt != null) {
+                philosopher.setDeathYear(deathDateInt);
+            }
+        }
         
         // 处理文件上传
         Philosopher savedPhilosopher;
@@ -262,6 +278,10 @@ public class AdminController {
         // 如果翻译存在且与中文不同，则使用翻译，否则为空
         model.addAttribute("nameEn", nameEn != null && !nameEn.equals(philosopher.getName()) ? nameEn : "");
         model.addAttribute("biographyEn", biographyEn != null && !biographyEn.equals(philosopher.getBio()) ? biographyEn : "");
+        
+        // 将 birthYear 和 deathYear 转换为日期范围字符串
+        String birthDeathDateRange = DateUtils.formatBirthYearToDateRange(philosopher.getBirthYear(), philosopher.getDeathYear());
+        model.addAttribute("birthDeathDateRange", birthDeathDateRange);
         
         return "admin/philosophers/form";
     }

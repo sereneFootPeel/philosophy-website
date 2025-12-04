@@ -14,6 +14,7 @@ import com.philosophy.service.UserService;
 import com.philosophy.service.CommentService;
 import com.philosophy.repository.SchoolTranslationRepository;
 import com.philosophy.util.UserInfoCollector;
+import com.philosophy.util.DateUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -329,6 +330,8 @@ public class ModeratorController {
         // 初始化英文翻译字段
         model.addAttribute("nameEn", "");
         model.addAttribute("biographyEn", "");
+        // 初始化日期范围字段
+        model.addAttribute("birthDeathDateRange", "");
         return "moderator/philosophers/form";
     }
 
@@ -364,6 +367,11 @@ public class ModeratorController {
         String biographyEn = translationService.getPhilosopherDisplayBiography(philosopher, "en");
         model.addAttribute("nameEn", nameEn != null && !nameEn.equals(philosopher.getName()) ? nameEn : "");
         model.addAttribute("biographyEn", biographyEn != null && !biographyEn.equals(philosopher.getBio()) ? biographyEn : "");
+        
+        // 将 birthYear 和 deathYear 转换为日期范围字符串
+        String birthDeathDateRange = DateUtils.formatBirthYearToDateRange(philosopher.getBirthYear(), philosopher.getDeathYear());
+        model.addAttribute("birthDeathDateRange", birthDeathDateRange);
+        
         return "moderator/philosophers/form";
     }
 
@@ -371,7 +379,8 @@ public class ModeratorController {
     public String savePhilosopher(@ModelAttribute Philosopher philosopher,
                                  @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
                                  @RequestParam(value = "nameEn", required = false) String nameEn,
-                                 @RequestParam(value = "biographyEn", required = false) String biographyEn) throws IOException {
+                                 @RequestParam(value = "biographyEn", required = false) String biographyEn,
+                                 @RequestParam(value = "birthDeathDate", required = false) String birthDeathDate) throws IOException {
         User moderator = getCurrentModerator();
         if (moderator == null || moderator.getAssignedSchoolId() == null) {
             return "redirect:/error?message=No assigned school";
@@ -414,6 +423,19 @@ public class ModeratorController {
 
         // 设置哲学家的创建者为当前版主
         philosopher.setUser(moderator);
+
+        // 解析出生死亡日期范围，自动计算出生日期（格式19990101）用于排序
+        if (birthDeathDate != null && !birthDeathDate.trim().isEmpty()) {
+            Integer birthDateInt = DateUtils.parseBirthDateFromRange(birthDeathDate);
+            if (birthDateInt != null) {
+                philosopher.setBirthYear(birthDateInt);
+            }
+            // 解析死亡日期
+            Integer deathDateInt = DateUtils.parseDeathYearFromRange(birthDeathDate);
+            if (deathDateInt != null) {
+                philosopher.setDeathYear(deathDateInt);
+            }
+        }
 
         // 处理文件上传
         Philosopher savedPhilosopher;
