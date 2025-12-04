@@ -134,6 +134,23 @@
 
     <!-- 点赞按钮功能 -->
     <script th:src="@{/js/like-button-component.js}"></script>
+    
+    <!-- 传递选中的流派ID给JavaScript -->
+    <script>
+        // 从URL路径中提取流派ID（/schools/filter/{id}）
+        window.selectedSchoolId = null;
+        const pathMatch = window.location.pathname.match(/\/schools\/filter\/(\d+)/);
+        if (pathMatch) {
+            window.selectedSchoolId = parseInt(pathMatch[1]);
+        } else {
+            // 如果URL中没有ID，但后端传入了selectedSchool，使用后端的ID
+            const backendSchoolId = /*[[${selectedSchool != null ? selectedSchool.id : null}]]*/ null;
+            if (backendSchoolId) {
+                window.selectedSchoolId = backendSchoolId;
+            }
+        }
+    </script>
+    
     <script th:src="@{/js/school-tree.js}"></script>
     
     <div th:replace="~{fragments/footer :: footer}"></div>

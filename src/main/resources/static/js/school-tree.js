@@ -15,7 +15,15 @@ document.addEventListener('DOMContentLoaded', function () {
     let hasMore = true;
 
     // 初始化顶级流派的展开图标
-    initializeTopLevelSchools();
+    initializeTopLevelSchools().then(() => {
+        // 初始化完成后，检查是否有选中的流派需要自动加载
+        if (window.selectedSchoolId) {
+            // 延迟一下，确保DOM完全渲染
+            setTimeout(() => {
+                findAndSelectSchool(window.selectedSchoolId);
+            }, 100);
+        }
+    });
 
     function getDirectSchoolLink(li) {
         if (!li || !li.children) return null;
@@ -63,6 +71,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 showExpandIcon(link, false);
             }
         }
+        return Promise.resolve();
     }
 
     tree.addEventListener('click', async function (e) {
@@ -422,6 +431,121 @@ document.addEventListener('DOMContentLoaded', function () {
             return content.contentEn;
         }
         return content.content || content.contentEn || '';
+    }
+
+    // 查找并选中指定的流派（用于从URL跳转时自动定位）
+    async function findAndSelectSchool(schoolId) {
+        if (!schoolId) return;
+
+        // 首先检查顶级流派
+        const topLevelLink = tree.querySelector(`.school-link[data-id="${schoolId}"]`);
+        if (topLevelLink) {
+            // 是顶级流派，直接点击它
+            topLevelLink.click();
+            // 滚动到该元素（左侧树）
+            setTimeout(() => {
+                topLevelLink.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                // 同时滚动页面到顶部，确保右侧内容区域可见
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }, 300);
+            return;
+        }
+
+        // 不是顶级流派，需要递归查找
+        const found = await findSchoolInChildren(schoolId);
+        if (found) {
+            // 找到后点击它
+            found.click();
+            // 滚动到该元素（左侧树）
+            setTimeout(() => {
+                found.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                // 同时滚动页面到顶部，确保右侧内容区域可见
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }, 500); // 给更多时间让内容加载完成
+        }
+    }
+
+    // 递归查找子流派中的目标流派
+    async function findSchoolInChildren(targetSchoolId) {
+        const topLevelLinks = tree.querySelectorAll('.school-link[data-id]');
+        
+        for (const link of topLevelLinks) {
+            const found = await searchInSubtree(link, targetSchoolId);
+            if (found) {
+                return found;
+            }
+        }
+
+        return null;
+    }
+
+    // 在子树中递归查找目标流派
+    async function searchInSubtree(parentLink, targetSchoolId) {
+        const parentId = parentLink.getAttribute('data-id');
+        const childrenUl = parentLink.parentElement.querySelector('.children');
+        
+        // 如果子列表未加载，先加载它
+        if (childrenUl && childrenUl.dataset.loaded !== 'true') {
+            try {
+                const resp = await fetch(`/api/schools/children?parentId=${encodeURIComponent(parentId)}`);
+                if (!resp.ok) return null;
+                const data = await resp.json();
+                
+                if (Array.isArray(data) && data.length > 0) {
+                    childrenUl.innerHTML = '';
+                    for (const node of data) {
+                        const li = document.createElement('li');
+                        li.className = 'mt-2';
+                        const displayName = node.displayName || node.name || '未命名';
+                        const hasChildren = node.hasChildren || false;
+                        li.innerHTML = `
+                            <div class="school-link px-3 py-2 rounded-lg transition-smooth text-gray-700 cursor-pointer flex items-center justify-between" data-id="${node.id}">
+                                <span class="font-medium">${escapeHtml(displayName)}</span>
+                                <i class="fa fa-chevron-right expand-icon transition-transform duration-200" style="display: ${hasChildren ? 'inline-block' : 'none'};"></i>
+                            </div>
+                            <ul class="children mt-2 hidden" id="children-of-${node.id}"></ul>
+                        `;
+                        childrenUl.appendChild(li);
+                    }
+                    childrenUl.dataset.loaded = 'true';
+                    childrenUl.classList.remove('hidden');
+                    toggleExpandIcon(parentLink, true);
+                } else {
+                    childrenUl.dataset.loaded = 'true';
+                    toggleExpandIcon(parentLink, false);
+                    return null;
+                }
+            } catch (err) {
+                console.error('加载子流派失败', err);
+                return null;
+            }
+        }
+
+        // 在已加载的子流派中查找
+        if (childrenUl) {
+            // 确保父节点已展开
+            if (childrenUl.classList.contains('hidden')) {
+                childrenUl.classList.remove('hidden');
+                toggleExpandIcon(parentLink, true);
+            }
+
+            // 直接查找当前层的子流派
+            const childLink = childrenUl.querySelector(`.school-link[data-id="${targetSchoolId}"]`);
+            if (childLink) {
+                return childLink;
+            }
+
+            // 递归查找更深层的子流派
+            const childLinks = childrenUl.querySelectorAll('.school-link[data-id]');
+            for (const childLink of childLinks) {
+                const found = await searchInSubtree(childLink, targetSchoolId);
+                if (found) {
+                    return found;
+                }
+            }
+        }
+
+        return null;
     }
 });
 
