@@ -79,10 +79,11 @@ public class DateUtils {
     
     /**
      * 将 birthYear（YYYYMMDD 格式）和 deathYear 转换为日期范围字符串
-     * 格式：YYYY.M.D - YYYY.M.D
+     * 格式：YYYY.M.D - YYYY.M.D 或 YYYY.M.D（如果没有死亡日期）
+     * 支持负数年份（公元前），如：-5510101 -> -551.1.1
      * 
-     * @param birthYear 出生日期（YYYYMMDD 格式的整数）
-     * @param deathYear 死亡年份（整数，可选）
+     * @param birthYear 出生日期（YYYYMMDD 格式的整数，可为负数表示公元前）
+     * @param deathYear 死亡年份（整数，可选，可为负数表示公元前）
      * @return 日期范围字符串，如果 birthYear 为 null 返回空字符串
      */
     public static String formatBirthYearToDateRange(Integer birthYear, Integer deathYear) {
@@ -90,29 +91,45 @@ public class DateUtils {
             return "";
         }
         
-        // 解析 YYYYMMDD 格式
-        int year = birthYear / 10000;
-        int month = (birthYear % 10000) / 100;
-        int day = birthYear % 100;
+        // 解析 YYYYMMDD 格式，支持负数年份（公元前）
+        boolean isNegative = birthYear < 0;
+        int absBirthYear = Math.abs(birthYear);
+        int year = absBirthYear / 10000;
+        int month = (absBirthYear % 10000) / 100;
+        int day = absBirthYear % 100;
+        
+        // 如果是负数年份，添加负号
+        if (isNegative) {
+            year = -year;
+        }
         
         // 构建出生日期部分
         String birthDateStr = String.format("%d.%d.%d", year, month, day);
         
         // 如果有死亡年份，构建死亡日期部分
         if (deathYear != null) {
-            // 如果 deathYear 是 YYYYMMDD 格式（大于 10000），解析它
-            if (deathYear > 10000) {
-                int deathYearInt = deathYear / 10000;
-                int deathMonth = (deathYear % 10000) / 100;
-                int deathDay = deathYear % 100;
+            // 如果 deathYear 是 YYYYMMDD 格式（绝对值 >= 10000），解析它
+            if (Math.abs(deathYear) >= 10000) {
+                boolean isNegativeDeath = deathYear < 0;
+                int absDeathYear = Math.abs(deathYear);
+                int deathYearInt = absDeathYear / 10000;
+                int deathMonth = (absDeathYear % 10000) / 100;
+                int deathDay = absDeathYear % 100;
+                
+                // 如果是负数年份，添加负号
+                if (isNegativeDeath) {
+                    deathYearInt = -deathYearInt;
+                }
+                
                 String deathDateStr = String.format("%d.%d.%d", deathYearInt, deathMonth, deathDay);
                 return birthDateStr + " - " + deathDateStr;
             } else {
-                // 如果只是年份，使用默认的 12.31
+                // 如果只是年份（绝对值 < 10000），使用默认的 12.31
                 return birthDateStr + " - " + deathYear + ".12.31";
             }
         }
         
+        // 如果没有死亡日期，只返回出生日期
         return birthDateStr;
     }
     

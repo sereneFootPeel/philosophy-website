@@ -36,8 +36,7 @@
                                 <tr>
                                     <th class="admin-table-cell">ID</th>
                                     <th class="admin-table-cell">姓名</th>
-                                    <th class="admin-table-cell">时代</th>
-                                    <th class="admin-table-cell">出生年份</th>
+                                    <th class="admin-table-cell">出生死亡年份</th>
                                     <th class="admin-table-cell">流派</th>
                                     <th class="admin-table-cell">作者</th>
                                     <th class="admin-table-cell">操作</th>
@@ -47,10 +46,12 @@
                                 <tr th:each="philosopher : ${philosophers}">
                                     <td class="admin-table-cell" th:text="${philosopher.id}"></td>
                                     <td class="admin-table-cell" th:text="${philosopher.name}"></td>
-                                    <td class="admin-table-cell" th:text="${philosopher.era}"></td>
                                     <td class="admin-table-cell">
-                                        <span th:text="${philosopher.birthYear}"></span>
-                                        <span th:unless="${philosopher.birthYear}" style="color: var(--color-error);" class="text-xs ml-1">未设置</span>
+                                        <span th:if="${philosopher.birthYear != null}" 
+                                              th:text="${T(com.philosophy.util.DateUtils).formatBirthYearToDateRange(philosopher.birthYear, philosopher.deathYear)}"></span>
+                                        <span th:if="${philosopher.birthYear == null}" 
+                                              style="color: var(--color-error);" 
+                                              class="text-xs">未设置</span>
                                     </td>
                                     <td class="admin-table-cell">
                                         <span th:each="school, status : ${philosopher.schools}">
