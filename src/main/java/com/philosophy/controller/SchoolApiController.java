@@ -4,8 +4,8 @@ import com.philosophy.model.School;
 import com.philosophy.service.SchoolService;
 import com.philosophy.service.TranslationService;
 import com.philosophy.util.PinyinStringComparator;
+import com.philosophy.util.LanguageUtil;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,10 +21,12 @@ public class SchoolApiController {
 
     private final SchoolService schoolService;
     private final TranslationService translationService;
+    private final LanguageUtil languageUtil;
 
-    public SchoolApiController(SchoolService schoolService, TranslationService translationService) {
+    public SchoolApiController(SchoolService schoolService, TranslationService translationService, LanguageUtil languageUtil) {
         this.schoolService = schoolService;
         this.translationService = translationService;
+        this.languageUtil = languageUtil;
     }
 
     @GetMapping("/api/schools/children")
@@ -42,12 +44,8 @@ public class SchoolApiController {
         PinyinStringComparator nameComparator = new PinyinStringComparator();
         children.sort(Comparator.comparing(s -> nameComparator.toComparableKey(s.getName())));
 
-        // 获取当前语言设置
-        HttpSession session = request.getSession();
-        String language = (String) session.getAttribute("language");
-        if (language == null) {
-            language = "zh";
-        }
+        // 获取当前语言设置（根据IP自动判断默认语言）
+        String language = languageUtil.getLanguage(request);
 
         List<SchoolNodeDTO> result = new ArrayList<>();
         for (School child : children) {
@@ -75,12 +73,8 @@ public class SchoolApiController {
             return ResponseEntity.ok(new SchoolDetailDTO());
         }
 
-        // 获取当前语言设置
-        HttpSession session = request.getSession();
-        String language = (String) session.getAttribute("language");
-        if (language == null) {
-            language = "zh";
-        }
+        // 获取当前语言设置（根据IP自动判断默认语言）
+        String language = languageUtil.getLanguage(request);
 
         String displayName = translationService.getSchoolDisplayName(school, language);
         String displayDesc = translationService.getSchoolDisplayDescription(school, language);

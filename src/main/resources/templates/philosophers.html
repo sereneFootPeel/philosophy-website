@@ -89,7 +89,7 @@
                             <div class="flex justify-between items-start mb-4">
                                 <div class="flex-1 pr-2">
                                     <h1 class="text-2xl sm:text-3xl font-bold text-dark mb-2" th:text="${translationService.getPhilosopherDisplayName(currentPhilosopher, language)}"></h1>
-                                    <p class="text-base sm:text-lg text-gray-600 mb-4" th:text="${currentPhilosopher.era}"></p>
+                                    <p class="text-base sm:text-lg text-gray-600 mb-4" th:text="${T(com.philosophy.util.DateUtils).formatBirthYearToDateRange(currentPhilosopher.birthYear, currentPhilosopher.deathYear)}"></p>
                                 </div>
                             </div>
                             <div class="flex flex-wrap gap-2 mb-4">
@@ -401,7 +401,7 @@
                     <div class="flex justify-between items-start mb-4">
                         <div class="flex-1 pr-2">
                             <h1 class="text-2xl sm:text-3xl font-bold text-dark mb-2">${escapeHtml(philosopher.displayName)}</h1>
-                            <p class="text-base sm:text-lg text-gray-600 mb-4">${escapeHtml(philosopher.era || '')}</p>
+                            <p class="text-base sm:text-lg text-gray-600 mb-4">${escapeHtml(philosopher.dateRange || '')}</p>
                         </div>
                     </div>
                     <div class="flex flex-wrap gap-2 mb-4">
@@ -811,7 +811,7 @@
             
             // 显示父流派（如果有）
             const parentSchoolTag = content.school && content.school.parent ? 
-                `<a href="/schools/filter/${content.school.parent.id}" class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-200 transition-smooth" onclick="event.stopPropagation()">
+                `<a href="/schools/filter/${content.school.parent.id}" class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-200 transition-smooth" onclick="event.stopPropagation(); event.preventDefault(); window.location.href='/schools/filter/${content.school.parent.id}'">
                     ${escapeHtml(content.school.parent.displayName || (language === 'en' && content.school.parent.nameEn ? content.school.parent.nameEn : content.school.parent.name))}
                 </a>` : '';
             
@@ -820,13 +820,13 @@
             return `
                 <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px] relative group" 
                      data-content-id="${content.id}"
-                     onclick="window.location.href='/contents?schoolId=${content.school ? content.school.id : ''}&philosopherId=${philosopherId}'">
+                     onclick="if(!event.target.closest('a') && !event.target.closest('button') && !event.target.closest('.like-btn')) { window.location.href='/contents?schoolId=${content.school ? content.school.id : ''}&philosopherId=${philosopherId}'; }">
                     <div class="flex justify-between items-start mb-4">
                         <div class="flex-1">
                             ${schoolName ? `
                             <div class="flex flex-wrap gap-2 mb-2">
                                 ${parentSchoolTag}
-                                <a href="/schools/filter/${content.school.id}" class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm hover:bg-primary/20 transition-smooth" onclick="event.stopPropagation()">
+                                <a href="/schools/filter/${content.school.id}" class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm hover:bg-primary/20 transition-smooth" onclick="event.stopPropagation(); event.preventDefault(); window.location.href='/schools/filter/${content.school.id}'">
                                     ${escapeHtml(schoolName)}
                                 </a>
                             </div>
@@ -846,7 +846,15 @@
             const div = document.createElement('div');
             div.className = 'bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px] relative group';
             div.setAttribute('data-content-id', content.id);
-            div.onclick = function() {
+            div.onclick = function(e) {
+                // 如果点击的是链接、按钮或点赞按钮，不处理（让原有功能继续工作）
+                if (e.target.closest('a') || 
+                    e.target.closest('button') || 
+                    e.target.closest('[onclick]') ||
+                    e.target.closest('.like-btn') ||
+                    e.target.classList.contains('like-btn')) {
+                    return;
+                }
                 if (content.philosopher && content.school) {
                     window.location.href = `/contents?schoolId=${content.school.id}&philosopherId=${content.philosopher.id}`;
                 }
@@ -854,7 +862,7 @@
             
             // 获取流派名称
             const schoolName = content.school ? 
-                (language === 'en' && content.school.nameEn ? content.school.nameEn : content.school.name) : '';
+                (content.school.displayName || (language === 'en' && content.school.nameEn ? content.school.nameEn : content.school.name)) : '';
             
             // 注意：哲学家页面的content卡片不显示标题和作者信息
             
@@ -865,8 +873,8 @@
             
             // 显示父流派（如果有）
             const parentSchoolTag = content.school && content.school.parent ? 
-                `<a href="/schools/filter/${content.school.parent.id}" class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-200 transition-smooth" onclick="event.stopPropagation()">
-                    ${escapeHtml(language === 'en' && content.school.parent.nameEn ? content.school.parent.nameEn : content.school.parent.name)}
+                `<a href="/schools/filter/${content.school.parent.id}" class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-200 transition-smooth" onclick="event.stopPropagation(); event.preventDefault(); window.location.href='/schools/filter/${content.school.parent.id}'">
+                    ${escapeHtml(content.school.parent.displayName || (language === 'en' && content.school.parent.nameEn ? content.school.parent.nameEn : content.school.parent.name))}
                 </a>` : '';
             
             div.innerHTML = `
@@ -875,7 +883,7 @@
                         ${schoolName ? `
                         <div class="flex flex-wrap gap-2 mb-2">
                             ${parentSchoolTag}
-                            <a href="/schools/filter/${content.school.id}" class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm hover:bg-primary/20 transition-smooth" onclick="event.stopPropagation()">
+                            <a href="/schools/filter/${content.school.id}" class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm hover:bg-primary/20 transition-smooth" onclick="event.stopPropagation(); event.preventDefault(); window.location.href='/schools/filter/${content.school.id}'">
                                 ${escapeHtml(schoolName)}
                             </a>
                         </div>

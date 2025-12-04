@@ -7,6 +7,7 @@ import com.philosophy.service.EmailService;
 import com.philosophy.service.VerificationCodeService;
 import com.philosophy.service.RateLimitingService;
 import com.philosophy.util.UserInfoCollector;
+import com.philosophy.util.LanguageUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,23 +36,22 @@ public class AuthController {
     private final EmailService emailService;
     private final VerificationCodeService verificationCodeService;
     private final RateLimitingService rateLimitingService;
+    private final LanguageUtil languageUtil;
     
-    public AuthController(UserService userService, UserInfoCollector userInfoCollector, TranslationService translationService, EmailService emailService, VerificationCodeService verificationCodeService, RateLimitingService rateLimitingService) {
+    public AuthController(UserService userService, UserInfoCollector userInfoCollector, TranslationService translationService, EmailService emailService, VerificationCodeService verificationCodeService, RateLimitingService rateLimitingService, LanguageUtil languageUtil) {
         this.userService = userService;
         this.userInfoCollector = userInfoCollector;
         this.translationService = translationService;
         this.emailService = emailService;
         this.verificationCodeService = verificationCodeService;
         this.rateLimitingService = rateLimitingService;
+        this.languageUtil = languageUtil;
     }
 
     @GetMapping("/login")
     public String login(Model model, HttpServletRequest request) {
-        // 获取当前语言设置
-        String language = (String) request.getSession().getAttribute("language");
-        if (language == null) {
-            language = "zh"; // 默认中文
-        }
+        // 获取当前语言设置（根据IP自动判断默认语言）
+        String language = languageUtil.getLanguage(request);
         
         // 检查是否有登录错误信息
         String loginError = (String) request.getSession().getAttribute("loginError");
@@ -69,11 +69,8 @@ public class AuthController {
 
     @GetMapping("/register")
     public String register(Model model, HttpServletRequest request) {
-        // 获取当前语言设置
-        String language = (String) request.getSession().getAttribute("language");
-        if (language == null) {
-            language = "zh"; // 默认中文
-        }
+        // 获取当前语言设置（根据IP自动判断默认语言）
+        String language = languageUtil.getLanguage(request);
         
         model.addAttribute("user", new User());
         model.addAttribute("activePage", "register");
@@ -162,11 +159,8 @@ public class AuthController {
         
         // 如果有验证错误，返回注册页面
         if (bindingResult.hasErrors()) {
-            // 获取当前语言设置
-            String language = (String) request.getSession().getAttribute("language");
-            if (language == null) {
-                language = "zh"; // 默认中文
-            }
+            // 获取当前语言设置（根据IP自动判断默认语言）
+            String language = languageUtil.getLanguage(request);
             model.addAttribute("language", language);
             model.addAttribute("translationService", translationService);
             return "register";
@@ -185,10 +179,7 @@ public class AuthController {
         }
         
         // 注册成功，重定向到登录页面
-        String language = (String) request.getSession().getAttribute("language");
-        if (language == null) {
-            language = "zh"; // 默认中文
-        }
+        String language = languageUtil.getLanguage(request);
         model.addAttribute("language", language);
         model.addAttribute("translationService", translationService);
         model.addAttribute("successMessage", "注册成功，请登录");

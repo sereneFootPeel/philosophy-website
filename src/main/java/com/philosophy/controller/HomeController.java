@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.http.ResponseEntity;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +29,8 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.HashMap;
 import com.philosophy.util.PinyinStringComparator;
+import com.philosophy.util.LanguageUtil;
+import com.philosophy.util.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,9 +46,10 @@ public class HomeController {
     private final ContentService contentService;
     private final LikeService likeService;
     private final UserService userService;
+    private final LanguageUtil languageUtil;
     
     // 构造函数注入
-    public HomeController(PhilosopherService philosopherService, SchoolService schoolService, CommentService commentService, TranslationService translationService, ContentService contentService, LikeService likeService, UserService userService) {
+    public HomeController(PhilosopherService philosopherService, SchoolService schoolService, CommentService commentService, TranslationService translationService, ContentService contentService, LikeService likeService, UserService userService, LanguageUtil languageUtil) {
         this.philosopherService = philosopherService;
         this.schoolService = schoolService;
         this.commentService = commentService;
@@ -55,6 +57,7 @@ public class HomeController {
         this.contentService = contentService;
         this.likeService = likeService;
         this.userService = userService;
+        this.languageUtil = languageUtil;
     }
     
     // 递归排序所有层级的流派
@@ -74,12 +77,8 @@ public class HomeController {
     
     @GetMapping("/")
     public String home(HttpServletRequest request, Model model, Authentication authentication) {
-        // 获取当前语言设置
-        HttpSession session = request.getSession();
-        String language = (String) session.getAttribute("language");
-        if (language == null) {
-            language = "zh"; // 默认中文
-        }
+        // 获取当前语言设置（根据IP自动判断默认语言）
+        String language = languageUtil.getLanguage(request);
         
         // 添加身份验证相关变量
         boolean isAuthenticated = authentication != null && authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken);
@@ -166,12 +165,8 @@ public class HomeController {
     
     @GetMapping("/search")
     public String searchForm(HttpServletRequest request, Model model) {
-        // 获取当前语言设置
-        HttpSession session = request.getSession();
-        String language = (String) session.getAttribute("language");
-        if (language == null) {
-            language = "zh"; // 默认中文
-        }
+        // 获取当前语言设置（根据IP自动判断默认语言）
+        String language = languageUtil.getLanguage(request);
         
         model.addAttribute("language", language);
         model.addAttribute("translationService", translationService);
@@ -185,12 +180,8 @@ public class HomeController {
             return "redirect:/search";
         }
         
-        // 获取当前语言设置
-        HttpSession session = request.getSession();
-        String language = (String) session.getAttribute("language");
-        if (language == null) {
-            language = "zh"; // 默认中文
-        }
+        // 获取当前语言设置（根据IP自动判断默认语言）
+        String language = languageUtil.getLanguage(request);
         
         List<Philosopher> philosophers = philosopherService.searchPhilosophers(query);
         List<School> schools = schoolService.searchSchools(query);
@@ -317,12 +308,8 @@ public class HomeController {
     
     @GetMapping("/schools")
     public String schools(Model model, Authentication authentication, HttpServletRequest request) {
-        // 获取当前语言设置
-        HttpSession session = request.getSession();
-        String language = (String) session.getAttribute("language");
-        if (language == null) {
-            language = "zh"; // 默认中文
-        }
+        // 获取当前语言设置（根据IP自动判断默认语言）
+        String language = languageUtil.getLanguage(request);
         
         List<School> allSchools = schoolService.findTopLevelSchools();
         // 使用拼音/忽略大小写排序顶级流派
@@ -352,12 +339,8 @@ public class HomeController {
     
     @GetMapping("/schools/filter/{id}")
     public String filterBySchool(@PathVariable Long id, Model model, Authentication authentication, HttpServletRequest request) {
-        // 获取当前语言设置
-        HttpSession session = request.getSession();
-        String language = (String) session.getAttribute("language");
-        if (language == null) {
-            language = "zh"; // 默认中文
-        }
+        // 获取当前语言设置（根据IP自动判断默认语言）
+        String language = languageUtil.getLanguage(request);
         
         List<School> allSchools = schoolService.findTopLevelSchools();
         // 使用拼音/忽略大小写排序顶级流派
@@ -437,12 +420,8 @@ public class HomeController {
                               Authentication authentication,
                               HttpServletRequest request) {
         
-        // 获取当前语言设置
-        HttpSession session = request.getSession();
-        String language = (String) session.getAttribute("language");
-        if (language == null) {
-            language = "zh"; // 默认中文
-        }
+        // 获取当前语言设置（根据IP自动判断默认语言）
+        String language = languageUtil.getLanguage(request);
         
         // 添加身份验证相关变量
         boolean isAuthenticated = authentication != null && authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken);
@@ -461,12 +440,30 @@ public class HomeController {
         List<Philosopher> allPhilosophers = philosopherService.getAllPhilosophers();
         List<School> allSchools = schoolService.getAllSchools();
         
-        // 按哲学家出生年份排序，处理可能为null的情况
+        // 按哲学家出生日期排序（升序：数字越小越靠前，即更早的日期排在前面）
+        // 输入格式都是日期格式（如"1914.11.18"或"1914.11.18 - 1975.3.4"），解析后存储为YYYYMMDD格式（如19141118）
+        // 排序时直接使用YYYYMMDD格式的数字，按从小到大排序
+        // 兼容处理：如果数据库中还有旧格式的年份数据（绝对值<10000），会转换为YYYY0101格式用于排序
         allPhilosophers.sort(Comparator.comparing((Philosopher p) -> {
             if (p.getBirthYear() == null) {
-                return Integer.MAX_VALUE; // 没有出生年份的排到最后
+                return Long.MAX_VALUE; // 没有出生年份的排到最后
             }
-            return p.getBirthYear();
+            Integer birthYear = p.getBirthYear();
+            // 如果 birthYear 的绝对值 < 10000，说明是旧格式（年份），转换为日期格式（YYYY0101）用于排序
+            // 处理负数年份（公元前）：-551 -> -5510101
+            if (Math.abs(birthYear) < 10000) {
+                // 保持负数年份的符号，转换为日期格式
+                if (birthYear < 0) {
+                    // 公元前年份：-551 -> -5510101
+                    return (long)birthYear * 10000L - 101L;
+                } else {
+                    // 公元年份：1999 -> 19990101
+                    return (long)birthYear * 10000L + 101L;
+                }
+            }
+            // 如果 birthYear 的绝对值 >= 10000，说明是YYYYMMDD格式（完整日期），直接使用
+            // 例如：19141118（从"1914.11.18"生成）会直接用于排序
+            return birthYear.longValue();
         }));
         
         // 如果有指定哲学家ID，则使用该哲学家作为当前哲学家
@@ -512,12 +509,8 @@ public class HomeController {
     
     @GetMapping("/test/likes-fixed")
     public String testLikesFixed(HttpServletRequest request, Model model, Authentication authentication) {
-        // 获取当前语言设置
-        HttpSession session = request.getSession();
-        String language = (String) session.getAttribute("language");
-        if (language == null) {
-            language = "zh"; // 默认中文
-        }
+        // 获取当前语言设置（根据IP自动判断默认语言）
+        String language = languageUtil.getLanguage(request);
         
         // 添加身份验证相关变量
         boolean isAuthenticated = authentication != null && authentication.isAuthenticated();
@@ -779,12 +772,8 @@ public class HomeController {
     // 内容优先级测试页面
     @GetMapping("/test-priority")
     public String testPriority(Model model, Authentication authentication, HttpServletRequest request) {
-        // 获取当前语言设置
-        HttpSession session = request.getSession();
-        String language = (String) session.getAttribute("language");
-        if (language == null) {
-            language = "zh"; // 默认中文
-        }
+        // 获取当前语言设置（根据IP自动判断默认语言）
+        String language = languageUtil.getLanguage(request);
 
         // 获取所有流派
         List<School> allSchools = schoolService.getAllSchools();
@@ -809,12 +798,8 @@ public class HomeController {
     // 点赞功能调试页面
     @GetMapping("/test-like-debug")
     public String testLikeDebug(Model model, Authentication authentication, HttpServletRequest request) {
-        // 获取当前语言设置
-        HttpSession session = request.getSession();
-        String language = (String) session.getAttribute("language");
-        if (language == null) {
-            language = "zh"; // 默认中文
-        }
+        // 获取当前语言设置（根据IP自动判断默认语言）
+        String language = languageUtil.getLanguage(request);
 
         // 添加身份验证相关变量
         boolean isAuthenticated = authentication != null && authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken);
@@ -831,12 +816,8 @@ public class HomeController {
     public String allContents(@RequestParam(required = false) Long schoolId, 
                              @RequestParam(required = false) Long philosopherId, 
                              Model model, Authentication authentication, HttpServletRequest request) {
-        // 获取当前语言设置
-        HttpSession session = request.getSession();
-        String language = (String) session.getAttribute("language");
-        if (language == null) {
-            language = "zh"; // 默认中文
-        }
+        // 获取当前语言设置（根据IP自动判断默认语言）
+        String language = languageUtil.getLanguage(request);
 
         // 添加身份验证相关变量
         boolean isAuthenticated = authentication != null && authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken);
@@ -1035,12 +1016,8 @@ public class HomeController {
         Map<String, Object> response = new HashMap<>();
         
         try {
-            // 获取当前语言设置
-            HttpSession session = request.getSession();
-            String language = (String) session.getAttribute("language");
-            if (language == null) {
-                language = "zh"; // 默认中文
-            }
+            // 获取当前语言设置（根据IP自动判断默认语言）
+            String language = languageUtil.getLanguage(request);
             
             Philosopher philosopher = philosopherService.getPhilosopherById(philosopherId);
             if (philosopher == null) {
@@ -1062,6 +1039,9 @@ public class HomeController {
             philosopherData.put("name", philosopher.getName());
             philosopherData.put("nameEn", philosopher.getNameEn());
             philosopherData.put("era", philosopher.getEra());
+            // 格式化日期范围：从birthYear和deathYear生成日期范围字符串
+            String dateRange = DateUtils.formatBirthYearToDateRange(philosopher.getBirthYear(), philosopher.getDeathYear());
+            philosopherData.put("dateRange", dateRange);
             philosopherData.put("bio", philosopher.getBio());
             philosopherData.put("bioEn", philosopher.getBioEn());
             philosopherData.put("imageUrl", philosopher.getImageUrl());
@@ -1230,12 +1210,8 @@ public class HomeController {
     // 名句推荐页面
     @GetMapping("/quotes")
     public String quotes(HttpServletRequest request, Model model, Authentication authentication) {
-        // 获取当前语言设置
-        HttpSession session = request.getSession();
-        String language = (String) session.getAttribute("language");
-        if (language == null) {
-            language = "zh"; // 默认中文
-        }
+        // 获取当前语言设置（根据IP自动判断默认语言）
+        String language = languageUtil.getLanguage(request);
         
         // 添加身份验证相关变量
         boolean isAuthenticated = authentication != null && authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken);
@@ -1272,12 +1248,8 @@ public class HomeController {
             Authentication authentication) {
         
         try {
-            // 获取当前语言设置
-            HttpSession session = request.getSession();
-            String language = (String) session.getAttribute("language");
-            if (language == null) {
-                language = "zh"; // 默认中文
-            }
+            // 获取当前语言设置（根据IP自动判断默认语言）
+            String language = languageUtil.getLanguage(request);
             
             // 获取当前用户（用于隐私过滤）
             boolean isAuthenticated = authentication != null && authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken);

@@ -20,6 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.philosophy.model.User;
 import com.philosophy.util.UserInfoCollector;
+import com.philosophy.service.IpLocationService;
+import com.philosophy.util.LanguageUtil;
 
 @Configuration
 @EnableWebSecurity
@@ -30,13 +32,19 @@ public class SecurityConfig {
     private final UserInfoCollector userInfoCollector;
     private final com.philosophy.service.UserService userService;
     private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
+    private final IpLocationService ipLocationService;
+    private final LanguageUtil languageUtil;
     
     public SecurityConfig(UserInfoCollector userInfoCollector,
                           com.philosophy.service.UserService userService,
-                          CustomAuthenticationFailureHandler customAuthenticationFailureHandler) {
+                          CustomAuthenticationFailureHandler customAuthenticationFailureHandler,
+                          IpLocationService ipLocationService,
+                          LanguageUtil languageUtil) {
         this.userInfoCollector = userInfoCollector;
         this.userService = userService;
         this.customAuthenticationFailureHandler = customAuthenticationFailureHandler;
+        this.ipLocationService = ipLocationService;
+        this.languageUtil = languageUtil;
     }
 
     @Bean
@@ -155,8 +163,18 @@ public class SecurityConfig {
                 // 从数据库读取用户的语言偏好并设置到Session和Cookie
                 try {
                     String userLanguage = user.getLanguage();
+                    
+                    // 如果用户没有设置语言偏好，根据IP地址判断默认语言
                     if (userLanguage == null || userLanguage.trim().isEmpty()) {
-                        userLanguage = "zh"; // 默认中文
+                        boolean isForeign = ipLocationService.isForeignIp(request);
+                        userLanguage = isForeign ? "en" : "zh";
+                        
+                        // 保存到数据库
+                        user.setLanguage(userLanguage);
+                        userService.updateUser(user);
+                        
+                        logger.info("User {} 没有语言偏好，根据IP地址设置默认语言: {} (IP是否国外: {})", 
+                                    user.getUsername(), userLanguage, isForeign);
                     }
                     
                     // 设置到Session
@@ -168,9 +186,16 @@ public class SecurityConfig {
                     languageCookie.setMaxAge(30 * 24 * 60 * 60); // 30天
                     response.addCookie(languageCookie);
                     
-                    logger.info("User {} language preference loaded from database: {}", user.getUsername(), userLanguage);
+                    logger.info("User {} language preference loaded: {}", user.getUsername(), userLanguage);
                 } catch (Exception e) {
                     logger.error("Failed to load user language preference", e);
+                    // 如果出错，使用工具类获取默认语言
+                    try {
+                        String defaultLanguage = languageUtil.getLanguage(request);
+                        request.getSession().setAttribute("language", defaultLanguage);
+                    } catch (Exception ex) {
+                        logger.error("Failed to set default language", ex);
+                    }
                 }
             } catch (Exception e) {
                 logger.error("Failed to record user login info", e);

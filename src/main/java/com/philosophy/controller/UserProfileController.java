@@ -16,6 +16,7 @@ import com.philosophy.service.SchoolService;
 import com.philosophy.service.UserBlockService;
 import com.philosophy.model.School;
 import com.philosophy.util.UserInfoCollector;
+import com.philosophy.util.LanguageUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -29,7 +30,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Set;
 import java.util.Map;
@@ -47,6 +47,7 @@ public class UserProfileController {
     private final UserContentEditService userContentEditService;
     private final SchoolService schoolService;
     private final UserBlockService userBlockService;
+    private final LanguageUtil languageUtil;
 
     private static final Logger logger = LoggerFactory.getLogger(UserProfileController.class);
 
@@ -54,7 +55,7 @@ public class UserProfileController {
                                 UserInfoCollector userInfoCollector, TranslationService translationService,
                                 LikeService likeService, ContentService contentService,
                                 UserContentEditService userContentEditService, SchoolService schoolService,
-                                UserBlockService userBlockService) {
+                                UserBlockService userBlockService, LanguageUtil languageUtil) {
         this.userService = userService;
         this.commentService = commentService;
         this.userInfoCollector = userInfoCollector;
@@ -64,6 +65,7 @@ public class UserProfileController {
         this.userContentEditService = userContentEditService;
         this.schoolService = schoolService;
         this.userBlockService = userBlockService;
+        this.languageUtil = languageUtil;
     }
 
     // 管理员界面查看用户详情
@@ -75,12 +77,8 @@ public class UserProfileController {
             return "error";
         }
 
-        // 获取当前语言设置
-        HttpSession session = request.getSession();
-        String language = (String) session.getAttribute("language");
-        if (language == null) {
-            language = "zh"; // 默认中文
-        }
+        // 获取当前语言设置（根据IP自动判断默认语言）
+        String language = languageUtil.getLanguage(request);
 
         // 获取当前用户信息用于隐私过滤
         User currentUser = null;
@@ -166,12 +164,8 @@ public class UserProfileController {
             return "error";
         }
 
-        // 获取当前语言设置
-        HttpSession session = request.getSession();
-        String language = (String) session.getAttribute("language");
-        if (language == null) {
-            language = "zh"; // 默认中文
-        }
+        // 获取当前语言设置（根据IP自动判断默认语言）
+        String language = languageUtil.getLanguage(request);
 
         // 检查当前登录用户是否是管理员
         boolean isAdmin = authentication != null && authentication.isAuthenticated() &&
@@ -258,12 +252,8 @@ public class UserProfileController {
             return "error";
         }
 
-        // 获取当前语言设置
-        HttpSession session = request.getSession();
-        String language = (String) session.getAttribute("language");
-        if (language == null) {
-            language = "zh"; // 默认中文
-        }
+        // 获取当前语言设置（根据IP自动判断默认语言）
+        String language = languageUtil.getLanguage(request);
 
         // 获取当前用户信息用于隐私过滤
         User currentUser = null;
@@ -530,12 +520,8 @@ public class UserProfileController {
             return "error";
         }
 
-        // 获取当前语言设置
-        HttpSession session = request.getSession();
-        String language = (String) session.getAttribute("language");
-        if (language == null) {
-            language = "zh"; // 默认中文
-        }
+        // 获取当前语言设置（根据IP自动判断默认语言）
+        String language = languageUtil.getLanguage(request);
 
         // 获取用户点赞的不同类型内容
         List<Content> likedContents = likeService.getUserLikedContents(currentUser.getId());
@@ -574,12 +560,8 @@ public class UserProfileController {
             return "error";
         }
 
-        // 获取当前语言设置
-        HttpSession session = request.getSession();
-        String language = (String) session.getAttribute("language");
-        if (language == null) {
-            language = "zh"; // 默认中文
-        }
+        // 获取当前语言设置（根据IP自动判断默认语言）
+        String language = languageUtil.getLanguage(request);
 
         // 获取用户的所有评论（不包括已删除的）
         List<Comment> comments = commentService.findByUserIdWithPrivacyFilter(currentUser.getId(), currentUser);

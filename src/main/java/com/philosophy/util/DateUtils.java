@@ -9,11 +9,15 @@ import java.util.regex.Matcher;
 public class DateUtils {
     
     /**
-     * 将日期范围字符串（如 "1999.1.1 - 2000.1.1"）解析为出生日期的整数格式（YYYYMMDD）
+     * 将日期范围字符串解析为出生日期的整数格式（YYYYMMDD）
      * 如果解析失败，返回 null
      * 支持两种格式：
-     * 1. "1999.1.1 - 2000.1.1" (完整日期范围)
-     * 2. "1999.1.1" (仅出生日期)
+     * 1. "1914.11.18 - 1975.3.4" (完整日期范围，会解析为19141118)
+     * 2. "1914.11.18" (仅出生日期，会解析为19141118)
+     * 
+     * 生成的YYYYMMDD格式数字用于数据库存储和排序，例如：
+     * - "1914.11.18" -> 19141118
+     * - "1975.3.4" -> 19750304
      * 
      * @param dateRange 日期范围字符串，格式：YYYY.M.D - YYYY.M.D 或 YYYY.M.D
      * @return 出生日期的整数格式（YYYYMMDD），如果解析失败返回 null
@@ -150,6 +154,35 @@ public class DateUtils {
         
         // 如果没有匹配到日期范围格式，说明只有出生日期，返回 null
         return null;
+    }
+    
+    /**
+     * 将旧格式的年份（如1999或-551）转换为YYYYMMDD格式（如19990101或-5510101）
+     * 用于统一数据格式，确保所有日期都是YYYYMMDD格式，便于排序
+     * 
+     * @param year 年份（可能是旧格式，如1999或-551）
+     * @return 转换后的YYYYMMDD格式（如19990101或-5510101），如果输入为null返回null
+     */
+    public static Integer convertYearToDateFormat(Integer year) {
+        if (year == null) {
+            return null;
+        }
+        
+        // 如果已经是YYYYMMDD格式（绝对值 >= 10000），直接返回
+        if (Math.abs(year) >= 10000) {
+            return year;
+        }
+        
+        // 如果是旧格式（年份），转换为YYYYMMDD格式
+        // 对于正数年份：1999 -> 19990101（1月1日）
+        // 对于负数年份（公元前）：-551 -> -5510101（1月1日）
+        if (year < 0) {
+            // 公元前年份：-551 -> -5510101
+            return year * 10000 - 101;
+        } else {
+            // 公元年份：1999 -> 19990101
+            return year * 10000 + 101;
+        }
     }
 }
 

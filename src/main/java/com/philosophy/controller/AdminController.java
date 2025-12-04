@@ -182,7 +182,11 @@ public class AdminController {
         
         User currentUser = (User) authentication.getPrincipal();
         
-        // 解析出生死亡日期范围，自动计算出生日期（格式19990101）用于排序
+        // 解析出生死亡日期范围，自动生成YYYYMMDD格式的整数用于排序
+        // 输入格式支持：
+        // 1. "1914.11.18 - 1975.3.4" (完整日期范围，会解析为19141118和19750304)
+        // 2. "1914.11.18" (仅出生日期，会解析为19141118)
+        // 解析后的YYYYMMDD格式数字存储在数据库birth_year和death_year字段中，用于从小到大排序
         if (birthDeathDate != null && !birthDeathDate.trim().isEmpty()) {
             Integer birthDateInt = DateUtils.parseBirthDateFromRange(birthDeathDate);
             if (birthDateInt != null) {

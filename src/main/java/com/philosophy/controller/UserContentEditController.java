@@ -6,6 +6,7 @@ import com.philosophy.service.PhilosopherService;
 import com.philosophy.service.SchoolService;
 import com.philosophy.service.ContentService;
 import com.philosophy.service.TranslationService;
+import com.philosophy.util.LanguageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -39,6 +40,9 @@ public class UserContentEditController {
     @Autowired
     private TranslationService translationService;
     
+    @Autowired
+    private LanguageUtil languageUtil;
+    
     // 显示用户编辑列表
     @GetMapping
     public String listUserEdits(@RequestParam(defaultValue = "0") int page,
@@ -50,11 +54,8 @@ public class UserContentEditController {
         Pageable pageable = PageRequest.of(page, size);
         Page<UserContentEdit> edits = userContentEditService.getUserEdits(user.getId(), pageable);
 
-        // 获取语言设置
-        String language = (String) request.getSession().getAttribute("language");
-        if (language == null) {
-            language = "zh"; // 默认中文
-        }
+        // 获取语言设置（根据IP自动判断默认语言）
+        String language = languageUtil.getLanguage(request);
 
         // 判断用户是否已认证
         boolean isAuthenticated = authentication != null && !(authentication instanceof AnonymousAuthenticationToken);
@@ -81,11 +82,8 @@ public class UserContentEditController {
         Pageable pageable = PageRequest.of(page, size);
         Page<Content> contents = contentService.findUserOwnContents(user.getId(), pageable);
 
-        // 获取语言设置
-        String language = (String) request.getSession().getAttribute("language");
-        if (language == null) {
-            language = "zh"; // 默认中文
-        }
+        // 获取语言设置（根据IP自动判断默认语言）
+        String language = languageUtil.getLanguage(request);
 
         // 判断用户是否已认证
         boolean isAuthenticated = authentication != null && !(authentication instanceof AnonymousAuthenticationToken);
@@ -109,11 +107,8 @@ public class UserContentEditController {
         List<Philosopher> philosophers = philosopherService.getAllPhilosophers();
         List<School> schools = schoolService.getAllSchools();
 
-        // 获取语言设置
-        String language = (String) request.getSession().getAttribute("language");
-        if (language == null) {
-            language = "zh"; // 默认中文
-        }
+        // 获取语言设置（根据IP自动判断默认语言）
+        String language = languageUtil.getLanguage(request);
 
         // 判断用户是否已认证
         boolean isAuthenticated = authentication != null && !(authentication instanceof AnonymousAuthenticationToken);
@@ -142,11 +137,8 @@ public class UserContentEditController {
         List<Philosopher> philosophers = philosopherService.getAllPhilosophers();
         List<School> schools = schoolService.getAllSchools();
 
-        // 获取语言设置
-        String language = (String) request.getSession().getAttribute("language");
-        if (language == null) {
-            language = "zh"; // 默认中文
-        }
+        // 获取语言设置（根据IP自动判断默认语言）
+        String language = languageUtil.getLanguage(request);
 
         // 判断用户是否已认证
         boolean isAuthenticated = authentication != null && !(authentication instanceof AnonymousAuthenticationToken);
@@ -244,11 +236,8 @@ public class UserContentEditController {
         List<Philosopher> philosophers = philosopherService.getAllPhilosophers();
         List<School> schools = schoolService.getAllSchools();
 
-        // 获取语言设置
-        String language = (String) request.getSession().getAttribute("language");
-        if (language == null) {
-            language = "zh"; // 默认中文
-        }
+        // 获取语言设置（根据IP自动判断默认语言）
+        String language = languageUtil.getLanguage(request);
 
         // 判断用户是否已认证
         boolean isAuthenticated = authentication != null && !(authentication instanceof AnonymousAuthenticationToken);
@@ -330,11 +319,8 @@ public class UserContentEditController {
             throw new RuntimeException("内容不存在");
         }
 
-        // 获取语言设置
-        String language = (String) request.getSession().getAttribute("language");
-        if (language == null) {
-            language = "zh"; // 默认中文
-        }
+        // 获取语言设置（根据IP自动判断默认语言）
+        String language = languageUtil.getLanguage(request);
 
         // 判断用户是否已认证
         boolean isAuthenticated = authentication != null && !(authentication instanceof AnonymousAuthenticationToken);

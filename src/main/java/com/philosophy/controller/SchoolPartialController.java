@@ -6,8 +6,8 @@ import com.philosophy.model.User;
 import com.philosophy.service.ContentService;
 import com.philosophy.service.SchoolService;
 import com.philosophy.service.TranslationService;
+import com.philosophy.util.LanguageUtil;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -27,11 +27,13 @@ public class SchoolPartialController {
     private final SchoolService schoolService;
     private final TranslationService translationService;
     private final ContentService contentService;
+    private final LanguageUtil languageUtil;
 
-    public SchoolPartialController(SchoolService schoolService, TranslationService translationService, ContentService contentService) {
+    public SchoolPartialController(SchoolService schoolService, TranslationService translationService, ContentService contentService, LanguageUtil languageUtil) {
         this.schoolService = schoolService;
         this.translationService = translationService;
         this.contentService = contentService;
+        this.languageUtil = languageUtil;
     }
 
     // 返回内容列表的局部HTML，用于AJAX更新右侧面板（首次加载）
@@ -57,10 +59,8 @@ public class SchoolPartialController {
         // 应用隐私和屏蔽过滤
         contents = contentService.filterContentsByPrivacy(contents, currentUser);
 
-        // 语言和鉴权变量供片段使用
-        HttpSession session = request.getSession();
-        String language = (String) session.getAttribute("language");
-        if (language == null) language = "zh";
+        // 语言和鉴权变量供片段使用（根据IP自动判断默认语言）
+        String language = languageUtil.getLanguage(request);
 
         model.addAttribute("contents", contents);
         model.addAttribute("translationService", translationService);

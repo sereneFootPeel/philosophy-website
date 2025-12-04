@@ -16,7 +16,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
+import com.philosophy.util.LanguageUtil;
 import java.util.List;
 import java.util.Collections;
 
@@ -31,13 +31,15 @@ public class CommentController {
     private final ContentService contentService;
     private final TranslationService translationService;
     private final SchoolService schoolService;
+    private final LanguageUtil languageUtil;
 
-    public CommentController(CommentService commentService, UserService userService, ContentService contentService, TranslationService translationService, SchoolService schoolService) {
+    public CommentController(CommentService commentService, UserService userService, ContentService contentService, TranslationService translationService, SchoolService schoolService, LanguageUtil languageUtil) {
         this.commentService = commentService;
         this.userService = userService;
         this.contentService = contentService;
         this.translationService = translationService;
         this.schoolService = schoolService;
+        this.languageUtil = languageUtil;
     }
 
     // 查看指定内容的评论
@@ -50,12 +52,8 @@ public class CommentController {
     @GetMapping("/view/{contentId}")
     public String viewCommentsByPath(@PathVariable Long contentId, Model model, Authentication authentication, HttpServletRequest request) {
         try {
-            // 获取当前语言设置
-            HttpSession session = request.getSession();
-            String language = (String) session.getAttribute("language");
-            if (language == null) {
-                language = "zh"; // 默认中文
-            }
+            // 获取当前语言设置（根据IP自动判断默认语言）
+            String language = languageUtil.getLanguage(request);
             
             model.addAttribute("contentId", contentId);
             model.addAttribute("language", language);

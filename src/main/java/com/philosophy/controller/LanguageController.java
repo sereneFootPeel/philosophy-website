@@ -3,6 +3,7 @@ package com.philosophy.controller;
 import com.philosophy.model.User;
 import com.philosophy.service.TranslationService;
 import com.philosophy.service.UserService;
+import com.philosophy.util.LanguageUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -24,10 +25,12 @@ public class LanguageController {
     
     private final TranslationService translationService;
     private final UserService userService;
+    private final LanguageUtil languageUtil;
 
-    public LanguageController(TranslationService translationService, UserService userService) {
+    public LanguageController(TranslationService translationService, UserService userService, LanguageUtil languageUtil) {
         this.translationService = translationService;
         this.userService = userService;
+        this.languageUtil = languageUtil;
     }
 
     /**
@@ -84,11 +87,10 @@ public class LanguageController {
     @GetMapping("/language/current")
     @ResponseBody
     public Map<String, String> getCurrentLanguage(HttpServletRequest request) {
-        HttpSession session = request.getSession();
-        String language = (String) session.getAttribute("language");
+        String language = languageUtil.getLanguage(request);
         
         Map<String, String> result = new HashMap<>();
-        result.put("language", language != null ? language : "zh");
+        result.put("language", language);
         return result;
     }
 
