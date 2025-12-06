@@ -48,7 +48,12 @@ public class TranslationService {
         if ("en".equals(languageCode)) {
             Optional<SchoolTranslation> translation = schoolTranslationRepository
                 .findBySchoolIdAndLanguageCode(school.getId(), languageCode);
-            return translation.map(SchoolTranslation::getNameEn).orElse(school.getName());
+            if (translation.isPresent()) {
+                return translation.get().getNameEn();
+            }
+            if (school.getNameEn() != null && !school.getNameEn().isEmpty()) {
+                return school.getNameEn();
+            }
         }
         return school.getName();
     }
@@ -281,7 +286,12 @@ public class TranslationService {
         if ("en".equals(languageCode)) {
             Optional<PhilosopherTranslation> translation = philosopherTranslationRepository
                 .findByPhilosopherIdAndLanguageCode(philosopher.getId(), languageCode);
-            return translation.map(PhilosopherTranslation::getNameEn).orElse(philosopher.getName());
+            if (translation.isPresent()) {
+                return translation.get().getNameEn();
+            }
+            if (philosopher.getNameEn() != null && !philosopher.getNameEn().isEmpty()) {
+                return philosopher.getNameEn();
+            }
         }
         return philosopher.getName();
     }
@@ -554,6 +564,12 @@ public class TranslationService {
             case "id": return "ID";
             case "actions": return "操作";
             case "none": return "无";
+            case "found": return "共找到";
+            case "results_unit": return "条结果";
+            case "philosophers_unit": return "位哲学家";
+            case "schools_unit": return "个学派";
+            case "contents_unit": return "条内容";
+            case "users_unit": return "位用户";
             default: return key;
         }
     }
@@ -700,6 +716,12 @@ public class TranslationService {
             case "id": return "ID";
             case "actions": return "Actions";
             case "none": return "None";
+            case "found": return "Found";
+            case "results_unit": return "results";
+            case "philosophers_unit": return "philosophers";
+            case "schools_unit": return "schools";
+            case "contents_unit": return "contents";
+            case "users_unit": return "users";
             default: return key;
         }
     }

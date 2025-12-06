@@ -78,4 +78,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Transactional
     @Query("UPDATE User u SET u.failedLoginAttempts = 0, u.accountLocked = false, u.lockTime = null, u.lockExpireTime = null WHERE u.username = :username")
     void resetFailedAttemptsByUsername(@Param("username") String username);
+
+    @Query("SELECT u FROM User u WHERE LOWER(u.username) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(u.firstName) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(u.lastName) LIKE LOWER(CONCAT('%', :query, '%'))")
+    List<User> searchByUsernameOrName(@Param("query") String query);
 }

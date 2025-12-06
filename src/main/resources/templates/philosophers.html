@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/springsecurity6">
+<html th:lang="${language}" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/springsecurity6">
 <head th:replace="~{fragments/header :: head}" th:with="pageTitle=${translationService.getStaticText('philosophy', language)} + ' - ' + ${translationService.getStaticText('philosophers', language)}">
     <!-- Like Button Component -->
     <script th:src="@{/js/like-button-component.js}"></script>
@@ -855,8 +855,10 @@
                     e.target.classList.contains('like-btn')) {
                     return;
                 }
-                if (content.philosopher && content.school) {
-                    window.location.href = `/contents?schoolId=${content.school.id}&philosopherId=${content.philosopher.id}`;
+                
+                const pId = content.philosopherId || (content.philosopher ? content.philosopher.id : null);
+                if (pId && content.school) {
+                    window.location.href = `/contents?schoolId=${content.school.id}&philosopherId=${pId}`;
                 }
             };
             

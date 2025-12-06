@@ -163,4 +163,7 @@ public interface ContentRepository extends JpaRepository<Content, Long> {
     // 获取所有内容（用于随机名句）
     @Query("SELECT c FROM Content c LEFT JOIN FETCH c.philosopher p LEFT JOIN FETCH c.user u")
     List<Content> findAllContentsForQuotes();
+
+    @Query("SELECT c FROM Content c LEFT JOIN FETCH c.philosopher p LEFT JOIN FETCH c.school s LEFT JOIN FETCH s.parent WHERE LOWER(c.content) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(c.contentEn) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(c.title) LIKE LOWER(CONCAT('%', :query, '%'))")
+    List<Content> searchByContentOrContentEnOrTitle(@Param("query") String query);
 }

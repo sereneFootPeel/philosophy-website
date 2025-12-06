@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<html th:lang="${language}" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/header :: head}" th:with="pageTitle='搜索结果 - ' + ${query}">
     <!-- Like Button Component -->
     <script th:src="@{/js/like-button-component.js}"></script>
@@ -79,7 +79,11 @@
 
         <!-- 搜索结果统计 -->
         <div class="mb-6 text-sm text-gray-600">
-            <span>共找到 <span id="total-results">0</span> 条结果</span>
+            <span>
+                <span th:text="${translationService.getStaticText('found', language)}">共找到</span> 
+                <span id="total-results">0</span> 
+                <span th:text="${translationService.getStaticText('results_unit', language)}">条结果</span>
+            </span>
         </div>
 
         <!-- 搜索结果容器 -->
@@ -95,7 +99,9 @@
                                 <span th:text="${translationService.getStaticText('philosophers', language)}">哲学家</span>
                             </h2>
                             <p class="text-sm text-gray-500 mt-1">
-                                共找到 <span class="category-count" th:text="${#lists.size(philosophers)}">0</span> 位哲学家
+                                <span th:text="${translationService.getStaticText('found', language)}">共找到</span> 
+                                <span class="category-count" th:text="${#lists.size(philosophers)}">0</span> 
+                                <span th:text="${translationService.getStaticText('philosophers_unit', language)}">位哲学家</span>
                             </p>
                         </div>
                     </div>
@@ -126,7 +132,9 @@
                                 <span th:text="${translationService.getStaticText('schools', language)}">学派</span>
                             </h2>
                             <p class="text-sm text-gray-500 mt-1">
-                                共找到 <span class="category-count" th:text="${#lists.size(schools)}">0</span> 个学派
+                                <span th:text="${translationService.getStaticText('found', language)}">共找到</span> 
+                                <span class="category-count" th:text="${#lists.size(schools)}">0</span> 
+                                <span th:text="${translationService.getStaticText('schools_unit', language)}">个学派</span>
                             </p>
                         </div>
                     </div>
@@ -157,7 +165,9 @@
                                 <span th:text="${translationService.getStaticText('contents', language)}">内容</span>
                             </h2>
                             <p class="text-sm text-gray-500 mt-1">
-                                共找到 <span class="category-count" th:text="${#lists.size(contents)}">0</span> 条内容
+                                <span th:text="${translationService.getStaticText('found', language)}">共找到</span> 
+                                <span class="category-count" th:text="${#lists.size(contents)}">0</span> 
+                                <span th:text="${translationService.getStaticText('contents_unit', language)}">条内容</span>
                             </p>
                         </div>
                     </div>
@@ -188,7 +198,9 @@
                                 <span th:text="${translationService.getStaticText('users', language)}">用户</span>
                             </h2>
                             <p class="text-sm text-gray-500 mt-1">
-                                共找到 <span class="category-count" th:text="${#lists.size(users)}">0</span> 位用户
+                                <span th:text="${translationService.getStaticText('found', language)}">共找到</span> 
+                                <span class="category-count" th:text="${#lists.size(users)}">0</span> 
+                                <span th:text="${translationService.getStaticText('users_unit', language)}">位用户</span>
                             </p>
                         </div>
                     </div>

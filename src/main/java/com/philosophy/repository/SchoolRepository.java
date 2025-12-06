@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 
 import java.time.LocalDateTime;
@@ -34,5 +35,8 @@ public interface SchoolRepository extends JpaRepository<School, Long> {
     @Modifying
     @Transactional
     @Query("UPDATE School s SET s.likeCount = s.likeCount + :delta WHERE s.id = :id")
-    void updateLikeCount(Long id, int delta);
+    void updateLikeCount(@Param("id") Long id, @Param("delta") int delta);
+
+    @Query("SELECT s FROM School s WHERE LOWER(s.name) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(s.nameEn) LIKE LOWER(CONCAT('%', :query, '%'))")
+    List<School> searchByNameOrNameEn(@Param("query") String query);
 }

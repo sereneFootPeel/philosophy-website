@@ -99,7 +99,7 @@
                 <a th:href="@{/philosophers(philosopherId=${content != null and content.philosopher != null ? content.philosopher.id : ''})}"
                    onclick="event.stopPropagation()"
                    class="flex items-center text-secondary hover:text-primary transition-colors duration-200">
-                    <span class="text-xs font-medium" th:text="${content.philosopher != null and content.philosopher.name != null ? content.philosopher.name : '未知哲学家'}">哲学家名称</span>
+                    <span class="text-xs font-medium" th:text="${content.philosopher != null ? translationService.getPhilosopherDisplayName(content.philosopher, language != null ? language : 'zh') : '未知哲学家'}">哲学家名称</span>
                     <span th:if="${content.philosopher != null and content.philosopher.era != null}" class="text-gray-400 mx-1 text-xs">|</span>
                     <span th:if="${content.philosopher != null and content.philosopher.era != null}" class="text-xs text-gray-500" th:text="${content.philosopher.era}">时代</span>
                 </a>
@@ -171,7 +171,7 @@
                 <!-- 显示哲学家信息 -->
                 <div th:if="${edit.philosopher != null}" class="flex items-center text-sm text-gray-500 mb-2">
                     <i class="fa fa-user mr-1"></i>
-                    <span th:text="${edit.philosopher.name != null ? edit.philosopher.name : '未知哲学家'}">哲学家名称</span>
+                    <span th:text="${edit.philosopher != null ? translationService.getPhilosopherDisplayName(edit.philosopher, language != null ? language : 'zh') : '未知哲学家'}">哲学家名称</span>
                     <span th:if="${edit.philosopher.era != null}" class="mx-1">|</span>
                     <span th:if="${edit.philosopher.era != null}" th:text="${edit.philosopher.era}">时代</span>
                 </div>

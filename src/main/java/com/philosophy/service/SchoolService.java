@@ -218,7 +218,7 @@ public class SchoolService {
         if (query == null || query.trim().isEmpty()) {
             return new ArrayList<>();
         }
-        return schoolRepository.findByNameContainingIgnoreCase(query.trim());
+        return schoolRepository.searchByNameOrNameEn(query.trim());
     }
     
     // 获取指定流派及其所有子孙流派的ID集合

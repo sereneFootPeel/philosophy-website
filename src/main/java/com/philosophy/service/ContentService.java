@@ -264,7 +264,7 @@ public class ContentService {
         if (query == null || query.trim().isEmpty()) {
             return new ArrayList<>();
         }
-        return contentRepository.findByContentContainingIgnoreCase(query.trim());
+        return contentRepository.searchByContentOrContentEnOrTitle(query.trim());
     }
 
     // 获取指定哲学家和流派的内容，按用户角色优先级排序

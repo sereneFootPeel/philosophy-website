@@ -289,7 +289,7 @@ public class UserService implements UserDetailsService {
         if (query == null || query.trim().isEmpty()) {
             return new ArrayList<>();
         }
-        return userRepository.findByUsernameContainingIgnoreCase(query.trim());
+        return userRepository.searchByUsernameOrName(query.trim());
     }
     
     @Transactional(readOnly = true)

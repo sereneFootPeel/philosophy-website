@@ -285,7 +285,7 @@ public class PhilosopherService {
     // 搜索哲学家（支持关键词）
     @Transactional(readOnly = true)
     public List<Philosopher> searchPhilosophers(String query) {
-        return findByNameContainingIgnoreCase(query);
+        return philosopherRepository.searchByNameOrNameEn(query);
     }
 
     /**

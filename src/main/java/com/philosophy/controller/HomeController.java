@@ -568,7 +568,8 @@ public class HomeController {
             @RequestParam String category,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
-            Authentication authentication) {
+            Authentication authentication,
+            HttpServletRequest request) {
         
         logger.info("收到搜索分页请求 - query: {}, category: {}, page: {}, size: {}", query, category, page, size);
         
@@ -580,8 +581,11 @@ public class HomeController {
             return ResponseEntity.badRequest().body(response);
         }
         
+        // 获取当前语言设置（根据IP自动判断默认语言）
+        String language = languageUtil.getLanguage(request);
+        
         try {
-            List<?> results = new ArrayList<>();
+            List<Map<String, Object>> results = new ArrayList<>();
             int totalCount = 0;
             
             // 根据类别搜索
@@ -593,26 +597,16 @@ public class HomeController {
                     int endP = Math.min(startP + size, totalCount);
                     if (startP < totalCount) {
                         List<Philosopher> pagedPhilosophers = allPhilosophers.subList(startP, endP);
-                        // 清除循环引用：移除schools中的philosophers引用
                         for (Philosopher p : pagedPhilosophers) {
-                            if (p.getSchools() != null) {
-                                for (School s : p.getSchools()) {
-                                    s.setPhilosophers(null);
-                                    s.setContents(null);
-                                    if (s.getParent() != null) {
-                                        s.getParent().setChildren(null);
-                                        s.getParent().setPhilosophers(null);
-                                        s.getParent().setContents(null);
-                                    }
-                                    s.setChildren(null);
-                                }
-                            }
-                            // 清除内容引用
-                            p.setContents(null);
+                            Map<String, Object> pMap = new HashMap<>();
+                            pMap.put("id", p.getId());
+                            pMap.put("name", translationService.getPhilosopherDisplayName(p, language));
+                            pMap.put("bio", translationService.getPhilosopherDisplayBiography(p, language));
+                            pMap.put("birthYear", p.getBirthYear());
+                            results.add(pMap);
                         }
-                        results = pagedPhilosophers;
                     }
-                    logger.info("哲学家搜索结果: 总数={}, 返回={}", totalCount, ((List<?>)results).size());
+                    logger.info("哲学家搜索结果: 总数={}, 返回={}", totalCount, results.size());
                     break;
                     
                 case "schools":
@@ -622,27 +616,15 @@ public class HomeController {
                     int endS = Math.min(startS + size, totalCount);
                     if (startS < totalCount) {
                         List<School> pagedSchools = allSchools.subList(startS, endS);
-                        // 清除循环引用
                         for (School s : pagedSchools) {
-                            s.setPhilosophers(null);
-                            s.setContents(null);
-                            if (s.getParent() != null) {
-                                s.getParent().setChildren(null);
-                                s.getParent().setPhilosophers(null);
-                                s.getParent().setContents(null);
-                            }
-                            if (s.getChildren() != null) {
-                                for (School child : s.getChildren()) {
-                                    child.setParent(null);
-                                    child.setChildren(null);
-                                    child.setPhilosophers(null);
-                                    child.setContents(null);
-                                }
-                            }
+                            Map<String, Object> sMap = new HashMap<>();
+                            sMap.put("id", s.getId());
+                            sMap.put("name", translationService.getSchoolDisplayName(s, language));
+                            sMap.put("description", translationService.getSchoolDisplayDescription(s, language));
+                            results.add(sMap);
                         }
-                        results = pagedSchools;
                     }
-                    logger.info("学派搜索结果: 总数={}, 返回={}", totalCount, ((List<?>)results).size());
+                    logger.info("学派搜索结果: 总数={}, 返回={}", totalCount, results.size());
                     break;
                     
                 case "contents":
@@ -664,51 +646,42 @@ public class HomeController {
                     int endC = Math.min(startC + size, totalCount);
                     if (startC < totalCount) {
                         List<Content> pagedContents = allContents.subList(startC, endC);
-                        logger.info("开始清除循环引用，内容数量: {}", pagedContents.size());
                         
-                        // 清除循环引用
                         for (Content c : pagedContents) {
-                            logger.debug("处理content id: {}", c.getId());
+                            Map<String, Object> cMap = new HashMap<>();
+                            cMap.put("id", c.getId());
+                            cMap.put("title", c.getTitle());
+                            // 使用 TranslationService 获取内容显示文本
+                            cMap.put("content", translationService.getContentDisplayText(c, language));
                             
-                            // 清理philosopher的循环引用
+                            // 哲学家信息
                             if (c.getPhilosopher() != null) {
-                                Philosopher p = c.getPhilosopher();
-                                logger.debug("清理philosopher: {}", p.getName());
-                                p.setSchools(null);
-                                p.setContents(null);
+                                Map<String, Object> pMap = new HashMap<>();
+                                pMap.put("id", c.getPhilosopher().getId());
+                                pMap.put("name", translationService.getPhilosopherDisplayName(c.getPhilosopher(), language));
+                                cMap.put("philosopher", pMap);
                             }
                             
-                            // 清理school的循环引用（需要递归清理parent链）
+                            // 学派信息
                             if (c.getSchool() != null) {
-                                School school = c.getSchool();
-                                logger.debug("清理school: {}", school.getName());
-                                school.setPhilosophers(null);
-                                school.setContents(null);
-                                school.setChildren(null);
+                                Map<String, Object> sMap = new HashMap<>();
+                                sMap.put("id", c.getSchool().getId());
+                                sMap.put("name", translationService.getSchoolDisplayName(c.getSchool(), language));
                                 
-                                // 递归清理所有parent
-                                School parent = school.getParent();
-                                while (parent != null) {
-                                    logger.debug("清理parent school: {}", parent.getName());
-                                    parent.setPhilosophers(null);
-                                    parent.setContents(null);
-                                    parent.setChildren(null);
-                                    School nextParent = parent.getParent();
-                                    parent.setParent(null);
-                                    parent = nextParent;
+                                // 父流派
+                                if (c.getSchool().getParent() != null) {
+                                    Map<String, Object> parentMap = new HashMap<>();
+                                    parentMap.put("id", c.getSchool().getParent().getId());
+                                    parentMap.put("name", translationService.getSchoolDisplayName(c.getSchool().getParent(), language));
+                                    sMap.put("parent", parentMap);
                                 }
+                                cMap.put("school", sMap);
                             }
                             
-                            // 简化User引用，只保留基本信息
-                            c.setLockedByUser(null);
-                            c.setPrivacySetBy(null);
-                            c.setBlockedBy(null);
+                            results.add(cMap);
                         }
-                        
-                        logger.info("循环引用清除完成");
-                        results = pagedContents;
                     }
-                    logger.info("内容分页结果: 返回={}", ((List<?>)results).size());
+                    logger.info("内容分页结果: 返回={}", results.size());
                     break;
                     
                 case "users":
@@ -717,10 +690,18 @@ public class HomeController {
                     int startU = page * size;
                     int endU = Math.min(startU + size, totalCount);
                     if (startU < totalCount) {
-                        // User对象比较简单，不包含循环引用，直接返回
-                        results = allUsers.subList(startU, endU);
+                        List<User> pagedUsers = allUsers.subList(startU, endU);
+                        for (User u : pagedUsers) {
+                            Map<String, Object> uMap = new HashMap<>();
+                            uMap.put("id", u.getId());
+                            uMap.put("username", u.getUsername());
+                            uMap.put("firstName", u.getFirstName());
+                            uMap.put("lastName", u.getLastName());
+                            uMap.put("role", u.getRole());
+                            results.add(uMap);
+                        }
                     }
-                    logger.info("用户搜索结果: 总数={}, 返回={}", totalCount, ((List<?>)results).size());
+                    logger.info("用户搜索结果: 总数={}, 返回={}", totalCount, results.size());
                     break;
                     
                 default:
@@ -739,7 +720,7 @@ public class HomeController {
             response.put("currentPage", page);
             response.put("hasMore", hasMore);
             
-            logger.info("返回搜索结果: success=true, totalCount={}, resultsSize={}, hasMore={}", totalCount, ((List<?>)results).size(), hasMore);
+            logger.info("返回搜索结果: success=true, totalCount={}, resultsSize={}, hasMore={}", totalCount, results.size(), hasMore);
             
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -1082,7 +1063,8 @@ public class HomeController {
                     Map<String, Object> contentData = new HashMap<>();
                     contentData.put("id", content.getId());
                     contentData.put("title", content.getTitle());
-                    contentData.put("content", content.getContent());
+                    // 使用 TranslationService 获取显示文本
+                    contentData.put("content", translationService.getContentDisplayText(content, language));
                     contentData.put("likeCount", content.getLikeCount() != null ? content.getLikeCount() : 0);
                     contentData.put("commentCount", commentService.countByContentId(content.getId()));
                     
@@ -1165,11 +1147,15 @@ public class HomeController {
             @RequestParam("philosopherId") Long philosopherId,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "12") int size,
-            Authentication authentication) {
+            Authentication authentication,
+            HttpServletRequest request) {
         
         Map<String, Object> response = new HashMap<>();
         
         try {
+            // 获取当前语言设置（根据IP自动判断默认语言）
+            String language = languageUtil.getLanguage(request);
+
             Philosopher philosopher = philosopherService.getPhilosopherById(philosopherId);
             if (philosopher == null) {
                 response.put("success", false);
@@ -1193,8 +1179,72 @@ public class HomeController {
             // 应用隐私和屏蔽过滤
             contents = contentService.filterContentsByPrivacy(contents, currentUser);
             
+            // 构建内容数据列表（包含翻译和关联信息）
+            List<Map<String, Object>> contentList = new ArrayList<>();
+            for (Content content : contents) {
+                try {
+                    Map<String, Object> contentData = new HashMap<>();
+                    contentData.put("id", content.getId());
+                    contentData.put("title", content.getTitle());
+                    // 使用 TranslationService 获取显示文本
+                    contentData.put("content", translationService.getContentDisplayText(content, language));
+                    contentData.put("likeCount", content.getLikeCount() != null ? content.getLikeCount() : 0);
+                    contentData.put("commentCount", commentService.countByContentId(content.getId()));
+                    
+                    // 流派信息
+                    try {
+                        if (content.getSchool() != null) {
+                            Map<String, Object> schoolData = new HashMap<>();
+                            School school = content.getSchool();
+                            schoolData.put("id", school.getId());
+                            schoolData.put("name", school.getName());
+                            schoolData.put("nameEn", school.getNameEn());
+                            schoolData.put("displayName", translationService.getSchoolDisplayName(school, language));
+                            
+                            // 父流派信息
+                            try {
+                                if (school.getParent() != null) {
+                                    Map<String, Object> parentSchoolData = new HashMap<>();
+                                    School parent = school.getParent();
+                                    parentSchoolData.put("id", parent.getId());
+                                    parentSchoolData.put("name", parent.getName());
+                                    parentSchoolData.put("nameEn", parent.getNameEn());
+                                    parentSchoolData.put("displayName", translationService.getSchoolDisplayName(parent, language));
+                                    schoolData.put("parent", parentSchoolData);
+                                }
+                            } catch (Exception e) {
+                                // 忽略
+                            }
+                            
+                            contentData.put("school", schoolData);
+                        }
+                    } catch (Exception e) {
+                        // 忽略
+                    }
+                    
+                    // 作者信息
+                    try {
+                        if (content.getUser() != null) {
+                            Map<String, Object> userData = new HashMap<>();
+                            User user = content.getUser();
+                            userData.put("id", user.getId());
+                            userData.put("username", user.getUsername());
+                            userData.put("role", user.getRole());
+                            contentData.put("user", userData);
+                        }
+                    } catch (Exception e) {
+                        // 忽略
+                    }
+                    
+                    contentData.put("philosopherId", philosopherId);
+                    contentList.add(contentData);
+                } catch (Exception e) {
+                    logger.error("Error processing content {}: {}", content.getId(), e.getMessage(), e);
+                }
+            }
+
             response.put("success", true);
-            response.put("contents", contents);
+            response.put("contents", contentList);
             response.put("hasMore", result.get("hasMore"));
             response.put("totalElements", result.get("totalElements"));
             response.put("currentPage", page);
