@@ -602,7 +602,7 @@ public class HomeController {
                             pMap.put("id", p.getId());
                             pMap.put("name", translationService.getPhilosopherDisplayName(p, language));
                             pMap.put("bio", translationService.getPhilosopherDisplayBiography(p, language));
-                            pMap.put("birthYear", p.getBirthYear());
+                            pMap.put("formattedDate", DateUtils.formatBirthYearToDateRange(p.getBirthYear(), p.getDeathYear()));
                             results.add(pMap);
                         }
                     }

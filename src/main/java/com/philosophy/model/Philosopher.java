@@ -4,8 +4,10 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import com.philosophy.util.DateUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -150,6 +152,11 @@ public class Philosopher {
 
     public void setDeathYear(Integer deathYear) {
         this.deathYear = deathYear;
+    }
+
+    @JsonProperty("formattedDate")
+    public String getFormattedDate() {
+        return DateUtils.formatBirthYearToDateRange(this.birthYear, this.deathYear);
     }
 
     public String getNationality() {
