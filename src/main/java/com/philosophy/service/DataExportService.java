@@ -9,7 +9,11 @@ import org.slf4j.LoggerFactory;
 import java.io.StringWriter;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.ArrayList;
 import java.time.format.DateTimeFormatter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @Service
 public class DataExportService {
@@ -131,6 +135,11 @@ public class DataExportService {
             pw.println("ID,姓名,英文姓名,生年,卒年,时代,国籍,传记,英文传记,图片URL,创建者ID,点赞数,创建时间,更新时间");
             List<Philosopher> philosophers = philosopherRepository.findAll();
             for (Philosopher philosopher : philosophers) {
+                // 处理图片URL，如果为空则显示提示信息
+                String imageUrl = philosopher.getImageUrl();
+                if (imageUrl == null || imageUrl.trim().isEmpty()) {
+                    imageUrl = "[无图片]";
+                }
                 pw.printf("%d,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%d,%s,%s%n",
                     philosopher.getId(),
                     escapeCsv(philosopher.getName()),
@@ -141,7 +150,7 @@ public class DataExportService {
                     escapeCsv(philosopher.getNationality()),
                     escapeCsv(philosopher.getBio()),
                     escapeCsv(philosopher.getBioEn()),
-                    escapeCsv(philosopher.getImageUrl()),
+                    escapeCsv(imageUrl),
                     philosopher.getUser() != null ? philosopher.getUser().getId().toString() : "",
                     philosopher.getLikeCount(),
                     philosopher.getCreatedAt() != null ? philosopher.getCreatedAt().format(formatter) : "未知时间",
@@ -368,5 +377,37 @@ public class DataExportService {
             return "\"" + value.replace("\"", "\"\"") + "\"";
         }
         return value;
+    }
+
+    /**
+     * 收集所有哲学家图片文件路径
+     * @return 图片文件路径列表
+     */
+    public List<String> collectImageFiles() {
+        List<String> imageFiles = new ArrayList<>();
+        List<Philosopher> philosophers = philosopherRepository.findAll();
+        
+        for (Philosopher philosopher : philosophers) {
+            String imageUrl = philosopher.getImageUrl();
+            if (imageUrl != null && !imageUrl.trim().isEmpty() && !imageUrl.equals("[无图片]")) {
+                // 从URL中提取文件路径
+                // URL格式应该是 /uploads/filename 或类似的格式
+                String filePath = imageUrl;
+                if (filePath.startsWith("/")) {
+                    filePath = filePath.substring(1);
+                }
+                
+                Path path = Paths.get(filePath);
+                if (Files.exists(path) && Files.isRegularFile(path)) {
+                    imageFiles.add(filePath);
+                    logger.debug("找到图片文件: {}", filePath);
+                } else {
+                    logger.warn("图片文件不存在: {}", filePath);
+                }
+            }
+        }
+        
+        logger.info("收集到 {} 个图片文件", imageFiles.size());
+        return imageFiles;
     }
 }

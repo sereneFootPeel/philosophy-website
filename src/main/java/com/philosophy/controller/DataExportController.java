@@ -17,6 +17,14 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @Controller
 @RequestMapping("/admin")
@@ -44,6 +52,57 @@ public class DataExportController {
         return ResponseEntity.ok()
                 .headers(headers)
                 .body(exportData.csvBytes);
+    }
+
+    @GetMapping("/export/download-zip")
+    public ResponseEntity<byte[]> downloadZipFile() {
+        try {
+            ExportData exportData = generateExportData();
+            List<String> imageFiles = dataExportService.collectImageFiles();
+            
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            try (ZipOutputStream zos = new ZipOutputStream(baos)) {
+                // 添加CSV文件到ZIP
+                ZipEntry csvEntry = new ZipEntry(exportData.filename);
+                zos.putNextEntry(csvEntry);
+                zos.write(exportData.csvBytes);
+                zos.closeEntry();
+                
+                // 添加图片文件到ZIP
+                for (String imagePath : imageFiles) {
+                    Path path = Paths.get(imagePath);
+                    if (Files.exists(path) && Files.isRegularFile(path)) {
+                        // 使用文件名作为ZIP中的路径
+                        String fileName = path.getFileName().toString();
+                        ZipEntry imageEntry = new ZipEntry("images/" + fileName);
+                        zos.putNextEntry(imageEntry);
+                        
+                        try (FileInputStream fis = new FileInputStream(path.toFile())) {
+                            byte[] buffer = new byte[1024];
+                            int len;
+                            while ((len = fis.read(buffer)) > 0) {
+                                zos.write(buffer, 0, len);
+                            }
+                        }
+                        zos.closeEntry();
+                    }
+                }
+            }
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.parseMediaType("application/zip"));
+            String zipFilename = exportData.filename.replace(".csv", ".zip");
+            headers.setContentDispositionFormData("attachment", zipFilename);
+            headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(baos.toByteArray());
+        } catch (Exception e) {
+            logger.error("Failed to create ZIP file", e);
+            // 如果ZIP创建失败，返回CSV文件
+            return downloadCsvFile();
+        }
     }
 
     @GetMapping("/export/email")
