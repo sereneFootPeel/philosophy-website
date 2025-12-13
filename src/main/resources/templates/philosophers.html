@@ -811,7 +811,7 @@
             
             // 显示父流派（如果有）
             const parentSchoolTag = content.school && content.school.parent ? 
-                `<a href="/schools/filter/${content.school.parent.id}" class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-200 transition-smooth" onclick="event.stopPropagation(); event.preventDefault(); window.location.href='/schools/filter/${content.school.parent.id}'">
+                `<a href="/schools/filter/${content.school.parent.id}" class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-200 transition-smooth" onclick="event.stopPropagation()">
                     ${escapeHtml(content.school.parent.displayName || (language === 'en' && content.school.parent.nameEn ? content.school.parent.nameEn : content.school.parent.name))}
                 </a>` : '';
             
@@ -826,7 +826,7 @@
                             ${schoolName ? `
                             <div class="flex flex-wrap gap-2 mb-2">
                                 ${parentSchoolTag}
-                                <a href="/schools/filter/${content.school.id}" class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm hover:bg-primary/20 transition-smooth" onclick="event.stopPropagation(); event.preventDefault(); window.location.href='/schools/filter/${content.school.id}'">
+                                <a href="/schools/filter/${content.school.id}" class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm hover:bg-primary/20 transition-smooth" onclick="event.stopPropagation()">
                                     ${escapeHtml(schoolName)}
                                 </a>
                             </div>
@@ -875,7 +875,7 @@
             
             // 显示父流派（如果有）
             const parentSchoolTag = content.school && content.school.parent ? 
-                `<a href="/schools/filter/${content.school.parent.id}" class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-200 transition-smooth" onclick="event.stopPropagation(); event.preventDefault(); window.location.href='/schools/filter/${content.school.parent.id}'">
+                `<a href="/schools/filter/${content.school.parent.id}" class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-200 transition-smooth" onclick="event.stopPropagation()">
                     ${escapeHtml(content.school.parent.displayName || (language === 'en' && content.school.parent.nameEn ? content.school.parent.nameEn : content.school.parent.name))}
                 </a>` : '';
             
@@ -885,7 +885,7 @@
                         ${schoolName ? `
                         <div class="flex flex-wrap gap-2 mb-2">
                             ${parentSchoolTag}
-                            <a href="/schools/filter/${content.school.id}" class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm hover:bg-primary/20 transition-smooth" onclick="event.stopPropagation(); event.preventDefault(); window.location.href='/schools/filter/${content.school.id}'">
+                            <a href="/schools/filter/${content.school.id}" class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm hover:bg-primary/20 transition-smooth" onclick="event.stopPropagation()">
                                 ${escapeHtml(schoolName)}
                             </a>
                         </div>

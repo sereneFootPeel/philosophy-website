@@ -117,6 +117,18 @@ public interface ContentRepository extends JpaRepository<Content, Long> {
            "c.likeCount DESC")
     List<Content> findBySchoolIdsWithLikedAuthors(List<Long> schoolIds, Long currentUserId);
 
+    // 获取指定流派的内容，包含管理员、版主编辑的内容以及用户关注的作者的内容（用于 /schools/filter/{id} 端点）
+    @Query("SELECT DISTINCT c FROM Content c LEFT JOIN FETCH c.user u LEFT JOIN FETCH c.philosopher p " +
+           "WHERE c.school.id IN :schoolIds AND " +
+           "(u.role = 'ADMIN' OR u.role = 'MODERATOR' OR " +
+           "u.id IN (SELECT DISTINCT uf.following.id FROM UserFollow uf WHERE uf.follower.id = :currentUserId)) " +
+           "ORDER BY " +
+           "CASE WHEN u.role = 'ADMIN' THEN 1 " +
+           "WHEN u.role = 'MODERATOR' THEN 2 " +
+           "ELSE 3 END, " +
+           "c.likeCount DESC")
+    List<Content> findBySchoolIdsWithFollowedAuthors(@Param("schoolIds") List<Long> schoolIds, @Param("currentUserId") Long currentUserId);
+
     @Modifying
     @Transactional
     @Query("UPDATE Content c SET c.likeCount = c.likeCount + :delta WHERE c.id = :id")

@@ -645,6 +645,7 @@ public class SchoolService {
     /**
      * 获取指定流派的内容，只显示管理员、版主和用户关注的作者的内容
      * 用于 /schools/filter/{id} 端点
+     * 优化：使用数据库查询而非内存过滤，大幅提升性能
      */
     @Transactional(readOnly = true)
     public List<Content> getContentsBySchoolIdFiltered(Long schoolId, Long currentUserId) {
@@ -654,49 +655,17 @@ public class SchoolService {
                 return new ArrayList<>();
             }
 
-            // 获取该流派的所有内容
-            List<Content> allContents = contentRepository.findContentsBySchoolIds(schoolIds);
-
-            // 获取用户关注的所有作者ID
-            List<Long> followingIds = new ArrayList<>();
-            if (currentUserId != null) {
-                followingIds = userFollowService.getFollowingIds(currentUserId);
+            // 如果用户未登录，只返回管理员和版主的内容
+            if (currentUserId == null) {
+                return getContentsBySchoolIdAdminModeratorOnly(schoolId);
             }
 
-            // 过滤内容：只显示管理员、版主和用户关注的作者的内容
-            List<Content> filteredContents = new ArrayList<>();
-            for (Content content : allContents) {
-                if (content == null) {
-                    continue;
-                }
-                
-                User contentUser = content.getUser();
-                if (contentUser == null) {
-                    continue;
-                }
-
-                // 检查是否为管理员或版主
-                if (isAdminOrModerator(contentUser)) {
-                    filteredContents.add(content);
-                } else if (currentUserId != null && followingIds.contains(contentUser.getId())) {
-                    // 检查是否为用户关注的作者
-                    filteredContents.add(content);
-                }
-            }
-
-            // 按优先级排序：管理员和版主的内容优先，然后是按点赞数排序
-            filteredContents.sort((c1, c2) -> {
-                int priority1 = getUserPriority(c1.getUser());
-                int priority2 = getUserPriority(c2.getUser());
-                int roleComparison = Integer.compare(priority1, priority2);
-                if (roleComparison != 0) {
-                    return roleComparison;
-                }
-                return Integer.compare(c2.getLikeCount(), c1.getLikeCount());
-            });
+            // 使用数据库查询直接过滤，避免在内存中循环处理大量数据
+            List<Content> contents = contentRepository.findBySchoolIdsWithFollowedAuthors(schoolIds, currentUserId);
 
             // 确保所有必要字段都有值
-            return filteredContents.stream()
+            return contents.stream()
+                    .filter(content -> content != null)
                     .collect(ArrayList::new, (list, content) -> {
                         if (content.getContent() == null) {
                             content.setContent("");
