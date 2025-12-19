@@ -40,55 +40,21 @@ public class DataImportController {
     @PostMapping("/upload")
     public String uploadCsvFile(@RequestParam("file") MultipartFile file,
                                RedirectAttributes redirectAttributes) {
-
-        if (file.isEmpty()) {
+        DataImportService.ImportResult result = processCsvFile(file);
+        
+        if (result == null) {
             redirectAttributes.addFlashAttribute("error", "请选择要上传的CSV文件");
             return "redirect:/admin/data-import";
         }
 
-        // 检查文件类型
-        String filename = file.getOriginalFilename();
-        if (filename == null || !filename.toLowerCase().endsWith(".csv")) {
-            redirectAttributes.addFlashAttribute("error", "只支持CSV文件格式");
-            return "redirect:/admin/data-import";
-        }
-
-        try {
-            logger.info("开始导入CSV文件: {}, 默认行为：只覆盖相同ID的数据", filename);
-
-            DataImportService.ImportResult result = dataImportService.importCsvData(file, false);
-            logger.info("导入服务执行完毕，结果: {}", result);
-
-            if (result.isSuccess()) {
-                redirectAttributes.addFlashAttribute("success", result.getMessage());
-                logger.info("设置成功消息: {}", result.getMessage());
-
-                // 添加详细的导入结果
-                Map<String, Object> importDetails = new HashMap<>();
-                importDetails.put("results", result.getResults());
-                importDetails.put("totalImported", result.getTotalImported());
-                importDetails.put("totalFailed", result.getTotalFailed());
-                importDetails.put("failureDetails", result.getFailureDetails());
-                redirectAttributes.addFlashAttribute("importDetails", importDetails);
-                logger.info("设置导入详情: {}", importDetails);
-
-            } else {
-                redirectAttributes.addFlashAttribute("error", result.getMessage());
-                logger.warn("设置失败消息: {}", result.getMessage());
-                if (result.getFailureDetails() != null && !result.getFailureDetails().isEmpty()) {
-                    Map<String, Object> importDetails = new HashMap<>();
-                    importDetails.put("results", result.getResults());
-                    importDetails.put("totalImported", result.getTotalImported());
-                    importDetails.put("totalFailed", result.getTotalFailed());
-                    importDetails.put("failureDetails", result.getFailureDetails());
-                    redirectAttributes.addFlashAttribute("importDetails", importDetails);
-                    logger.info("设置失败详情: {}", importDetails);
-                }
+        if (result.isSuccess()) {
+            redirectAttributes.addFlashAttribute("success", result.getMessage());
+            addImportDetails(redirectAttributes, result);
+        } else {
+            redirectAttributes.addFlashAttribute("error", result.getMessage());
+            if (result.getFailureDetails() != null && !result.getFailureDetails().isEmpty()) {
+                addImportDetails(redirectAttributes, result);
             }
-
-        } catch (Exception e) {
-            logger.error("CSV文件导入失败", e);
-            redirectAttributes.addFlashAttribute("error", "导入失败: " + e.getMessage());
         }
 
         return "redirect:/admin/data-import";
@@ -100,43 +66,61 @@ public class DataImportController {
     @PostMapping("/api/upload")
     @ResponseBody
     public ResponseEntity<?> uploadCsvFileApi(@RequestParam("file") MultipartFile file) {
-
-        if (file.isEmpty()) {
+        DataImportService.ImportResult result = processCsvFile(file);
+        
+        if (result == null) {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", "请选择要上传的CSV文件"));
+        }
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", result.isSuccess());
+        response.put("message", result.getMessage());
+        response.put("results", result.getResults());
+        response.put("totalImported", result.getTotalImported());
+        response.put("totalFailed", result.getTotalFailed());
+        response.put("failureDetails", result.getFailureDetails());
+
+        return result.isSuccess() 
+            ? ResponseEntity.ok(response) 
+            : ResponseEntity.badRequest().body(response);
+    }
+    
+    /**
+     * 处理CSV文件的通用逻辑
+     */
+    private DataImportService.ImportResult processCsvFile(MultipartFile file) {
+        if (file.isEmpty()) {
+            return null;
         }
 
         // 检查文件类型
         String filename = file.getOriginalFilename();
         if (filename == null || !filename.toLowerCase().endsWith(".csv")) {
-            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "只支持CSV文件格式"));
+            throw new IllegalArgumentException("只支持CSV文件格式");
         }
 
         try {
-            logger.info("API: 开始导入CSV文件: {}, 默认行为：只覆盖相同ID的数据", filename);
-
+            logger.info("开始导入CSV文件: {}, 默认行为：只覆盖相同ID的数据", filename);
             DataImportService.ImportResult result = dataImportService.importCsvData(file, false);
-
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", result.isSuccess());
-            response.put("message", result.getMessage());
-            response.put("results", result.getResults());
-            response.put("totalImported", result.getTotalImported());
-            response.put("totalFailed", result.getTotalFailed());
-            response.put("failureDetails", result.getFailureDetails());
-
-            if (result.isSuccess()) {
-                return ResponseEntity.ok(response);
-            } else {
-                return ResponseEntity.badRequest().body(response);
-            }
-
+            logger.info("导入服务执行完毕，结果: {}", result);
+            return result;
         } catch (Exception e) {
-            logger.error("API: CSV文件导入失败", e);
-            return ResponseEntity.internalServerError().body(Map.of(
-                "success", false,
-                "message", "导入失败: " + e.getMessage()
-            ));
+            logger.error("CSV文件导入失败", e);
+            throw new RuntimeException("导入失败: " + e.getMessage(), e);
         }
+    }
+    
+    /**
+     * 添加导入详情到重定向属性
+     */
+    private void addImportDetails(RedirectAttributes redirectAttributes, DataImportService.ImportResult result) {
+        Map<String, Object> importDetails = new HashMap<>();
+        importDetails.put("results", result.getResults());
+        importDetails.put("totalImported", result.getTotalImported());
+        importDetails.put("totalFailed", result.getTotalFailed());
+        importDetails.put("failureDetails", result.getFailureDetails());
+        redirectAttributes.addFlashAttribute("importDetails", importDetails);
+        logger.info("设置导入详情: {}", importDetails);
     }
 
     /**
@@ -173,21 +157,11 @@ public class DataImportController {
             DataImportService.ImportResult result = dataImportService.repairAuthorsFromSimpleCsv(file);
             if (result.isSuccess()) {
                 redirectAttributes.addFlashAttribute("success", result.getMessage());
-                Map<String, Object> details = new HashMap<>();
-                details.put("results", result.getResults());
-                details.put("totalImported", result.getTotalImported());
-                details.put("totalFailed", result.getTotalFailed());
-                details.put("failureDetails", result.getFailureDetails());
-                redirectAttributes.addFlashAttribute("importDetails", details);
+                addImportDetails(redirectAttributes, result);
             } else {
                 redirectAttributes.addFlashAttribute("error", result.getMessage());
                 if (result.getFailureDetails() != null && !result.getFailureDetails().isEmpty()) {
-                    Map<String, Object> details = new HashMap<>();
-                    details.put("results", result.getResults());
-                    details.put("totalImported", result.getTotalImported());
-                    details.put("totalFailed", result.getTotalFailed());
-                    details.put("failureDetails", result.getFailureDetails());
-                    redirectAttributes.addFlashAttribute("importDetails", details);
+                    addImportDetails(redirectAttributes, result);
                 }
             }
         } catch (Exception e) {

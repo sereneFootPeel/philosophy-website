@@ -217,64 +217,62 @@ public class HomeController {
         return "search/results";
     }
     
+    /**
+     * 通用测试页面处理方法
+     */
+    private String handleTestPage(String viewName, Model model, Authentication authentication) {
+        model.addAttribute("isAuthenticated", authentication != null && authentication.isAuthenticated());
+        return viewName;
+    }
+    
     @GetMapping("/test-likes")
     public String testLikes(Model model, Authentication authentication) {
-        model.addAttribute("isAuthenticated", authentication != null && authentication.isAuthenticated());
-        return "test-likes";
+        return handleTestPage("test-likes", model, authentication);
     }
     
     @GetMapping("/test-like-component")
     public String testLikeComponent(Model model, Authentication authentication) {
-        model.addAttribute("isAuthenticated", authentication != null && authentication.isAuthenticated());
-        return "test-like-component";
+        return handleTestPage("test-like-component", model, authentication);
     }
     
     @GetMapping("/test-likes-debug")
     public String testLikesDebug(Model model, Authentication authentication) {
-        model.addAttribute("isAuthenticated", authentication != null && authentication.isAuthenticated());
-        return "test-likes-debug";
+        return handleTestPage("test-likes-debug", model, authentication);
     }
 
     @GetMapping("/test-likes-final")
     public String testLikesFinal(Model model, Authentication authentication) {
-        model.addAttribute("isAuthenticated", authentication != null && authentication.isAuthenticated());
-        return "test-likes-final";
+        return handleTestPage("test-likes-final", model, authentication);
     }
 
     @GetMapping("/diagnose-likes")
     public String diagnoseLikes(Model model, Authentication authentication) {
-        model.addAttribute("isAuthenticated", authentication != null && authentication.isAuthenticated());
-        return "diagnose-likes";
+        return handleTestPage("diagnose-likes", model, authentication);
     }
 
     @GetMapping("/test-api")
     public String testApi(Model model, Authentication authentication) {
-        model.addAttribute("isAuthenticated", authentication != null && authentication.isAuthenticated());
-        return "test-api";
+        return handleTestPage("test-api", model, authentication);
     }
 
     @GetMapping("/quick-test")
     public String quickTest(Model model, Authentication authentication) {
-        model.addAttribute("isAuthenticated", authentication != null && authentication.isAuthenticated());
-        return "quick-test";
+        return handleTestPage("quick-test", model, authentication);
     }
 
     @GetMapping("/simple-test")
     public String simpleTest(Model model, Authentication authentication) {
-        model.addAttribute("isAuthenticated", authentication != null && authentication.isAuthenticated());
-        return "simple-test";
+        return handleTestPage("simple-test", model, authentication);
     }
 
     @GetMapping("/debug-db")
     public String debugDb(Model model, Authentication authentication) {
-        model.addAttribute("isAuthenticated", authentication != null && authentication.isAuthenticated());
-        return "debug-db";
+        return handleTestPage("debug-db", model, authentication);
     }
 
     @GetMapping("/final-test")
     public String finalTest(Model model, Authentication authentication) {
-        model.addAttribute("isAuthenticated", authentication != null && authentication.isAuthenticated());
-        return "final-test";
+        return handleTestPage("final-test", model, authentication);
     }
 
 

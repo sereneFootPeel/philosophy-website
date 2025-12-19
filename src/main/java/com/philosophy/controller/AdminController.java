@@ -603,49 +603,49 @@ public class AdminController {
         return "redirect:/admin/contents?success=" + java.net.URLEncoder.encode("内容删除成功", java.nio.charset.StandardCharsets.UTF_8);
     }
 
+    /**
+     * 处理内容锁定/解锁的通用逻辑
+     */
+    private String handleContentLockUnlock(Long id, boolean isLock,
+                                           org.springframework.security.core.Authentication authentication,
+                                           HttpServletRequest request) {
+        String language = getLanguage(request);
+        User currentUser = (User) authentication.getPrincipal();
+        
+        boolean success = isLock 
+            ? contentService.lockContent(id, currentUser)
+            : contentService.unlockContent(id, currentUser);
+
+        if (!success) {
+            String errorMessage = isLock
+                ? ("en".equals(language) ? 
+                    "Failed to lock content. You may not have permission or the content may already be locked." :
+                    "锁定内容失败。您可能没有权限或内容已经被锁定。")
+                : ("en".equals(language) ?
+                    "Failed to unlock content. You may not have permission or the content may not be locked." :
+                    "解锁内容失败。您可能没有权限或内容未被锁定。");
+            return "redirect:/admin/contents?error=" + java.net.URLEncoder.encode(errorMessage, java.nio.charset.StandardCharsets.UTF_8);
+        }
+
+        String successMessage = isLock
+            ? ("en".equals(language) ? "Content locked successfully." : "内容锁定成功。")
+            : ("en".equals(language) ? "Content unlocked successfully." : "内容解锁成功。");
+        return "redirect:/admin/contents?success=" + java.net.URLEncoder.encode(successMessage, java.nio.charset.StandardCharsets.UTF_8);
+    }
+
     // 内容锁定管理
     @PostMapping("/contents/{id}/lock")
     public String lockContent(@PathVariable Long id,
                              org.springframework.security.core.Authentication authentication,
                              HttpServletRequest request) {
-        String language = getLanguage(request);
-
-        User currentUser = (User) authentication.getPrincipal();
-        boolean success = contentService.lockContent(id, currentUser);
-
-        if (!success) {
-            String errorMessage = "en".equals(language) ?
-                "Failed to lock content. You may not have permission or the content may already be locked." :
-                "锁定内容失败。您可能没有权限或内容已经被锁定。";
-            return "redirect:/admin/contents?error=" + java.net.URLEncoder.encode(errorMessage, java.nio.charset.StandardCharsets.UTF_8);
-        }
-
-        String successMessage = "en".equals(language) ?
-            "Content locked successfully." :
-            "内容锁定成功。";
-        return "redirect:/admin/contents?success=" + java.net.URLEncoder.encode(successMessage, java.nio.charset.StandardCharsets.UTF_8);
+        return handleContentLockUnlock(id, true, authentication, request);
     }
 
     @PostMapping("/contents/{id}/unlock")
     public String unlockContent(@PathVariable Long id,
                                org.springframework.security.core.Authentication authentication,
                                HttpServletRequest request) {
-        String language = getLanguage(request);
-
-        User currentUser = (User) authentication.getPrincipal();
-        boolean success = contentService.unlockContent(id, currentUser);
-
-        if (!success) {
-            String errorMessage = "en".equals(language) ?
-                "Failed to unlock content. You may not have permission or the content may not be locked." :
-                "解锁内容失败。您可能没有权限或内容未被锁定。";
-            return "redirect:/admin/contents?error=" + java.net.URLEncoder.encode(errorMessage, java.nio.charset.StandardCharsets.UTF_8);
-        }
-
-        String successMessage = "en".equals(language) ?
-            "Content unlocked successfully." :
-            "内容解锁成功。";
-        return "redirect:/admin/contents?success=" + java.net.URLEncoder.encode(successMessage, java.nio.charset.StandardCharsets.UTF_8);
+        return handleContentLockUnlock(id, false, authentication, request);
     }
 
     // 上传图片

@@ -747,12 +747,34 @@ public class ModeratorController {
         return "redirect:/moderator/contents";
     }
 
-    // 内容锁定管理
-    @PostMapping("/contents/{id}/lock")
-    public String lockContent(@PathVariable Long id, HttpServletRequest request) {
+    /**
+     * 检查版主是否有权限访问内容
+     */
+    private boolean hasAccessToContent(User moderator, Content content) {
+        if (moderator == null || moderator.getAssignedSchoolId() == null || content == null) {
+            return false;
+        }
+        
+        if (content.getSchool() != null) {
+            return schoolService.canModeratorManageSchool(moderator.getAssignedSchoolId(), content.getSchool().getId());
+        } else if (content.getPhilosopher() != null) {
+            List<Long> accessibleSchoolIds = schoolService.getSchoolIdWithDescendants(moderator.getAssignedSchoolId());
+            for (School school : content.getPhilosopher().getSchools()) {
+                if (accessibleSchoolIds.contains(school.getId())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * 处理内容锁定/解锁的通用逻辑
+     */
+    private String handleContentLockUnlock(Long id, boolean isLock, HttpServletRequest request) {
         String language = getLanguage(request);
-
         User moderator = getCurrentModerator();
+        
         if (moderator == null || moderator.getAssignedSchoolId() == null) {
             return "redirect:/error?message=No assigned school";
         }
@@ -762,82 +784,40 @@ public class ModeratorController {
             return "redirect:/moderator/contents?error=Content not found";
         }
 
-        // 检查该内容是否属于版主负责的流派
-        boolean hasAccess = false;
-        if (content.getSchool() != null) {
-            hasAccess = schoolService.canModeratorManageSchool(moderator.getAssignedSchoolId(), content.getSchool().getId());
-        } else if (content.getPhilosopher() != null) {
-            List<Long> accessibleSchoolIds = schoolService.getSchoolIdWithDescendants(moderator.getAssignedSchoolId());
-            for (School school : content.getPhilosopher().getSchools()) {
-                if (accessibleSchoolIds.contains(school.getId())) {
-                    hasAccess = true;
-                    break;
-                }
-            }
-        }
-        if (!hasAccess) {
+        if (!hasAccessToContent(moderator, content)) {
             return "redirect:/moderator/contents?error=Access denied";
         }
 
-        boolean success = contentService.lockContent(id, moderator);
+        boolean success = isLock 
+            ? contentService.lockContent(id, moderator)
+            : contentService.unlockContent(id, moderator);
 
         if (!success) {
-            String errorMessage = "en".equals(language) ?
-                "Failed to lock content. You may not have permission or the content may already be locked." :
-                "锁定内容失败。您可能没有权限或内容已经被锁定。";
+            String errorMessage = isLock
+                ? ("en".equals(language) ? 
+                    "Failed to lock content. You may not have permission or the content may already be locked." :
+                    "锁定内容失败。您可能没有权限或内容已经被锁定。")
+                : ("en".equals(language) ?
+                    "Failed to unlock content. You may not have permission or the content may not be locked." :
+                    "解锁内容失败。您可能没有权限或内容未被锁定。");
             return "redirect:/moderator/contents?error=" + java.net.URLEncoder.encode(errorMessage, java.nio.charset.StandardCharsets.UTF_8);
         }
 
-        String successMessage = "en".equals(language) ?
-            "Content locked successfully." :
-            "内容锁定成功。";
+        String successMessage = isLock
+            ? ("en".equals(language) ? "Content locked successfully." : "内容锁定成功。")
+            : ("en".equals(language) ? "Content unlocked successfully." : "内容解锁成功。");
         return "redirect:/moderator/contents?success=" + java.net.URLEncoder.encode(successMessage, java.nio.charset.StandardCharsets.UTF_8);
+    }
+
+    // 内容锁定管理
+    @PostMapping("/contents/{id}/lock")
+    public String lockContent(@PathVariable Long id, HttpServletRequest request) {
+        return handleContentLockUnlock(id, true, request);
     }
 
     @PostMapping("/contents/{id}/unlock")
     public String unlockContent(@PathVariable Long id, HttpServletRequest request) {
-        String language = getLanguage(request);
-
-        User moderator = getCurrentModerator();
-        if (moderator == null || moderator.getAssignedSchoolId() == null) {
-            return "redirect:/error?message=No assigned school";
-        }
-
-        Content content = contentService.getContentById(id);
-        if (content == null) {
-            return "redirect:/moderator/contents?error=Content not found";
-        }
-
-        // 检查该内容是否属于版主负责的流派
-        boolean hasAccess = false;
-        if (content.getSchool() != null) {
-            hasAccess = schoolService.canModeratorManageSchool(moderator.getAssignedSchoolId(), content.getSchool().getId());
-        } else if (content.getPhilosopher() != null) {
-            List<Long> accessibleSchoolIds = schoolService.getSchoolIdWithDescendants(moderator.getAssignedSchoolId());
-            for (School school : content.getPhilosopher().getSchools()) {
-                if (accessibleSchoolIds.contains(school.getId())) {
-                    hasAccess = true;
-                    break;
-                }
-            }
-        }
-        if (!hasAccess) {
-            return "redirect:/moderator/contents?error=Access denied";
-        }
-
-        boolean success = contentService.unlockContent(id, moderator);
-
-        if (!success) {
-            String errorMessage = "en".equals(language) ?
-                "Failed to unlock content. You may not have permission or the content may not be locked." :
-                "解锁内容失败。您可能没有权限或内容未被锁定。";
-            return "redirect:/moderator/contents?error=" + java.net.URLEncoder.encode(errorMessage, java.nio.charset.StandardCharsets.UTF_8);
-        }
-
-        String successMessage = "en".equals(language) ?
-            "Content unlocked successfully." :
-            "内容解锁成功。";
-        return "redirect:/moderator/contents?success=" + java.net.URLEncoder.encode(successMessage, java.nio.charset.StandardCharsets.UTF_8);
+        return handleContentLockUnlock(id, false, request);
     }
 
 

@@ -41,36 +41,7 @@ public class LanguageController {
                                 HttpServletRequest request, 
                                 HttpServletResponse response,
                                 Authentication authentication) {
-        
-        // 验证语言代码
-        if (!isValidLanguageCode(lang)) {
-            lang = "zh"; // 默认中文
-        }
-        
-        // 将语言设置保存到Session
-        HttpSession session = request.getSession();
-        session.setAttribute("language", lang);
-        
-        // 设置Cookie以便客户端JavaScript可以读取
-        jakarta.servlet.http.Cookie languageCookie = new jakarta.servlet.http.Cookie("philosophy_language", lang);
-        languageCookie.setPath("/");
-        languageCookie.setMaxAge(30 * 24 * 60 * 60); // 30天
-        response.addCookie(languageCookie);
-        
-        // 如果用户已登录，保存到数据库
-        if (authentication != null && authentication.isAuthenticated() 
-            && !"anonymousUser".equals(authentication.getName())) {
-            try {
-                User user = userService.findByUsername(authentication.getName());
-                if (user != null) {
-                    user.setLanguage(lang);
-                    userService.updateUser(user);
-                    logger.info("User {} updated language preference to: {}", user.getUsername(), lang);
-                }
-            } catch (Exception e) {
-                logger.error("Failed to save language preference to database for user: " + authentication.getName(), e);
-            }
-        }
+        setLanguageInternal(lang, request, response, authentication);
         
         // 获取来源页面，如果没有则返回首页
         String referer = request.getHeader("Referer");
@@ -112,6 +83,27 @@ public class LanguageController {
             return result;
         }
         
+        setLanguageInternal(lang, request, response, authentication);
+        
+        result.put("success", true);
+        result.put("message", "语言设置成功");
+        result.put("language", lang);
+        
+        return result;
+    }
+    
+    /**
+     * 内部方法：设置语言的通用逻辑
+     */
+    private void setLanguageInternal(String lang, 
+                                     HttpServletRequest request,
+                                     HttpServletResponse response,
+                                     Authentication authentication) {
+        // 验证语言代码
+        if (!isValidLanguageCode(lang)) {
+            lang = "zh"; // 默认中文
+        }
+        
         // 将语言设置保存到Session
         HttpSession session = request.getSession();
         session.setAttribute("language", lang);
@@ -134,15 +126,8 @@ public class LanguageController {
                 }
             } catch (Exception e) {
                 logger.error("Failed to save language preference to database for user: " + authentication.getName(), e);
-                // 不返回错误，因为Session和Cookie已经设置成功
             }
         }
-        
-        result.put("success", true);
-        result.put("message", "语言设置成功");
-        result.put("language", lang);
-        
-        return result;
     }
 
     /**

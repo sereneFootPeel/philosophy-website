@@ -267,56 +267,131 @@
 
 /* ==========================================================================
    Theme 10: Pure White Minimal
-   - Concept: 极简纯白主题，几乎完全白色，字体黑色，适合游客和新用户
-   - Palette: 纯白、极浅灰、黑色字体、灰蓝色按钮
+   - Concept: 极简纯白主题，纯白色背景、黑色文字和边框，简洁经典
+   - Palette: 纯白背景、黑色文字、黑色边框
    ========================================================================== */
 .theme-midnight {
-    --color-primary: #64748B; /* Slate Blue Gray for buttons */
-    --color-primary-dark: #475569;
-    --color-primary-light: #94A3B8;
-    --color-secondary: #9CA3AF; /* Light Gray */
-    --color-accent: #FAFAFA; /* Very Light Gray */
+    --color-primary: #000000; /* Pure Black for buttons and accents */
+    --color-primary-dark: #000000;
+    --color-primary-light: #333333;
+    --color-secondary: #000000; /* Black */
+    --color-accent: #FFFFFF; /* Pure White */
 
-    --bg-primary: #FAFAFA; /* Very Light Gray - slightly off white */
-    --bg-secondary: #FAFAFA; /* Very Light Gray - slightly off white */
-    --bg-tertiary: #F5F5F5; /* Slightly darker light gray */
-    --bg-quaternary: #F0F0F0; /* Light gray */
+    --bg-primary: #FFFFFF; /* Pure White */
+    --bg-secondary: #FFFFFF; /* Pure White */
+    --bg-tertiary: #FFFFFF; /* Pure White */
+    --bg-quaternary: #FFFFFF; /* Pure White */
     
     --text-primary: #000000; /* Pure Black */
-    --text-secondary: #1F2937; /* Very Dark Gray */
-    --text-tertiary: #64748B; /* Slate Blue Gray */
-    --text-on-primary: #FFFFFF;
+    --text-secondary: #000000; /* Pure Black */
+    --text-tertiary: #000000; /* Pure Black */
+    --text-on-primary: #FFFFFF; /* White text on black buttons */
     
-    --border-primary: #F0F0F0; /* Light Gray */
-    --border-secondary: #E5E5E5; /* Slightly darker gray */
+    --border-primary: #000000; /* Pure Black */
+    --border-secondary: #000000; /* Pure Black */
     
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.02);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.03), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
-/* Special override for theme-midnight to ensure light gray background */
+/* Special override for theme-midnight to ensure pure white background and black text */
 .theme-midnight body {
-    background-color: #FAFAFA !important;
+    background-color: #FFFFFF !important;
     color: #000000 !important;
 }
 
 .theme-midnight .bg-secondary {
-    background-color: #FAFAFA !important;
+    background-color: #FFFFFF !important;
 }
 
+/* Buttons in midnight theme - white background with black border */
+.theme-midnight button,
+.theme-midnight .btn,
 .theme-midnight button.bg-secondary,
-.theme-midnight button.bg-secondary:hover,
 .theme-midnight .btn.bg-secondary,
-.theme-midnight .btn-secondary,
+.theme-midnight .btn-secondary {
+    background-color: #FFFFFF !important;
+    color: #000000 !important;
+    border: 1px solid #000000 !important;
+}
+
+/* Button hover/active/focus states - keep white background, add thicker border */
+.theme-midnight button:hover,
+.theme-midnight button:active,
+.theme-midnight button:focus,
+.theme-midnight .btn:hover,
+.theme-midnight .btn:active,
+.theme-midnight .btn:focus,
+.theme-midnight button.bg-secondary:hover,
+.theme-midnight button.bg-secondary:active,
+.theme-midnight button.bg-secondary:focus,
+.theme-midnight .btn.bg-secondary:hover,
+.theme-midnight .btn.bg-secondary:active,
+.theme-midnight .btn.bg-secondary:focus,
+.theme-midnight .btn-secondary:hover,
+.theme-midnight .btn-secondary:active,
+.theme-midnight .btn-secondary:focus,
 .theme-midnight .hover\:bg-secondary\/90:hover {
-    background-color: var(--color-primary) !important;
-    color: var(--text-on-primary) !important;
-    border-color: var(--color-primary) !important;
+    background-color: #FFFFFF !important;
+    color: #000000 !important;
+    border: 2px solid #000000 !important;
+}
+
+/* Primary buttons - white background with black border and text */
+.theme-midnight .btn-primary,
+.theme-midnight button.bg-primary {
+    background-color: #FFFFFF !important;
+    color: #000000 !important;
+    border: 1px solid #000000 !important;
+}
+
+.theme-midnight .btn-primary:hover,
+.theme-midnight .btn-primary:active,
+.theme-midnight .btn-primary:focus,
+.theme-midnight button.bg-primary:hover,
+.theme-midnight button.bg-primary:active,
+.theme-midnight button.bg-primary:focus {
+    background-color: #FFFFFF !important;
+    color: #000000 !important;
+    border: 2px solid #000000 !important;
 }
 
 .theme-midnight .theme-card.active {
-    background: #FAFAFA !important;
+    background: #FFFFFF !important;
+    border-color: #000000 !important;
+}
+
+/* Ensure all borders are black in midnight theme */
+.theme-midnight .card,
+.theme-midnight .bg-white,
+.theme-midnight input,
+.theme-midnight textarea,
+.theme-midnight select,
+.theme-midnight .form-control,
+.theme-midnight .border,
+.theme-midnight [class*="border"] {
+    border-color: #000000 !important;
+}
+
+/* Ensure all text is black */
+.theme-midnight h1,
+.theme-midnight h2,
+.theme-midnight h3,
+.theme-midnight h4,
+.theme-midnight h5,
+.theme-midnight h6,
+.theme-midnight p,
+.theme-midnight span,
+.theme-midnight a:not(.footer-search-btn),
+.theme-midnight label {
+    color: #000000 !important;
+}
+
+/* Links should be black with underline on hover */
+.theme-midnight a:not(.footer-search-btn):hover {
+    color: #000000 !important;
+    text-decoration: underline;
 }
 
 /* ==========================================================================
@@ -794,32 +869,89 @@ a:hover {
     border-color: var(--color-primary-dark);
 }
 
-/* Midnight Black theme footer */
+/* Midnight Black theme footer - pure white with black border */
 .theme-midnight .footer-component {
-    background-color: var(--bg-tertiary);
-    border-top: 1px solid var(--border-primary);
+    background-color: #FFFFFF !important;
+    border-top: 1px solid #000000 !important;
 }
 
 .theme-midnight .footer-title,
 .theme-midnight .footer-subtitle {
-    color: var(--text-primary);
+    color: #000000 !important;
 }
 
 .theme-midnight .footer-search-btn {
-    background-color: var(--color-primary);
-    color: var(--text-on-primary);
-    border-color: var(--color-primary);
+    background-color: #000000 !important;
+    color: #FFFFFF !important;
+    border-color: #000000 !important;
 }
 
 .theme-midnight .footer-search-btn:hover {
-    background-color: var(--color-primary-dark);
-    border-color: var(--color-primary-dark);
+    background-color: #333333 !important;
+    border-color: #333333 !important;
 }
 
-/* Midnight Black theme navbar - match footer style */
-.theme-midnight .navbar {
-    background-color: var(--bg-tertiary);
-    border-bottom: 1px solid var(--border-primary);
+/* Midnight Black theme navbar - pure white with black border */
+.theme-midnight .navbar,
+.theme-midnight #navbar,
+.theme-midnight header,
+.theme-midnight #navbar.bg-primary,
+.theme-midnight header.bg-primary {
+    background-color: #FFFFFF !important;
+    border-bottom: 1px solid #000000 !important;
+}
+
+/* Ensure header text is black in midnight theme */
+.theme-midnight #navbar a,
+.theme-midnight header a,
+.theme-midnight #navbar .text-gray-900,
+.theme-midnight #navbar .text-gray-600,
+.theme-midnight header .text-gray-900,
+.theme-midnight header .text-gray-600,
+.theme-midnight #navbar .text-primary,
+.theme-midnight header .text-primary {
+    color: #000000 !important;
+}
+
+.theme-midnight #navbar a:hover,
+.theme-midnight header a:hover {
+    color: #000000 !important;
+}
+
+/* Ensure bg-primary class shows white in midnight theme header */
+.theme-midnight #navbar.bg-primary,
+.theme-midnight header.bg-primary {
+    background-color: #FFFFFF !important;
+}
+
+/* Ensure all header child elements have white background and black text */
+.theme-midnight #navbar *,
+.theme-midnight header * {
+    color: #000000 !important;
+}
+
+.theme-midnight #navbar .bg-white,
+.theme-midnight header .bg-white,
+.theme-midnight #navbar .bg-primary,
+.theme-midnight header .bg-primary,
+.theme-midnight #navbar .bg-secondary,
+.theme-midnight header .bg-secondary,
+.theme-midnight #navbar .bg-tertiary,
+.theme-midnight header .bg-tertiary {
+    background-color: #FFFFFF !important;
+}
+
+/* Mobile menu in midnight theme */
+.theme-midnight #mobile-menu,
+.theme-midnight #navbar #mobile-menu,
+.theme-midnight header #mobile-menu {
+    background-color: #FFFFFF !important;
+    border-color: #000000 !important;
+}
+
+.theme-midnight #mobile-menu a,
+.theme-midnight #mobile-menu * {
+    color: #000000 !important;
 }
 
 /* Carbon Gray theme footer */
@@ -1016,12 +1148,62 @@ body button[type="submit"] {
     color: #FFFFFF !important;
 }
 
-/* Midnight Black theme - white text on dark */
+/* Midnight Black theme - buttons with white background and black text */
 .theme-midnight button[type="submit"],
+.theme-midnight button[type="submit"]:hover,
+.theme-midnight button[type="submit"]:active,
+.theme-midnight button[type="submit"]:focus {
+    background-color: #FFFFFF !important;
+    color: #000000 !important;
+    border: 1px solid #000000 !important;
+}
+
+.theme-midnight button[type="submit"]:hover,
+.theme-midnight button[type="submit"]:active,
+.theme-midnight button[type="submit"]:focus {
+    border: 2px solid #000000 !important;
+}
+
 .theme-midnight button[type="submit"] span,
-.theme-midnight .bg-primary span,
-.theme-midnight button .text-white {
+.theme-midnight button .text-white:not(.footer-search-btn) {
+    color: #000000 !important;
+}
+
+/* Keep footer search button black (special case) */
+.theme-midnight .footer-search-btn,
+.theme-midnight .footer-search-btn span {
+    background-color: #000000 !important;
     color: #FFFFFF !important;
+}
+
+/* All buttons with bg-primary class - white background with black border */
+.theme-midnight button.bg-primary,
+.theme-midnight .btn.bg-primary {
+    background-color: #FFFFFF !important;
+    color: #000000 !important;
+    border: 1px solid #000000 !important;
+}
+
+.theme-midnight button.bg-primary:hover,
+.theme-midnight button.bg-primary:active,
+.theme-midnight button.bg-primary:focus,
+.theme-midnight .btn.bg-primary:hover,
+.theme-midnight .btn.bg-primary:active,
+.theme-midnight .btn.bg-primary:focus {
+    background-color: #FFFFFF !important;
+    color: #000000 !important;
+    border: 2px solid #000000 !important;
+}
+
+/* Ensure button text is always black in midnight theme (except footer buttons) */
+.theme-midnight button:not(.footer-search-btn),
+.theme-midnight .btn:not(.footer-search-btn) {
+    color: #000000 !important;
+}
+
+.theme-midnight button:not(.footer-search-btn) span,
+.theme-midnight .btn:not(.footer-search-btn) span {
+    color: #000000 !important;
 }
 
 /* Carbon Gray theme - white text on dark */

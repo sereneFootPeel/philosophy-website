@@ -161,11 +161,36 @@ public class CommentController {
         return "redirect:/comments/content/" + contentId;
     }
 
+    /**
+     * 检查用户是否已认证
+     */
+    private boolean isAuthenticated(Authentication authentication) {
+        return authentication != null && authentication.isAuthenticated() && 
+            !(authentication instanceof org.springframework.security.authentication.AnonymousAuthenticationToken);
+    }
+    
+    /**
+     * 检查用户是否是管理员
+     */
+    private boolean checkIsAdmin(Authentication authentication) {
+        return authentication != null && authentication.getAuthorities() != null &&
+            authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+    }
+    
+    /**
+     * 检查用户是否是版主或管理员
+     */
+    private boolean isModeratorOrAdmin(User user, Authentication authentication) {
+        if (user == null) return false;
+        boolean isModerator = user.getRole() != null && 
+            (user.getRole().equals("MODERATOR") || user.getRole().equals("ADMIN"));
+        return isModerator || checkIsAdmin(authentication);
+    }
+
     // 删除评论
     @PostMapping("/delete/{commentId}")
     public String deleteComment(@PathVariable Long commentId, Authentication authentication) {
-        if (authentication == null || !(authentication.isAuthenticated()) || 
-            authentication instanceof org.springframework.security.authentication.AnonymousAuthenticationToken) {
+        if (!isAuthenticated(authentication)) {
             return "redirect:/login";
         }
         
@@ -177,7 +202,7 @@ public class CommentController {
             
             // 检查用户是否有权限删除评论（评论所有者或管理员）
             boolean isOwner = comment.getUser().getId().equals(currentUser.getId());
-            boolean isAdmin = authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+            boolean isAdmin = checkIsAdmin(authentication);
             boolean isModeratorWithAccess = false;
             if (!isOwner && !isAdmin && currentUser != null && "MODERATOR".equals(currentUser.getRole())) {
                 Long assignedSchoolId = currentUser.getAssignedSchoolId();
@@ -201,8 +226,7 @@ public class CommentController {
     // 屏蔽评论
     @PostMapping("/block/{commentId}")
     public String blockComment(@PathVariable Long commentId, Authentication authentication) {
-        if (authentication == null || !(authentication.isAuthenticated()) || 
-            authentication instanceof org.springframework.security.authentication.AnonymousAuthenticationToken) {
+        if (!isAuthenticated(authentication)) {
             return "redirect:/login";
         }
         
@@ -210,13 +234,7 @@ public class CommentController {
         if (comment != null) {
             User currentUser = userService.findByUsername(authentication.getName());
             
-            // 检查用户是否有权限屏蔽评论（版主或管理员）
-            boolean isModerator = currentUser.getRole() != null && 
-                (currentUser.getRole().equals("MODERATOR") || currentUser.getRole().equals("ADMIN"));
-            boolean isAdmin = authentication.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-            
-            if (isModerator || isAdmin) {
+            if (isModeratorOrAdmin(currentUser, authentication)) {
                 commentService.blockComment(commentId, currentUser);
             }
         }
@@ -227,8 +245,7 @@ public class CommentController {
     // 取消屏蔽评论
     @PostMapping("/unblock/{commentId}")
     public String unblockComment(@PathVariable Long commentId, Authentication authentication) {
-        if (authentication == null || !(authentication.isAuthenticated()) || 
-            authentication instanceof org.springframework.security.authentication.AnonymousAuthenticationToken) {
+        if (!isAuthenticated(authentication)) {
             return "redirect:/login";
         }
         
@@ -236,13 +253,7 @@ public class CommentController {
         if (comment != null) {
             User currentUser = userService.findByUsername(authentication.getName());
             
-            // 检查用户是否有权限取消屏蔽评论（版主或管理员）
-            boolean isModerator = currentUser.getRole() != null && 
-                (currentUser.getRole().equals("MODERATOR") || currentUser.getRole().equals("ADMIN"));
-            boolean isAdmin = authentication.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-            
-            if (isModerator || isAdmin) {
+            if (isModeratorOrAdmin(currentUser, authentication)) {
                 commentService.unblockComment(commentId);
             }
         }
