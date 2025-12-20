@@ -1699,3 +1699,40 @@ body .border-gray-200 {
     }
 }
 
+/* ==========================================================================
+   Remove circle from mobile menu toggle button
+   ========================================================================== */
+#menu-toggle,
+button#menu-toggle {
+    outline: none !important;
+    border: none !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+#menu-toggle:focus,
+#menu-toggle:active,
+#menu-toggle:hover,
+button#menu-toggle:focus,
+button#menu-toggle:active,
+button#menu-toggle:hover {
+    outline: none !important;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+/* ==========================================================================
+   Remove border from welcome button on home page
+   ========================================================================== */
+.welcome-button {
+    border: none !important;
+}
+
+.welcome-button:focus,
+.welcome-button:active,
+.welcome-button:hover {
+    border: none !important;
+}
+
