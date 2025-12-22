@@ -652,6 +652,16 @@ a:hover {
     color: var(--text-primary) !important;
 }
 
+/* 搜索面板关闭按钮 - 去掉所有边框 */
+#search-panel button[aria-label="关闭搜索"],
+#search-panel button[aria-label="关闭搜索"]:focus,
+#search-panel button[aria-label="关闭搜索"]:active,
+#search-panel button[aria-label="关闭搜索"]:hover {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
 #search-input {
     background-color: var(--bg-primary) !important;
     border-color: var(--border-primary) !important;
