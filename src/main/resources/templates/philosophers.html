@@ -54,17 +54,19 @@
 
         <div class="flex flex-col md:flex-row gap-8">
             <!-- 左侧哲学家列表 (桌面端) -->
-            <aside id="philosophers-sidebar" class="hidden md:block sticky top-24 h-[calc(100vh-6rem)] w-64 overflow-y-auto pr-4 scrollbar-hide">
-                <ul id="philosophers-timeline" class="space-y-2">
-                    <li th:each="philosopher : ${philosophers}">
-                        <a href="javascript:void(0)" 
-                           th:data-id="${philosopher.id}" 
-                           th:class="|philosopher-link py-2 px-3 block rounded-lg transition-smooth hover:bg-primary/10 hover:text-primary ${philosopher == currentPhilosopher ? 'bg-primary text-white' : 'text-gray-700'}|"
-                           th:onclick="|showPhilosopher('${philosopher.id}')|">
-                            <span th:text="${translationService.getPhilosopherDisplayName(philosopher, language)}"></span>
-                        </a>
-                    </li>
-                </ul>
+            <aside id="philosophers-sidebar" class="hidden md:block sticky top-24 w-64 pr-4">
+                <div class="bg-white rounded-xl shadow-md p-4 overflow-y-auto scrollbar-hide">
+                    <ul id="philosophers-timeline" class="space-y-2">
+                        <li th:each="philosopher : ${philosophers}">
+                            <a href="javascript:void(0)" 
+                               th:data-id="${philosopher.id}" 
+                               th:class="|philosopher-link py-2 px-3 block rounded-lg transition-smooth hover:bg-primary/10 hover:text-primary ${philosopher == currentPhilosopher ? 'bg-primary text-white' : 'text-gray-700'}|"
+                               th:onclick="|showPhilosopher('${philosopher.id}')|">
+                                <span th:text="${translationService.getPhilosopherDisplayName(philosopher, language)}"></span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </aside>
 
             <!-- 右侧主内容区 -->
@@ -505,6 +507,11 @@
             currentPage = 0;
             hasMore = data.hasMore;
             isLoading = false;
+            
+            // 同步容器高度
+            setTimeout(() => {
+                syncContainerHeights();
+            }, 100);
         }
         
         // 更新URL和UI状态
@@ -641,6 +648,19 @@
             return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
         }
 
+        // 同步左右容器高度（以右侧容器为基准）
+        function syncContainerHeights() {
+            const rightContainer = document.getElementById('philosopher-content');
+            const leftContainer = document.querySelector('#philosophers-sidebar > div');
+            
+            if (rightContainer && leftContainer) {
+                // 获取右侧容器的实际高度
+                const rightHeight = rightContainer.offsetHeight;
+                // 设置左侧容器的高度与右侧一致
+                leftContainer.style.height = rightHeight + 'px';
+            }
+        }
+        
         // 修改页面加载时的初始化逻辑
         document.addEventListener('DOMContentLoaded', function() {
             const mobileSelect = document.getElementById('mobile-philosopher-select');
@@ -683,6 +703,28 @@
                 setTimeout(() => {
                     preloadAdjacentPhilosophers(initialPhilosopherId);
                 }, 1000); // 延迟1秒，确保页面渲染完成后再预加载
+            }
+            
+            // 同步容器高度
+            setTimeout(() => {
+                syncContainerHeights();
+            }, 100);
+            
+            // 监听窗口大小变化和内容变化，重新同步高度
+            window.addEventListener('resize', syncContainerHeights);
+            
+            // 使用 MutationObserver 监听右侧容器内容变化
+            const rightContainer = document.getElementById('philosopher-content');
+            if (rightContainer) {
+                const observer = new MutationObserver(() => {
+                    setTimeout(syncContainerHeights, 50);
+                });
+                observer.observe(rightContainer, {
+                    childList: true,
+                    subtree: true,
+                    attributes: true,
+                    attributeFilter: ['class']
+                });
             }
             
             // 检查URL中是否有思想ID参数，如果有则滚动到对应的思想卡片
@@ -785,6 +827,11 @@
                     if (typeof initContentCardClickHandlers === 'function') {
                         initContentCardClickHandlers();
                     }
+                    
+                    // 同步容器高度
+                    setTimeout(() => {
+                        syncContainerHeights();
+                    }, 100);
                 } else {
                     hasMore = false;
                 }

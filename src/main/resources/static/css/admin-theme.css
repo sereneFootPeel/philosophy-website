@@ -359,3 +359,64 @@ tr:hover td {
     }
 }
 
+/* ==========================================================================
+   管理员页面主题覆盖 - 防止用户主题影响管理员界面
+   ========================================================================== */
+
+/* 当使用 theme-midnight 主题时，管理员侧边栏使用固定颜色 */
+/* 使用更具体的选择器来覆盖内联样式和全局主题规则 */
+.theme-midnight aside.w-64.flex-shrink-0 {
+    background-color: #4B5563 !important; /* 使用默认的灰色背景 */
+    color: #FFFFFF !important; /* 白色文字 */
+}
+
+/* 覆盖 theme-midnight 的全局文字颜色规则，确保侧边栏文字是白色 */
+.theme-midnight aside.w-64.flex-shrink-0 a,
+.theme-midnight aside.w-64.flex-shrink-0 a:not(.footer-search-btn),
+.theme-midnight aside.w-64.flex-shrink-0 a:hover,
+.theme-midnight aside.w-64.flex-shrink-0 .sidebar-link,
+.theme-midnight aside.w-64.flex-shrink-0 span,
+.theme-midnight aside.w-64.flex-shrink-0 h1,
+.theme-midnight aside.w-64.flex-shrink-0 h2,
+.theme-midnight aside.w-64.flex-shrink-0 h3,
+.theme-midnight aside.w-64.flex-shrink-0 h4,
+.theme-midnight aside.w-64.flex-shrink-0 h5,
+.theme-midnight aside.w-64.flex-shrink-0 h6,
+.theme-midnight aside.w-64.flex-shrink-0 p,
+.theme-midnight aside.w-64.flex-shrink-0 label,
+.theme-midnight aside.w-64.flex-shrink-0 * {
+    color: #FFFFFF !important; /* 确保所有文字都是白色，覆盖 theme-midnight 的黑色文字规则 */
+}
+
+.theme-midnight aside.w-64.flex-shrink-0 .border-b {
+    border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* 移动端抽屉菜单也使用相同处理 */
+.theme-midnight #mobile-drawer > div.absolute {
+    background-color: #4B5563 !important;
+    color: #FFFFFF !important;
+}
+
+.theme-midnight #mobile-drawer > div.absolute a,
+.theme-midnight #mobile-drawer > div.absolute a:not(.footer-search-btn),
+.theme-midnight #mobile-drawer > div.absolute a:hover,
+.theme-midnight #mobile-drawer > div.absolute .sidebar-link,
+.theme-midnight #mobile-drawer > div.absolute span,
+.theme-midnight #mobile-drawer > div.absolute button,
+.theme-midnight #mobile-drawer > div.absolute h1,
+.theme-midnight #mobile-drawer > div.absolute h2,
+.theme-midnight #mobile-drawer > div.absolute h3,
+.theme-midnight #mobile-drawer > div.absolute h4,
+.theme-midnight #mobile-drawer > div.absolute h5,
+.theme-midnight #mobile-drawer > div.absolute h6,
+.theme-midnight #mobile-drawer > div.absolute p,
+.theme-midnight #mobile-drawer > div.absolute label,
+.theme-midnight #mobile-drawer > div.absolute * {
+    color: #FFFFFF !important; /* 覆盖 theme-midnight 的黑色文字规则 */
+}
+
+.theme-midnight #mobile-drawer > div.absolute .border-b {
+    border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
