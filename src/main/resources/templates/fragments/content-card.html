@@ -62,20 +62,25 @@
             </th:block>
         </div>
         
-        <!-- 显示流派信息（根据showParentSchool参数决定是否显示父流派） -->
+        <!-- 显示流派信息（根据showParentSchool参数决定是否显示父/祖先流派） -->
         <div class="flex flex-wrap gap-2 mb-3">
             <th:block th:if="${content != null and content.school != null}">
-                <th:block th:if="${content.school.parent != null and (showParentSchool == null or showParentSchool)}">
-                    <a th:href="@{/schools/filter/{id}(id=${content != null and content.school != null and content.school.parent != null ? content.school.parent.id : ''})}"
-                       onclick="event.stopPropagation()"
-                       class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs hover:bg-gray-200 transition-smooth">
-                        <span th:text="${content != null and content.school != null and content.school.parent != null ? translationService.getSchoolDisplayName(content.school.parent, language != null ? language : 'zh') : '无父流派'}">父流派</span>
-                    </a>
+                <!-- 所有父流派（祖先流派）：顶级 -> ... -> 直接父流派 -->
+                <th:block th:if="${(showParentSchool == null or showParentSchool)}">
+                    <th:block th:each="ancestor : ${translationService.getSchoolAncestors(content.school)}">
+                        <a th:href="@{/schools/filter/{id}(id=${ancestor.id})}"
+                           onclick="event.stopPropagation()"
+                           class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs hover:bg-gray-200 transition-smooth">
+                            <span th:text="${translationService.getSchoolDisplayName(ancestor, language != null ? language : 'zh')}">父流派</span>
+                        </a>
+                    </th:block>
                 </th:block>
-                <a th:href="@{/schools/filter/{id}(id=${content != null and content.school != null ? content.school.id : ''})}"
+
+                <!-- 当前流派 -->
+                <a th:href="@{/schools/filter/{id}(id=${content.school.id})}"
                    onclick="event.stopPropagation()"
                    class="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs hover:bg-primary/20 transition-smooth">
-                    <span th:text="${content != null and content.school != null ? translationService.getSchoolDisplayName(content.school, language != null ? language : 'zh') : '无流派'}">流派名称</span>
+                    <span th:text="${translationService.getSchoolDisplayName(content.school, language != null ? language : 'zh')}">流派名称</span>
                 </a>
             </th:block>
         </div>
@@ -113,16 +118,18 @@
         
         <div class="flex justify-between items-start">
             <div class="w-full">
-                <!-- 显示流派信息（根据showParentSchool参数决定是否显示父流派） -->
+                <!-- 显示流派信息（根据showParentSchool参数决定是否显示父/祖先流派） -->
                 <div class="flex flex-wrap gap-2 mb-3">
                     <th:block th:if="${content != null and content.school != null}">
-                        <th:block th:if="${content.school.parent != null and (showParentSchool == null or showParentSchool)}">
-                            <a th:href="@{/schools/filter/{id}(id=${content != null and content.school != null and content.school.parent != null ? content.school.parent.id : ''})}"
-                               class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs hover:bg-gray-200 transition-smooth">
-                                <span th:text="${content.school.parent != null ? content.school.parent.name : '无父流派'}">父流派</span>
-                            </a>
+                        <th:block th:if="${(showParentSchool == null or showParentSchool)}">
+                            <th:block th:each="ancestor : ${translationService.getSchoolAncestors(content.school)}">
+                                <a th:href="@{/schools/filter/{id}(id=${ancestor.id})}"
+                                   class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs hover:bg-gray-200 transition-smooth">
+                                    <span th:text="${translationService.getSchoolDisplayName(ancestor, language != null ? language : 'zh')}">父流派</span>
+                                </a>
+                            </th:block>
                         </th:block>
-                        <a th:href="@{/schools/filter/{id}(id=${content != null and content.school != null ? content.school.id : ''})}"
+                        <a th:href="@{/schools/filter/{id}(id=${content.school.id})}"
                            class="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs hover:bg-primary/20 transition-smooth">
                             <span th:text="${content != null and content.school != null ? translationService.getSchoolDisplayName(content.school, language != null ? language : 'zh') : '无流派'}">流派名称</span>
                         </a>
@@ -142,14 +149,16 @@
         
         <div class="flex justify-between items-start">
             <div class="w-full">
-                <!-- 显示流派信息 -->
+                <!-- 显示流派信息（根据showParentSchool参数决定是否显示父/祖先流派） -->
                 <div class="flex flex-wrap gap-2 mb-3">
                     <th:block th:if="${edit.school != null}">
-                        <th:block th:if="${edit.school.parent != null and (showParentSchool == null or showParentSchool)}">
-                            <a th:href="@{/schools/filter/{id}(id=${edit.school.parent.id})}"
-                               class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs hover:bg-gray-200 transition-smooth">
-                                <span th:text="${edit.school.parent != null ? edit.school.parent.name : '无父流派'}">父流派</span>
-                            </a>
+                        <th:block th:if="${(showParentSchool == null or showParentSchool)}">
+                            <th:block th:each="ancestor : ${translationService.getSchoolAncestors(edit.school)}">
+                                <a th:href="@{/schools/filter/{id}(id=${ancestor.id})}"
+                                   class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs hover:bg-gray-200 transition-smooth">
+                                    <span th:text="${translationService.getSchoolDisplayName(ancestor, language != null ? language : 'zh')}">父流派</span>
+                                </a>
+                            </th:block>
                         </th:block>
                         <a th:href="@{/schools/filter/{id}(id=${edit.school.id})}"
                            class="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs hover:bg-primary/20 transition-smooth">

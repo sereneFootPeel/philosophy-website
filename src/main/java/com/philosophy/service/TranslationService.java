@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,6 +39,24 @@ public class TranslationService {
     }
 
     // ==================== 流派翻译相关方法 ====================
+
+    /**
+     * 获取某个流派的所有父流派（祖先流派），顺序为：顶级父流派 -> ... -> 直接父流派。
+     * <p>
+     * 注意：返回列表不包含传入的school本身。
+     */
+    public List<School> getSchoolAncestors(School school) {
+        List<School> ancestors = new ArrayList<>();
+        if (school == null) return ancestors;
+
+        School current = school.getParent();
+        while (current != null) {
+            // 添加到开头，保证顺序从顶级到最近父级
+            ancestors.add(0, current);
+            current = current.getParent();
+        }
+        return ancestors;
+    }
 
     /**
      * 获取流派的显示名称（优先英文，没有则显示中文）
