@@ -198,7 +198,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 // 更新编辑链接的href - 根据用户角色动态设置路径
                 if (editLink) {
-                    const redirectUrl = encodeURIComponent(window.location.href);
+                    // 关键：redirectUrl 必须是站内相对路径（后端只允许以 "/" 开头），
+                    // 且最好带上当前流派ID，保证保存后回到页面时能自动选中并加载右侧面板。
+                    const redirectUrl = encodeURIComponent(`/schools/filter/${d.id}`);
                     // 根据用户角色选择正确的路径：版主用 /moderator，管理员用 /admin
                     const basePath = window.userRole === 'MODERATOR' ? '/moderator' : '/admin';
                     editLink.href = `${basePath}/schools/edit/${d.id}?redirectUrl=${redirectUrl}`;
