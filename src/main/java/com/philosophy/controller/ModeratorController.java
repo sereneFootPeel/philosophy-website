@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -41,6 +42,7 @@ public class ModeratorController {
     private final UserService userService;
     private final TranslationService translationService;
     private final SchoolTranslationRepository schoolTranslationRepository;
+    private final UserInfoCollector userInfoCollector;
     private final CommentService commentService;
 
     public ModeratorController(PhilosopherService philosopherService, SchoolService schoolService,
@@ -53,6 +55,7 @@ public class ModeratorController {
         this.userService = userService;
         this.translationService = translationService;
         this.schoolTranslationRepository = schoolTranslationRepository;
+        this.userInfoCollector = userInfoCollector;
         this.commentService = commentService;
     }
 
@@ -64,6 +67,16 @@ public class ModeratorController {
             return user;
         }
         return null;
+    }
+
+    // 检查版主是否有权限访问该流派
+    private boolean hasAccessToSchool(User moderator, Long schoolId) {
+        if (moderator == null || moderator.getAssignedSchoolId() == null || schoolId == null) {
+            return false;
+        }
+        // 获取版主负责的流派及其所有子流派的ID
+        List<Long> accessibleSchoolIds = schoolService.getSchoolIdWithDescendants(moderator.getAssignedSchoolId());
+        return accessibleSchoolIds.contains(schoolId);
     }
 
     @GetMapping
@@ -248,8 +261,7 @@ public class ModeratorController {
     @PostMapping("/schools/save")
     public String saveSchool(@ModelAttribute School school,
                            @RequestParam(required = false) String nameEn,
-                           @RequestParam(required = false) String descriptionEn,
-                           @RequestParam(value = "redirectUrl", required = false) String redirectUrl) {
+                           @RequestParam(required = false) String descriptionEn) {
         User moderator = getCurrentModerator();
         if (moderator == null || moderator.getAssignedSchoolId() == null) {
             return "redirect:/error?message=No assigned school";
@@ -288,11 +300,6 @@ public class ModeratorController {
             }
         }
 
-        // 若从前台「流派树」跳转而来，会携带 redirectUrl（站内相对路径）。
-        // 与管理员端保持一致：仅允许以 "/" 开头的站内路径，避免开放重定向风险。
-        if (redirectUrl != null && !redirectUrl.isEmpty() && redirectUrl.startsWith("/")) {
-            return "redirect:" + redirectUrl;
-        }
         return "redirect:/moderator/schools";
     }
 

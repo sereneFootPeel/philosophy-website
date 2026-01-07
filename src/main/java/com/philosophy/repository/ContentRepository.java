@@ -176,6 +176,18 @@ public interface ContentRepository extends JpaRepository<Content, Long> {
     @Query("SELECT c FROM Content c LEFT JOIN FETCH c.philosopher p LEFT JOIN FETCH c.user u")
     List<Content> findAllContentsForQuotes();
 
-    @Query("SELECT c FROM Content c LEFT JOIN FETCH c.philosopher p LEFT JOIN FETCH c.school s LEFT JOIN FETCH s.parent WHERE LOWER(c.content) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(c.contentEn) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(c.title) LIKE LOWER(CONCAT('%', :query, '%'))")
+    @Query("SELECT c FROM Content c LEFT JOIN FETCH c.philosopher p LEFT JOIN FETCH c.school s LEFT JOIN FETCH s.parent WHERE " +
+           "LOWER(c.content) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+           "LOWER(c.contentEn) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+           "LOWER(c.title) LIKE LOWER(CONCAT('%', :query, '%'))")
     List<Content> searchByContentOrContentEnOrTitle(@Param("query") String query);
+
+    @Query("SELECT c FROM Content c LEFT JOIN FETCH c.philosopher p LEFT JOIN FETCH c.school s LEFT JOIN FETCH s.parent WHERE " +
+           "LOWER(c.content) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+           "LOWER(c.contentEn) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+           "LOWER(c.title) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+           "LOWER(REPLACE(REPLACE(c.content, '·', ''), ' ', '')) LIKE CONCAT('%', :normalizedQuery, '%') OR " +
+           "LOWER(REPLACE(REPLACE(c.contentEn, '·', ''), ' ', '')) LIKE CONCAT('%', :normalizedQuery, '%') OR " +
+           "LOWER(REPLACE(REPLACE(c.title, '·', ''), ' ', '')) LIKE CONCAT('%', :normalizedQuery, '%')")
+    List<Content> searchByContentOrContentEnOrTitleNormalized(@Param("query") String query, @Param("normalizedQuery") String normalizedQuery);
 }

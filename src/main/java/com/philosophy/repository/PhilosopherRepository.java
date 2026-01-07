@@ -47,6 +47,10 @@ public interface PhilosopherRepository extends JpaRepository<Philosopher, Long> 
     @Query("SELECT p FROM Philosopher p WHERE p.user.id = :userId")
     List<Philosopher> findByUserId(@Param("userId") Long userId);
 
-    @Query("SELECT p FROM Philosopher p WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(p.nameEn) LIKE LOWER(CONCAT('%', :query, '%'))")
-    List<Philosopher> searchByNameOrNameEn(@Param("query") String query);
+    @Query("SELECT p FROM Philosopher p WHERE " +
+           "LOWER(p.name) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+           "LOWER(p.nameEn) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+           "LOWER(REPLACE(REPLACE(p.name, '·', ''), ' ', '')) LIKE CONCAT('%', :normalizedQuery, '%') OR " +
+           "LOWER(REPLACE(REPLACE(p.nameEn, '·', ''), ' ', '')) LIKE CONCAT('%', :normalizedQuery, '%')")
+    List<Philosopher> searchByNameOrNameEn(@Param("query") String query, @Param("normalizedQuery") String normalizedQuery);
 }

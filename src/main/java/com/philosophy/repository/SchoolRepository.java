@@ -17,6 +17,7 @@ import java.util.Optional;
 public interface SchoolRepository extends JpaRepository<School, Long> {
     List<School> findByParentIsNullOrderByName();
     List<School> findByParentId(Long parentId);
+    boolean existsByParentId(Long parentId);
     boolean existsByName(String name);
 
     Optional<School> findByName(String name);
@@ -39,4 +40,18 @@ public interface SchoolRepository extends JpaRepository<School, Long> {
 
     @Query("SELECT s FROM School s WHERE LOWER(s.name) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(s.nameEn) LIKE LOWER(CONCAT('%', :query, '%'))")
     List<School> searchByNameOrNameEn(@Param("query") String query);
+
+    @Query("SELECT s FROM School s WHERE " +
+           "LOWER(s.name) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+           "LOWER(s.nameEn) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+           "LOWER(REPLACE(REPLACE(s.name, '·', ''), ' ', '')) LIKE CONCAT('%', :normalizedQuery, '%') OR " +
+           "LOWER(REPLACE(REPLACE(s.nameEn, '·', ''), ' ', '')) LIKE CONCAT('%', :normalizedQuery, '%')")
+    List<School> searchByNameOrNameEnNormalized(@Param("query") String query, @Param("normalizedQuery") String normalizedQuery);
+
+    /**
+     * 批量判断哪些 parentId 拥有至少一个子流派。
+     * 返回值是“有子流派的 parentId 列表”（去重）。
+     */
+    @Query("SELECT DISTINCT s.parent.id FROM School s WHERE s.parent.id IN :parentIds")
+    List<Long> findParentIdsHavingChildren(@Param("parentIds") List<Long> parentIds);
 }

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 public class SchoolApiController {
@@ -47,9 +48,13 @@ public class SchoolApiController {
         // 获取当前语言设置（根据IP自动判断默认语言）
         String language = languageUtil.getLanguage(request);
 
+        // 批量判断这些子流派是否还有子流派（避免 N+1）
+        List<Long> childIds = children.stream().map(School::getId).toList();
+        Set<Long> childHasChildrenSet = schoolService.findParentIdsHavingChildren(childIds);
+
         List<SchoolNodeDTO> result = new ArrayList<>();
         for (School child : children) {
-            boolean hasChildren = !schoolService.findByParentId(child.getId()).isEmpty();
+            boolean hasChildren = childHasChildrenSet.contains(child.getId());
             String displayName = translationService.getSchoolDisplayName(child, language);
             result.add(new SchoolNodeDTO(
                     child.getId(),
@@ -62,6 +67,27 @@ public class SchoolApiController {
         }
 
         return ResponseEntity.ok(result);
+    }
+
+    /**
+     * 返回指定流派的祖先路径（从顶级到当前，包含自身）。
+     * 用于前端在 /schools/filter/{id} 时只沿路径懒加载展开，避免递归扫描整棵树。
+     */
+    @GetMapping("/api/schools/ancestry")
+    @Transactional(readOnly = true)
+    public ResponseEntity<List<Long>> getSchoolAncestry(@RequestParam("id") Long id) {
+        School school = schoolService.getSchoolById(id);
+        if (school == null) {
+            return ResponseEntity.ok(List.of());
+        }
+
+        List<Long> path = new ArrayList<>();
+        School current = school;
+        while (current != null) {
+            path.add(0, current.getId());
+            current = current.getParent();
+        }
+        return ResponseEntity.ok(path);
     }
 
     @GetMapping("/api/schools/detail")

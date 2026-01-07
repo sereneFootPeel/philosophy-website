@@ -20,6 +20,7 @@ import com.philosophy.repository.UserContentEditRepository;
 import com.philosophy.repository.UserBlockRepository;
 import com.philosophy.repository.ModeratorBlockRepository;
 import com.philosophy.repository.PhilosopherRepository;
+import com.philosophy.util.SearchNormalizer;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -289,7 +290,12 @@ public class UserService implements UserDetailsService {
         if (query == null || query.trim().isEmpty()) {
             return new ArrayList<>();
         }
-        return userRepository.searchByUsernameOrName(query.trim());
+        String trimmed = query.trim();
+        String normalized = SearchNormalizer.normalize(trimmed);
+        if (normalized.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return userRepository.searchByUsernameOrNameNormalized(trimmed, normalized);
     }
     
     @Transactional(readOnly = true)

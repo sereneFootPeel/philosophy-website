@@ -8,6 +8,7 @@ import com.philosophy.repository.ContentRepository;
 import com.philosophy.repository.PhilosopherRepository;
 import com.philosophy.repository.PhilosopherTranslationRepository;
 import com.philosophy.repository.UserContentEditRepository;
+import com.philosophy.util.SearchNormalizer;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -285,7 +286,15 @@ public class PhilosopherService {
     // 搜索哲学家（支持关键词）
     @Transactional(readOnly = true)
     public List<Philosopher> searchPhilosophers(String query) {
-        return philosopherRepository.searchByNameOrNameEn(query);
+        if (query == null || query.trim().isEmpty()) {
+            return new ArrayList<>();
+        }
+        String trimmed = query.trim();
+        String normalized = SearchNormalizer.normalize(trimmed);
+        if (normalized.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return philosopherRepository.searchByNameOrNameEn(trimmed, normalized);
     }
 
     /**

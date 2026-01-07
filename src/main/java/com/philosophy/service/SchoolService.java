@@ -7,8 +7,8 @@ import com.philosophy.model.User;
 import com.philosophy.repository.SchoolRepository;
 import com.philosophy.repository.PhilosopherRepository;
 import com.philosophy.repository.ContentRepository;
-import com.philosophy.repository.UserContentEditRepository;
 import com.philosophy.repository.SchoolTranslationRepository;
+import com.philosophy.util.SearchNormalizer;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.Map;
+import java.util.Set;
+import java.util.HashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,18 +30,14 @@ public class SchoolService {
     private final SchoolRepository schoolRepository;
     private final PhilosopherRepository philosopherRepository;
     private final ContentRepository contentRepository;
-    private final UserContentEditRepository userContentEditRepository;
     private final TranslationService translationService;
-    private final UserFollowService userFollowService;
     private final SchoolTranslationRepository schoolTranslationRepository;
 
-    public SchoolService(SchoolRepository schoolRepository, PhilosopherRepository philosopherRepository, ContentRepository contentRepository, UserContentEditRepository userContentEditRepository, TranslationService translationService, UserFollowService userFollowService, SchoolTranslationRepository schoolTranslationRepository) {
+    public SchoolService(SchoolRepository schoolRepository, PhilosopherRepository philosopherRepository, ContentRepository contentRepository, TranslationService translationService, SchoolTranslationRepository schoolTranslationRepository) {
         this.schoolRepository = schoolRepository;
         this.philosopherRepository = philosopherRepository;
         this.contentRepository = contentRepository;
-        this.userContentEditRepository = userContentEditRepository;
         this.translationService = translationService;
-        this.userFollowService = userFollowService;
         this.schoolTranslationRepository = schoolTranslationRepository;
     }
 
@@ -73,6 +71,29 @@ public class SchoolService {
     @Transactional(readOnly = true)
     public List<School> findByParentId(Long parentId) {
         return schoolRepository.findByParentId(parentId);
+    }
+
+    /**
+     * 是否存在子流派（轻量查询）。
+     */
+    @Transactional(readOnly = true)
+    public boolean hasChildren(Long parentId) {
+        if (parentId == null) {
+            return false;
+        }
+        return schoolRepository.existsByParentId(parentId);
+    }
+
+    /**
+     * 批量获取“哪些 parentId 有子流派”。
+     * 返回 Set 便于 contains 判断。
+     */
+    @Transactional(readOnly = true)
+    public Set<Long> findParentIdsHavingChildren(List<Long> parentIds) {
+        if (parentIds == null || parentIds.isEmpty()) {
+            return Set.of();
+        }
+        return new HashSet<>(schoolRepository.findParentIdsHavingChildren(parentIds));
     }
 
     // AdminController需要的方法
@@ -218,7 +239,12 @@ public class SchoolService {
         if (query == null || query.trim().isEmpty()) {
             return new ArrayList<>();
         }
-        return schoolRepository.searchByNameOrNameEn(query.trim());
+        String trimmed = query.trim();
+        String normalized = SearchNormalizer.normalize(trimmed);
+        if (normalized.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return schoolRepository.searchByNameOrNameEnNormalized(trimmed, normalized);
     }
     
     // 获取指定流派及其所有子孙流派的ID集合

@@ -47,6 +47,7 @@ public class HomeController {
     private final LikeService likeService;
     private final UserService userService;
     private final LanguageUtil languageUtil;
+    private static final int PHILOSOPHER_NAME_BATCH_SIZE = 30;
     
     // 构造函数注入
     public HomeController(PhilosopherService philosopherService, SchoolService schoolService, CommentService commentService, TranslationService translationService, ContentService contentService, LikeService likeService, UserService userService, LanguageUtil languageUtil) {
@@ -58,6 +59,31 @@ public class HomeController {
         this.likeService = likeService;
         this.userService = userService;
         this.languageUtil = languageUtil;
+    }
+
+    /**
+     * 哲学家排序Key：与 /philosophers 页面一致。
+     * - birthYear 为 null：排到最后
+     * - 旧格式（|birthYear| < 10000）：按 YYYY0101 转换（支持公元前负数）
+     * - 新格式（|birthYear| >= 10000）：直接视为 YYYYMMDD
+     */
+    private long philosopherSortKey(Philosopher p) {
+        if (p == null || p.getBirthYear() == null) {
+            return Long.MAX_VALUE;
+        }
+        int birthYear = p.getBirthYear();
+        if (Math.abs(birthYear) < 10000) {
+            if (birthYear < 0) {
+                return (long) birthYear * 10000L - 101L;
+            }
+            return (long) birthYear * 10000L + 101L;
+        }
+        return (long) birthYear;
+    }
+
+    private void sortPhilosophersByBirth(List<Philosopher> philosophers) {
+        if (philosophers == null || philosophers.isEmpty()) return;
+        philosophers.sort(Comparator.comparing(this::philosopherSortKey));
     }
     
     // 递归排序所有层级的流派
@@ -145,6 +171,11 @@ public class HomeController {
         // 使用拼音/忽略大小写排序顶级流派
         PinyinStringComparator nameComparator = new PinyinStringComparator();
         allSchools.sort(Comparator.comparing(s -> nameComparator.toComparableKey(s.getName())));
+        // 批量判断顶级流派是否有子流派（用于决定是否显示展开图标）
+        List<Long> topIds = allSchools.stream()
+                .map(School::getId)
+                .toList();
+        model.addAttribute("topLevelHasChildren", schoolService.findParentIdsHavingChildren(topIds));
 
         model.addAttribute("isAuthenticated", isAuthenticated);
         model.addAttribute("isAdmin", isAdmin);
@@ -313,6 +344,12 @@ public class HomeController {
         // 使用拼音/忽略大小写排序顶级流派
         PinyinStringComparator nameComparator = new PinyinStringComparator();
         allSchools.sort(Comparator.comparing(s -> nameComparator.toComparableKey(s.getName())));
+
+        // 批量判断顶级流派是否有子流派（用于决定是否显示展开图标）
+        List<Long> topIds = allSchools.stream()
+                .map(School::getId)
+                .toList();
+        model.addAttribute("topLevelHasChildren", schoolService.findParentIdsHavingChildren(topIds));
         List<Philosopher> allPhilosophers = philosopherService.getAllPhilosophers();
 
         // 添加身份验证相关变量
@@ -344,6 +381,12 @@ public class HomeController {
         // 使用拼音/忽略大小写排序顶级流派
         PinyinStringComparator nameComparator = new PinyinStringComparator();
         allSchools.sort(Comparator.comparing(s -> nameComparator.toComparableKey(s.getName())));
+
+        // 批量判断顶级流派是否有子流派（用于决定是否显示展开图标）
+        List<Long> topIds = allSchools.stream()
+                .map(School::getId)
+                .toList();
+        model.addAttribute("topLevelHasChildren", schoolService.findParentIdsHavingChildren(topIds));
         School selectedSchool = schoolService.getSchoolById(id);
         
         // 添加身份验证相关变量
@@ -438,31 +481,8 @@ public class HomeController {
         List<Philosopher> allPhilosophers = philosopherService.getAllPhilosophers();
         List<School> allSchools = schoolService.getAllSchools();
         
-        // 按哲学家出生日期排序（升序：数字越小越靠前，即更早的日期排在前面）
-        // 输入格式都是日期格式（如"1914.11.18"或"1914.11.18 - 1975.3.4"），解析后存储为YYYYMMDD格式（如19141118）
-        // 排序时直接使用YYYYMMDD格式的数字，按从小到大排序
-        // 兼容处理：如果数据库中还有旧格式的年份数据（绝对值<10000），会转换为YYYY0101格式用于排序
-        allPhilosophers.sort(Comparator.comparing((Philosopher p) -> {
-            if (p.getBirthYear() == null) {
-                return Long.MAX_VALUE; // 没有出生年份的排到最后
-            }
-            Integer birthYear = p.getBirthYear();
-            // 如果 birthYear 的绝对值 < 10000，说明是旧格式（年份），转换为日期格式（YYYY0101）用于排序
-            // 处理负数年份（公元前）：-551 -> -5510101
-            if (Math.abs(birthYear) < 10000) {
-                // 保持负数年份的符号，转换为日期格式
-                if (birthYear < 0) {
-                    // 公元前年份：-551 -> -5510101
-                    return (long)birthYear * 10000L - 101L;
-                } else {
-                    // 公元年份：1999 -> 19990101
-                    return (long)birthYear * 10000L + 101L;
-                }
-            }
-            // 如果 birthYear 的绝对值 >= 10000，说明是YYYYMMDD格式（完整日期），直接使用
-            // 例如：19141118（从"1914.11.18"生成）会直接用于排序
-            return birthYear.longValue();
-        }));
+        // 与 API /api/philosophers/names 保持一致的排序
+        sortPhilosophersByBirth(allPhilosophers);
         
         // 如果有指定哲学家ID，则使用该哲学家作为当前哲学家
         Philosopher currentPhilosopher = null;
@@ -485,7 +505,13 @@ public class HomeController {
             model.addAttribute("hasMoreContents", result.get("hasMore"));
         }
         
-        model.addAttribute("philosophers", allPhilosophers);
+        // 首屏只下发少量名字，避免一次性渲染过多 DOM 导致卡顿
+        int initialCount = Math.min(PHILOSOPHER_NAME_BATCH_SIZE, allPhilosophers.size());
+        List<Philosopher> initialPhilosophers = allPhilosophers.subList(0, initialCount);
+        model.addAttribute("initialPhilosophers", initialPhilosophers);
+        model.addAttribute("initialPhilosophersCount", initialCount);
+        model.addAttribute("totalPhilosophersCount", allPhilosophers.size());
+        model.addAttribute("hasMorePhilosophers", allPhilosophers.size() > initialCount);
         model.addAttribute("topLevelSchools", allSchools);
         model.addAttribute("currentPhilosopher", currentPhilosopher);
         model.addAttribute("commentService", commentService);
@@ -503,6 +529,56 @@ public class HomeController {
         }
         
         return "philosophers";
+    }
+
+    /**
+     * API：按 offset/limit 分批返回哲学家名字（已按出生日期排序），用于左侧列表/移动端选择器的增量加载。
+     */
+    @GetMapping("/api/philosophers/names")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getPhilosopherNames(
+            @RequestParam(value = "offset", defaultValue = "0") int offset,
+            @RequestParam(value = "limit", defaultValue = "30") int limit,
+            HttpServletRequest request) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            if (offset < 0) offset = 0;
+            if (limit < 1) limit = 1;
+            if (limit > 100) limit = 100;
+
+            String language = languageUtil.getLanguage(request);
+
+            List<Philosopher> allPhilosophers = philosopherService.getAllPhilosophers();
+            sortPhilosophersByBirth(allPhilosophers);
+
+            int total = allPhilosophers.size();
+            int start = Math.min(offset, total);
+            int end = Math.min(offset + limit, total);
+
+            List<Map<String, Object>> items = new ArrayList<>();
+            for (int i = start; i < end; i++) {
+                Philosopher p = allPhilosophers.get(i);
+                Map<String, Object> item = new HashMap<>();
+                item.put("id", p.getId());
+                item.put("displayName", translationService.getPhilosopherDisplayName(p, language));
+                items.add(item);
+            }
+
+            boolean hasMore = end < total;
+
+            response.put("success", true);
+            response.put("items", items);
+            response.put("totalCount", total);
+            response.put("offset", start);
+            response.put("limit", limit);
+            response.put("nextOffset", end);
+            response.put("hasMore", hasMore);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Error loading philosopher names: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
     }
     
     @GetMapping("/test/likes-fixed")

@@ -7,7 +7,7 @@ import com.philosophy.model.UserContentEdit;
 import com.philosophy.repository.ContentRepository;
 import com.philosophy.repository.ContentTranslationRepository;
 import com.philosophy.repository.UserContentEditRepository;
-import com.philosophy.service.ModeratorBlockService;
+import com.philosophy.util.SearchNormalizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class ContentService {
@@ -264,7 +263,12 @@ public class ContentService {
         if (query == null || query.trim().isEmpty()) {
             return new ArrayList<>();
         }
-        return contentRepository.searchByContentOrContentEnOrTitle(query.trim());
+        String trimmed = query.trim();
+        String normalized = SearchNormalizer.normalize(trimmed);
+        if (normalized.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return contentRepository.searchByContentOrContentEnOrTitleNormalized(trimmed, normalized);
     }
 
     // 获取指定哲学家和流派的内容，按用户角色优先级排序
@@ -284,9 +288,6 @@ public class ContentService {
     public List<Content> findByPhilosopherAndSchoolAll(Long philosopherId, Long schoolId) {
         // 获取原始内容
         List<Content> originalContents = contentRepository.findByPhilosopherAndSchoolAll(philosopherId, schoolId);
-
-        // 获取用户编辑的内容（待审核和已通过的）
-        List<UserContentEdit> userEdits = userContentEditRepository.findByPhilosopherIdAndSchoolId(philosopherId, schoolId);
 
         // 合并内容：将用户编辑的内容添加到原始内容列表中
         // 注意：这里我们需要创建一个包装类或者修改返回类型来同时包含两种类型的内容
