@@ -1448,11 +1448,22 @@ public class DataImportService {
     }
 
     private String resolvePhilosopherBioColumn() {
-        if (tableColumnExists("philosophers", "bio")) {
-            return "bio";
-        }
-        if (tableColumnExists("philosophers", "biography")) {
+        // NOTE:
+        // `Philosopher.bio` 实体字段映射到数据库列 `biography`（见 Philosopher.java 的 @Column(name="biography")）。
+        // 但某些数据库历史版本可能同时存在 `bio` 与 `biography` 两列。
+        // 为保证页面/实体读取一致性，这里必须优先写入 `biography`。
+        boolean hasBiography = tableColumnExists("philosophers", "biography");
+        boolean hasBio = tableColumnExists("philosophers", "bio");
+
+        if (hasBiography) {
+            // 如果同时存在两列，提示一次即可（帮助定位“导入了但页面不显示”的问题）
+            if (hasBio) {
+                logger.warn("检测到 philosophers 表同时存在 bio 与 biography 两列；导入将优先写入 biography 以匹配实体映射。");
+            }
             return "biography";
+        }
+        if (hasBio) {
+            return "bio";
         }
         return null;
     }
