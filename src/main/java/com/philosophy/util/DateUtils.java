@@ -7,6 +7,16 @@ import java.util.regex.Matcher;
  * 日期工具类，用于处理哲学家出生死亡日期的格式转换
  */
 public class DateUtils {
+
+    /**
+     * 日期分隔符兼容：支持半角点 "." 与全角点 "．"
+     */
+    private static final String DATE_SEP = "[\\.．]";
+
+    /**
+     * 范围分隔符兼容：支持 "-"、"–"、"—"、"－"
+     */
+    private static final String RANGE_SEP = "[-–—－]";
     
     /**
      * 将日期范围字符串解析为出生日期的整数格式（YYYYMMDD）
@@ -37,8 +47,12 @@ public class DateUtils {
         // 移除所有空格并转换为小写以便匹配
         String cleaned = dateRange.trim().replaceAll("\\s+", " ").toLowerCase();
         
-        // 1. 先尝试匹配完整日期范围格式：YYYY.M.D - YYYY.M.D
-        Pattern pattern = Pattern.compile("(\\d{4})\\.(\\d{1,2})\\.(\\d{1,2})\\s*-\\s*(\\d{4})\\.(\\d{1,2})\\.(\\d{1,2})");
+        // 1. 先尝试匹配完整日期范围格式：Y.M.D - Y.M.D
+        // 兼容：
+        // - 年份 1-4 位（如 121.4.26）
+        // - 分隔符 "."/ "．"
+        // - 范围分隔符 "-" / "–" / "—" / "－"
+        Pattern pattern = Pattern.compile("(\\d{1,4})" + DATE_SEP + "(\\d{1,2})" + DATE_SEP + "(\\d{1,2})\\s*" + RANGE_SEP + "\\s*(\\d{1,4})" + DATE_SEP + "(\\d{1,2})" + DATE_SEP + "(\\d{1,2})");
         Matcher matcher = pattern.matcher(cleaned);
         
         if (matcher.find()) {
@@ -59,8 +73,8 @@ public class DateUtils {
             }
         }
         
-        // 2. 尝试匹配单个完整日期：YYYY.M.D
-        pattern = Pattern.compile("(\\d{4})\\.(\\d{1,2})\\.(\\d{1,2})");
+        // 2. 尝试匹配单个完整日期：Y.M.D（兼容 1-4 位年份与 "."/"．"）
+        pattern = Pattern.compile("(\\d{1,4})" + DATE_SEP + "(\\d{1,2})" + DATE_SEP + "(\\d{1,2})");
         matcher = pattern.matcher(cleaned);
         
         if (matcher.find()) {
@@ -279,8 +293,8 @@ public class DateUtils {
         // 移除所有空格并转换为小写以便匹配
         String cleaned = dateRange.trim().replaceAll("\\s+", " ").toLowerCase();
         
-        // 1. 先尝试匹配完整日期范围格式：YYYY.M.D - YYYY.M.D
-        Pattern pattern = Pattern.compile("(\\d{4})\\.(\\d{1,2})\\.(\\d{1,2})\\s*-\\s*(\\d{4})\\.(\\d{1,2})\\.(\\d{1,2})");
+        // 1. 先尝试匹配完整日期范围格式：Y.M.D - Y.M.D（同 parseBirthDateFromRange 的分隔符兼容）
+        Pattern pattern = Pattern.compile("(\\d{1,4})" + DATE_SEP + "(\\d{1,2})" + DATE_SEP + "(\\d{1,2})\\s*" + RANGE_SEP + "\\s*(\\d{1,4})" + DATE_SEP + "(\\d{1,2})" + DATE_SEP + "(\\d{1,2})");
         Matcher matcher = pattern.matcher(cleaned);
         
         if (matcher.find()) {
