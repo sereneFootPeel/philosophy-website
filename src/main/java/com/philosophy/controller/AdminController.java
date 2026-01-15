@@ -196,6 +196,10 @@ public class AdminController {
             Integer deathDateInt = DateUtils.parseDeathYearFromRange(birthDeathDate);
             if (deathDateInt != null) {
                 philosopher.setDeathYear(deathDateInt);
+            } else if (birthDateInt != null) {
+                // 如果解析到了出生日期但没有死亡日期，显式清除死亡日期
+                // 这样当用户只输入出生日期时，可以清除原有的死亡日期
+                philosopher.setDeathYear(null);
             }
         }
         

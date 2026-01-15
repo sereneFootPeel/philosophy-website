@@ -141,12 +141,11 @@ public class PhilosopherService {
             philosopherToSave.setName(philosopherFromForm.getName());
             philosopherToSave.setBio(philosopherFromForm.getBio());
             philosopherToSave.setEra(philosopherFromForm.getEra());
-            // 只有在明确提供了新的 birthYear 时才更新，否则保留原有值
+            // 如果用户输入了出生日期，更新出生日期和死亡日期
+            // 这样当用户只输入出生日期时，可以清除原有的死亡日期
             if (philosopherFromForm.getBirthYear() != null) {
                 philosopherToSave.setBirthYear(philosopherFromForm.getBirthYear());
-            }
-            // 只有在明确提供了新的 deathYear 时才更新，否则保留原有值
-            if (philosopherFromForm.getDeathYear() != null) {
+                // 更新死亡日期（即使为 null，表示用户想要清除死亡日期）
                 philosopherToSave.setDeathYear(philosopherFromForm.getDeathYear());
             }
             // 只有在明确提供了新的 imageUrl 时才更新，否则保留原有的照片
