@@ -191,6 +191,14 @@ public class AdminController {
             Integer birthDateInt = DateUtils.parseBirthDateFromRange(birthDeathDate);
             if (birthDateInt != null) {
                 philosopher.setBirthYear(birthDateInt);
+            } else {
+                // 如果用户输入了日期但解析失败，显示错误
+                redirectAttributes.addFlashAttribute("error", "日期格式不正确，请使用格式：1999.1.1 或 1999.1.1 - 2000.1.1");
+                if (philosopher.getId() != null) {
+                    return "redirect:/admin/philosophers/edit/" + philosopher.getId();
+                } else {
+                    return "redirect:/admin/philosophers/new";
+                }
             }
             // 解析死亡日期
             Integer deathDateInt = DateUtils.parseDeathYearFromRange(birthDeathDate);

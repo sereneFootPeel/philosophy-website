@@ -33,8 +33,8 @@ public class DateUtils {
      * 生成的YYYYMMDD格式数字用于数据库存储和排序，例如：
      * - "1914.11.18" -> 19141118
      * - "1975.3.4" -> 19750304
-     * - "460BC" -> -4600101
-     * - "c.460BC" -> -4600101
+     * - "460BC" -> -4600000（仅年份，月日补 00 用于排序）
+     * - "c.460BC" -> -4600001（约年，仅年份，day=01 标记 circa）
      * 
      * @param dateRange 日期范围字符串，支持多种格式
      * @return 出生日期的整数格式（YYYYMMDD），如果解析失败返回 null
@@ -52,10 +52,10 @@ public class DateUtils {
         // - 年份 1-4 位（如 121.4.26）
         // - 分隔符 "."/ "．"
         // - 范围分隔符 "-" / "–" / "—" / "－"
-        Pattern pattern = Pattern.compile("(\\d{1,4})" + DATE_SEP + "(\\d{1,2})" + DATE_SEP + "(\\d{1,2})\\s*" + RANGE_SEP + "\\s*(\\d{1,4})" + DATE_SEP + "(\\d{1,2})" + DATE_SEP + "(\\d{1,2})");
+        Pattern pattern = Pattern.compile("^(\\d{1,4})" + DATE_SEP + "(\\d{1,2})" + DATE_SEP + "(\\d{1,2})\\s*" + RANGE_SEP + "\\s*(\\d{1,4})" + DATE_SEP + "(\\d{1,2})" + DATE_SEP + "(\\d{1,2})$");
         Matcher matcher = pattern.matcher(cleaned);
         
-        if (matcher.find()) {
+        if (matcher.matches()) {
             try {
                 int birthYear = Integer.parseInt(matcher.group(1));
                 int birthMonth = Integer.parseInt(matcher.group(2));
@@ -74,10 +74,11 @@ public class DateUtils {
         }
         
         // 2. 尝试匹配单个完整日期：Y.M.D（兼容 1-4 位年份与 "."/"．"）
-        pattern = Pattern.compile("(\\d{1,4})" + DATE_SEP + "(\\d{1,2})" + DATE_SEP + "(\\d{1,2})");
+        // 使用 ^ 和 $ 确保完全匹配，避免部分匹配
+        pattern = Pattern.compile("^(\\d{1,4})" + DATE_SEP + "(\\d{1,2})" + DATE_SEP + "(\\d{1,2})$");
         matcher = pattern.matcher(cleaned);
         
-        if (matcher.find()) {
+        if (matcher.matches()) {
             try {
                 int birthYear = Integer.parseInt(matcher.group(1));
                 int birthMonth = Integer.parseInt(matcher.group(2));
@@ -116,9 +117,9 @@ public class DateUtils {
                 }
                 
                 // 转换为 YYYYMMDD 格式
-                // 如果有 "c." 标记，使用 1月2日 (0102) 作为标记
-                // 否则使用 1月1日 (0101)
-                int dateSuffix = startHasC ? 102 : 101;
+                // 仅年份时：月日补 00（用于排序）
+                // 约年（c.）用 day=01 做标记，方便显示为 "c. YYYY"
+                int dateSuffix = startHasC ? 1 : 0;
                 
                 return birthYear * 10000 + (birthYear < 0 ? -dateSuffix : dateSuffix);
             } catch (NumberFormatException e) {
@@ -145,9 +146,9 @@ public class DateUtils {
                 }
                 
                 // 转换为 YYYYMMDD 格式
-                // 如果有 "c." 标记，使用 1月2日 (0102) 作为标记
-                // 否则使用 1月1日 (0101)
-                int dateSuffix = hasC ? 102 : 101;
+                // 仅年份时：月日补 00（用于排序）
+                // 约年（c.）用 day=01 做标记，方便显示为 "c. YYYY"
+                int dateSuffix = hasC ? 1 : 0;
                 
                 return birthYear * 10000 + (birthYear < 0 ? -dateSuffix : dateSuffix);
             } catch (NumberFormatException e) {
@@ -187,11 +188,12 @@ public class DateUtils {
         }
         
         // 判断是否为年份格式
-        // 1月1日 (0101) = 普通年份
-        // 1月2日 (0102) = 带 "c." 的年份 (circa)
-        // 增强判断：如果是公元前年份，强制使用年份格式显示，避免显示如 -490.1.1 这样的格式
-        boolean isYearOnlyFormat = (month == 1 && (day == 1 || day == 2)) || isNegative;
-        boolean hasApproxMarker = (month == 1 && day == 2);
+        // - 用户输入了月份和日期：month/day 为真实值（>=1），显示完整日期（包括 1.1）
+        // - 用户只输入年份：存储为 YYYY0000（月日补 00 用于排序），显示年份
+        // - 约年（c.）：存储为 YYYY0001（day=01 标记 circa），显示 "c. YYYY"
+        // - 公元前年份：强制使用年份格式显示，避免显示如 -490.0.0 这样的格式
+        boolean isYearOnlyFormat = isNegative || (month == 0 && (day == 0 || day == 1));
+        boolean hasApproxMarker = (month == 0 && day == 1);
         
         // 预先检查死亡年份是否为BC，以决定是否在出生年份显示BC
         boolean isDeathBC = false;
@@ -207,7 +209,7 @@ public class DateUtils {
         // 构建出生日期部分
         String birthDateStr;
         if (isYearOnlyFormat) {
-            // 年份格式
+            // 年份格式：显示时不补齐 0（补齐 0 仅用于排序存储）
             StringBuilder sb = new StringBuilder();
             if (hasApproxMarker) {
                 sb.append("c. ");
@@ -218,7 +220,7 @@ public class DateUtils {
             }
             birthDateStr = sb.toString();
         } else {
-            // 完整日期格式
+            // 完整日期格式：只要写了月份和日期就显示完整日期（包括 1.1）
             birthDateStr = String.format("%d.%d.%d", year, month, day);
         }
         
@@ -237,13 +239,13 @@ public class DateUtils {
                     deathYearInt = -deathYearInt;
                 }
                 
-                // 判断死亡日期是否为年份格式
-                boolean isDeathYearOnlyFormat = (deathMonth == 1 && (deathDay == 1 || deathDay == 2)) || isNegativeDeath;
-                boolean deathHasApproxMarker = (deathMonth == 1 && deathDay == 2);
+                // 判断死亡日期是否为年份格式（使用与出生日期相同的逻辑）
+                boolean isDeathYearOnlyFormat = isNegativeDeath || (deathMonth == 0 && (deathDay == 0 || deathDay == 1));
+                boolean deathHasApproxMarker = (deathMonth == 0 && deathDay == 1);
                 
                 String deathDateStr;
                 if (isDeathYearOnlyFormat) {
-                    // 年份格式
+                    // 年份格式：显示时不补齐 0（补齐 0 仅用于排序存储）
                     StringBuilder sb = new StringBuilder();
                     if (deathHasApproxMarker) {
                         sb.append("c. ");
@@ -254,7 +256,7 @@ public class DateUtils {
                     }
                     deathDateStr = sb.toString();
                 } else {
-                    // 完整日期格式
+                    // 完整日期格式：只要写了月份和日期就显示完整日期（包括 1.1）
                     deathDateStr = String.format("%d.%d.%d", deathYearInt, deathMonth, deathDay);
                 }
                 
@@ -294,10 +296,10 @@ public class DateUtils {
         String cleaned = dateRange.trim().replaceAll("\\s+", " ").toLowerCase();
         
         // 1. 先尝试匹配完整日期范围格式：Y.M.D - Y.M.D（同 parseBirthDateFromRange 的分隔符兼容）
-        Pattern pattern = Pattern.compile("(\\d{1,4})" + DATE_SEP + "(\\d{1,2})" + DATE_SEP + "(\\d{1,2})\\s*" + RANGE_SEP + "\\s*(\\d{1,4})" + DATE_SEP + "(\\d{1,2})" + DATE_SEP + "(\\d{1,2})");
+        Pattern pattern = Pattern.compile("^(\\d{1,4})" + DATE_SEP + "(\\d{1,2})" + DATE_SEP + "(\\d{1,2})\\s*" + RANGE_SEP + "\\s*(\\d{1,4})" + DATE_SEP + "(\\d{1,2})" + DATE_SEP + "(\\d{1,2})$");
         Matcher matcher = pattern.matcher(cleaned);
         
-        if (matcher.find()) {
+        if (matcher.matches()) {
             try {
                 int deathYear = Integer.parseInt(matcher.group(4));
                 int deathMonth = Integer.parseInt(matcher.group(5));
@@ -336,9 +338,9 @@ public class DateUtils {
                 }
                 
                 // 转换为 YYYYMMDD 格式
-                // 如果有 "c." 标记，使用 1月2日 (0102) 作为标记
-                // 否则使用 1月1日 (0101)
-                int dateSuffix = endHasC ? 102 : 101;
+                // 仅年份时：月日补 00（用于排序）
+                // 约年（c.）用 day=01 做标记，方便显示为 "c. YYYY"
+                int dateSuffix = endHasC ? 1 : 0;
                 
                 return deathYear * 10000 + (deathYear < 0 ? -dateSuffix : dateSuffix);
             } catch (NumberFormatException e) {
@@ -367,16 +369,9 @@ public class DateUtils {
             return year;
         }
         
-        // 如果是旧格式（年份），转换为YYYYMMDD格式
-        // 对于正数年份：1999 -> 19990101（1月1日）
-        // 对于负数年份（公元前）：-551 -> -5510101（1月1日）
-        if (year < 0) {
-            // 公元前年份：-551 -> -5510101
-            return year * 10000 - 101;
-        } else {
-            // 公元年份：1999 -> 19990101
-            return year * 10000 + 101;
-        }
+        // 如果是旧格式（年份），转换为YYYYMMDD格式（仅年份）
+        // 规则：YYYY -> YYYY0000（用于排序；显示时仍为 YYYY）
+        return year * 10000;
     }
 }
 
