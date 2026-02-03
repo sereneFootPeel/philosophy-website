@@ -618,104 +618,130 @@ public class ModeratorController {
                              @RequestParam(value = "philosopherId", required = false) Long philosopherId,
                              @RequestParam(value = "schoolId", required = false) Long schoolId,
                              @RequestParam(value = "contentEn", required = false) String contentEn,
-                             @RequestParam(value = "lockAfterSave", required = false, defaultValue = "false") boolean lockAfterSave) {
+                             @RequestParam(value = "lockAfterSave", required = false, defaultValue = "false") boolean lockAfterSave,
+                             Model model) {
         User moderator = getCurrentModerator();
         if (moderator == null || moderator.getAssignedSchoolId() == null) {
             return "redirect:/error?message=No assigned school";
         }
 
-        // 编辑时先加载持久化实体以保留version等字段
-        Content contentToSave;
-        if (content.getId() != null) {
-            Content existingContent = contentService.getContentById(content.getId());
-            if (existingContent == null) {
-                return "redirect:/error?message=Content not found";
+        try {
+            // 编辑时先加载持久化实体以保留version等字段
+            Content contentToSave;
+            if (content.getId() != null) {
+                Content existingContent = contentService.getContentById(content.getId());
+                if (existingContent == null) {
+                    model.addAttribute("error", "内容不存在");
+                    // 重新加载表单数据
+                    List<School> schools = schoolService.getModeratorManageableSchools(moderator.getAssignedSchoolId());
+                    model.addAttribute("schools", schools);
+                    List<Long> schoolIds = schoolService.getSchoolIdWithDescendants(moderator.getAssignedSchoolId());
+                    List<Philosopher> philosophers = philosopherService.getPhilosophersBySchoolIds(schoolIds);
+                    model.addAttribute("philosophers", philosophers);
+                    model.addAttribute("contentForm", content);
+                    model.addAttribute("contentEn", contentEn != null ? contentEn : "");
+                    model.addAttribute("currentUserId", moderator.getId());
+                    return "moderator/contents/form";
+                }
+
+                boolean hasAccess = false;
+                if (existingContent.getSchool() != null) {
+                    List<Long> accessibleSchoolIds = schoolService.getSchoolIdWithDescendants(moderator.getAssignedSchoolId());
+                    hasAccess = accessibleSchoolIds.contains(existingContent.getSchool().getId());
+                } else if (existingContent.getPhilosopher() != null) {
+                    List<Long> accessibleSchoolIds = schoolService.getSchoolIdWithDescendants(moderator.getAssignedSchoolId());
+                    for (School school : existingContent.getPhilosopher().getSchools()) {
+                        if (accessibleSchoolIds.contains(school.getId())) {
+                            hasAccess = true;
+                            break;
+                        }
+                    }
+                }
+                if (!hasAccess) {
+                    return "redirect:/error?message=Access denied";
+                }
+
+                // 检查用户是否有权限编辑这个内容（包括锁定检查）
+                if (!contentService.canUserEditContent(moderator, existingContent)) {
+                    String errorMsg = URLEncoder.encode("您没有权限编辑这个内容", StandardCharsets.UTF_8);
+                    return "redirect:/moderator/contents?error=" + errorMsg;
+                }
+
+                // 使用持久化实体，更新需要修改的字段
+                contentToSave = existingContent;
+                contentToSave.setContent(content.getContent());
+            } else {
+                // 新建内容直接使用表单对象
+                contentToSave = content;
             }
 
-            boolean hasAccess = false;
-            if (existingContent.getSchool() != null) {
+            // 设置关联（基于请求参数）
+            if (philosopherId != null) {
+                contentToSave.setPhilosopher(philosopherService.getPhilosopherById(philosopherId));
+            }
+            if (schoolId != null) {
+                contentToSave.setSchool(schoolService.getSchoolById(schoolId));
+            }
+
+            // 检查关联的流派是否在权限范围内
+            if (contentToSave.getSchool() != null && !schoolService.canModeratorManageSchool(moderator.getAssignedSchoolId(), contentToSave.getSchool().getId())) {
+                return "redirect:/error?message=Access denied for associated school";
+            }
+
+            // 检查关联的哲学家是否在权限范围内
+            if (contentToSave.getPhilosopher() != null) {
+                boolean hasAccess = false;
                 List<Long> accessibleSchoolIds = schoolService.getSchoolIdWithDescendants(moderator.getAssignedSchoolId());
-                hasAccess = accessibleSchoolIds.contains(existingContent.getSchool().getId());
-            } else if (existingContent.getPhilosopher() != null) {
-                List<Long> accessibleSchoolIds = schoolService.getSchoolIdWithDescendants(moderator.getAssignedSchoolId());
-                for (School school : existingContent.getPhilosopher().getSchools()) {
+                for (School school : contentToSave.getPhilosopher().getSchools()) {
                     if (accessibleSchoolIds.contains(school.getId())) {
                         hasAccess = true;
                         break;
                     }
                 }
-            }
-            if (!hasAccess) {
-                return "redirect:/error?message=Access denied";
-            }
-
-            // 检查用户是否有权限编辑这个内容（包括锁定检查）
-            if (!contentService.canUserEditContent(moderator, existingContent)) {
-                String errorMsg = URLEncoder.encode("您没有权限编辑这个内容", StandardCharsets.UTF_8);
-                return "redirect:/moderator/contents?error=" + errorMsg;
-            }
-
-            // 使用持久化实体，更新需要修改的字段
-            contentToSave = existingContent;
-            contentToSave.setContent(content.getContent());
-        } else {
-            // 新建内容直接使用表单对象
-            contentToSave = content;
-        }
-
-        // 设置关联（基于请求参数）
-        if (philosopherId != null) {
-            contentToSave.setPhilosopher(philosopherService.getPhilosopherById(philosopherId));
-        }
-        if (schoolId != null) {
-            contentToSave.setSchool(schoolService.getSchoolById(schoolId));
-        }
-
-        // 检查关联的流派是否在权限范围内
-        if (contentToSave.getSchool() != null && !schoolService.canModeratorManageSchool(moderator.getAssignedSchoolId(), contentToSave.getSchool().getId())) {
-            return "redirect:/error?message=Access denied for associated school";
-        }
-
-        // 检查关联的哲学家是否在权限范围内
-        if (contentToSave.getPhilosopher() != null) {
-            boolean hasAccess = false;
-            List<Long> accessibleSchoolIds = schoolService.getSchoolIdWithDescendants(moderator.getAssignedSchoolId());
-            for (School school : contentToSave.getPhilosopher().getSchools()) {
-                if (accessibleSchoolIds.contains(school.getId())) {
-                    hasAccess = true;
-                    break;
+                if (!hasAccess) {
+                    return "redirect:/error?message=Access denied for associated philosopher";
                 }
             }
-            if (!hasAccess) {
-                return "redirect:/error?message=Access denied for associated philosopher";
+
+            Content savedContent = contentService.saveContentWithUser(contentToSave, moderator);
+
+            // 保存英文翻译
+            if (savedContent.getId() != null) {
+                if (contentEn != null && !contentEn.trim().isEmpty()) {
+                    translationService.saveContentTranslation(
+                        savedContent.getId(),
+                        "en",
+                        contentEn.trim()
+                    );
+                } else {
+                    // 如果翻译为空，则删除已有的英文翻译
+                    translationService.deleteContentTranslation(savedContent.getId(), "en");
+                }
             }
-        }
 
-        Content savedContent = contentService.saveContentWithUser(contentToSave, moderator);
-
-        // 保存英文翻译
-        if (savedContent.getId() != null) {
-            if (contentEn != null && !contentEn.trim().isEmpty()) {
-                translationService.saveContentTranslation(
-                    savedContent.getId(),
-                    "en",
-                    contentEn.trim()
-                );
-            } else {
-                // 如果翻译为空，则删除已有的英文翻译
-                translationService.deleteContentTranslation(savedContent.getId(), "en");
+            // 保存后锁定（仅当勾选且当前用户为创建者时）
+            if (lockAfterSave && savedContent.getId() != null) {
+                try {
+                    contentService.lockContent(savedContent.getId(), moderator);
+                } catch (Exception ignore) {
+                }
             }
-        }
 
-        // 保存后锁定（仅当勾选且当前用户为创建者时）
-        if (lockAfterSave && savedContent.getId() != null) {
-            try {
-                contentService.lockContent(savedContent.getId(), moderator);
-            } catch (Exception ignore) {
-            }
+            return "redirect:/moderator/contents";
+        } catch (Exception e) {
+            // 异常处理：返回表单页面并显示错误信息
+            model.addAttribute("error", "保存内容失败: " + e.getMessage());
+            model.addAttribute("contentForm", content);
+            // 重新加载表单所需的数据
+            List<School> schools = schoolService.getModeratorManageableSchools(moderator.getAssignedSchoolId());
+            model.addAttribute("schools", schools);
+            List<Long> schoolIds = schoolService.getSchoolIdWithDescendants(moderator.getAssignedSchoolId());
+            List<Philosopher> philosophers = philosopherService.getPhilosophersBySchoolIds(schoolIds);
+            model.addAttribute("philosophers", philosophers);
+            model.addAttribute("contentEn", contentEn != null ? contentEn : "");
+            model.addAttribute("currentUserId", moderator.getId());
+            return "moderator/contents/form";
         }
-
-        return "redirect:/moderator/contents";
     }
 
     @PostMapping("/contents/delete/{id}")

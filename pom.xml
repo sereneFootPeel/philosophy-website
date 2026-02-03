@@ -79,6 +79,13 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- In-memory DB for tests (avoid relying on local MySQL) -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+
 
         <!-- Jakarta EE 替代 javax -->
         <dependency>

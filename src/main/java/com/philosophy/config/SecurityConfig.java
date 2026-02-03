@@ -110,7 +110,13 @@ public class SecurityConfig {
             .logout(logout -> logout
                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                 .logoutSuccessUrl("/")
+                .deleteCookies("remember-me")
                 .permitAll()
+            )
+            // 记住我：勾选后登录状态保持 24 小时（1 天），关闭浏览器后仍有效
+            .rememberMe(remember -> remember
+                .key("philosophy-remember-me-key")
+                .tokenValiditySeconds(86400)
             );
         
         return http.build();

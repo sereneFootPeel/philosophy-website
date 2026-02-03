@@ -44,8 +44,8 @@ public interface SchoolRepository extends JpaRepository<School, Long> {
     @Query("SELECT s FROM School s WHERE " +
            "LOWER(s.name) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
            "LOWER(s.nameEn) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
-           "LOWER(REPLACE(REPLACE(s.name, '·', ''), ' ', '')) LIKE CONCAT('%', :normalizedQuery, '%') OR " +
-           "LOWER(REPLACE(REPLACE(s.nameEn, '·', ''), ' ', '')) LIKE CONCAT('%', :normalizedQuery, '%')")
+           "LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(s.name, '·', ''), '・', ''), '‧', ''), '.', ''), '．', ''), ' ', ''), '　', '')) LIKE CONCAT('%', :normalizedQuery, '%') OR " +
+           "LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(s.nameEn, '·', ''), '・', ''), '‧', ''), '.', ''), '．', ''), ' ', ''), '　', '')) LIKE CONCAT('%', :normalizedQuery, '%')")
     List<School> searchByNameOrNameEnNormalized(@Param("query") String query, @Param("normalizedQuery") String normalizedQuery);
 
     /**

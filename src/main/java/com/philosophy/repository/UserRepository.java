@@ -86,8 +86,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
            "LOWER(u.username) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
            "LOWER(u.firstName) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
            "LOWER(u.lastName) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
-           "LOWER(REPLACE(REPLACE(u.username, '·', ''), ' ', '')) LIKE CONCAT('%', :normalizedQuery, '%') OR " +
-           "LOWER(REPLACE(REPLACE(u.firstName, '·', ''), ' ', '')) LIKE CONCAT('%', :normalizedQuery, '%') OR " +
-           "LOWER(REPLACE(REPLACE(u.lastName, '·', ''), ' ', '')) LIKE CONCAT('%', :normalizedQuery, '%')")
+           "LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(u.username, '·', ''), '・', ''), '‧', ''), '.', ''), '．', ''), ' ', ''), '　', '')) LIKE CONCAT('%', :normalizedQuery, '%') OR " +
+           "LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(u.firstName, '·', ''), '・', ''), '‧', ''), '.', ''), '．', ''), ' ', ''), '　', '')) LIKE CONCAT('%', :normalizedQuery, '%') OR " +
+           "LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(u.lastName, '·', ''), '・', ''), '‧', ''), '.', ''), '．', ''), ' ', ''), '　', '')) LIKE CONCAT('%', :normalizedQuery, '%')")
     List<User> searchByUsernameOrNameNormalized(@Param("query") String query, @Param("normalizedQuery") String normalizedQuery);
 }

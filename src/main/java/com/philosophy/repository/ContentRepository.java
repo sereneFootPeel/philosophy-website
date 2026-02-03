@@ -186,8 +186,8 @@ public interface ContentRepository extends JpaRepository<Content, Long> {
            "LOWER(c.content) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
            "LOWER(c.contentEn) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
            "LOWER(c.title) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
-           "LOWER(REPLACE(REPLACE(c.content, '·', ''), ' ', '')) LIKE CONCAT('%', :normalizedQuery, '%') OR " +
-           "LOWER(REPLACE(REPLACE(c.contentEn, '·', ''), ' ', '')) LIKE CONCAT('%', :normalizedQuery, '%') OR " +
-           "LOWER(REPLACE(REPLACE(c.title, '·', ''), ' ', '')) LIKE CONCAT('%', :normalizedQuery, '%')")
+           "LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(c.content, '·', ''), '・', ''), '‧', ''), '.', ''), '．', ''), ' ', ''), '　', '')) LIKE CONCAT('%', :normalizedQuery, '%') OR " +
+           "LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(c.contentEn, '·', ''), '・', ''), '‧', ''), '.', ''), '．', ''), ' ', ''), '　', '')) LIKE CONCAT('%', :normalizedQuery, '%') OR " +
+           "LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(c.title, '·', ''), '・', ''), '‧', ''), '.', ''), '．', ''), ' ', ''), '　', '')) LIKE CONCAT('%', :normalizedQuery, '%')")
     List<Content> searchByContentOrContentEnOrTitleNormalized(@Param("query") String query, @Param("normalizedQuery") String normalizedQuery);
 }
