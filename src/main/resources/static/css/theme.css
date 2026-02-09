@@ -295,6 +295,13 @@
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
+/* 用户主页：第十个主题(极简纯白)不强制所有字体为黑色，保留 text-gray-* 等灰度层次 */
+.theme-midnight body.user-profile-page {
+    --text-primary: #111827;
+    --text-secondary: #4b5563;
+    --text-tertiary: #6b7280;
+}
+
 /* Special override for theme-midnight to ensure pure white background and black text (不作用于用户主页，避免黑底黑字) */
 .theme-midnight body:not(.user-profile-page) {
     background-color: #FFFFFF !important;
