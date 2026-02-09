@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html th:lang="${language != null and language == 'en'} ? 'en' : 'zh-CN'" lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:with="pageTitle=${(language != null and language == 'en') ? 'MBTI Personality Test' : (pageTitle != null ? pageTitle : 'MBTI 性格测试')}">
+    <th:block th:replace="~{fragments/header :: header-contents}"></th:block>
+    <style type="text/tailwindcss">
+        .mbti-page main { background-color: var(--bg-secondary) !important; }
+        .mbti-page .mbti-card .border-b,
+        .mbti-page .mbti-card .border-t { border-color: var(--border-primary) !important; }
+        .mbti-page .mbti-card h1,
+        .mbti-page .mbti-card h2 { color: var(--text-primary) !important; }
+        .mbti-page .mbti-card p,
+        .mbti-page .mbti-card span { color: var(--text-secondary) !important; }
+        .mbti-page .mbti-card .mbti-text-muted { color: var(--text-tertiary) !important; }
+        .mbti-page .mbti-card .mbti-text-secondary { color: var(--text-secondary) !important; }
+        .mbti-page .mbti-progress-track { background-color: var(--border-primary) !important; }
+        .mbti-page .mbti-progress-fill { background-color: var(--color-primary) !important; }
+        .mbti-page .mbti-btn-primary {
+            background-color: var(--color-primary) !important;
+            border: 2px solid var(--color-primary) !important;
+            color: var(--text-on-primary) !important;
+            transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+        }
+        .mbti-page .mbti-btn-primary span { color: var(--text-on-primary) !important; }
+        .mbti-page .mbti-btn-primary:hover {
+            background-color: var(--bg-tertiary) !important;
+            border-color: var(--color-primary) !important;
+            color: var(--color-primary) !important;
+        }
+        .mbti-page .mbti-btn-primary:hover span { color: var(--color-primary) !important; }
+        .mbti-page .mbti-btn-outline {
+            background-color: var(--bg-tertiary) !important;
+            border: 1px solid var(--border-primary) !important;
+            color: var(--text-secondary) !important;
+            transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+        }
+        .mbti-page .mbti-btn-outline span { color: var(--text-secondary) !important; }
+        .mbti-page .mbti-btn-outline:hover {
+            background-color: var(--bg-quaternary) !important;
+            border-color: var(--border-primary) !important;
+            color: var(--text-primary) !important;
+        }
+        .mbti-page .mbti-btn-outline:hover span { color: var(--text-primary) !important; }
+        .mbti-page .mbti-btn-answer.mbti-selected-primary {
+            background-color: var(--color-primary) !important;
+            border-color: var(--color-primary) !important;
+            color: var(--text-on-primary) !important;
+        }
+        .mbti-page .mbti-btn-answer.mbti-selected-primary span { color: var(--text-on-primary) !important; }
+        .mbti-page .mbti-btn-answer.mbti-selected-outline {
+            background-color: var(--bg-quaternary) !important;
+            border: 1px solid var(--color-primary) !important;
+            color: var(--text-primary) !important;
+        }
+        .mbti-page .mbti-btn-answer.mbti-selected-outline span { color: var(--text-primary) !important; }
+        .mbti-page .mbti-btn-answer { min-height: 48px; transition: opacity 0.25s ease, transform 0.25s ease; }
+        .mbti-page .mbti-nav-link { outline: none; }
+        .mbti-page #mbti-prev { color: var(--text-tertiary) !important; }
+        .mbti-page #mbti-prev:hover { color: var(--color-primary) !important; }
+        .mbti-page #mbti-next { color: var(--color-primary) !important; }
+        .mbti-page button:focus,
+        .mbti-page button:focus-visible,
+        .mbti-page button:active { outline: none !important; box-shadow: none !important; }
+        .mbti-page .mbti-btn-answer.mbti-selected-primary,
+        .mbti-page .mbti-btn-answer.mbti-selected-outline,
+        .mbti-page .mbti-btn-answer[aria-pressed="true"] {
+            background-color: var(--color-primary-dark) !important;
+            border-color: var(--color-primary-dark) !important;
+            color: var(--text-on-primary) !important;
+            box-shadow: none !important;
+        }
+        .mbti-page .mbti-btn-answer.mbti-selected-primary span,
+        .mbti-page .mbti-btn-answer.mbti-selected-outline span,
+        .mbti-page .mbti-btn-answer[aria-pressed="true"] span { color: var(--text-on-primary) !important; }
+        .mbti-page .mbti-draft-banner {
+            background-color: var(--bg-tertiary) !important;
+            border-color: var(--border-primary) !important;
+            border-left: 4px solid var(--color-primary) !important;
+        }
+        .mbti-page .mbti-type-badge { font-size: 1.5rem; font-weight: 700; letter-spacing: 0.2em; }
+    </style>
+</head>
+<body class="mbti-page bg-secondary min-h-screen flex flex-col">
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="flex-grow container mx-auto px-4 py-6 sm:py-8" style="padding-top: calc(3.5rem + 1rem);">
+        <!-- 介绍页 -->
+        <div id="mbti-intro" class="max-w-2xl mx-auto">
+            <div class="mbti-card mbti-card-inner bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 p-6 sm:p-8">
+                <h1 class="text-2xl sm:text-3xl font-bold text-primary mb-4" th:if="${language != null and language == 'en'}">MBTI Personality Type Indicator</h1>
+                <h1 class="text-2xl sm:text-3xl font-bold text-primary mb-4" th:unless="${language != null and language == 'en'}">MBTI 性格测试</h1>
+                <p class="mbti-text-secondary leading-relaxed mb-4" th:if="${language != null and language == 'en'}">
+                    Choose the option (A or B) that best describes you. There are no right or wrong answers; go with your first instinct. About 93 questions, 15–20 minutes.
+                </p>
+                <p class="mbti-text-secondary leading-relaxed mb-4" th:unless="${language != null and language == 'en'}">
+                    请选择最符合您的选项（A 或 B）。无对错之分，凭第一直觉作答。共 93 题，约 15–20 分钟。
+                </p>
+                <!-- 未完成答题恢复提示 -->
+                <div id="mbti-draft-banner" class="mbti-draft-banner hidden mb-4 p-4 rounded-lg border">
+                    <p class="text-sm mb-3" id="mbti-draft-text"></p>
+                    <div class="flex gap-2 flex-wrap">
+                        <button type="button" id="mbti-resume" class="mbti-btn-primary px-4 py-2 rounded-lg text-sm font-medium">
+                            <span th:if="${language != null and language == 'en'}">Resume</span>
+                            <span th:unless="${language != null and language == 'en'}">继续作答</span>
+                        </button>
+                        <button type="button" id="mbti-discard-draft" class="mbti-btn-outline px-4 py-2 rounded-lg text-sm font-medium">
+                            <span th:if="${language != null and language == 'en'}">Start over</span>
+                            <span th:unless="${language != null and language == 'en'}">重新开始</span>
+                        </button>
+                    </div>
+                </div>
+                <button type="button" id="mbti-start" class="mbti-btn-primary w-full px-6 py-4 rounded-xl font-medium">
+                    <span th:if="${language != null and language == 'en'}">Start Test (93 questions)</span>
+                    <span th:unless="${language != null and language == 'en'}">开始测试（93 题）</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 答题区 -->
+        <div id="mbti-test" class="max-w-2xl mx-auto hidden">
+            <div class="mbti-card mbti-card-inner bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 p-6 sm:p-8">
+                <div class="flex justify-between items-center mb-4 text-sm mbti-text-muted">
+                    <span id="mbti-progress-text"></span>
+                </div>
+                <div class="h-2 mbti-progress-track rounded-full overflow-hidden mb-6">
+                    <div id="mbti-progress-bar" class="h-full mbti-progress-fill rounded-full transition-all duration-300" style="width: 0%;"></div>
+                </div>
+                <p id="mbti-question-text" class="text-lg sm:text-xl mb-6 leading-relaxed"></p>
+                <div class="flex flex-col gap-3">
+                    <button type="button" id="mbti-answer-a" class="mbti-btn-answer mbti-btn-outline text-left px-6 py-3 rounded-xl font-medium">
+                        <span class="font-semibold">A.</span> <span id="mbti-option-a"></span>
+                    </button>
+                    <button type="button" id="mbti-answer-b" class="mbti-btn-answer mbti-btn-outline text-left px-6 py-3 rounded-xl font-medium">
+                        <span class="font-semibold">B.</span> <span id="mbti-option-b"></span>
+                    </button>
+                </div>
+                <div class="mt-4 flex justify-between">
+                    <span role="button" tabindex="0" id="mbti-prev" class="mbti-nav-link mbti-text-secondary hover:text-primary text-sm py-2 hidden cursor-pointer">
+                        <span th:if="${language != null and language == 'en'}">Previous</span>
+                        <span th:unless="${language != null and language == 'en'}">上一题</span>
+                    </span>
+                    <span role="button" tabindex="0" id="mbti-next" class="mbti-nav-link text-primary hover:underline text-sm py-2 hidden cursor-pointer">
+                        <span th:if="${language != null and language == 'en'}">Next</span>
+                        <span th:unless="${language != null and language == 'en'}">下一题</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 结果区 -->
+        <div id="mbti-result" class="max-w-3xl mx-auto hidden">
+            <div class="mbti-card mbti-card-inner bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 p-6 sm:p-8">
+                <h2 class="text-xl font-bold text-primary mb-4" th:if="${language != null and language == 'en'}">Your MBTI Type</h2>
+                <h2 class="text-xl font-bold text-primary mb-4" th:unless="${language != null and language == 'en'}">你的 MBTI 类型</h2>
+                <div class="mb-6 p-4 rounded-lg border-2 border-primary/30 bg-primary/5">
+                    <p class="text-sm mbti-text-muted mb-1" th:if="${language != null and language == 'en'}">Result</p>
+                    <p class="text-sm mbti-text-muted mb-1" th:unless="${language != null and language == 'en'}">结果</p>
+                    <p id="mbti-type-result" class="mbti-type-badge text-primary"></p>
+                </div>
+                <div class="overflow-x-auto mb-4">
+                    <table class="w-full text-sm border-collapse">
+                        <thead>
+                            <tr class="border-b border-gray-200">
+                                <th class="text-left py-2 px-2" th:text="${language != null and language == 'en'} ? 'Dimension' : '维度'">维度</th>
+                                <th class="text-right py-2 px-2" th:text="${language != null and language == 'en'} ? 'Score' : '得分'">得分</th>
+                            </tr>
+                        </thead>
+                        <tbody id="mbti-result-tbody"></tbody>
+                    </table>
+                </div>
+                <p id="mbti-type-desc" class="text-sm mbti-text-secondary leading-relaxed mb-4"></p>
+                <div class="mt-6 pt-4 border-t border-gray-200">
+                    <button type="button" id="mbti-restart" class="mbti-btn-outline px-4 py-2 rounded-lg font-medium">
+                        <span th:if="${language != null and language == 'en'}">Restart Test</span>
+                        <span th:unless="${language != null and language == 'en'}">重新测试</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script th:inline="javascript">
+        (function() {
+            const LANG = /*[[${language}]]*/ 'zh';
+            const isEn = LANG === 'en';
+            const QUESTIONS_URL = /*[[@{/data/mbti_questions.json}]]*/ '/data/mbti_questions.json';
+            const STORAGE_KEY = 'mbti_draft';
+            const MSG_PROGRESS = isEn ? 'Question %1 / %2' : '第 %1 / %2 题';
+            const MSG_DRAFT_BANNER = isEn ? 'You have unsaved progress (%1 answered). Resume or start over?' : '检测到未完成的答题（已答 %1 题），是否继续？';
+
+            const TYPE_DESC_ZH = {
+                'INTJ':'内向、直觉、思考、判断。独立，善于规划，追求系统与逻辑。',
+                'INTP':'内向、直觉、思考、知觉。分析型，喜欢理论与可能性。',
+                'ENTJ':'外向、直觉、思考、判断。果断，善于组织与领导。',
+                'ENTP':'外向、直觉、思考、知觉。创新，喜欢辩论与挑战。',
+                'INFJ':'内向、直觉、情感、判断。理想主义，关注他人与意义。',
+                'INFP':'内向、直觉、情感、知觉。敏感，重视价值观与和谐。',
+                'ENFJ':'外向、直觉、情感、判断。热情，善于激励他人。',
+                'ENFP':'外向、直觉、情感、知觉。热情洋溢，富有想象力。',
+                'ISTJ':'内向、实感、思考、判断。可靠，注重事实与秩序。',
+                'ISFJ':'内向、实感、情感、判断。尽责，关心他人细节。',
+                'ESTJ':'外向、实感、思考、判断。务实，善于管理与执行。',
+                'ESFJ':'外向、实感、情感、判断。热心，重视和谐与责任。',
+                'ISTP':'内向、实感、思考、知觉。冷静，善于动手解决问题。',
+                'ISFP':'内向、实感、情感、知觉。温和，注重当下与美感。',
+                'ESTP':'外向、实感、思考、知觉。行动派，喜欢冒险与即兴。',
+                'ESFP':'外向、实感、情感、知觉。活泼，享受与人互动与乐趣。'
+            };
+            const TYPE_DESC_EN = {
+                'INTJ':'Introverted, Intuitive, Thinking, Judging. Independent, strategic, values logic.',
+                'INTP':'Introverted, Intuitive, Thinking, Perceiving. Analytical, loves theory.',
+                'ENTJ':'Extraverted, Intuitive, Thinking, Judging. Decisive leader, organized.',
+                'ENTP':'Extraverted, Intuitive, Thinking, Perceiving. Innovative, enjoys debate.',
+                'INFJ':'Introverted, Intuitive, Feeling, Judging. Idealistic, cares about meaning.',
+                'INFP':'Introverted, Intuitive, Feeling, Perceiving. Sensitive, values harmony.',
+                'ENFJ':'Extraverted, Intuitive, Feeling, Judging. Enthusiastic, motivates others.',
+                'ENFP':'Extraverted, Intuitive, Feeling, Perceiving. Enthusiastic, imaginative.',
+                'ISTJ':'Introverted, Sensing, Thinking, Judging. Reliable, fact-based, orderly.',
+                'ISFJ':'Introverted, Sensing, Feeling, Judging. Conscientious, cares for others.',
+                'ESTJ':'Extraverted, Sensing, Thinking, Judging. Practical, manages and executes.',
+                'ESFJ':'Extraverted, Sensing, Feeling, Judging. Warm, values harmony.',
+                'ISTP':'Introverted, Sensing, Thinking, Perceiving. Cool, hands-on problem solver.',
+                'ISFP':'Introverted, Sensing, Feeling, Perceiving. Gentle, present-focused.',
+                'ESTP':'Extraverted, Sensing, Thinking, Perceiving. Action-oriented, adventurous.',
+                'ESFP':'Extraverted, Sensing, Feeling, Perceiving. Lively, enjoys people and fun.'
+            };
+            const TYPE_DESC = isEn ? TYPE_DESC_EN : TYPE_DESC_ZH;
+
+            let questions = [];
+            let answers = {};
+            let currentIndex = 0;
+
+            const el = (id) => document.getElementById(id);
+            const show = (id) => el(id).classList.remove('hidden');
+            const hide = (id) => el(id).classList.add('hidden');
+
+            function loadQuestions() {
+                if (questions.length) return Promise.resolve(questions);
+                return fetch(QUESTIONS_URL).then(r => r.json()).then(data => {
+                    questions = data;
+                    return questions;
+                });
+            }
+
+            function saveToStorage() {
+                if (!questions.length) return;
+                const payload = {
+                    answers: Object.assign({}, answers),
+                    currentIndex: currentIndex,
+                    savedAt: Date.now()
+                };
+                try { localStorage.setItem(STORAGE_KEY, JSON.stringify(payload)); } catch (e) {}
+            }
+
+            function loadFromStorage() {
+                try {
+                    const raw = localStorage.getItem(STORAGE_KEY);
+                    if (!raw) return null;
+                    return JSON.parse(raw);
+                } catch (e) { return null; }
+            }
+
+            function clearStorage() {
+                try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+            }
+
+            function showDraftBanner(saved) {
+                const answered = Object.keys(saved.answers || {}).length;
+                el('mbti-draft-text').textContent = MSG_DRAFT_BANNER.replace('%1', answered);
+                show('mbti-draft-banner');
+            }
+
+            function getAnswer(id) { return answers[String(id)]; }
+            function setAnswer(id, value) { answers[String(id)] = value; }
+
+            function setAnswerUI(choice) {
+                const btnA = el('mbti-answer-a');
+                const btnB = el('mbti-answer-b');
+                [btnA, btnB].forEach(b => {
+                    if (!b) return;
+                    b.classList.remove('mbti-selected-primary', 'mbti-selected-outline');
+                    b.setAttribute('aria-pressed', 'false');
+                });
+                if (choice === 'A' && btnA) { btnA.classList.add('mbti-selected-primary'); btnA.setAttribute('aria-pressed', 'true'); }
+                else if (choice === 'B' && btnB) { btnB.classList.add('mbti-selected-outline'); btnB.setAttribute('aria-pressed', 'true'); }
+            }
+
+            function renderQuestion() {
+                const q = questions[currentIndex];
+                if (!q) return;
+                const text = (isEn && q.text_en) ? q.text_en : q.text;
+                const optA = (isEn && q.optionA_en) ? q.optionA_en : q.optionA;
+                const optB = (isEn && q.optionB_en) ? q.optionB_en : q.optionB;
+                el('mbti-question-text').textContent = q.id + '. ' + text;
+                el('mbti-option-a').textContent = optA;
+                el('mbti-option-b').textContent = optB;
+                el('mbti-progress-text').textContent = MSG_PROGRESS.replace('%1', currentIndex + 1).replace('%2', questions.length);
+                el('mbti-progress-bar').style.width = ((currentIndex + 1) / questions.length * 100) + '%';
+                el('mbti-prev').classList.toggle('hidden', currentIndex === 0);
+                el('mbti-next').classList.toggle('hidden', currentIndex >= questions.length - 1);
+                setAnswerUI(getAnswer(q.id));
+            }
+
+            function computeScores() {
+                const dim = { E:0, I:0, S:0, N:0, T:0, F:0, J:0, P:0 };
+                questions.forEach(q => {
+                    const choice = getAnswer(q.id);
+                    if (choice === 'A') dim[q.scoreA] = (dim[q.scoreA] || 0) + 1;
+                    else if (choice === 'B') dim[q.scoreB] = (dim[q.scoreB] || 0) + 1;
+                });
+                return dim;
+            }
+
+            function getType(scores) {
+                const ei = (scores.E || 0) >= (scores.I || 0) ? 'E' : 'I';
+                const sn = (scores.S || 0) >= (scores.N || 0) ? 'S' : 'N';
+                const tf = (scores.T || 0) >= (scores.F || 0) ? 'T' : 'F';
+                const jp = (scores.J || 0) >= (scores.P || 0) ? 'J' : 'P';
+                return ei + sn + tf + jp;
+            }
+
+            function showResult() {
+                clearStorage();
+                const scores = computeScores();
+                const type = getType(scores);
+                el('mbti-type-result').textContent = type;
+                const tbody = el('mbti-result-tbody');
+                tbody.innerHTML = '';
+                [
+                    { dim: 'E-I', a: 'E', b: 'I' },
+                    { dim: 'S-N', a: 'S', b: 'N' },
+                    { dim: 'T-F', a: 'T', b: 'F' },
+                    { dim: 'J-P', a: 'J', b: 'P' }
+                ].forEach(({ dim, a, b }) => {
+                    const sa = scores[a] || 0, sb = scores[b] || 0;
+                    const tr = document.createElement('tr');
+                    tr.className = 'border-b border-gray-200';
+                    tr.innerHTML = '<td class="py-2 px-2 font-medium">' + dim + '</td><td class="py-2 px-2 text-right">' + a + ':' + sa + ' / ' + b + ':' + sb + '</td>';
+                    tbody.appendChild(tr);
+                });
+                el('mbti-type-desc').textContent = TYPE_DESC[type] || '';
+                hide('mbti-test');
+                show('mbti-result');
+            }
+
+            function startTest() {
+                loadQuestions().then(() => {
+                    answers = {};
+                    currentIndex = 0;
+                    hide('mbti-intro');
+                    hide('mbti-draft-banner');
+                    show('mbti-test');
+                    renderQuestion();
+                    saveToStorage();
+                }).catch(err => console.error(err));
+            }
+
+            el('mbti-start').addEventListener('click', startTest);
+
+            (function checkDraftOnLoad() {
+                const saved = loadFromStorage();
+                if (saved && Object.keys(saved.answers || {}).length > 0) {
+                    showDraftBanner(saved);
+                }
+            })();
+
+            el('mbti-resume').addEventListener('click', function() {
+                const saved = loadFromStorage();
+                if (!saved) return;
+                loadQuestions().then(() => {
+                    answers = saved.answers || {};
+                    currentIndex = Math.min(saved.currentIndex || 0, Math.max(0, questions.length - 1));
+                    hide('mbti-intro');
+                    hide('mbti-draft-banner');
+                    show('mbti-test');
+                    renderQuestion();
+                    saveToStorage();
+                }).catch(err => console.error(err));
+            });
+
+            el('mbti-discard-draft').addEventListener('click', function() {
+                clearStorage();
+                hide('mbti-draft-banner');
+            });
+
+            function submitAnswer(choice) {
+                const q = questions[currentIndex];
+                if (!q) return;
+                setAnswer(q.id, choice);
+                setAnswerUI(choice);
+                if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+                saveToStorage();
+                if (currentIndex >= questions.length - 1) {
+                    showResult();
+                    return;
+                }
+                currentIndex++;
+                renderQuestion();
+            }
+
+            el('mbti-answer-a').addEventListener('click', function() { submitAnswer('A'); });
+            el('mbti-answer-b').addEventListener('click', function() { submitAnswer('B'); });
+
+            function onPrev() {
+                if (currentIndex > 0) {
+                    currentIndex--;
+                    renderQuestion();
+                    saveToStorage();
+                }
+            }
+            function onNext() {
+                if (currentIndex < questions.length - 1) {
+                    currentIndex++;
+                    renderQuestion();
+                    saveToStorage();
+                }
+            }
+            el('mbti-prev').addEventListener('click', onPrev);
+            el('mbti-next').addEventListener('click', onNext);
+            el('mbti-prev').addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onPrev(); } });
+            el('mbti-next').addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNext(); } });
+
+            el('mbti-restart').addEventListener('click', function() {
+                clearStorage();
+                show('mbti-intro');
+                hide('mbti-result');
+                answers = {};
+                currentIndex = 0;
+            });
+        })();
+    </script>
+</body>
+</html>

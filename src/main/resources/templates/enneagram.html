@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html th:lang="${language != null and language == 'en'} ? 'en' : 'zh-CN'" lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:with="pageTitle=${(language != null and language == 'en') ? 'Enneagram Test' : (pageTitle != null ? pageTitle : '九型人格测试')}">
+    <th:block th:replace="~{fragments/header :: header-contents}"></th:block>
+    <style type="text/tailwindcss">
+        .enneagram-page main { background-color: var(--bg-secondary) !important; }
+        .enneagram-page .enneagram-card .border-b,
+        .enneagram-page .enneagram-card .border-t { border-color: var(--border-primary) !important; }
+        .enneagram-page .enneagram-card h1,
+        .enneagram-page .enneagram-card h2 { color: var(--text-primary) !important; }
+        .enneagram-page .enneagram-card p,
+        .enneagram-page .enneagram-card span { color: var(--text-secondary) !important; }
+        .enneagram-page .enneagram-card .enneagram-text-muted { color: var(--text-tertiary) !important; }
+        .enneagram-page .enneagram-card .enneagram-text-secondary { color: var(--text-secondary) !important; }
+        .enneagram-page .enneagram-progress-track { background-color: var(--border-primary) !important; }
+        .enneagram-page .enneagram-progress-fill { background-color: var(--color-primary) !important; }
+        .enneagram-page .enneagram-btn-primary {
+            background-color: var(--color-primary) !important;
+            border: 2px solid var(--color-primary) !important;
+            color: var(--text-on-primary) !important;
+            transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+        }
+        .enneagram-page .enneagram-btn-primary span { color: var(--text-on-primary) !important; }
+        .enneagram-page .enneagram-btn-primary:hover {
+            background-color: var(--bg-tertiary) !important;
+            border-color: var(--color-primary) !important;
+            color: var(--color-primary) !important;
+        }
+        .enneagram-page .enneagram-btn-primary:hover span { color: var(--color-primary) !important; }
+        .enneagram-page .enneagram-btn-outline {
+            background-color: var(--bg-tertiary) !important;
+            border: 1px solid var(--border-primary) !important;
+            color: var(--text-secondary) !important;
+            transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+        }
+        .enneagram-page .enneagram-btn-outline span { color: var(--text-secondary) !important; }
+        .enneagram-page .enneagram-btn-outline:hover {
+            background-color: var(--bg-quaternary) !important;
+            border-color: var(--border-primary) !important;
+            color: var(--text-primary) !important;
+        }
+        .enneagram-page .enneagram-btn-outline:hover span { color: var(--text-primary) !important; }
+        .enneagram-page .enneagram-btn-answer { min-height: 48px; transition: opacity 0.25s ease, transform 0.25s ease; }
+        .enneagram-page .enneagram-btn-answer.enneagram-selected {
+            background-color: var(--color-primary) !important;
+            border-color: var(--color-primary) !important;
+            color: var(--text-on-primary) !important;
+        }
+        .enneagram-page .enneagram-btn-answer.enneagram-selected span { color: var(--text-on-primary) !important; }
+        .enneagram-page .enneagram-btn-answer[aria-pressed="true"] {
+            background-color: var(--color-primary-dark) !important;
+            border-color: var(--color-primary-dark) !important;
+            color: var(--text-on-primary) !important;
+            box-shadow: none !important;
+        }
+        .enneagram-page .enneagram-btn-answer[aria-pressed="true"] span { color: var(--text-on-primary) !important; }
+        .enneagram-page .enneagram-nav-link { outline: none; }
+        .enneagram-page #enneagram-prev { color: var(--text-tertiary) !important; }
+        .enneagram-page #enneagram-prev:hover { color: var(--color-primary) !important; }
+        .enneagram-page #enneagram-next { color: var(--color-primary) !important; }
+        .enneagram-page button:focus, .enneagram-page button:focus-visible, .enneagram-page button:active {
+            outline: none !important; box-shadow: none !important;
+        }
+        .enneagram-page .enneagram-draft-banner {
+            background-color: var(--bg-tertiary) !important;
+            border-color: var(--border-primary) !important;
+            border-left: 4px solid var(--color-primary) !important;
+        }
+        .enneagram-page .enneagram-draft-banner #enneagram-draft-text { color: var(--text-secondary) !important; }
+        .enneagram-page .enneagram-result-row td { color: var(--text-secondary) !important; }
+        .enneagram-page .enneagram-type-desc { color: var(--text-secondary) !important; }
+    </style>
+</head>
+<body class="enneagram-page bg-secondary min-h-screen flex flex-col">
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="flex-grow container mx-auto px-4 py-6 sm:py-8" style="padding-top: calc(3.5rem + 1rem);">
+        <!-- 介绍页 -->
+        <div id="enneagram-intro" class="max-w-2xl mx-auto">
+            <div class="enneagram-card enneagram-card-inner bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 p-6 sm:p-8">
+                <h1 class="text-2xl sm:text-3xl font-bold text-primary mb-4" th:if="${language != null and language == 'en'}">Enneagram Personality Test</h1>
+                <h1 class="text-2xl sm:text-3xl font-bold text-primary mb-4" th:unless="${language != null and language == 'en'}">九型人格测试</h1>
+                <p class="enneagram-text-secondary leading-relaxed mb-4" th:if="${language != null and language == 'en'}">
+                    Choose the option that best describes you. There are no right or wrong answers. The test has 144 questions (two choices per question). Please answer based on your usual behavior and feelings.
+                </p>
+                <p class="enneagram-text-secondary leading-relaxed mb-4" th:unless="${language != null and language == 'en'}">
+                    请选择最符合您平时行为与感受的选项。无对错之分。本测试共 144 题，每题二选一，请勿漏题。
+                </p>
+                <div id="enneagram-draft-banner" class="enneagram-draft-banner hidden mb-4 p-4 rounded-lg border">
+                    <p class="text-sm mb-3" id="enneagram-draft-text"></p>
+                    <div class="flex gap-2 flex-wrap">
+                        <button type="button" id="enneagram-resume" class="enneagram-btn-primary px-4 py-2 rounded-lg text-sm font-medium">
+                            <span th:if="${language != null and language == 'en'}">Resume</span>
+                            <span th:unless="${language != null and language == 'en'}">继续作答</span>
+                        </button>
+                        <button type="button" id="enneagram-discard-draft" class="enneagram-btn-outline px-4 py-2 rounded-lg text-sm font-medium">
+                            <span th:if="${language != null and language == 'en'}">Start over</span>
+                            <span th:unless="${language != null and language == 'en'}">重新开始</span>
+                        </button>
+                    </div>
+                </div>
+                <button type="button" id="enneagram-start" class="enneagram-btn-primary w-full sm:w-auto px-8 py-4 rounded-xl font-medium">
+                    <span th:if="${language != null and language == 'en'}">Start Test (144 questions)</span>
+                    <span th:unless="${language != null and language == 'en'}">开始测试（144 题）</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 答题区 -->
+        <div id="enneagram-test" class="max-w-2xl mx-auto hidden">
+            <div class="enneagram-card enneagram-card-inner bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 p-6 sm:p-8">
+                <div class="mb-4 text-sm enneagram-text-muted" id="enneagram-progress-text"></div>
+                <div class="h-2 enneagram-progress-track rounded-full overflow-hidden mb-6">
+                    <div id="enneagram-progress-bar" class="h-full enneagram-progress-fill rounded-full transition-all duration-300" style="width: 0%;"></div>
+                </div>
+                <p class="text-sm enneagram-text-muted mb-2" th:if="${language != null and language == 'en'}">Which option is more like you?</p>
+                <p class="text-sm enneagram-text-muted mb-2" th:unless="${language != null and language == 'en'}">请选择更符合您的一项：</p>
+                <div class="flex flex-col gap-3 mb-6">
+                    <button type="button" id="enneagram-answer-a" class="enneagram-btn-answer enneagram-btn-outline w-full px-6 py-4 rounded-xl font-medium text-left" data-option="a"></button>
+                    <button type="button" id="enneagram-answer-b" class="enneagram-btn-answer enneagram-btn-outline w-full px-6 py-4 rounded-xl font-medium text-left" data-option="b"></button>
+                </div>
+                <div class="mt-4 flex justify-between">
+                    <span role="button" tabindex="0" id="enneagram-prev" class="enneagram-nav-link enneagram-text-secondary hover:text-primary text-sm py-2 hidden cursor-pointer">
+                        <span th:if="${language != null and language == 'en'}">Previous</span>
+                        <span th:unless="${language != null and language == 'en'}">上一题</span>
+                    </span>
+                    <span role="button" tabindex="0" id="enneagram-next" class="enneagram-nav-link text-primary hover:underline text-sm py-2 hidden cursor-pointer">
+                        <span th:if="${language != null and language == 'en'}">Next</span>
+                        <span th:unless="${language != null and language == 'en'}">下一题</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 结果区 -->
+        <div id="enneagram-result" class="max-w-3xl mx-auto hidden">
+            <div class="enneagram-card enneagram-card-inner bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 p-6 sm:p-8">
+                <h2 class="text-xl font-bold text-primary mb-4" th:if="${language != null and language == 'en'}">Your Result</h2>
+                <h2 class="text-xl font-bold text-primary mb-4" th:unless="${language != null and language == 'en'}">测验结果</h2>
+                <div id="enneagram-main-type" class="mb-4 p-4 rounded-lg border-2 border-primary bg-opacity-10" style="background-color: var(--bg-tertiary); border-color: var(--color-primary);"></div>
+                <div class="overflow-x-auto mb-4">
+                    <table class="w-full text-sm border-collapse">
+                        <thead>
+                            <tr class="border-b border-gray-200">
+                                <th class="text-left py-2 px-2" th:text="${language != null and language == 'en'} ? 'Type' : '类型'">类型</th>
+                                <th class="text-left py-2 px-2" th:text="${language != null and language == 'en'} ? 'Name' : '名称'">名称</th>
+                                <th class="text-right py-2 px-2" th:text="${language != null and language == 'en'} ? 'Score' : '得分'">得分</th>
+                            </tr>
+                        </thead>
+                        <tbody id="enneagram-result-tbody"></tbody>
+                    </table>
+                </div>
+                <div id="enneagram-type-descriptions" class="enneagram-type-desc text-sm space-y-2 mb-4"></div>
+                <div class="mt-6 pt-4 border-t border-gray-200">
+                    <button type="button" id="enneagram-restart" class="enneagram-btn-outline px-4 py-2 rounded-lg font-medium">
+                        <span th:if="${language != null and language == 'en'}">Restart Test</span>
+                        <span th:unless="${language != null and language == 'en'}">重新测试</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script th:inline="javascript">
+        (function() {
+            const LANG = /*[[${language}]]*/ 'zh';
+            const isEn = LANG === 'en';
+            const QUESTIONS_URL = /*[[@{/data/enneagram_questions.json}]]*/ '/data/enneagram_questions.json';
+            const STORAGE_KEY = 'enneagram_draft';
+
+            const TYPE_NAMES_ZH = {
+                1: '完美型', 2: '助人型', 3: '成就型', 4: '自我型', 5: '理智型', 6: '忠诚型', 7: '活跃型', 8: '领袖型', 9: '和平型'
+            };
+            const TYPE_NAMES_EN = {
+                1: 'Perfectionist', 2: 'Helper', 3: 'Achiever', 4: 'Individualist', 5: 'Investigator', 6: 'Loyalist', 7: 'Enthusiast', 8: 'Challenger', 9: 'Peacemaker'
+            };
+            const TYPE_DESC_ZH = {
+                1: '讲原则、求完美，对自己和他人要求高，是非分明。',
+                2: '乐于付出、善解人意，重视关系，渴望被需要。',
+                3: '目标明确、追求成功与认可，效率高，重视形象。',
+                4: '感性、追求独特与深度，情绪丰富，渴望被理解。',
+                5: '理性、喜欢独处与思考，重视隐私与知识。',
+                6: '谨慎、忠诚，重视安全与承诺，容易担心。',
+                7: '乐观、爱玩，喜欢新鲜与自由，避免沉重。',
+                8: '强势、直接，重视公平与力量，保护欲强。',
+                9: '温和、随和，追求和谐，不愿冲突。'
+            };
+            const TYPE_DESC_EN = {
+                1: 'Principled, perfectionistic, high standards for self and others.',
+                2: 'Caring, supportive, values relationships, wants to be needed.',
+                3: 'Goal-oriented, seeks success and recognition, efficient.',
+                4: 'Emotional, seeks uniqueness and depth, creative.',
+                5: 'Analytical, values privacy and knowledge, observant.',
+                6: 'Loyal, security-oriented, cautious, committed.',
+                7: 'Optimistic, fun-loving, seeks variety and freedom.',
+                8: 'Assertive, direct, values justice and strength.',
+                9: 'Easygoing, peace-seeking, avoids conflict.'
+            };
+            const TYPE_NAMES = isEn ? TYPE_NAMES_EN : TYPE_NAMES_ZH;
+            const TYPE_DESC = isEn ? TYPE_DESC_EN : TYPE_DESC_ZH;
+            const MSG_PROGRESS = isEn ? 'Question %1 / %2' : '第 %1 / %2 题';
+            const MSG_DRAFT_BANNER = isEn ? 'You have unsaved progress (%1 answered). Resume or start over?' : '检测到未完成的答题（已答 %1 题），是否继续？';
+
+            let questions = [];
+            let answers = {};
+            let currentIndex = 0;
+
+            const el = (id) => document.getElementById(id);
+            const show = (id) => el(id).classList.remove('hidden');
+            const hide = (id) => el(id).classList.add('hidden');
+
+            function loadQuestions() {
+                return fetch(QUESTIONS_URL).then(r => r.json()).then(data => {
+                    questions = data;
+                    return questions;
+                });
+            }
+
+            function saveToStorage() {
+                if (!questions.length) return;
+                const payload = { answers: Object.assign({}, answers), currentIndex, savedAt: Date.now() };
+                try { localStorage.setItem(STORAGE_KEY, JSON.stringify(payload)); } catch (e) {}
+            }
+
+            function loadFromStorage() {
+                try {
+                    const raw = localStorage.getItem(STORAGE_KEY);
+                    return raw ? JSON.parse(raw) : null;
+                } catch (e) { return null; }
+            }
+
+            function clearStorage() {
+                try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+            }
+
+            function showDraftBanner(saved) {
+                const answered = Object.keys(saved.answers || {}).length;
+                el('enneagram-draft-text').textContent = MSG_DRAFT_BANNER.replace('%1', answered);
+                show('enneagram-draft-banner');
+            }
+
+            function setAnswerUI(option) {
+                const btnA = el('enneagram-answer-a');
+                const btnB = el('enneagram-answer-b');
+                [btnA, btnB].forEach(b => {
+                    if (!b) return;
+                    b.classList.remove('enneagram-selected');
+                    b.setAttribute('aria-pressed', 'false');
+                });
+                if (option === 'a' && btnA) { btnA.classList.add('enneagram-selected'); btnA.setAttribute('aria-pressed', 'true'); }
+                if (option === 'b' && btnB) { btnB.classList.add('enneagram-selected'); btnB.setAttribute('aria-pressed', 'true'); }
+            }
+
+            function renderQuestion() {
+                const q = questions[currentIndex];
+                if (!q) return;
+                const textA = (isEn && q.optionA && q.optionA.text_en) ? q.optionA.text_en : (q.optionA && q.optionA.text ? q.optionA.text : '');
+                const textB = (isEn && q.optionB && q.optionB.text_en) ? q.optionB.text_en : (q.optionB && q.optionB.text ? q.optionB.text : '');
+                el('enneagram-progress-text').textContent = MSG_PROGRESS.replace('%1', currentIndex + 1).replace('%2', questions.length);
+                el('enneagram-progress-bar').style.width = ((currentIndex + 1) / questions.length * 100) + '%';
+                el('enneagram-answer-a').innerHTML = '<span>A. ' + textA + '</span>';
+                el('enneagram-answer-b').innerHTML = '<span>B. ' + textB + '</span>';
+                el('enneagram-prev').classList.toggle('hidden', currentIndex === 0);
+                el('enneagram-next').classList.toggle('hidden', currentIndex >= questions.length - 1);
+                const ans = answers[String(q.id)];
+                setAnswerUI(ans === 'a' ? 'a' : ans === 'b' ? 'b' : null);
+            }
+
+            function computeScores() {
+                const scores = { 1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0 };
+                questions.forEach(q => {
+                    const ans = answers[String(q.id)];
+                    if (ans === 'a' && q.optionA && q.optionA.type) scores[q.optionA.type] = (scores[q.optionA.type] || 0) + 1;
+                    if (ans === 'b' && q.optionB && q.optionB.type) scores[q.optionB.type] = (scores[q.optionB.type] || 0) + 1;
+                });
+                return scores;
+            }
+
+            function showResult() {
+                clearStorage();
+                const scores = computeScores();
+                const order = [1,2,3,4,5,6,7,8,9];
+                const sorted = order.slice().sort((a, b) => (scores[b] || 0) - (scores[a] || 0));
+                const mainType = sorted[0];
+                const mainName = TYPE_NAMES[mainType] || '';
+                const mainDesc = TYPE_DESC[mainType] || '';
+
+                const mainEl = el('enneagram-main-type');
+                mainEl.innerHTML = '<strong class="text-primary">' + (isEn ? 'Your main type: ' : '您的主要类型：') + '第' + mainType + '型 ' + mainName + '</strong><br><span class="enneagram-type-desc">' + mainDesc + '</span>';
+
+                const tbody = el('enneagram-result-tbody');
+                tbody.innerHTML = '';
+                order.forEach(t => {
+                    const tr = document.createElement('tr');
+                    tr.className = 'enneagram-result-row border-b border-gray-200';
+                    tr.innerHTML = '<td class="py-2 px-2 font-medium">' + t + '</td><td class="py-2 px-2">' + (TYPE_NAMES[t] || '') + '</td><td class="py-2 px-2 text-right">' + (scores[t] || 0) + '</td>';
+                    tbody.appendChild(tr);
+                });
+
+                const descEl = el('enneagram-type-descriptions');
+                descEl.innerHTML = '<p class="font-medium enneagram-text-muted mb-2">' + (isEn ? 'Brief descriptions of all types:' : '各类型简要说明：') + '</p>' +
+                    order.map(t => '<p><strong>' + t + ' ' + (TYPE_NAMES[t] || '') + '</strong>：' + (TYPE_DESC[t] || '') + '</p>').join('');
+
+                hide('enneagram-test');
+                show('enneagram-result');
+            }
+
+            function startTest() {
+                loadQuestions().then(() => {
+                    answers = {};
+                    currentIndex = 0;
+                    hide('enneagram-intro');
+                    hide('enneagram-draft-banner');
+                    show('enneagram-test');
+                    renderQuestion();
+                    saveToStorage();
+                }).catch(err => console.error(err));
+            }
+
+            el('enneagram-start').addEventListener('click', startTest);
+
+            (function checkDraftOnLoad() {
+                const saved = loadFromStorage();
+                if (saved && Object.keys(saved.answers || {}).length > 0) showDraftBanner(saved);
+            })();
+
+            el('enneagram-resume').addEventListener('click', function() {
+                const saved = loadFromStorage();
+                if (!saved) return;
+                loadQuestions().then(() => {
+                    answers = saved.answers || {};
+                    currentIndex = Math.min(saved.currentIndex || 0, Math.max(0, questions.length - 1));
+                    hide('enneagram-intro');
+                    hide('enneagram-draft-banner');
+                    show('enneagram-test');
+                    renderQuestion();
+                    saveToStorage();
+                }).catch(err => console.error(err));
+            });
+            el('enneagram-discard-draft').addEventListener('click', function() { clearStorage(); hide('enneagram-draft-banner'); });
+
+            function submitAnswer(option) {
+                const q = questions[currentIndex];
+                if (!q) return;
+                answers[String(q.id)] = option;
+                setAnswerUI(option);
+                if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+                saveToStorage();
+                if (currentIndex >= questions.length - 1) {
+                    showResult();
+                    return;
+                }
+                currentIndex++;
+                renderQuestion();
+            }
+            el('enneagram-answer-a').addEventListener('click', function() { submitAnswer('a'); });
+            el('enneagram-answer-b').addEventListener('click', function() { submitAnswer('b'); });
+
+            function onPrev() {
+                if (currentIndex > 0) {
+                    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+                    currentIndex--;
+                    renderQuestion();
+                    saveToStorage();
+                }
+            }
+            function onNext() {
+                if (currentIndex < questions.length - 1) {
+                    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+                    currentIndex++;
+                    renderQuestion();
+                    saveToStorage();
+                }
+            }
+            el('enneagram-prev').addEventListener('click', onPrev);
+            el('enneagram-next').addEventListener('click', onNext);
+            el('enneagram-prev').addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onPrev(); } });
+            el('enneagram-next').addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNext(); } });
+
+            el('enneagram-restart').addEventListener('click', function() {
+                clearStorage();
+                show('enneagram-intro');
+                hide('enneagram-result');
+                answers = {};
+                currentIndex = 0;
+            });
+        })();
+    </script>
+</body>
+</html>

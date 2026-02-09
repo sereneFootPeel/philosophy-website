@@ -1,0 +1,6813 @@
+[
+  {
+    "id": 1,
+    "text": "我喜欢看机械方面的杂志",
+    "key": 1,
+    "scale_if_1": [
+      "Q"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Mf-m",
+      "Mf-f"
+    ],
+    "text_en": "I like to read mechanics magazines"
+  },
+  {
+    "id": 2,
+    "text": "我的胃口很好",
+    "key": 0,
+    "scale_if_1": [
+      "Hs",
+      "D",
+      "Hy"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "I have a good appetite"
+  },
+  {
+    "id": 3,
+    "text": "我早上起来的时候，多半觉得睡眠充足，头脑清醒",
+    "key": 0,
+    "scale_if_1": [
+      "Hs",
+      "Hy",
+      "Pt"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "When I wake up in the morning I usually feel well rested and clear-headed"
+  },
+  {
+    "id": 4,
+    "text": "我想我会喜欢图书管理员的工作",
+    "key": 1,
+    "scale_if_1": [
+      "Mf-m",
+      "Mf-f"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "I think I would like the work of a librarian"
+  },
+  {
+    "id": 5,
+    "text": "我很容易被吵醒",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "D"
+    ],
+    "text_en": "I am easily awakened by noise"
+  },
+  {
+    "id": 6,
+    "text": "我喜欢看报纸上的犯罪新闻",
+    "key": 1,
+    "scale_if_1": [
+      "Cn"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Hy",
+      "Re"
+    ],
+    "text_en": "I like to read crime news in the newspaper"
+  },
+  {
+    "id": 7,
+    "text": "我的手脚经常是很暖和的",
+    "key": 0,
+    "scale_if_1": [
+      "Hs",
+      "Hy",
+      "MAS"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "My hands and feet are usually warm"
+  },
+  {
+    "id": 8,
+    "text": "我的日常生活中，充满了使我感兴趣的事情",
+    "key": 0,
+    "scale_if_1": [
+      "D",
+      "Hy",
+      "Pd",
+      "Pt"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "My daily life is full of things that interest me"
+  },
+  {
+    "id": 9,
+    "text": "我现在工作(学习)的能力，和从前差不多",
+    "key": 0,
+    "scale_if_1": [
+      "Hs",
+      "D",
+      "Hy",
+      "Dy"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "My ability to work (or study) is about the same as before"
+  },
+  {
+    "id": 10,
+    "text": "我的喉咙里总好象有一块东西堵着似的",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Hy",
+      "Pt"
+    ],
+    "text_en": "I often feel as if there is something stuck in my throat"
+  },
+  {
+    "id": 11,
+    "text": "一个人应该去了解自己的梦，并从中得到指导和警告",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Ma"
+    ],
+    "text_en": "A person should try to understand their dreams and get guidance from them"
+  },
+  {
+    "id": 12,
+    "text": "我喜欢侦探小说或神秘小说",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Hy"
+    ],
+    "text_en": "I like detective or mystery novels"
+  },
+  {
+    "id": 13,
+    "text": "我总是在很紧张的情况下工作",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Ma",
+      "MAS"
+    ],
+    "text_en": "I always work under a great deal of tension"
+  },
+  {
+    "id": 14,
+    "text": "我每个月至少有一、二次拉肚子",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "F",
+      "MAS"
+    ],
+    "text_en": "I have diarrhea at least once or twice a month"
+  },
+  {
+    "id": 15,
+    "text": "偶尔我会想到一些坏得说不出口的事",
+    "key": 1,
+    "scale_if_1": [
+      "Pt",
+      "Sc"
+    ],
+    "scale_if_0": [
+      "Q",
+      "L"
+    ],
+    "text_en": "I occasionally think of things too bad to say out loud"
+  },
+  {
+    "id": 16,
+    "text": "我深信生活对我是残酷的",
+    "key": 1,
+    "scale_if_1": [
+      "Pd",
+      "Pa"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "I am convinced that life has been cruel to me"
+  },
+  {
+    "id": 17,
+    "text": "我的父亲是一个好人",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "F",
+      "Sc"
+    ],
+    "text_en": "My father was a good man"
+  },
+  {
+    "id": 18,
+    "text": "我很少有大便不通的毛病",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Hs",
+      "D",
+      "MAS"
+    ],
+    "text_en": "I rarely have trouble with constipation"
+  },
+  {
+    "id": 19,
+    "text": "当我干一件新的工作时，总喜欢别人告诉我，我应该接近谁",
+    "key": 0,
+    "scale_if_1": [
+      "Mf-m",
+      "Mf-f"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Dy"
+    ],
+    "text_en": "When I start a new job I like to be told who I should get to know"
+  },
+  {
+    "id": 20,
+    "text": "我的性生活是满意的",
+    "key": 1,
+    "scale_if_1": [
+      "Cn"
+    ],
+    "scale_if_0": [
+      "Q",
+      "F",
+      "Pd"
+    ],
+    "text_en": "My sex life is satisfactory"
+  },
+  {
+    "id": 21,
+    "text": "有时我非常想离开家",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Pd",
+      "Ma",
+      "Dy"
+    ],
+    "text_en": "Sometimes I have a very strong desire to leave home"
+  },
+  {
+    "id": 22,
+    "text": "有时我会哭一阵笑一阵，连自己也不能控制",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Pt",
+      "Sc",
+      "Ma"
+    ],
+    "text_en": "Sometimes I laugh or cry in a way I cannot control"
+  },
+  {
+    "id": 23,
+    "text": "恶心和呕吐的毛病使我苦恼",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Hs",
+      "Hy",
+      "MAS"
+    ],
+    "text_en": "Nausea and vomiting trouble me"
+  },
+  {
+    "id": 24,
+    "text": "似乎没有一个人了解我",
+    "key": 1,
+    "scale_if_1": [
+      "Pd",
+      "Pa",
+      "Dy"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "It seems no one understands me"
+  },
+  {
+    "id": 25,
+    "text": "我想当一个歌唱家",
+    "key": 0,
+    "scale_if_1": [
+      "Si"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Mf-m",
+      "Mf-f"
+    ],
+    "text_en": "I would like to be a singer"
+  },
+  {
+    "id": 26,
+    "text": "当我处境困难的时候，我觉得最好是不开口",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Hy",
+      "Mf-m",
+      "Mf-f"
+    ],
+    "text_en": "When I am in trouble I think it is best to keep my mouth shut"
+  },
+  {
+    "id": 27,
+    "text": "有时我觉得有鬼神附在我身上",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "F",
+      "Pa"
+    ],
+    "text_en": "Sometimes I feel as if there are spirits inside me"
+  },
+  {
+    "id": 28,
+    "text": "当别人惹了我时，我觉得只要有机会就应报复，这是理所当然的",
+    "key": 0,
+    "scale_if_1": [
+      "Mf-m",
+      "Mf-f",
+      "Re"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "When someone wrongs me I feel I should get even when I get the chance"
+  },
+  {
+    "id": 29,
+    "text": "我有胃酸过多的毛病，一星期要犯好几次，使我苦恼",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Hs"
+    ],
+    "text_en": "I am bothered by excess stomach acid several times a week"
+  },
+  {
+    "id": 30,
+    "text": "有时我真想骂人",
+    "key": 0,
+    "scale_if_1": [
+      "L",
+      "K",
+      "D",
+      "Hy",
+      "Re"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Cn"
+    ],
+    "text_en": "Sometimes I feel like swearing"
+  },
+  {
+    "id": 31,
+    "text": "每隔几个晚上我就做恶梦",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "F",
+      "MAS"
+    ],
+    "text_en": "I have nightmares every few nights"
+  },
+  {
+    "id": 32,
+    "text": "我发现我很难把注意力集中到一件工作上",
+    "key": 0,
+    "scale_if_1": [
+      "Do"
+    ],
+    "scale_if_0": [
+      "Q",
+      "D",
+      "Hy",
+      "Pd",
+      "Pt",
+      "Si",
+      "MAS"
+    ],
+    "text_en": "I find it hard to keep my mind on a task or job"
+  },
+  {
+    "id": 33,
+    "text": "我曾经有过很特别，很奇怪的体验",
+    "key": 1,
+    "scale_if_1": [
+      "Pd"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Si",
+      "Re"
+    ],
+    "text_en": "I have had very unusual and strange experiences"
+  },
+  {
+    "id": 34,
+    "text": "我时常咳嗽",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "F"
+    ],
+    "text_en": "I cough often"
+  },
+  {
+    "id": 35,
+    "text": "假如不是有人和我作对，我一定会有更大的成就",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "F",
+      "Pd",
+      "Pa"
+    ],
+    "text_en": "If people had not had it in for me I would have achieved much more"
+  },
+  {
+    "id": 36,
+    "text": "我很少担心自己的健康",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "D",
+      "Pt"
+    ],
+    "text_en": "I rarely worry about my health"
+  },
+  {
+    "id": 37,
+    "text": "我从来没有为了我的性方面的行为出过事",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Pd"
+    ],
+    "text_en": "I have never gotten into trouble because of my sexual behavior"
+  },
+  {
+    "id": 38,
+    "text": "我小的时候，有一段时间我干过小偷小摸的事",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Pd"
+    ],
+    "text_en": "When I was young I stole things occasionally for a while"
+  },
+  {
+    "id": 39,
+    "text": "有时我真想摔东西",
+    "key": 0,
+    "scale_if_1": [
+      "K",
+      "D"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Sometimes I feel like smashing things"
+  },
+  {
+    "id": 40,
+    "text": "有很多时候我宁愿坐着空想，而不愿做任何事情",
+    "key": 1,
+    "scale_if_1": [
+      "F",
+      "Sc"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Often I would rather sit and daydream than do anything"
+  },
+  {
+    "id": 41,
+    "text": "我曾一连几天、几个星期、几个月什么也不想干，因为我总是提不起精神",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "D",
+      "Pt",
+      "Sc",
+      "Dy"
+    ],
+    "text_en": "I have had days or weeks or months when I could not take interest in anything because I had no energy"
+  },
+  {
+    "id": 42,
+    "text": "我家里人对我已选择的工作(或将要选择的职业)不满意",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "F",
+      "Pd"
+    ],
+    "text_en": "My family is not satisfied with the job I have chosen (or will choose)"
+  },
+  {
+    "id": 43,
+    "text": "我睡得不安，容易被惊醒",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Hs",
+      "D",
+      "Hy",
+      "MAS"
+    ],
+    "text_en": "My sleep is restless and I am easily awakened"
+  },
+  {
+    "id": 44,
+    "text": "我觉得我的头到处都疼",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Hy"
+    ],
+    "text_en": "I feel pain in various parts of my head"
+  },
+  {
+    "id": 45,
+    "text": "有时我也讲假话",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "L"
+    ],
+    "text_en": "Sometimes I tell lies"
+  },
+  {
+    "id": 46,
+    "text": "我的判断力比以往任何时候都好",
+    "key": 0,
+    "scale_if_1": [
+      "D"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "My judgment is better than it ever was"
+  },
+  {
+    "id": 47,
+    "text": "每星期至少有一、二次，我突然觉得无缘无故地全身发热",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Hy",
+      "Sc"
+    ],
+    "text_en": "At least once or twice a week I suddenly feel hot all over for no reason"
+  },
+  {
+    "id": 48,
+    "text": "当我与人相处的时候，听到别人谈论希奇古怪的事，我就心烦",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "F"
+    ],
+    "text_en": "When I am with people it bothers me to hear strange or unusual stories"
+  },
+  {
+    "id": 49,
+    "text": "最好是把所有的法律全都不要",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "F"
+    ],
+    "text_en": "It would be better if all laws were done away with"
+  },
+  {
+    "id": 50,
+    "text": "有时我觉得我的灵魂离开了我的身体",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "F"
+    ],
+    "text_en": "Sometimes I feel my soul has left my body"
+  },
+  {
+    "id": 51,
+    "text": "我的身体和我的大多数朋友一样地健康",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Hs",
+      "D",
+      "Hy"
+    ],
+    "text_en": "My body is as healthy as most of my friends"
+  },
+  {
+    "id": 52,
+    "text": "遇到同学或不常见的朋友，除非他们先向我打招呼，不然我就装作没看见",
+    "key": 1,
+    "scale_if_1": [
+      "D",
+      "Sc"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "When I meet classmates or acquaintances I pretend not to see them unless they speak first"
+  },
+  {
+    "id": 53,
+    "text": "一位牧师(和尚、道士、神父、阿訇等教士)能用祈祷和把手放在病人的头上来治病",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "F"
+    ],
+    "text_en": "A minister or priest can cure disease by prayer and laying hands on the sick"
+  },
+  {
+    "id": 54,
+    "text": "认识我的人差不多都喜欢我",
+    "key": 0,
+    "scale_if_1": [
+      "F"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Most people who know me like me"
+  },
+  {
+    "id": 55,
+    "text": "我从来没有因为胸部痛或心痛而感到苦恼",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Hs",
+      "Hy"
+    ],
+    "text_en": "I have never been troubled by pain in my chest or heart"
+  },
+  {
+    "id": 56,
+    "text": "我小时候，曾经因为胡闹而受过学校的处分",
+    "key": 0,
+    "scale_if_1": [
+      "Re"
+    ],
+    "scale_if_0": [
+      "Q",
+      "F",
+      "Cn"
+    ],
+    "text_en": "When I was young I was sometimes punished for mischief at school"
+  },
+  {
+    "id": 57,
+    "text": "我和别人一见面就熟了(自来熟)",
+    "key": 0,
+    "scale_if_1": [
+      "D",
+      "Si"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "I get along with people easily as soon as I meet them"
+  },
+  {
+    "id": 58,
+    "text": "一切事情都由老天爷按排好了",
+    "key": 0,
+    "scale_if_1": [
+      "D",
+      "Cn"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Re"
+    ],
+    "text_en": "Everything is prearranged by fate or heaven"
+  },
+  {
+    "id": 59,
+    "text": "我时常听从某些人的指挥，其实他们还不如我高明",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Ma"
+    ],
+    "text_en": "I often take orders from people who are not as capable as I am"
+  },
+  {
+    "id": 60,
+    "text": "我不是每天都看报纸上的每一篇社论",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "L"
+    ],
+    "text_en": "I do not read every editorial in the paper every day"
+  },
+  {
+    "id": 61,
+    "text": "我从未有过正常的生活",
+    "key": 0,
+    "scale_if_1": [
+      "Do"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Pd"
+    ],
+    "text_en": "I have never had a normal life"
+  },
+  {
+    "id": 62,
+    "text": "我的身体某些部分常有象火烧、刺痛、虫爬、麻木的感觉",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Hs"
+    ],
+    "text_en": "Parts of my body often have feelings like burning, tingling, crawling, or numbness"
+  },
+  {
+    "id": 63,
+    "text": "我的大便正常，不难控制",
+    "key": 1,
+    "scale_if_1": [
+      "Dy"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Hs"
+    ],
+    "text_en": "My bowel movements are regular and not hard to control"
+  },
+  {
+    "id": 64,
+    "text": "有时我会不停地做某一件事，直到别人不耐烦为止",
+    "key": 0,
+    "scale_if_1": [
+      "D"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Ma",
+      "Do"
+    ],
+    "text_en": "Sometimes I keep on doing something until others lose patience"
+  },
+  {
+    "id": 65,
+    "text": "我爱我的父亲",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "F",
+      "Sc"
+    ],
+    "text_en": "I love my father"
+  },
+  {
+    "id": 66,
+    "text": "我能在我周围看到其他人所看不到的东西、动物和人",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "F"
+    ],
+    "text_en": "I can see things, animals, or people around me that others cannot see"
+  },
+  {
+    "id": 67,
+    "text": "我希望我能像别人那样快乐",
+    "key": 1,
+    "scale_if_1": [
+      "D",
+      "Pd",
+      "Pt",
+      "Si",
+      "MAS",
+      "Dy",
+      "Cn"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "I wish I could be as happy as others seem to be"
+  },
+  {
+    "id": 68,
+    "text": "我从未感到脖子(颈)后面疼痛",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Hs"
+    ],
+    "text_en": "I have never felt pain at the back of my neck"
+  },
+  {
+    "id": 69,
+    "text": "和我性别相同的人对我有强烈的吸引力",
+    "key": 0,
+    "scale_if_1": [
+      "Mf-f"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Mf-m"
+    ],
+    "text_en": "People of my own sex are strongly attracted to me"
+  },
+  {
+    "id": 70,
+    "text": "我过去经常喜欢玩\"丢手帕”的游戏",
+    "key": 1,
+    "scale_if_1": [
+      "Mf-m",
+      "Mf-f",
+      "Dy"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "I used to enjoy playing drop-the-handkerchief"
+  },
+  {
+    "id": 71,
+    "text": "我觉得许多人喜欢夸大自己的不幸，以便得到别人的同情和帮助",
+    "key": 0,
+    "scale_if_1": [
+      "K",
+      "Hy"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "I think many people exaggerate their misfortunes to get sympathy and help"
+  },
+  {
+    "id": 72,
+    "text": "我为每隔几天或经常感到心口(胃)不舒服而烦恼",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Hs"
+    ],
+    "text_en": "I am bothered by an upset stomach every few days or more often"
+  },
+  {
+    "id": 73,
+    "text": "我是个重要人物",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Ma"
+    ],
+    "text_en": "I am an important person"
+  },
+  {
+    "id": 74,
+    "text": "男性：我总希望我是个女的\n女性：我从不因为我是女的而遗憾",
+    "key": 1,
+    "scale_if_1": [
+      "Mf-m",
+      "Mf-f"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Male: I have often wished I were a girl. Female: I have never been sorry I am a woman"
+  },
+  {
+    "id": 75,
+    "text": "我有时发怒",
+    "key": 0,
+    "scale_if_1": [
+      "L",
+      "F"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "I get angry sometimes"
+  },
+  {
+    "id": 76,
+    "text": "我时常感到悲观失望",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Hy",
+      "Pt",
+      "Sc"
+    ],
+    "text_en": "I often feel downcast and hopeless"
+  },
+  {
+    "id": 77,
+    "text": "我喜欢看爱情小说",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Mf-m",
+      "Mf-f"
+    ],
+    "text_en": "I like to read love stories"
+  },
+  {
+    "id": 78,
+    "text": "我喜欢诗",
+    "key": 1,
+    "scale_if_1": [
+      "Mf-m",
+      "Mf-f"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "I like poetry"
+  },
+  {
+    "id": 79,
+    "text": "我的感情不容易受伤害",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Mf-m",
+      "Mf-f",
+      "Dy"
+    ],
+    "text_en": "My feelings are not easily hurt"
+  },
+  {
+    "id": 80,
+    "text": "我有时捉弄动物",
+    "key": 0,
+    "scale_if_1": [
+      "D",
+      "Mf-m",
+      "Mf-f",
+      "Cn"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "I sometimes tease animals"
+  },
+  {
+    "id": 81,
+    "text": "我想我会喜欢干森林管理员那一类的工作",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Mf-m",
+      "Mf-f"
+    ],
+    "text_en": "I think I would like the work of a forest ranger"
+  },
+  {
+    "id": 82,
+    "text": "和人争辨的时候，我常争不过别人",
+    "key": 0,
+    "scale_if_1": [
+      "Pd",
+      "Do"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Si",
+      "Dy"
+    ],
+    "text_en": "When I argue I often lose to others"
+  },
+  {
+    "id": 83,
+    "text": "任何人只要他有能力，而且愿意努力工作是能成功的",
+    "key": 0,
+    "scale_if_1": [
+      "F"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Anyone who is able and willing to work hard can succeed"
+  },
+  {
+    "id": 84,
+    "text": "近来，我觉得很容易放弃对某些事物的希望",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Pd"
+    ],
+    "text_en": "Lately I find it easy to give up hope about some things"
+  },
+  {
+    "id": 85,
+    "text": "有时我对别人的东西，如鞋、手套等等所强烈吸引，虽然这些东西对我毫无用处，但我总是想摸摸它或把它偷来",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "F"
+    ],
+    "text_en": "Sometimes I am strongly attracted by others' things (e.g. shoes, gloves) and want to touch or take them even though I have no use for them"
+  },
+  {
+    "id": 86,
+    "text": "我确实缺少自信心",
+    "key": 0,
+    "scale_if_1": [
+      "Do"
+    ],
+    "scale_if_0": [
+      "Q",
+      "D",
+      "Pt",
+      "MAS",
+      "Dy"
+    ],
+    "text_en": "I really lack self-confidence"
+  },
+  {
+    "id": 87,
+    "text": "我愿意做一名花匠",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Mf-m",
+      "Mf-f"
+    ],
+    "text_en": "I would like to be a florist"
+  },
+  {
+    "id": 88,
+    "text": "我总觉得人生是有价值的",
+    "key": 0,
+    "scale_if_1": [
+      "D"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "I always feel that life is worthwhile"
+  },
+  {
+    "id": 89,
+    "text": "要使大多数人相信事实的真相，是要经过一番辨论的",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "K",
+      "D",
+      "Hy",
+      "Mf-m",
+      "Mf-f"
+    ],
+    "text_en": "It takes a lot of argument to convince most people of the truth"
+  },
+  {
+    "id": 90,
+    "text": "有时我将今天应该做的事，拖到明天去做",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "L"
+    ],
+    "text_en": "Sometimes I put off until tomorrow what I should do today"
+  },
+  {
+    "id": 91,
+    "text": "我不在乎别人拿我开玩笑",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Pd",
+      "Si"
+    ],
+    "text_en": "I don't mind people making fun of me"
+  },
+  {
+    "id": 92,
+    "text": "我想当个护士",
+    "key": 0,
+    "scale_if_1": [
+      "Cn"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Mf-m",
+      "Mf-f"
+    ],
+    "text_en": "I would like to be a nurse"
+  },
+  {
+    "id": 93,
+    "text": "我觉得大多数人是为了向上爬而不惜说谎的",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Hy",
+      "Pa"
+    ],
+    "text_en": "I think most people would lie to get ahead"
+  },
+  {
+    "id": 94,
+    "text": "许多事情，我做过以后就后悔了",
+    "key": 0,
+    "scale_if_1": [
+      "Do"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Pd",
+      "Pt"
+    ],
+    "text_en": "I have often regretted things I have done"
+  },
+  {
+    "id": 95,
+    "text": "我几乎每星期都去教堂(或常去寺庙)",
+    "key": 0,
+    "scale_if_1": [
+      "D"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "I go to church (or temple) almost every week"
+  },
+  {
+    "id": 96,
+    "text": "我几乎没有和家里人吵过嘴",
+    "key": 1,
+    "scale_if_1": [
+      "K"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Pd",
+      "Cn"
+    ],
+    "text_en": "I have hardly ever quarreled with my family"
+  },
+  {
+    "id": 97,
+    "text": "有时我有一种强烈的冲动，去做一些惊人或有害的事",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Sc",
+      "Ma"
+    ],
+    "text_en": "Sometimes I have a strong urge to do something shocking or harmful"
+  },
+  {
+    "id": 98,
+    "text": "我相信善有善报，恶有恶报",
+    "key": 0,
+    "scale_if_1": [
+      "D"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Dy"
+    ],
+    "text_en": "I believe in reward for good and punishment for evil"
+  },
+  {
+    "id": 99,
+    "text": "我喜欢参加热闹的聚会",
+    "key": 0,
+    "scale_if_1": [
+      "Mf-m",
+      "Mf-f",
+      "Si"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "I like to go to lively parties"
+  },
+  {
+    "id": 100,
+    "text": "我碰到一些千头万绪的问题，使我感到犹豫不决",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Ma",
+      "Dy"
+    ],
+    "text_en": "I run into problems that are so tangled I feel uncertain what to do"
+  },
+  {
+    "id": 101,
+    "text": "我认为女的在性生活方面，应该和男的有同等的自由",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Ma"
+    ],
+    "text_en": "I think women should have the same sexual freedom as men"
+  },
+  {
+    "id": 102,
+    "text": "我认为最难的是控制我自己",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Pd",
+      "Pt"
+    ],
+    "text_en": "The hardest thing for me is controlling myself"
+  },
+  {
+    "id": 103,
+    "text": "我很少有肌肉抽筋或颤抖的毛病",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Hs",
+      "Hy",
+      "Sc"
+    ],
+    "text_en": "I rarely have muscle cramps or twitching"
+  },
+  {
+    "id": 104,
+    "text": "我似乎对什么事情都不在乎",
+    "key": 1,
+    "scale_if_1": [
+      "D",
+      "Sc"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "I seem not to care about anything"
+  },
+  {
+    "id": 105,
+    "text": "我身体不舒服的时候，我有时发脾气",
+    "key": 0,
+    "scale_if_1": [
+      "L",
+      "Ma"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Cn"
+    ],
+    "text_en": "When I don't feel well I sometimes lose my temper"
+  },
+  {
+    "id": 106,
+    "text": "我总觉得我自己好象做错了什么事或犯了什么罪",
+    "key": 1,
+    "scale_if_1": [
+      "Pd",
+      "Pt"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "I often feel as if I have done something wrong or committed a sin"
+  },
+  {
+    "id": 107,
+    "text": "我经常是快乐的",
+    "key": 0,
+    "scale_if_1": [
+      "D",
+      "Hy",
+      "Pd",
+      "Pa",
+      "MAS",
+      "Dy"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "I am often happy"
+  },
+  {
+    "id": 108,
+    "text": "我时常觉得头胀鼻塞似的",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Hs"
+    ],
+    "text_en": "I often feel as if my head is stuffed or my nose blocked"
+  },
+  {
+    "id": 109,
+    "text": "有些人太霸道，即使我明知他们是对的，也要和他们对着干",
+    "key": 0,
+    "scale_if_1": [
+      "Hy",
+      "Pa"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Ma"
+    ],
+    "text_en": "Some people are so bossy that I do the opposite even when I know they are right"
+  },
+  {
+    "id": 110,
+    "text": "有人想害我",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Pd",
+      "Pa"
+    ],
+    "text_en": "Statement 110."
+  },
+  {
+    "id": 111,
+    "text": "我从来没有为寻求刺激而去做危险的事",
+    "key": 1,
+    "scale_if_1": [
+      "Si",
+      "Re"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Pa",
+      "Ma",
+      "Cn"
+    ],
+    "text_en": "Statement 111."
+  },
+  {
+    "id": 112,
+    "text": "我时常认为必须坚持做那些我认为正确的事",
+    "key": 0,
+    "scale_if_1": [
+      "F",
+      "Mf-m",
+      "Mf-f"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 112."
+  },
+  {
+    "id": 113,
+    "text": "我相信法制",
+    "key": 0,
+    "scale_if_1": [
+      "F"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 113."
+  },
+  {
+    "id": 114,
+    "text": "我常觉得头上好象有一根绷得紧紧的带子",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Hs",
+      "Hy"
+    ],
+    "text_en": "Statement 114."
+  },
+  {
+    "id": 115,
+    "text": "我相信人死后还会有\"来世”",
+    "key": 0,
+    "scale_if_1": [
+      "F",
+      "Mf-m",
+      "Mf-f"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 115."
+  },
+  {
+    "id": 116,
+    "text": "我更喜欢我下了赌的比赛和游戏",
+    "key": 0,
+    "scale_if_1": [
+      "Mf-m",
+      "Mf-f",
+      "Re"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Cn"
+    ],
+    "text_en": "Statement 116."
+  },
+  {
+    "id": 117,
+    "text": "大部分人之所以是诚实的，主要是因为怕被人识破",
+    "key": 0,
+    "scale_if_1": [
+      "Mf-m",
+      "Mf-f",
+      "Pa"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Si"
+    ],
+    "text_en": "Statement 117."
+  },
+  {
+    "id": 118,
+    "text": "在上学的时候，有时因胡闹而被领导叫去",
+    "key": 0,
+    "scale_if_1": [
+      "Re"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Pd"
+    ],
+    "text_en": "Statement 118."
+  },
+  {
+    "id": 119,
+    "text": "我说话总是那样不快也不慢，不含糊也不嘶哑",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Sc",
+      "Ma",
+      "Si"
+    ],
+    "text_en": "Statement 119."
+  },
+  {
+    "id": 120,
+    "text": "我在外边和朋友们一起吃饭的时候，比在家规矩得多",
+    "key": 0,
+    "scale_if_1": [
+      "L",
+      "Mf-m",
+      "Mf-f",
+      "Ma"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 120."
+  },
+  {
+    "id": 121,
+    "text": "我相信有人暗算我",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "F",
+      "Pa",
+      "Sc"
+    ],
+    "text_en": "Statement 121."
+  },
+  {
+    "id": 122,
+    "text": "我似乎和我周围的人一样精明能干",
+    "key": 0,
+    "scale_if_1": [
+      "D",
+      "Pt"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 122."
+  },
+  {
+    "id": 123,
+    "text": "我相信有人在跟踪我",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "F",
+      "Pa"
+    ],
+    "text_en": "Statement 123."
+  },
+  {
+    "id": 124,
+    "text": "大多数人不惜用不正当的手段谋取利益，而不愿失掉机会",
+    "key": 1,
+    "scale_if_1": [
+      "Si"
+    ],
+    "scale_if_0": [
+      "Q",
+      "K",
+      "Hy",
+      "Pa"
+    ],
+    "text_en": "Statement 124."
+  },
+  {
+    "id": 125,
+    "text": "我的胃有很多毛病",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Hs",
+      "MAS"
+    ],
+    "text_en": "Statement 125."
+  },
+  {
+    "id": 126,
+    "text": "我喜欢戏剧",
+    "key": 0,
+    "scale_if_1": [
+      "Si"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Mf-m",
+      "Mf-f"
+    ],
+    "text_en": "Statement 126."
+  },
+  {
+    "id": 127,
+    "text": "我知道我的烦恼是谁造成的",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Pd",
+      "Pa",
+      "Ma"
+    ],
+    "text_en": "Statement 127."
+  },
+  {
+    "id": 128,
+    "text": "看到血的时候，我即不怕，也不难受",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Hy"
+    ],
+    "text_en": "Statement 128."
+  },
+  {
+    "id": 129,
+    "text": "我自己时常弄不清为什么会这样爱生气和发牢骚",
+    "key": 0,
+    "scale_if_1": [
+      "K",
+      "Hy"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 129."
+  },
+  {
+    "id": 130,
+    "text": "我从来没有吐过血，或咯过血",
+    "key": 0,
+    "scale_if_1": [
+      "Hs"
+    ],
+    "scale_if_0": [
+      "Q",
+      "D"
+    ],
+    "text_en": "Statement 130."
+  },
+  {
+    "id": 131,
+    "text": "我不为得病而担心",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "D"
+    ],
+    "text_en": "Statement 131."
+  },
+  {
+    "id": 132,
+    "text": "我喜欢栽花或采集花草",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Mf-m",
+      "Mf-f"
+    ],
+    "text_en": "Statement 132."
+  },
+  {
+    "id": 133,
+    "text": "我从来没有放纵自己发生过任何不正常的性行为",
+    "key": 0,
+    "scale_if_1": [
+      "Mf-m"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Mf-f"
+    ],
+    "text_en": "Statement 133."
+  },
+  {
+    "id": 134,
+    "text": "有时我的思想跑得太快都来不及表达出来",
+    "key": 1,
+    "scale_if_1": [
+      "Mf-m",
+      "Mf-f",
+      "Ma",
+      "Cn"
+    ],
+    "scale_if_0": [
+      "Q",
+      "K",
+      "Pd"
+    ],
+    "text_en": "Statement 134."
+  },
+  {
+    "id": 135,
+    "text": "假如我能不买票白看电影，而且不会被人发觉，我可能会去做的",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "L"
+    ],
+    "text_en": "Statement 135."
+  },
+  {
+    "id": 136,
+    "text": "如果别人待我好，我常常怀疑他们别有用心",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Hy"
+    ],
+    "text_en": "Statement 136."
+  },
+  {
+    "id": 137,
+    "text": "我相信我的家庭生活，和我所认识的许多人一样幸福快乐",
+    "key": 0,
+    "scale_if_1": [
+      "Hy",
+      "Pd"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 137."
+  },
+  {
+    "id": 138,
+    "text": "批评和责骂都使我非常伤心",
+    "key": 0,
+    "scale_if_1": [
+      "K"
+    ],
+    "scale_if_0": [
+      "Q",
+      "D",
+      "Si",
+      "Dy"
+    ],
+    "text_en": "Statement 138."
+  },
+  {
+    "id": 139,
+    "text": "有时我仿佛觉得我必须伤害自己或别人",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "F"
+    ],
+    "text_en": "Statement 139."
+  },
+  {
+    "id": 140,
+    "text": "我喜欢做饭烧菜",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Mf-m",
+      "Mf-f"
+    ],
+    "text_en": "Statement 140."
+  },
+  {
+    "id": 141,
+    "text": "我的行为多半受我周围人的习惯所支配",
+    "key": 0,
+    "scale_if_1": [
+      "Hy",
+      "Pd"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Dy"
+    ],
+    "text_en": "Statement 141."
+  },
+  {
+    "id": 142,
+    "text": "有时我觉得我真是毫无用处",
+    "key": 0,
+    "scale_if_1": [
+      "K"
+    ],
+    "scale_if_0": [
+      "Q",
+      "D",
+      "Pt",
+      "MAS"
+    ],
+    "text_en": "Statement 142."
+  },
+  {
+    "id": 143,
+    "text": "小时候我曾加入过一个团伙，有福共享，有难同当",
+    "key": 0,
+    "scale_if_1": [
+      "Si"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Ma"
+    ],
+    "text_en": "Statement 143."
+  },
+  {
+    "id": 144,
+    "text": "我喜欢当兵",
+    "key": 0,
+    "scale_if_1": [
+      "Mf-m",
+      "Mf-f"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 144."
+  },
+  {
+    "id": 145,
+    "text": "有时我想借故和别人打架",
+    "key": 0,
+    "scale_if_1": [
+      "D"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Cn"
+    ],
+    "text_en": "Statement 145."
+  },
+  {
+    "id": 146,
+    "text": "我喜欢到处乱逛，如果不行，我就不高兴",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "F"
+    ],
+    "text_en": "Statement 146."
+  },
+  {
+    "id": 147,
+    "text": "由于我经常不能当机立断，因而失去许多良机",
+    "key": 1,
+    "scale_if_1": [
+      "Si"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Hy"
+    ],
+    "text_en": "Statement 147."
+  },
+  {
+    "id": 148,
+    "text": "当我正在做一件重要事情的时候，如果有人向我请教或打扰我，我会不耐烦的",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "K",
+      "Ma"
+    ],
+    "text_en": "Statement 148."
+  },
+  {
+    "id": 149,
+    "text": "我以前写过日记",
+    "key": 1,
+    "scale_if_1": [
+      "Mf-m",
+      "Mf-f"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 149."
+  },
+  {
+    "id": 150,
+    "text": "做游戏的时候，我只愿赢而不愿输",
+    "key": 0,
+    "scale_if_1": [
+      "L"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 150."
+  },
+  {
+    "id": 151,
+    "text": "有人一直想毒死我",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "F",
+      "Pa"
+    ],
+    "text_en": "Statement 151."
+  },
+  {
+    "id": 152,
+    "text": "大多数晚上我睡觉时，不受什么思想干扰",
+    "key": 0,
+    "scale_if_1": [
+      "D",
+      "Pt"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 152."
+  },
+  {
+    "id": 153,
+    "text": "近几年来大部分时间，我的身体都很好",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Hs",
+      "D",
+      "Hy"
+    ],
+    "text_en": "Statement 153."
+  },
+  {
+    "id": 154,
+    "text": "我从来没有过抽搐的毛病",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "D"
+    ],
+    "text_en": "Statement 154."
+  },
+  {
+    "id": 155,
+    "text": "现在我的体重既没有增加也没有减轻",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Hs",
+      "D",
+      "Pd"
+    ],
+    "text_en": "Statement 155."
+  },
+  {
+    "id": 156,
+    "text": "有一段时间，我自己做过的事情全不记得了",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "F",
+      "Sc",
+      "Ma"
+    ],
+    "text_en": "Statement 156."
+  },
+  {
+    "id": 157,
+    "text": "我觉得我时常无缘无故地受到惩罚",
+    "key": 0,
+    "scale_if_1": [
+      "Re"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Pa",
+      "Sc",
+      "Ma"
+    ],
+    "text_en": "Statement 157."
+  },
+  {
+    "id": 158,
+    "text": "我容易哭",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "D",
+      "Pa",
+      "MAS",
+      "Dy"
+    ],
+    "text_en": "Statement 158."
+  },
+  {
+    "id": 159,
+    "text": "我不能象从前那样理解我所读的东西了",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "D",
+      "Pt",
+      "Sc"
+    ],
+    "text_en": "Statement 159."
+  },
+  {
+    "id": 160,
+    "text": "在我一生中，我从来没有感觉到象现在这么好",
+    "key": 0,
+    "scale_if_1": [
+      "K",
+      "D",
+      "Hy"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 160."
+  },
+  {
+    "id": 161,
+    "text": "有时候我觉得我的头顶一碰就疼",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Hs"
+    ],
+    "text_en": "Statement 161."
+  },
+  {
+    "id": 162,
+    "text": "我痛恨别人以不正当的手段捉弄我，使我不得不认输",
+    "key": 0,
+    "scale_if_1": [
+      "Hy"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Cn"
+    ],
+    "text_en": "Statement 162."
+  },
+  {
+    "id": 163,
+    "text": "我不容易疲倦",
+    "key": 0,
+    "scale_if_1": [
+      "Hs",
+      "Hy",
+      "MAS",
+      "Dy"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 163."
+  },
+  {
+    "id": 164,
+    "text": "我喜欢研究和阅读与我目前工作有关的东西",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "F",
+      "Pt"
+    ],
+    "text_en": "Statement 164."
+  },
+  {
+    "id": 165,
+    "text": "我喜欢结识一些重要人物，这样会使我感到自己也很重要",
+    "key": 0,
+    "scale_if_1": [
+      "L"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Dy"
+    ],
+    "text_en": "Statement 165."
+  },
+  {
+    "id": 166,
+    "text": "我很害怕从高处往下看",
+    "key": 0,
+    "scale_if_1": [
+      "Ma"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 166."
+  },
+  {
+    "id": 167,
+    "text": "即使我家里有人犯法，我也不会紧张",
+    "key": 0,
+    "scale_if_1": [
+      "Cn"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Ma"
+    ],
+    "text_en": "Statement 167."
+  },
+  {
+    "id": 168,
+    "text": "我的脑子有点毛病",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "F",
+      "Sc"
+    ],
+    "text_en": "Statement 168."
+  },
+  {
+    "id": 169,
+    "text": "我不怕管钱",
+    "key": 1,
+    "scale_if_1": [
+      "Cn"
+    ],
+    "scale_if_0": [
+      "Q",
+      "F"
+    ],
+    "text_en": "Statement 169."
+  },
+  {
+    "id": 170,
+    "text": "我不在乎别人对我有什么看法",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "K",
+      "Hy",
+      "Pd",
+      "Dy"
+    ],
+    "text_en": "Statement 170."
+  },
+  {
+    "id": 171,
+    "text": "在聚会当中，尽管有人出风头，如果让我也这样做，我会感到很不舒服",
+    "key": 0,
+    "scale_if_1": [
+      "K",
+      "Pd",
+      "Ma"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Si"
+    ],
+    "text_en": "Statement 171."
+  },
+  {
+    "id": 172,
+    "text": "我时常需要努力使自己不显出怕羞的样子",
+    "key": 0,
+    "scale_if_1": [
+      "Hy"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Si"
+    ],
+    "text_en": "Statement 172."
+  },
+  {
+    "id": 173,
+    "text": "我过去喜欢上学",
+    "key": 0,
+    "scale_if_1": [
+      "Pd"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Re"
+    ],
+    "text_en": "Statement 173."
+  },
+  {
+    "id": 174,
+    "text": "我从来没有昏倒过",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Hy",
+      "Cn"
+    ],
+    "text_en": "Statement 174."
+  },
+  {
+    "id": 175,
+    "text": "我很少头昏眼花",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Hs",
+      "Hy",
+      "Re"
+    ],
+    "text_en": "Statement 175."
+  },
+  {
+    "id": 176,
+    "text": "我不大怕蛇",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Mf-m",
+      "Mf-f"
+    ],
+    "text_en": "Statement 176."
+  },
+  {
+    "id": 177,
+    "text": "我母亲是个好人",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "F",
+      "Sc"
+    ],
+    "text_en": "Statement 177."
+  },
+  {
+    "id": 178,
+    "text": "我的记忆力似乎还不错",
+    "key": 0,
+    "scale_if_1": [
+      "D",
+      "Pt",
+      "Sc"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 178."
+  },
+  {
+    "id": 179,
+    "text": "有关性方面的问题，使我烦恼",
+    "key": 0,
+    "scale_if_1": [
+      "Mf-f"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Hy",
+      "Mf-m",
+      "Sc"
+    ],
+    "text_en": "Statement 179."
+  },
+  {
+    "id": 180,
+    "text": "我觉得我遇到生人的时候就不知道说什么好了",
+    "key": 0,
+    "scale_if_1": [
+      "K",
+      "Hy",
+      "Pd",
+      "Ma"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Si",
+      "Dy"
+    ],
+    "text_en": "Statement 180."
+  },
+  {
+    "id": 181,
+    "text": "无聊的时候，我就会惹事寻求开心",
+    "key": 0,
+    "scale_if_1": [
+      "Re"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Ma",
+      "Cn"
+    ],
+    "text_en": "Statement 181."
+  },
+  {
+    "id": 182,
+    "text": "我怕自己会发疯",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "D",
+      "Pt",
+      "Sc"
+    ],
+    "text_en": "Statement 182."
+  },
+  {
+    "id": 183,
+    "text": "我反对把钱给乞丐",
+    "key": 0,
+    "scale_if_1": [
+      "K",
+      "Pd"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 183."
+  },
+  {
+    "id": 184,
+    "text": "我时常听到说话的声音，而又不知道是从哪里来的",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "F"
+    ],
+    "text_en": "Statement 184."
+  },
+  {
+    "id": 185,
+    "text": "我的听觉显然和大多数人一样好",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "F"
+    ],
+    "text_en": "Statement 185."
+  },
+  {
+    "id": 186,
+    "text": "当我要做一件事的时候，我常发觉我的手在发抖",
+    "key": 0,
+    "scale_if_1": [
+      "Do"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Hy",
+      "MAS"
+    ],
+    "text_en": "Statement 186."
+  },
+  {
+    "id": 187,
+    "text": "我的双手并没有变得笨拙不灵",
+    "key": 1,
+    "scale_if_1": [
+      "Mf-m",
+      "Mf-f"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Sc"
+    ],
+    "text_en": "Statement 187."
+  },
+  {
+    "id": 188,
+    "text": "我能阅读很长的时间，而眼睛不觉得累",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Hs",
+      "Hy"
+    ],
+    "text_en": "Statement 188."
+  },
+  {
+    "id": 189,
+    "text": "许多时候，我觉得浑身无力",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Hs",
+      "D",
+      "Hy",
+      "Pt",
+      "Dy"
+    ],
+    "text_en": "Statement 189."
+  },
+  {
+    "id": 190,
+    "text": "我很少头痛",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Hs",
+      "Hy",
+      "MAS"
+    ],
+    "text_en": "Statement 190."
+  },
+  {
+    "id": 191,
+    "text": "有时，当我难为情的时候，会出很多汗，这使我非常苦恼",
+    "key": 0,
+    "scale_if_1": [
+      "D"
+    ],
+    "scale_if_0": [
+      "Q",
+      "MAS"
+    ],
+    "text_en": "Statement 191."
+  },
+  {
+    "id": 192,
+    "text": "我走路时保持平稳，并不困难",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Hs",
+      "Hy",
+      "Sc"
+    ],
+    "text_en": "Statement 192."
+  },
+  {
+    "id": 193,
+    "text": "我没哮喘这一类毛病",
+    "key": 1,
+    "scale_if_1": [
+      "D"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Si",
+      "Dy"
+    ],
+    "text_en": "Statement 193."
+  },
+  {
+    "id": 194,
+    "text": "我曾经有过几次突然不能控制自己的行动或语言，但当时我的头脑还很清醒",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Sc",
+      "Ma"
+    ],
+    "text_en": "Statement 194."
+  },
+  {
+    "id": 195,
+    "text": "我所认识的人里不是个个我都喜欢",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "L"
+    ],
+    "text_en": "Statement 195."
+  },
+  {
+    "id": 196,
+    "text": "我喜欢到我从来没有到过的地方去游览",
+    "key": 0,
+    "scale_if_1": [
+      "F",
+      "Sc"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 196."
+  },
+  {
+    "id": 197,
+    "text": "有人一直想抢我的东西",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "F"
+    ],
+    "text_en": "Statement 197."
+  },
+  {
+    "id": 198,
+    "text": "我很少空想",
+    "key": 0,
+    "scale_if_1": [
+      "Mf-m",
+      "Mf-f"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 198."
+  },
+  {
+    "id": 199,
+    "text": "我们应该把有关\"性”方面的主要知识告诉孩子",
+    "key": 0,
+    "scale_if_1": [
+      "F"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 199."
+  },
+  {
+    "id": 200,
+    "text": "有人想窃取我的思想和计划",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "F"
+    ],
+    "text_en": "Statement 200."
+  },
+  {
+    "id": 201,
+    "text": "但愿我不象现在这样的害羞",
+    "key": 0,
+    "scale_if_1": [
+      "Hy",
+      "Pd"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Si",
+      "Dy"
+    ],
+    "text_en": "Statement 201."
+  },
+  {
+    "id": 202,
+    "text": "我相信我是一个被谴责的人",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "F",
+      "Pa",
+      "Sc"
+    ],
+    "text_en": "Statement 202."
+  },
+  {
+    "id": 203,
+    "text": "假若我是一个新闻记者，我将喜欢报导戏剧界的新闻",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Mf-m",
+      "Mf-f"
+    ],
+    "text_en": "Statement 203."
+  },
+  {
+    "id": 204,
+    "text": "我喜欢做一个新闻记者",
+    "key": 1,
+    "scale_if_1": [
+      "Mf-m",
+      "Mf-f"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 204."
+  },
+  {
+    "id": 205,
+    "text": "有时我控制不住想要偷点东西",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "F"
+    ],
+    "text_en": "Statement 205."
+  },
+  {
+    "id": 206,
+    "text": "我很信神，程度超过多数人",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "F"
+    ],
+    "text_en": "Statement 206."
+  },
+  {
+    "id": 207,
+    "text": "我喜欢许多不同种类的游戏和娱乐",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "D"
+    ],
+    "text_en": "Statement 207."
+  },
+  {
+    "id": 208,
+    "text": "我喜欢和异性说笑",
+    "key": 0,
+    "scale_if_1": [
+      "D",
+      "Si"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 208."
+  },
+  {
+    "id": 209,
+    "text": "我相信我的罪恶是不可饶恕的",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "F"
+    ],
+    "text_en": "Statement 209."
+  },
+  {
+    "id": 210,
+    "text": "每一种东西吃起来味道都是一样",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "F",
+      "Sc"
+    ],
+    "text_en": "Statement 210."
+  },
+  {
+    "id": 211,
+    "text": "我白天能睡觉，晚上却睡不着",
+    "key": 1,
+    "scale_if_1": [
+      "F"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 211."
+  },
+  {
+    "id": 212,
+    "text": "我家里的人把我当做小孩子，而不把我当做大人看待",
+    "key": 1,
+    "scale_if_1": [
+      "Sc",
+      "Ma",
+      "Dy"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 212."
+  },
+  {
+    "id": 213,
+    "text": "走路时，我很小心地跨过人行道上的接缝",
+    "key": 0,
+    "scale_if_1": [
+      "Hy",
+      "Mf-m",
+      "Mf-f"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 213."
+  },
+  {
+    "id": 214,
+    "text": "我从来没有为皮肤上长点东西而烦恼",
+    "key": 0,
+    "scale_if_1": [
+      "Mf-m",
+      "Mf-f"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 214."
+  },
+  {
+    "id": 215,
+    "text": "我曾经饮酒过度",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "F",
+      "Pd"
+    ],
+    "text_en": "Statement 215."
+  },
+  {
+    "id": 216,
+    "text": "和别人的家庭比较，我的家庭缺乏爱和温暖",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Pd"
+    ],
+    "text_en": "Statement 216."
+  },
+  {
+    "id": 217,
+    "text": "我时常感到自己在为某些事而担忧",
+    "key": 0,
+    "scale_if_1": [
+      "K"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Mf-m",
+      "Mf-f",
+      "Pt",
+      "MAS"
+    ],
+    "text_en": "Statement 217."
+  },
+  {
+    "id": 218,
+    "text": "当看到动物受折磨的时候，我并不觉得特别难受",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "F"
+    ],
+    "text_en": "Statement 218."
+  },
+  {
+    "id": 219,
+    "text": "我想我会喜欢建筑承包的工作",
+    "key": 0,
+    "scale_if_1": [
+      "Mf-m",
+      "Mf-f"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 219."
+  },
+  {
+    "id": 220,
+    "text": "我爱我的母亲",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "F",
+      "Sc",
+      "Cn"
+    ],
+    "text_en": "Statement 220."
+  },
+  {
+    "id": 221,
+    "text": "我喜欢科学",
+    "key": 1,
+    "scale_if_1": [
+      "Re"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Mf-m",
+      "Mf-f"
+    ],
+    "text_en": "Statement 221."
+  },
+  {
+    "id": 222,
+    "text": "即使我以后不能报答恩惠，我也愿向朋友求助",
+    "key": 1,
+    "scale_if_1": [
+      "Ma"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 222."
+  },
+  {
+    "id": 223,
+    "text": "我很喜欢打猎",
+    "key": 0,
+    "scale_if_1": [
+      "Mf-m",
+      "Mf-f",
+      "Do",
+      "Re"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 223."
+  },
+  {
+    "id": 224,
+    "text": "我父母经常反对那些和我交往的人",
+    "key": 0,
+    "scale_if_1": [
+      "Do",
+      "Re"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Pd"
+    ],
+    "text_en": "Statement 224."
+  },
+  {
+    "id": 225,
+    "text": "有时我也会说说人家的闲话",
+    "key": 0,
+    "scale_if_1": [
+      "L"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Cn"
+    ],
+    "text_en": "Statement 225."
+  },
+  {
+    "id": 226,
+    "text": "我家里有些人的习惯，使我非常讨厌",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Mf-m",
+      "Mf-f",
+      "Ma"
+    ],
+    "text_en": "Statement 226."
+  },
+  {
+    "id": 227,
+    "text": "人家告诉我，我在睡觉中起来走路(梦游)",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "F"
+    ],
+    "text_en": "Statement 227."
+  },
+  {
+    "id": 228,
+    "text": "有时我觉得我非常容易地做出决定",
+    "key": 1,
+    "scale_if_1": [
+      "Ma"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 228."
+  },
+  {
+    "id": 229,
+    "text": "我喜欢同时参加几个团体",
+    "key": 0,
+    "scale_if_1": [
+      "Mf-m",
+      "Mf-f",
+      "Si"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Do"
+    ],
+    "text_en": "Statement 229."
+  },
+  {
+    "id": 230,
+    "text": "我从来没有感到心慌气短",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Hs",
+      "Hy",
+      "MAS"
+    ],
+    "text_en": "Statement 230."
+  },
+  {
+    "id": 231,
+    "text": "我喜欢谈论两性方面的事",
+    "key": 0,
+    "scale_if_1": [
+      "Pd",
+      "Mf-f",
+      "Si"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Mf-m"
+    ],
+    "text_en": "Statement 231."
+  },
+  {
+    "id": 232,
+    "text": "我曾经立志要过一种以责任为重的生活，我一直照此谨慎从事",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Ma"
+    ],
+    "text_en": "Statement 232."
+  },
+  {
+    "id": 233,
+    "text": "我有时阻止别人做某些事，并不是因为那种事有多大影响，而是在\"道义”上我应该干预他",
+    "key": 0,
+    "scale_if_1": [
+      "D"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Ma"
+    ],
+    "text_en": "Statement 233."
+  },
+  {
+    "id": 234,
+    "text": "我很容易生气，但很快就平静下来",
+    "key": 0,
+    "scale_if_1": [
+      "K",
+      "Hy"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 234."
+  },
+  {
+    "id": 235,
+    "text": "我已独立自主，不受家庭的约束",
+    "key": 0,
+    "scale_if_1": [
+      "Pd"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 235."
+  },
+  {
+    "id": 236,
+    "text": "我有很多心事",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "D",
+      "Si",
+      "Dy",
+      "Cn"
+    ],
+    "text_en": "Statement 236."
+  },
+  {
+    "id": 237,
+    "text": "我的亲属几乎全都同情我",
+    "key": 0,
+    "scale_if_1": [
+      "Pd"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 237."
+  },
+  {
+    "id": 238,
+    "text": "有时我十分烦躁，坐立不安",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Hy",
+      "Pt",
+      "Sc",
+      "Ma",
+      "MAS",
+      "Cn"
+    ],
+    "text_en": "Statement 238."
+  },
+  {
+    "id": 239,
+    "text": "我曾经失恋过",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Pd",
+      "Mf-m",
+      "Mf-f",
+      "Dy"
+    ],
+    "text_en": "Statement 239."
+  },
+  {
+    "id": 240,
+    "text": "我从来不为我的外貌而发愁",
+    "key": 0,
+    "scale_if_1": [
+      "Do"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Ma"
+    ],
+    "text_en": "Statement 240."
+  },
+  {
+    "id": 241,
+    "text": "我常梦到一些不可告人的事",
+    "key": 0,
+    "scale_if_1": [
+      "D"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Sc",
+      "MAS"
+    ],
+    "text_en": "Statement 241."
+  },
+  {
+    "id": 242,
+    "text": "我相信我并不比别人更为神经过敏",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "D",
+      "MAS",
+      "Cn"
+    ],
+    "text_en": "Statement 242."
+  },
+  {
+    "id": 243,
+    "text": "我几乎没有什么地方疼痛",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Hs",
+      "Hy"
+    ],
+    "text_en": "Statement 243."
+  },
+  {
+    "id": 244,
+    "text": "我的做事方法容易被人误解",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Pd"
+    ],
+    "text_en": "Statement 244."
+  },
+  {
+    "id": 245,
+    "text": "我的父母和家里人对我过于挑剔",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "F",
+      "Pd"
+    ],
+    "text_en": "Statement 245."
+  },
+  {
+    "id": 246,
+    "text": "我脖子(颈)上时常出现红斑",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "F"
+    ],
+    "text_en": "Statement 246."
+  },
+  {
+    "id": 247,
+    "text": "我有理由妒忌我家里的某些人",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "F"
+    ],
+    "text_en": "Statement 247."
+  },
+  {
+    "id": 248,
+    "text": "我有时无缘无故地，甚至在不顺利的时候也会觉得非常快乐",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "D",
+      "Pd"
+    ],
+    "text_en": "Statement 248."
+  },
+  {
+    "id": 249,
+    "text": "我相信阴间有魔鬼和地狱",
+    "key": 0,
+    "scale_if_1": [
+      "Mf-m",
+      "Mf-f",
+      "Do",
+      "Cn"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 249."
+  },
+  {
+    "id": 250,
+    "text": "有人想把世界上所能得到的东西都夺到手，我决不责怪他",
+    "key": 0,
+    "scale_if_1": [
+      "Do",
+      "Cn"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Ma"
+    ],
+    "text_en": "Statement 250."
+  },
+  {
+    "id": 251,
+    "text": "我曾经发呆(发愣)停止活动，不知道周围发生了什么事情",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Sc",
+      "Ma"
+    ],
+    "text_en": "Statement 251."
+  },
+  {
+    "id": 252,
+    "text": "谁也不关心谁的遭遇",
+    "key": 1,
+    "scale_if_1": [
+      "F"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 252."
+  },
+  {
+    "id": 253,
+    "text": "有些人所做的事，虽然我认为是错的，但我仍然能够友好地对待他们",
+    "key": 1,
+    "scale_if_1": [
+      "Hy"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 253."
+  },
+  {
+    "id": 254,
+    "text": "我喜欢和一些能互相开玩笑的人在一起",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Mf-m",
+      "Mf-f",
+      "Si"
+    ],
+    "text_en": "Statement 254."
+  },
+  {
+    "id": 255,
+    "text": "在选举的时候，有时我会选出我不熟悉的人",
+    "key": 1,
+    "scale_if_1": [
+      "Do"
+    ],
+    "scale_if_0": [
+      "Q",
+      "L"
+    ],
+    "text_en": "Statement 255."
+  },
+  {
+    "id": 256,
+    "text": "报纸上只有\"漫画”最有趣",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "F"
+    ],
+    "text_en": "Statement 256."
+  },
+  {
+    "id": 257,
+    "text": "凡是我做的事，我都指望能够成功",
+    "key": 0,
+    "scale_if_1": [
+      "F"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 257."
+  },
+  {
+    "id": 258,
+    "text": "我相信有神",
+    "key": 0,
+    "scale_if_1": [
+      "F"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 258."
+  },
+  {
+    "id": 259,
+    "text": "做什么事情，我都感到难以开头",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "D",
+      "Sc",
+      "Dy"
+    ],
+    "text_en": "Statement 259."
+  },
+  {
+    "id": 260,
+    "text": "有学校里，我是个笨学生",
+    "key": 0,
+    "scale_if_1": [
+      "Mf-m",
+      "Mf-f",
+      "Re"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 260."
+  },
+  {
+    "id": 261,
+    "text": "如果我是个画家，我喜欢画花",
+    "key": 1,
+    "scale_if_1": [
+      "Mf-m",
+      "Mf-f"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 261."
+  },
+  {
+    "id": 262,
+    "text": "我虽然相貌不好看，也不因此而苦恼",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Mf-m",
+      "Mf-f",
+      "Si"
+    ],
+    "text_en": "Statement 262."
+  },
+  {
+    "id": 263,
+    "text": "即使在冷天我也容易出汗",
+    "key": 0,
+    "scale_if_1": [
+      "D"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Ma",
+      "MAS"
+    ],
+    "text_en": "Statement 263."
+  },
+  {
+    "id": 264,
+    "text": "我十分自信",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Mf-m",
+      "Mf-f",
+      "MAS",
+      "Dy"
+    ],
+    "text_en": "Statement 264."
+  },
+  {
+    "id": 265,
+    "text": "对任何人都不信任，是比较安全的",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Hy"
+    ],
+    "text_en": "Statement 265."
+  },
+  {
+    "id": 266,
+    "text": "每星期至少有一两次我十分兴奋",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Pt",
+      "Sc",
+      "Ma"
+    ],
+    "text_en": "Statement 266."
+  },
+  {
+    "id": 267,
+    "text": "人多的时候，我不知道说些什么话好",
+    "key": 0,
+    "scale_if_1": [
+      "K",
+      "Hy",
+      "Pd",
+      "Ma",
+      "Do"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Si",
+      "Dy"
+    ],
+    "text_en": "Statement 267."
+  },
+  {
+    "id": 268,
+    "text": "在我心情不好的时候，总会有一些事情使我高兴起来",
+    "key": 1,
+    "scale_if_1": [
+      "Ma"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Pa",
+      "Do"
+    ],
+    "text_en": "Statement 268."
+  },
+  {
+    "id": 269,
+    "text": "我能很容易使人怕我，有时我故意这样做来寻开心",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "F"
+    ],
+    "text_en": "Statement 269."
+  },
+  {
+    "id": 270,
+    "text": "我离家外出的时候，从来不担心家里门窗是否关好锁好了",
+    "key": 1,
+    "scale_if_1": [
+      "Do"
+    ],
+    "scale_if_0": [
+      "Q",
+      "D"
+    ],
+    "text_en": "Statement 270."
+  },
+  {
+    "id": 271,
+    "text": "我不责怪一个欺负了自找没趣的人",
+    "key": 0,
+    "scale_if_1": [
+      "D"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Ma"
+    ],
+    "text_en": "Statement 271."
+  },
+  {
+    "id": 272,
+    "text": "我有时精力充沛",
+    "key": 0,
+    "scale_if_1": [
+      "F",
+      "K",
+      "D"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 272."
+  },
+  {
+    "id": 273,
+    "text": "我的皮肤上有一两处麻木了",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Hs",
+      "Sc"
+    ],
+    "text_en": "Statement 273."
+  },
+  {
+    "id": 274,
+    "text": "我的视力和往年一样好",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Hs",
+      "Hy"
+    ],
+    "text_en": "Statement 274."
+  },
+  {
+    "id": 275,
+    "text": "有人控制着我的思想",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "F",
+      "Pa"
+    ],
+    "text_en": "Statement 275."
+  },
+  {
+    "id": 276,
+    "text": "我喜欢小孩子",
+    "key": 0,
+    "scale_if_1": [
+      "F",
+      "Sc"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 276."
+  },
+  {
+    "id": 277,
+    "text": "有时我非常欣赏骗子的机智，我甚至希望他能侥幸混过去",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Ma"
+    ],
+    "text_en": "Statement 277."
+  },
+  {
+    "id": 278,
+    "text": "我时常觉得有些陌生人用挑剔的眼光盯着我",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Mf-m",
+      "Mf-f",
+      "Si"
+    ],
+    "text_en": "Statement 278."
+  },
+  {
+    "id": 279,
+    "text": "我每天喝特别多的水",
+    "key": 0,
+    "scale_if_1": [
+      "Hy"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Ma"
+    ],
+    "text_en": "Statement 279."
+  },
+  {
+    "id": 280,
+    "text": "大多数人交朋友，是因为朋友对他们有用",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Mf-m",
+      "Mf-f"
+    ],
+    "text_en": "Statement 280."
+  },
+  {
+    "id": 281,
+    "text": "我很少注意我的耳鸣",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Hs",
+      "Pa",
+      "Sc",
+      "Si"
+    ],
+    "text_en": "Statement 281."
+  },
+  {
+    "id": 282,
+    "text": "通常我爱家里的人，偶尔也恨他们",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Mf-m",
+      "Mf-f",
+      "Sc"
+    ],
+    "text_en": "Statement 282."
+  },
+  {
+    "id": 283,
+    "text": "假使我是一个新闻记者，我将很愿意报导体育新闻",
+    "key": 0,
+    "scale_if_1": [
+      "Mf-m",
+      "Mf-f"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 283."
+  },
+  {
+    "id": 284,
+    "text": "我相信别人正在议论我",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Pd",
+      "Pa"
+    ],
+    "text_en": "Statement 284."
+  },
+  {
+    "id": 285,
+    "text": "偶尔我听了下流的笑话也会发笑",
+    "key": 1,
+    "scale_if_1": [
+      "Cn"
+    ],
+    "scale_if_0": [
+      "Q",
+      "L",
+      "D"
+    ],
+    "text_en": "Statement 285."
+  },
+  {
+    "id": 286,
+    "text": "我独自一个人的时候，感到更快乐",
+    "key": 1,
+    "scale_if_1": [
+      "F"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 286."
+  },
+  {
+    "id": 287,
+    "text": "使我害怕的事比我的朋友们少得多",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Pd",
+      "MAS"
+    ],
+    "text_en": "Statement 287."
+  },
+  {
+    "id": 288,
+    "text": "恶心呕吐的毛病使我苦恼",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "F",
+      "D"
+    ],
+    "text_en": "Statement 288."
+  },
+  {
+    "id": 289,
+    "text": "当一个罪犯可以通过能言善辩的律师开脱罪责时，我对法律感到厌恶",
+    "key": 0,
+    "scale_if_1": [
+      "Hy",
+      "Pd",
+      "Ma"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 289."
+  },
+  {
+    "id": 290,
+    "text": "我总是在很紧张的情况下工作的",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "D"
+    ],
+    "text_en": "Statement 290."
+  },
+  {
+    "id": 291,
+    "text": "在我这一生中，至少有一两次我觉得有人用暗示使我做了一些事",
+    "key": 0,
+    "scale_if_1": [
+      "Cn"
+    ],
+    "scale_if_0": [
+      "Q",
+      "F",
+      "Pa",
+      "Sc"
+    ],
+    "text_en": "Statement 291."
+  },
+  {
+    "id": 292,
+    "text": "我不愿意同人讲话，除非他先开口",
+    "key": 1,
+    "scale_if_1": [
+      "Si"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Hy"
+    ],
+    "text_en": "Statement 292."
+  },
+  {
+    "id": 293,
+    "text": "有人一直想要影响我的思想",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "F",
+      "Pa"
+    ],
+    "text_en": "Statement 293."
+  },
+  {
+    "id": 294,
+    "text": "我从来没有犯过法",
+    "key": 1,
+    "scale_if_1": [
+      "Re"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Pd",
+      "Pa"
+    ],
+    "text_en": "Statement 294."
+  },
+  {
+    "id": 295,
+    "text": "我喜欢看《红楼梦》这一类的小说",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Mf-m",
+      "Mf-f"
+    ],
+    "text_en": "Statement 295."
+  },
+  {
+    "id": 296,
+    "text": "有些时候，我会无缘无故地觉得非常愉快",
+    "key": 1,
+    "scale_if_1": [
+      "Cn"
+    ],
+    "scale_if_0": [
+      "Q",
+      "K",
+      "D",
+      "Pd",
+      "Si"
+    ],
+    "text_en": "Statement 296."
+  },
+  {
+    "id": 297,
+    "text": "我希望我不再受那种和性方面有关的念头所困扰",
+    "key": 0,
+    "scale_if_1": [
+      "Mf-f"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Mf-m",
+      "Sc"
+    ],
+    "text_en": "Statement 297."
+  },
+  {
+    "id": 298,
+    "text": "假若有几个人闯了祸，他们最好先编一套假话，而且不改口",
+    "key": 1,
+    "scale_if_1": [
+      "Ma"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 298."
+  },
+  {
+    "id": 299,
+    "text": "我认为我比大多数人更重感情",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Mf-m",
+      "Mf-f",
+      "Pa"
+    ],
+    "text_en": "Statement 299."
+  },
+  {
+    "id": 300,
+    "text": "在我的一生当中，从来没有喜欢过洋娃娃",
+    "key": 0,
+    "scale_if_1": [
+      "Mf-m",
+      "Mf-f"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 300."
+  },
+  {
+    "id": 301,
+    "text": "许多时候，生活对我来说是一件吃力的事",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Pt",
+      "Sc",
+      "MAS"
+    ],
+    "text_en": "Statement 301."
+  },
+  {
+    "id": 302,
+    "text": "我从来没有为了我的性方面的行为出过事",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Sc"
+    ],
+    "text_en": "Statement 302."
+  },
+  {
+    "id": 303,
+    "text": "对于某些事情我很敏感，以至使我不能提起",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Sc"
+    ],
+    "text_en": "Statement 303."
+  },
+  {
+    "id": 304,
+    "text": "在学校里，要我在班上发言，是非常困难的",
+    "key": 0,
+    "scale_if_1": [
+      "Do",
+      "Re"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Pt",
+      "Si",
+      "Dy"
+    ],
+    "text_en": "Statement 304."
+  },
+  {
+    "id": 305,
+    "text": "即使和人们在一起，我还是经常感到孤单",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Pa",
+      "Dy"
+    ],
+    "text_en": "Statement 305."
+  },
+  {
+    "id": 306,
+    "text": "应得的同情，我全都得到了",
+    "key": 0,
+    "scale_if_1": [
+      "Sc"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 306."
+  },
+  {
+    "id": 307,
+    "text": "我拒绝玩那些我玩得不好的游戏",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Sc"
+    ],
+    "text_en": "Statement 307."
+  },
+  {
+    "id": 308,
+    "text": "有时我非常想离开家",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Sc"
+    ],
+    "text_en": "Statement 308."
+  },
+  {
+    "id": 309,
+    "text": "我交朋友差不多和别人一样地容易",
+    "key": 0,
+    "scale_if_1": [
+      "Sc",
+      "Si"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 309."
+  },
+  {
+    "id": 310,
+    "text": "我的性生活是满意的",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Sc"
+    ],
+    "text_en": "Statement 310."
+  },
+  {
+    "id": 311,
+    "text": "我小的时候，有一段时间我干过小偷小摸的事",
+    "key": 1,
+    "scale_if_1": [
+      "Sc"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 311."
+  },
+  {
+    "id": 312,
+    "text": "我不喜欢有人在我身旁",
+    "key": 1,
+    "scale_if_1": [
+      "Sc"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 312."
+  },
+  {
+    "id": 313,
+    "text": "有人不将自己的贵重物品保管好因而引起别人偷窃，这种人和小偷一样应受责备",
+    "key": 0,
+    "scale_if_1": [
+      "Pa",
+      "Cn"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 313."
+  },
+  {
+    "id": 314,
+    "text": "偶尔我会想到一些坏得说不出口的事",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Pa"
+    ],
+    "text_en": "Statement 314."
+  },
+  {
+    "id": 315,
+    "text": "我深信生活对我是残酷的",
+    "key": 1,
+    "scale_if_1": [
+      "Sc"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 315."
+  },
+  {
+    "id": 316,
+    "text": "我想差不多每个人，都会为了避免麻烦说点假话",
+    "key": 1,
+    "scale_if_1": [
+      "Si"
+    ],
+    "scale_if_0": [
+      "Q",
+      "K",
+      "Pa"
+    ],
+    "text_en": "Statement 316."
+  },
+  {
+    "id": 317,
+    "text": "我比大多数人更敏感",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Pa",
+      "MAS"
+    ],
+    "text_en": "Statement 317."
+  },
+  {
+    "id": 318,
+    "text": "我的日常生活中，充满着使我感兴趣的事情",
+    "key": 0,
+    "scale_if_1": [
+      "Sc"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 318."
+  },
+  {
+    "id": 319,
+    "text": "大多数人，都是内心不愿意挺身而出去帮助别人的",
+    "key": 1,
+    "scale_if_1": [
+      "Cn"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Pa"
+    ],
+    "text_en": "Statement 319."
+  },
+  {
+    "id": 320,
+    "text": "我的梦有好些是关于性方面的事",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Sc"
+    ],
+    "text_en": "Statement 320."
+  },
+  {
+    "id": 321,
+    "text": "我很容易感到不知所措",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Pt",
+      "Si",
+      "MAS",
+      "Dy"
+    ],
+    "text_en": "Statement 321."
+  },
+  {
+    "id": 322,
+    "text": "我为金钱和事业忧虑",
+    "key": 1,
+    "scale_if_1": [
+      "MAS"
+    ],
+    "scale_if_0": [
+      "Q",
+      "K",
+      "Sc"
+    ],
+    "text_en": "Statement 322."
+  },
+  {
+    "id": 323,
+    "text": "我曾经有过很特别，很奇怪的体验",
+    "key": 1,
+    "scale_if_1": [
+      "Sc"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 323."
+  },
+  {
+    "id": 324,
+    "text": "我从来没有爱上过任何人",
+    "key": 1,
+    "scale_if_1": [
+      "Sc"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 324."
+  },
+  {
+    "id": 325,
+    "text": "我家里有些人所做的事，使我吃惊",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Sc"
+    ],
+    "text_en": "Statement 325."
+  },
+  {
+    "id": 326,
+    "text": "有时我会哭一阵，笑一阵，连自己也不能控制",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Pa"
+    ],
+    "text_en": "Statement 326."
+  },
+  {
+    "id": 327,
+    "text": "我的母亲或父亲时常要我服从他，甚至我认为是不合理的",
+    "key": 0,
+    "scale_if_1": [
+      "Pa"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 327."
+  },
+  {
+    "id": 328,
+    "text": "我发现我很难把注意力集中到一件工作上",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Sc"
+    ],
+    "text_en": "Statement 328."
+  },
+  {
+    "id": 329,
+    "text": "我几乎从不做梦",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Pt"
+    ],
+    "text_en": "Statement 329."
+  },
+  {
+    "id": 330,
+    "text": "我从来没有瘫痪过，或是感到肌肉非常软弱无力",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Sc"
+    ],
+    "text_en": "Statement 330."
+  },
+  {
+    "id": 331,
+    "text": "假如不是有人和我作对，我一定会有更大的成就",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Sc"
+    ],
+    "text_en": "Statement 331."
+  },
+  {
+    "id": 332,
+    "text": "即使我没有感冒，我有时也会发不出声音或声音改变",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Sc",
+      "Si"
+    ],
+    "text_en": "Statement 332."
+  },
+  {
+    "id": 333,
+    "text": "似乎没有人能了解我",
+    "key": 1,
+    "scale_if_1": [
+      "Sc"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 333."
+  },
+  {
+    "id": 334,
+    "text": "有时我会闻到奇怪的气味",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Sc"
+    ],
+    "text_en": "Statement 334."
+  },
+  {
+    "id": 335,
+    "text": "我不能专心于一件事情上",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Sc",
+      "MAS"
+    ],
+    "text_en": "Statement 335."
+  },
+  {
+    "id": 336,
+    "text": "我很容易对人感到不耐烦",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Pt",
+      "Si"
+    ],
+    "text_en": "Statement 336."
+  },
+  {
+    "id": 337,
+    "text": "我几乎整天都在为某件事或某个人而焦虑",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Pt",
+      "MAS",
+      "Dy",
+      "Cn"
+    ],
+    "text_en": "Statement 337."
+  },
+  {
+    "id": 338,
+    "text": "我所操心的事，远远超过了我所应该操心的",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Pa",
+      "Dy"
+    ],
+    "text_en": "Statement 338."
+  },
+  {
+    "id": 339,
+    "text": "大部分时间，我觉得我还是死了的好",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Sc"
+    ],
+    "text_en": "Statement 339."
+  },
+  {
+    "id": 340,
+    "text": "有时我会兴奋得难以入睡",
+    "key": 1,
+    "scale_if_1": [
+      "Pt",
+      "MAS"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 340."
+  },
+  {
+    "id": 341,
+    "text": "有时我的听觉太灵敏了，反而使我感到烦恼",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Pa",
+      "Sc"
+    ],
+    "text_en": "Statement 341."
+  },
+  {
+    "id": 342,
+    "text": "别人对我所说的话，我立刻就忘记了",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Pt",
+      "Si"
+    ],
+    "text_en": "Statement 342."
+  },
+  {
+    "id": 343,
+    "text": "哪怕是琐碎小事，我也再三考虑后才去做",
+    "key": 0,
+    "scale_if_1": [
+      "Do"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Pt",
+      "Dy"
+    ],
+    "text_en": "Statement 343."
+  },
+  {
+    "id": 344,
+    "text": "有时为了避免和某些人相遇，我会绕道而行",
+    "key": 1,
+    "scale_if_1": [
+      "Pt"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 344."
+  },
+  {
+    "id": 345,
+    "text": "我常常觉得好象一切都不是真的",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Sc"
+    ],
+    "text_en": "Statement 345."
+  },
+  {
+    "id": 346,
+    "text": "我有一个习惯，喜欢点数一些不重要的东西，像路上的电线杆等等",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Pt"
+    ],
+    "text_en": "Statement 346."
+  },
+  {
+    "id": 347,
+    "text": "我没有真正想伤害我的仇人",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Pa"
+    ],
+    "text_en": "Statement 347."
+  },
+  {
+    "id": 348,
+    "text": "我提防那些对我过分亲近的人",
+    "key": 0,
+    "scale_if_1": [
+      "Pa"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 348."
+  },
+  {
+    "id": 349,
+    "text": "我有一些奇怪和特别的念头",
+    "key": 1,
+    "scale_if_1": [
+      "Pt",
+      "Sc"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 349."
+  },
+  {
+    "id": 350,
+    "text": "在我独处的时候，我听到奇怪的声音",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Sc"
+    ],
+    "text_en": "Statement 350."
+  },
+  {
+    "id": 351,
+    "text": "当我必须短期离家出门的时候，我会感到心神不定",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Pt"
+    ],
+    "text_en": "Statement 351."
+  },
+  {
+    "id": 352,
+    "text": "我怕一些东西或人，虽然我明知他们是不会伤害我的",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Pt",
+      "Sc",
+      "MAS"
+    ],
+    "text_en": "Statement 352."
+  },
+  {
+    "id": 353,
+    "text": "如果屋子里已经有人聚在一起谈话，这时要我一个人进去，我是一点也不怕的",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Pt",
+      "Si"
+    ],
+    "text_en": "Statement 353."
+  },
+  {
+    "id": 354,
+    "text": "我害怕使用刀子或任何尖利的东西",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Sc"
+    ],
+    "text_en": "Statement 354."
+  },
+  {
+    "id": 355,
+    "text": "有时我喜欢折磨我所爱的人",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Sc"
+    ],
+    "text_en": "Statement 355."
+  },
+  {
+    "id": 356,
+    "text": "我似乎比别人更难于集中注意力",
+    "key": 0,
+    "scale_if_1": [
+      "Do"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Pt",
+      "Sc"
+    ],
+    "text_en": "Statement 356."
+  },
+  {
+    "id": 357,
+    "text": "有好几次我放弃正在做的事，因为我感到自己的能力太差了",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Pt",
+      "Si",
+      "Dy"
+    ],
+    "text_en": "Statement 357."
+  },
+  {
+    "id": 358,
+    "text": "我脑子里出现一些坏的常常是可怕的字眼，却又无法摆脱它们",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Pt"
+    ],
+    "text_en": "Statement 358."
+  },
+  {
+    "id": 359,
+    "text": "有时一些无关紧要的念头缠着我，使我好多天都感到不安",
+    "key": 0,
+    "scale_if_1": [
+      "Si"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Pt"
+    ],
+    "text_en": "Statement 359."
+  },
+  {
+    "id": 360,
+    "text": "几乎每天都有使我害怕的事情发生",
+    "key": 0,
+    "scale_if_1": [
+      "Cn"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Pt",
+      "Sc"
+    ],
+    "text_en": "Statement 360."
+  },
+  {
+    "id": 361,
+    "text": "我总是将事情看得严重些",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Pt",
+      "MAS",
+      "Dy"
+    ],
+    "text_en": "Statement 361."
+  },
+  {
+    "id": 362,
+    "text": "我比大多数人更敏感",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Pt",
+      "Dy"
+    ],
+    "text_en": "Statement 362."
+  },
+  {
+    "id": 363,
+    "text": "有时我喜欢受到我心爱的人的折磨",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Sc"
+    ],
+    "text_en": "Statement 363."
+  },
+  {
+    "id": 364,
+    "text": "有人用侮辱性的和下流的话议论我",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Pa",
+      "Sc"
+    ],
+    "text_en": "Statement 364."
+  },
+  {
+    "id": 365,
+    "text": "我呆在屋里总是感到不安",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Pa"
+    ],
+    "text_en": "Statement 365."
+  },
+  {
+    "id": 366,
+    "text": "即使和人们在一起，我仍经常感到孤单",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Pt",
+      "Sc"
+    ],
+    "text_en": "Statement 366."
+  },
+  {
+    "id": 367,
+    "text": "我并不是特别害羞拘谨",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Si",
+      "MAS"
+    ],
+    "text_en": "Statement 367."
+  },
+  {
+    "id": 368,
+    "text": "有时我的头脑似乎比平时迟钝",
+    "key": 0,
+    "scale_if_1": [
+      "K"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 368."
+  },
+  {
+    "id": 369,
+    "text": "在社交场合，我多半是一个人坐着，或者只是跟另一个人坐在一起，而不到人群里去",
+    "key": 1,
+    "scale_if_1": [
+      "Si"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 369."
+  },
+  {
+    "id": 370,
+    "text": "人们常使我失望",
+    "key": 0,
+    "scale_if_1": [
+      "K"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Si",
+      "Dy"
+    ],
+    "text_en": "Statement 370."
+  },
+  {
+    "id": 371,
+    "text": "我很喜欢参加舞会",
+    "key": 0,
+    "scale_if_1": [
+      "Si"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 371."
+  },
+  {
+    "id": 372,
+    "text": "有时我常感到困难重重，无法克服",
+    "key": 0,
+    "scale_if_1": [
+      "K"
+    ],
+    "scale_if_0": [
+      "Q",
+      "MAS",
+      "Dy"
+    ],
+    "text_en": "Statement 372."
+  },
+  {
+    "id": 373,
+    "text": "我常想：\"我要能再成为一个孩子就好了”",
+    "key": 1,
+    "scale_if_1": [
+      "Si",
+      "Dy"
+    ],
+    "scale_if_0": [
+      "Q",
+      "K"
+    ],
+    "text_en": "Statement 373."
+  },
+  {
+    "id": 374,
+    "text": "如果给我机会，我一定能做些对世界大有益处的事",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Si"
+    ],
+    "text_en": "Statement 374."
+  },
+  {
+    "id": 375,
+    "text": "我时常遇见一些所谓的专家，他们并不比我高明",
+    "key": 0,
+    "scale_if_1": [
+      "K"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 375."
+  },
+  {
+    "id": 376,
+    "text": "当我听说我所熟悉的人成功了，我就会觉得自己失败了",
+    "key": 1,
+    "scale_if_1": [
+      "Si",
+      "Cn"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 376."
+  },
+  {
+    "id": 377,
+    "text": "如果有机会，我一定能成为一个人民的好领袖",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Si"
+    ],
+    "text_en": "Statement 377."
+  },
+  {
+    "id": 378,
+    "text": "下流的故事使我感到不好意思",
+    "key": 1,
+    "scale_if_1": [
+      "Si"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 378."
+  },
+  {
+    "id": 379,
+    "text": "一般来说人们要求别人尊重自己比较多，而自己却很少尊重别人",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Si",
+      "Cn"
+    ],
+    "text_en": "Statement 379."
+  },
+  {
+    "id": 380,
+    "text": "我总想把好的故事记住，讲给别人听",
+    "key": 0,
+    "scale_if_1": [
+      "Si"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 380."
+  },
+  {
+    "id": 381,
+    "text": "我喜欢搞输赢不大的赌博",
+    "key": 0,
+    "scale_if_1": [
+      "Si"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Cn"
+    ],
+    "text_en": "Statement 381."
+  },
+  {
+    "id": 382,
+    "text": "为了可以和人们在一起，我喜欢社交活动",
+    "key": 0,
+    "scale_if_1": [
+      "Si"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 382."
+  },
+  {
+    "id": 383,
+    "text": "我喜欢人多热闹的场合",
+    "key": 0,
+    "scale_if_1": [
+      "Si"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 383."
+  },
+  {
+    "id": 384,
+    "text": "当我和一群活泼的朋友在一起的时候，我的烦恼就消失了",
+    "key": 0,
+    "scale_if_1": [
+      "Si"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 384."
+  },
+  {
+    "id": 385,
+    "text": "当人们说我的班组人的闲话时，我从来不参与",
+    "key": 1,
+    "scale_if_1": [
+      "Si"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 385."
+  },
+  {
+    "id": 386,
+    "text": "只要我开始做一件事，就很难放下，哪怕是暂时的",
+    "key": 0,
+    "scale_if_1": [
+      "K"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 386."
+  },
+  {
+    "id": 387,
+    "text": "我的小便不困难，也不难控制",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Si"
+    ],
+    "text_en": "Statement 387."
+  },
+  {
+    "id": 388,
+    "text": "我常发现别人妨忌我的好主意，因为他们没能先想到",
+    "key": 0,
+    "scale_if_1": [
+      "Si",
+      "Re"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 388."
+  },
+  {
+    "id": 389,
+    "text": "只要有可能，我就避开人群",
+    "key": 1,
+    "scale_if_1": [
+      "Si"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 389."
+  },
+  {
+    "id": 390,
+    "text": "我不怕见生人",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Si"
+    ],
+    "text_en": "Statement 390."
+  },
+  {
+    "id": 391,
+    "text": "记得我曾经为了不想做某件事而装过病",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Si"
+    ],
+    "text_en": "Statement 391."
+  },
+  {
+    "id": 392,
+    "text": "在火车和公共汽车上，我常跟陌生人交谈",
+    "key": 0,
+    "scale_if_1": [
+      "Si"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 392."
+  },
+  {
+    "id": 393,
+    "text": "当事情不顺利的时候，我就想立即放弃",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Si",
+      "Dy"
+    ],
+    "text_en": "Statement 393."
+  },
+  {
+    "id": 394,
+    "text": "我不愿意让人家知道我对于事物的态度",
+    "key": 0,
+    "scale_if_1": [
+      "K"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 394."
+  },
+  {
+    "id": 395,
+    "text": "有些时候，我感到劲头十足，以至于一连好几天都不需要睡觉",
+    "key": 0,
+    "scale_if_1": [
+      "Si"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 395."
+  },
+  {
+    "id": 396,
+    "text": "在人群中，如果叫我带头发言，或对我所熟悉的事情发表意见，我并不感到不好意思",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Si"
+    ],
+    "text_en": "Statement 396."
+  },
+  {
+    "id": 397,
+    "text": "我喜欢聚会和社交活动",
+    "key": 0,
+    "scale_if_1": [
+      "Si"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 397."
+  },
+  {
+    "id": 398,
+    "text": "面对困难或危险的时候，我总是退缩不前",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Si",
+      "MAS",
+      "Dy"
+    ],
+    "text_en": "Statement 398."
+  },
+  {
+    "id": 399,
+    "text": "我原来想做的事，假若别人认为不值得做，我很容易放弃",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Si",
+      "Dy"
+    ],
+    "text_en": "Statement 399."
+  },
+  {
+    "id": 400,
+    "text": "我不怕火",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 400."
+  },
+  {
+    "id": 401,
+    "text": "我不怕水",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 401."
+  },
+  {
+    "id": 402,
+    "text": "我常常是仔细考虑之后才做出决定",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 402."
+  },
+  {
+    "id": 403,
+    "text": "生活在这个丰富多彩的时代里是多么美好",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 403."
+  },
+  {
+    "id": 404,
+    "text": "当我想纠正别人的错误和帮助他们的时候，我的好意常被误解",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 404."
+  },
+  {
+    "id": 405,
+    "text": "我吞咽没有困难",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 405."
+  },
+  {
+    "id": 406,
+    "text": "我有时回避见人，因为我怕我会做出一些事后令我懊悔的事",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Do"
+    ],
+    "text_en": "Statement 406."
+  },
+  {
+    "id": 407,
+    "text": "我通常很镇静，不容易激动",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "MAS"
+    ],
+    "text_en": "Statement 407."
+  },
+  {
+    "id": 408,
+    "text": "我不轻易流露自己的感情，以至于人家得罪了我，他自己还不知道",
+    "key": 1,
+    "scale_if_1": [
+      "Dy"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 408."
+  },
+  {
+    "id": 409,
+    "text": "有时我因为承担的事情太多，以至精疲力竭",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 409."
+  },
+  {
+    "id": 410,
+    "text": "我当然乐于以其人之道还治其人之身",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 410."
+  },
+  {
+    "id": 411,
+    "text": "宗教不使我烦恼",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Dy"
+    ],
+    "text_en": "Statement 411."
+  },
+  {
+    "id": 412,
+    "text": "我生病或受伤的时候，不怕找医生",
+    "key": 1,
+    "scale_if_1": [
+      "Re"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 412."
+  },
+  {
+    "id": 413,
+    "text": "我有罪，应受重罚",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 413."
+  },
+  {
+    "id": 414,
+    "text": "我把失望的事看得太重，以至于总忘不了",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 414."
+  },
+  {
+    "id": 415,
+    "text": "我很不喜欢匆匆忙忙地赶工作",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 415."
+  },
+  {
+    "id": 416,
+    "text": "虽然我明知自己能把事做好，但是我也怕别人看着我做",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 416."
+  },
+  {
+    "id": 417,
+    "text": "在排队的时候如果有人插到我的前面去，我会感到恼火而指责他",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 417."
+  },
+  {
+    "id": 418,
+    "text": "有时我觉得自己一无是处",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "MAS",
+      "Cn"
+    ],
+    "text_en": "Statement 418."
+  },
+  {
+    "id": 419,
+    "text": "小时候我时常逃学",
+    "key": 0,
+    "scale_if_1": [
+      "Do",
+      "Re"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 419."
+  },
+  {
+    "id": 420,
+    "text": "我曾经有过很不寻常的宗教体验",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 420."
+  },
+  {
+    "id": 421,
+    "text": "我家里有人很神经过敏",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 421."
+  },
+  {
+    "id": 422,
+    "text": "我因为家里有的人所从事的职业而感到不好意思",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 422."
+  },
+  {
+    "id": 423,
+    "text": "我很喜欢(或者喜欢过)钓鱼",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 423."
+  },
+  {
+    "id": 424,
+    "text": "我几乎总感到肚子饿",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "MAS"
+    ],
+    "text_en": "Statement 424."
+  },
+  {
+    "id": 425,
+    "text": "我经常做梦",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 425."
+  },
+  {
+    "id": 426,
+    "text": "我有时只好用不客气的态度去对付那些粗鲁或令人厌恶的人",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 426."
+  },
+  {
+    "id": 427,
+    "text": "我倾向于对各种不同爱好发生兴趣，而不愿意长期坚持其中的某一种",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 427."
+  },
+  {
+    "id": 428,
+    "text": "我喜欢阅读报纸的社论",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 428."
+  },
+  {
+    "id": 429,
+    "text": "我喜欢听主题严肃的演说",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 429."
+  },
+  {
+    "id": 430,
+    "text": "我易受异性的吸引",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 430."
+  },
+  {
+    "id": 431,
+    "text": "我相当担心那些可能发生的不幸",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "MAS"
+    ],
+    "text_en": "Statement 431."
+  },
+  {
+    "id": 432,
+    "text": "我有着坚定的政治见解",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Do"
+    ],
+    "text_en": "Statement 432."
+  },
+  {
+    "id": 433,
+    "text": "我曾经有过想象的同伴",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 433."
+  },
+  {
+    "id": 434,
+    "text": "我希望能成为一个摩托车运动员",
+    "key": 0,
+    "scale_if_1": [
+      "Re"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 434."
+  },
+  {
+    "id": 435,
+    "text": "我通常喜欢和妇女一起工作",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 435."
+  },
+  {
+    "id": 436,
+    "text": "我觉得只有一种宗教是真的",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 436."
+  },
+  {
+    "id": 437,
+    "text": "只要你不是真正地犯法，钻法律的空子是可以的",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Re"
+    ],
+    "text_en": "Statement 437."
+  },
+  {
+    "id": 438,
+    "text": "有些人讨厌极了，我会因为他们自食其果而暗中高兴",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 438."
+  },
+  {
+    "id": 439,
+    "text": "要我等待我就紧张",
+    "key": 0,
+    "scale_if_1": [
+      "Cn"
+    ],
+    "scale_if_0": [
+      "Q",
+      "MAS"
+    ],
+    "text_en": "Statement 439."
+  },
+  {
+    "id": 440,
+    "text": "当我兴高采烈的时候，见到别人忧郁消沉就使我大为扫兴",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Dy"
+    ],
+    "text_en": "Statement 440."
+  },
+  {
+    "id": 441,
+    "text": "我喜欢身材高的女人",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 441."
+  },
+  {
+    "id": 442,
+    "text": "有些时期我因忧虑而失眠",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "MAS"
+    ],
+    "text_en": "Statement 442."
+  },
+  {
+    "id": 443,
+    "text": "假若别人认为我对某些事的做法不妥的话，我很容易放弃",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Dy"
+    ],
+    "text_en": "Statement 443."
+  },
+  {
+    "id": 444,
+    "text": "我不想去纠正那些发表愚昧无知见解的人",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Cn"
+    ],
+    "text_en": "Statement 444."
+  },
+  {
+    "id": 445,
+    "text": "我年轻(童年)的时候，喜欢热闹",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 445."
+  },
+  {
+    "id": 446,
+    "text": "警察通常是诚实的",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 446."
+  },
+  {
+    "id": 447,
+    "text": "当别人反对我的意见时，我会不惜一切去说服他",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Cn"
+    ],
+    "text_en": "Statement 447."
+  },
+  {
+    "id": 448,
+    "text": "在街上、车上、或在商店里，如果有人注视我，我会觉得不安",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 448."
+  },
+  {
+    "id": 449,
+    "text": "我不喜欢看到妇女吸烟",
+    "key": 0,
+    "scale_if_1": [
+      "Cn"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 449."
+  },
+  {
+    "id": 450,
+    "text": "我很少有忧郁的毛病",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 450."
+  },
+  {
+    "id": 451,
+    "text": "如果有人对我所熟悉的事情发表愚蠢和无知的意见，我总设法纠正他",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 451."
+  },
+  {
+    "id": 452,
+    "text": "我喜欢开别人的玩笑",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 452."
+  },
+  {
+    "id": 453,
+    "text": "我小时候对是否参加团伙无所谓",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 453."
+  },
+  {
+    "id": 454,
+    "text": "独自住在深山或老林的小木屋里，我也会觉得快乐",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 454."
+  },
+  {
+    "id": 455,
+    "text": "许多人都说我是急性子",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 455."
+  },
+  {
+    "id": 456,
+    "text": "如果一个人触犯了一条他认为不合理的法律，他是不应该受到惩罚的",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 456."
+  },
+  {
+    "id": 457,
+    "text": "我认为一个人决不应该喝酒",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 457."
+  },
+  {
+    "id": 458,
+    "text": "小时候和我关系密切的人(父亲、继父等)对我十分严厉",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 458."
+  },
+  {
+    "id": 459,
+    "text": "我有几种坏习惯，已经根深蒂固，难于改正",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 459."
+  },
+  {
+    "id": 460,
+    "text": "我只适量地喝一点酒(或者一点也不喝)",
+    "key": 1,
+    "scale_if_1": [
+      "Cn"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 460."
+  },
+  {
+    "id": 461,
+    "text": "我希望我能避免因为破口伤人而引起的烦恼",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Dy",
+      "Cn"
+    ],
+    "text_en": "Statement 461."
+  },
+  {
+    "id": 462,
+    "text": "我觉得不能把自己的一切都告诉别人",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 462."
+  },
+  {
+    "id": 463,
+    "text": "我从前喜欢玩\"跳房子”(或跳皮筋)的游戏",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 463."
+  },
+  {
+    "id": 464,
+    "text": "我从来没有见过幻像",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 464."
+  },
+  {
+    "id": 465,
+    "text": "对于我的终身职业，我已经几次改变过主意",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 465."
+  },
+  {
+    "id": 466,
+    "text": "除了医生的嘱咐，我从来不服用任何药物或安眠药",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 466."
+  },
+  {
+    "id": 467,
+    "text": "我时常默记一些无关重要的号码(如汽车牌照等)",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 467."
+  },
+  {
+    "id": 468,
+    "text": "我时常因为自己爱发脾气和抱怨而感到懊悔",
+    "key": 0,
+    "scale_if_1": [
+      "Re"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 468."
+  },
+  {
+    "id": 469,
+    "text": "闪电是我害怕的东西中的一种",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 469."
+  },
+  {
+    "id": 470,
+    "text": "有关性方面的事使我厌恶",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 470."
+  },
+  {
+    "id": 471,
+    "text": "在学校中老师对我的品行评定总是很不好",
+    "key": 0,
+    "scale_if_1": [
+      "Re"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 471."
+  },
+  {
+    "id": 472,
+    "text": "火对我有一种吸引力",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Re"
+    ],
+    "text_en": "Statement 472."
+  },
+  {
+    "id": 473,
+    "text": "我喜欢让别人猜测我下一步的行动",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 473."
+  },
+  {
+    "id": 474,
+    "text": "我的小便次数不比别人多",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 474."
+  },
+  {
+    "id": 475,
+    "text": "万不得已的时候，我只吐露一些无损于自己的那部分真情",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 475."
+  },
+  {
+    "id": 476,
+    "text": "我是神派来的特使",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 476."
+  },
+  {
+    "id": 477,
+    "text": "假如我和几个朋友有着同样的过错，我宁可一人承担而不愿连累别人",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 477."
+  },
+  {
+    "id": 478,
+    "text": "我还从来没有因为家里人惹了事而自己感到特别紧张",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 478."
+  },
+  {
+    "id": 479,
+    "text": "人与人间的相互欺骗是我所知道的唯一奇迹",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 479."
+  },
+  {
+    "id": 480,
+    "text": "我常常怕黑暗",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 480."
+  },
+  {
+    "id": 481,
+    "text": "我害怕一个人单独呆在黑暗中",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 481."
+  },
+  {
+    "id": 482,
+    "text": "我的计划看来总是困难重重，使我不得不一一放弃",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 482."
+  },
+  {
+    "id": 483,
+    "text": "神创造奇迹",
+    "key": 0,
+    "scale_if_1": [
+      "Do",
+      "Cn"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 483."
+  },
+  {
+    "id": 484,
+    "text": "有些缺点，我只好承认并设法加以控制，但无法消除",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 484."
+  },
+  {
+    "id": 485,
+    "text": "一个男人和一个女人相处的时候，他通常想到的是关于她性方面的事",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 485."
+  },
+  {
+    "id": 486,
+    "text": "我从来没有发现我尿中有血",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 486."
+  },
+  {
+    "id": 487,
+    "text": "当我试图使别人不犯错误而做的事被人误解的时候，我往往感到十分难过",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Dy"
+    ],
+    "text_en": "Statement 487."
+  },
+  {
+    "id": 488,
+    "text": "每星期我祈祷几次",
+    "key": 0,
+    "scale_if_1": [
+      "Cn"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Dy"
+    ],
+    "text_en": "Statement 488."
+  },
+  {
+    "id": 489,
+    "text": "我同情那些不能摆脱苦恼和忧愁的人",
+    "key": 1,
+    "scale_if_1": [
+      "Dy"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Cn"
+    ],
+    "text_en": "Statement 489."
+  },
+  {
+    "id": 490,
+    "text": "我每星期念几次经",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 490."
+  },
+  {
+    "id": 491,
+    "text": "对认为世界上只有一种宗教是真的那些人，我感到不耐烦",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 491."
+  },
+  {
+    "id": 492,
+    "text": "我想起地震就害怕",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 492."
+  },
+  {
+    "id": 493,
+    "text": "我喜欢那种需要集中注意力的工作，而不喜欢省心(不费劲)的工作",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 493."
+  },
+  {
+    "id": 494,
+    "text": "我怕自己被关在小房间里或紧闭的小地方",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 494."
+  },
+  {
+    "id": 495,
+    "text": "对那些我想帮助他们改正或提高的人，我总是坦率地交底",
+    "key": 0,
+    "scale_if_1": [
+      "Q"
+    ],
+    "scale_if_0": [],
+    "text_en": "Statement 495."
+  },
+  {
+    "id": 496,
+    "text": "我从来没有过将一件东西看成两件(复视现象)",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 496."
+  },
+  {
+    "id": 497,
+    "text": "我喜欢探险小说",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 497."
+  },
+  {
+    "id": 498,
+    "text": "坦率永远是一件好事",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 498."
+  },
+  {
+    "id": 499,
+    "text": "我必须承认我有时会不合理地担心一些无关紧要的事情",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "MAS"
+    ],
+    "text_en": "Statement 499."
+  },
+  {
+    "id": 500,
+    "text": "我很乐意百分之百地接受一个好意见",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 500."
+  },
+  {
+    "id": 501,
+    "text": "我一向总是靠自己解决问题，而不是找人教我怎样做",
+    "key": 1,
+    "scale_if_1": [
+      "Re"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 501."
+  },
+  {
+    "id": 502,
+    "text": "风暴使我惊慌",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 502."
+  },
+  {
+    "id": 503,
+    "text": "我不经常对别人的行动表示强烈的赞成或反对",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 503."
+  },
+  {
+    "id": 504,
+    "text": "我不想隐瞒我对一个的坏印象或同情，以至他不知道我对他的看法",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 504."
+  },
+  {
+    "id": 505,
+    "text": "我认为\"不肯拉车的马应该受到鞭打”",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 505."
+  },
+  {
+    "id": 506,
+    "text": "我是一个神经高度紧张的人",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "MAS"
+    ],
+    "text_en": "Statement 506."
+  },
+  {
+    "id": 507,
+    "text": "我经常遇到一些领导人，他们把功劳归于自己，把错误推给下级",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 507."
+  },
+  {
+    "id": 508,
+    "text": "我相信我的嗅觉和别人一样好",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 508."
+  },
+  {
+    "id": 509,
+    "text": "因为我太拘谨，所以有时我难以坚持自己的正确意见",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Dy"
+    ],
+    "text_en": "Statement 509."
+  },
+  {
+    "id": 510,
+    "text": "肮脏使我害怕和恶心",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 510."
+  },
+  {
+    "id": 511,
+    "text": "我有一种不愿告诉别人的梦幻生活",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 511."
+  },
+  {
+    "id": 512,
+    "text": "我不喜欢洗澡",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 512."
+  },
+  {
+    "id": 513,
+    "text": "我认为为别人谋求幸福比自己争取自由更为伟大",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 513."
+  },
+  {
+    "id": 514,
+    "text": "我喜欢有男子气的女人",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 514."
+  },
+  {
+    "id": 515,
+    "text": "我们家总是不愁吃不愁穿",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 515."
+  },
+  {
+    "id": 516,
+    "text": "我家里有些人脾气急躁",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 516."
+  },
+  {
+    "id": 517,
+    "text": "我无论什么事情都做不好",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 517."
+  },
+  {
+    "id": 518,
+    "text": "我经常感到渐愧，因为我对某些事情想的和做的不一样",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 518."
+  },
+  {
+    "id": 519,
+    "text": "我的性器官有点毛病",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 519."
+  },
+  {
+    "id": 520,
+    "text": "我的原则是坚持强烈维护自己的意见",
+    "key": 0,
+    "scale_if_1": [
+      "MAS"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 520."
+  },
+  {
+    "id": 521,
+    "text": "我常常向别人请教",
+    "key": 1,
+    "scale_if_1": [
+      "Dy"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 521."
+  },
+  {
+    "id": 522,
+    "text": "我不害怕蜘蛛",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 522."
+  },
+  {
+    "id": 523,
+    "text": "我从来不脸红",
+    "key": 1,
+    "scale_if_1": [
+      "Do"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 523."
+  },
+  {
+    "id": 524,
+    "text": "我不怕从门把上传染上疾病",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 524."
+  },
+  {
+    "id": 525,
+    "text": "有些动物使我神经紧张",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 525."
+  },
+  {
+    "id": 526,
+    "text": "我的前途似乎没有希望",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 526."
+  },
+  {
+    "id": 527,
+    "text": "我家里人和近亲们相处得很好",
+    "key": 0,
+    "scale_if_1": [
+      "Cn"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 527."
+  },
+  {
+    "id": 528,
+    "text": "我并不容易比人脸红",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "MAS"
+    ],
+    "text_en": "Statement 528."
+  },
+  {
+    "id": 529,
+    "text": "我喜欢穿高档的衣服",
+    "key": 0,
+    "scale_if_1": [
+      "Re"
+    ],
+    "scale_if_0": [
+      "Q",
+      "Cn"
+    ],
+    "text_en": "Statement 529."
+  },
+  {
+    "id": 530,
+    "text": "我常常担心自己会脸红",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "MAS"
+    ],
+    "text_en": "Statement 530."
+  },
+  {
+    "id": 531,
+    "text": "即使我以为自己对某件事已经打定了主意，别人也很容易使我变卦",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Dy"
+    ],
+    "text_en": "Statement 531."
+  },
+  {
+    "id": 532,
+    "text": "我和别人一样能够经受同量的痛苦",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 532."
+  },
+  {
+    "id": 533,
+    "text": "我并不因为常常打嗝(呃逆)而觉得很烦恼",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 533."
+  },
+  {
+    "id": 534,
+    "text": "有好几次都是我一个人坚持到底，最后才放弃了所做的事",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 534."
+  },
+  {
+    "id": 535,
+    "text": "我几乎整天感到口干",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 535."
+  },
+  {
+    "id": 536,
+    "text": "只要有人催我，我就生气",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 536."
+  },
+  {
+    "id": 537,
+    "text": "我想去深山野林中打老虎",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 537."
+  },
+  {
+    "id": 538,
+    "text": "我想我会喜欢裁缝的工作",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 538."
+  },
+  {
+    "id": 539,
+    "text": "我不怕老鼠",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 539."
+  },
+  {
+    "id": 540,
+    "text": "我的面部从来没有麻痹过",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 540."
+  },
+  {
+    "id": 541,
+    "text": "我的皮肤似乎对触觉特别敏感",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 541."
+  },
+  {
+    "id": 542,
+    "text": "我从来没有过像柏油一样的黑粪便",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 542."
+  },
+  {
+    "id": 543,
+    "text": "每星期我总有几次觉得好象有可怕的事情要发生",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 543."
+  },
+  {
+    "id": 544,
+    "text": "我大部分时间都感到疲倦",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 544."
+  },
+  {
+    "id": 545,
+    "text": "有时我一再做同样的梦",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 545."
+  },
+  {
+    "id": 546,
+    "text": "我喜欢阅读有关历史的书籍",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 546."
+  },
+  {
+    "id": 547,
+    "text": "未来是变化无常的，一个人很难做出认真的安排",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Do"
+    ],
+    "text_en": "Statement 547."
+  },
+  {
+    "id": 548,
+    "text": "如果可以避免的话，我决不去看色情的表演",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Cn"
+    ],
+    "text_en": "Statement 548."
+  },
+  {
+    "id": 549,
+    "text": "许多时候，即使一切顺利，我对任何事情都觉得无所谓",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 549."
+  },
+  {
+    "id": 550,
+    "text": "我喜欢修理门锁",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 550."
+  },
+  {
+    "id": 551,
+    "text": "有时我可以肯定别人知道我在想什么",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 551."
+  },
+  {
+    "id": 552,
+    "text": "我喜欢阅读有关科学的书籍",
+    "key": 1,
+    "scale_if_1": [
+      "Re"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 552."
+  },
+  {
+    "id": 553,
+    "text": "我害怕单独呆在空旷的地方",
+    "key": 0,
+    "scale_if_1": [
+      "Re"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 553."
+  },
+  {
+    "id": 554,
+    "text": "假如我是个画家，我喜欢画小孩子",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "Dy"
+    ],
+    "text_en": "Statement 554."
+  },
+  {
+    "id": 555,
+    "text": "有时我觉得我就要垮了",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q",
+      "MAS",
+      "Cn"
+    ],
+    "text_en": "Statement 555."
+  },
+  {
+    "id": 556,
+    "text": "我很注意我的衣着式样",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 556."
+  },
+  {
+    "id": 557,
+    "text": "我喜欢当一个私人秘书",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 557."
+  },
+  {
+    "id": 558,
+    "text": "许多人都因为有过不良的性行为而感到惭愧",
+    "key": 0,
+    "scale_if_1": [
+      "Do",
+      "Re"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 558."
+  },
+  {
+    "id": 559,
+    "text": "我经常在半夜里受到惊吓",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 559."
+  },
+  {
+    "id": 560,
+    "text": "我经常因为记不清把东西放在哪里而感到苦恼",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 560."
+  },
+  {
+    "id": 561,
+    "text": "我很喜欢骑马",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 561."
+  },
+  {
+    "id": 562,
+    "text": "小时候，我最依恋和钦佩的是一个女人(母亲、姐姐、姑、婶、姨，等等)",
+    "key": 0,
+    "scale_if_1": [
+      "Do"
+    ],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 562."
+  },
+  {
+    "id": 563,
+    "text": "我喜欢探险小说胜过爱情小说",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 563."
+  },
+  {
+    "id": 564,
+    "text": "我不轻易生气",
+    "key": 1,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 564."
+  },
+  {
+    "id": 565,
+    "text": "当我站在高处的时候，我就很想往下跳",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 565."
+  },
+  {
+    "id": 566,
+    "text": "我喜欢电影里的爱情镜头",
+    "key": 0,
+    "scale_if_1": [],
+    "scale_if_0": [
+      "Q"
+    ],
+    "text_en": "Statement 566."
+  }
+]

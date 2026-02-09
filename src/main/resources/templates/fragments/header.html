@@ -320,6 +320,10 @@
                             <i class="fa fa-university mr-1"></i>
                             <span th:text="${language != null and language == 'en'} ? 'Schools' : '学派'">学派</span>
                         </a>
+                        <a href="/tests" class="text-gray-600 hover:text-gray-900 px-3 py-3 rounded-md text-sm font-medium">
+                            <i class="fa fa-clipboard-list mr-1"></i>
+                            <span th:text="${language != null and language == 'en'} ? 'Tests' : '测试'">测试</span>
+                        </a>
                     </nav>
                     
                     <!-- 用户相关链接 -->
@@ -357,6 +361,10 @@
                 <a href="/schools" class="text-gray-600 hover:text-gray-900 px-3 py-3 rounded-md text-sm font-medium">
                     <i class="fa fa-university mr-2"></i>
                     <span th:text="${language != null and language == 'en'} ? 'Schools' : '学派'">学派</span>
+                </a>
+                <a href="/tests" class="text-gray-600 hover:text-gray-900 px-3 py-3 rounded-md text-sm font-medium">
+                    <i class="fa fa-clipboard-list mr-2"></i>
+                    <span th:text="${language != null and language == 'en'} ? 'Tests' : '测试'">测试</span>
                 </a>
             </div>
         </div>

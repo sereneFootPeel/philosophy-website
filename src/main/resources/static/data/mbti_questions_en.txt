@@ -1,0 +1,279 @@
+When you want to go somewhere for the day, do you?
+Plan ahead and then go
+Go first and then play it by ear
+If you were a teacher, would you rather teach?
+Courses that focus on practice
+Courses that focus on theory
+When you run into a problem, you usually prefer to?
+Discuss solutions with others
+Figure it out yourself
+Do you think that?
+You should start preparing for parties or dates well in advance
+There's no need to prepare; just go and see what happens
+Who do you usually get along with better?
+People who like to imagine
+People who focus on reality
+More often, are you?
+Led by your heart over your head
+Led by your head over your heart
+When you're with a group, do you usually prefer to?
+Join in the general conversation
+Talk alone with people you know well
+How do you like to do things most?
+By mood or interest
+By plan
+How would you like to be seen?
+As a doer
+As an inventor
+When someone asks you a question, do you often?
+Answer right away
+Think it over in your head first
+Who do you prefer to deal with?
+People with surprising ideas
+People who act by common sense
+Following a schedule?
+Suits you
+Restricts you
+Do you find that usually others?
+Take a long time to get to know you
+Get to know you quickly
+Making a plan for the weekend?
+Is necessary
+Is unnecessary
+Which fits you better?
+Emotional
+Rational
+More often, do you tend to?
+Be alone
+Be with others
+In daily work, do you prefer to?
+Work under time pressure, against the clock
+Get a head start and finish early
+Who would you rather have as a friend?
+Someone who always has new ideas
+Someone who is down-to-earth
+Are you?
+Someone with wide interests who wants to try everything
+Someone who focuses deeply on one interest
+When you have a particular task to do, do you like to first?
+See the big picture of the work
+Identify the steps that must be done
+Do you respond more to?
+Appeals to the heart
+Appeals to logic
+When you read for fun, do you?
+Enjoy the author's unusual, original way of saying things
+Prefer the author to be direct and clear
+How do new acquaintances learn about your interests?
+Right away
+Only after they really know you
+When traveling, do you prefer to?
+Go with the flow
+Know in advance what you'll do each day
+When doing what many people do, do you like to?
+Follow the usual way
+Invent your own approach
+Do most people say you are?
+Someone who doesn't open up easily
+Very open
+Which do you prefer (what you are, not what you wish)? 
+Invisible / abstract
+Visible / concrete
+Which do you prefer (what you are, not what you wish)?
+Plan
+Spontaneity
+Which do you prefer (what you are, not what you wish)?
+Warmth
+Firmness
+Which do you prefer (what you are, not what you wish)?
+Facts
+Ideas
+Which do you prefer (what you are, not what you wish)?
+Thinking
+Feeling
+Which do you prefer (what you are, not what you wish)?
+Enthusiasm
+Calm
+Which do you prefer (what you are, not what you wish)?
+Persuade
+Move (emotionally)
+Which do you prefer (what you are, not what you wish)?
+Statement
+Concept
+Which do you prefer (what you are, not what you wish)?
+Analyze
+Sympathize
+Which do you prefer (what you are, not what you wish)?
+Systematic
+Random
+Which do you prefer (what you are, not what you wish)?
+Sensitive
+Precise
+Which do you prefer (what you are, not what you wish)?
+Reserved
+Talkative
+Which do you prefer (what you are, not what you wish)?
+Common-sense
+Theoretical
+Which do you prefer (what you are, not what you wish)?
+Warm-hearted
+Farsighted
+Which do you prefer (what you are, not what you wish)?
+Formal
+Informal
+Which do you prefer (what you are, not what you wish)?
+Quiet
+Active
+Which do you prefer (what you are, not what you wish)?
+Interest
+Blessing
+Which do you prefer (what you are, not what you wish)?
+Theoretical
+Certain
+Which do you prefer (what you are, not what you wish)?
+Firm
+Loyal
+Which do you prefer (what you are, not what you wish)?
+Ideal
+Real
+Which do you prefer (what you are, not what you wish)?
+Ambition
+Tenderness
+Which do you prefer (what you are, not what you wish)?
+Imagined
+Factual
+Which do you prefer (what you are, not what you wish)?
+Cool
+Passionate
+Which do you prefer (what you are, not what you wish)?
+Making
+Creating
+Which do you prefer (what you are, not what you wish)?
+Enthusiastic
+Neutral
+Which do you prefer (what you are, not what you wish)?
+Sensible
+Charming
+Which do you prefer (what you are, not what you wish)?
+Sympathetic
+Logical
+Which do you prefer (what you are, not what you wish)?
+Producing
+Designing
+Which do you prefer (what you are, not what you wish)?
+Impulse
+Choice
+Which do you prefer (what you are, not what you wish)?
+Fair
+Considerate
+Which do you prefer (what you are, not what you wish)?
+Quiet
+Sociable
+Which do you prefer (what you are, not what you wish)?
+Rational
+Emotional
+Which do you prefer (what you are, not what you wish)?
+Unconstrained
+Scheduled
+Which do you prefer (what you are, not what you wish)?
+Concrete
+Abstract
+Which do you prefer (what you are, not what you wish)?
+Capable
+Subtle
+Which do you prefer (what you are, not what you wish)?
+Open
+Private
+Which do you prefer (what you are, not what you wish)?
+Build
+Invent
+Which do you prefer (what you are, not what you wish)?
+Orderly
+Casual
+Which do you prefer (what you are, not what you wish)?
+Imagination
+Reality
+Which do you prefer (what you are, not what you wish)?
+Competitive
+Kind-hearted
+Which do you prefer (what you are, not what you wish)?
+Theory
+Facts
+Which do you prefer (what you are, not what you wish)?
+Few friends
+Many friends
+Which do you prefer (what you are, not what you wish)?
+Possible
+Certain
+Which do you prefer (what you are, not what you wish)?
+Tolerant
+Resolute
+Which do you prefer (what you are, not what you wish)?
+Novel
+Known
+Which do you prefer (what you are, not what you wish)?
+Gentle
+Strong
+Which do you prefer (what you are, not what you wish)?
+Practical
+Innovative
+Does a party with a group usually make you feel?
+Energized
+Drained
+When making a decision, do you more often?
+Weigh practical gains and losses
+Consider other people's feelings
+Do you usually prefer to?
+Plan in advance what to do
+Play it by ear when the time comes
+When you're home alone, do you?
+Enjoy being absorbed in your own thoughts
+Feel you should be doing something
+Most of the time, do you?
+Do things by mood
+Do things by schedule
+Do you usually?
+Mix easily with everyone
+Spend more time alone
+Do you tend to?
+Wait until you have all the information before planning
+Make plans well in advance
+How do people become your friends?
+Easily with you
+Less easily with you
+What kind of courses do you usually prefer?
+Exploring theory and concepts
+Listing facts and data
+At a party, do you?
+Talk more
+Listen more
+Do you see yourself more as?
+A casual person
+An orderly person
+Do you?
+Only have long talks with people who share your interests
+Can chat at length with anyone if you want
+When you have a report due in a week, do you?
+Often leave enough time and finish early
+Often finish at the last minute
+Which is higher praise to you?
+Competitive
+Compassionate
+Do you find following a schedule?
+Necessary but not likable
+Helpful and very likable
+What kind of boss would you rather work for?
+Warm but sometimes emotional
+Strict but always logical
+When finishing a big task, do you often?
+Consider the next step as you go
+Think through each step in advance
+In social situations, do you usually find it?
+Hard to talk to people you don't know
+Easy to chat and laugh with most people
+Do you often?
+Do things in ways that already work
+Try to see if there's a better way
+Do you prefer to do things by?
+How you feel that day
+A set schedule

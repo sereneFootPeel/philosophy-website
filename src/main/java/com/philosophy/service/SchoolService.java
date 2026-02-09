@@ -5,6 +5,7 @@ import com.philosophy.model.Philosopher;
 import com.philosophy.model.Content;
 import com.philosophy.model.User;
 import com.philosophy.repository.SchoolRepository;
+import jakarta.persistence.EntityManager;
 import com.philosophy.repository.PhilosopherRepository;
 import com.philosophy.repository.ContentRepository;
 import com.philosophy.repository.SchoolTranslationRepository;
@@ -32,13 +33,15 @@ public class SchoolService {
     private final ContentRepository contentRepository;
     private final TranslationService translationService;
     private final SchoolTranslationRepository schoolTranslationRepository;
+    private final EntityManager entityManager;
 
-    public SchoolService(SchoolRepository schoolRepository, PhilosopherRepository philosopherRepository, ContentRepository contentRepository, TranslationService translationService, SchoolTranslationRepository schoolTranslationRepository) {
+    public SchoolService(SchoolRepository schoolRepository, PhilosopherRepository philosopherRepository, ContentRepository contentRepository, TranslationService translationService, SchoolTranslationRepository schoolTranslationRepository, EntityManager entityManager) {
         this.schoolRepository = schoolRepository;
         this.philosopherRepository = philosopherRepository;
         this.contentRepository = contentRepository;
         this.translationService = translationService;
         this.schoolTranslationRepository = schoolTranslationRepository;
+        this.entityManager = entityManager;
     }
 
     @Transactional(readOnly = true)
@@ -209,8 +212,9 @@ public class SchoolService {
                 }
             }
             
-            // 4. 删除关联的翻译记录
+            // 4. 删除关联的翻译记录（必须先删除，否则外键约束会阻止删除 schools）
             schoolTranslationRepository.deleteBySchoolId(id);
+            entityManager.flush();  // 立即持久化翻译删除，确保在删除 school 之前执行
             logger.info("Deleted all translations for school {}", school.getName());
             
             // 5. 注意：由于在实体类中设置了cascade = CascadeType.ALL, orphanRemoval = true

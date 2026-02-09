@@ -1,0 +1,1874 @@
+[
+  {
+    "id": 1,
+    "optionA": {
+      "text": "我做事讲究原则和标准，难以接受敷衍了事",
+      "type": 1,
+      "text_en": "I stick to principles and standards and find it hard to accept slipshod work."
+    },
+    "optionB": {
+      "text": "我常把别人的需求放在自己前面，乐于付出",
+      "type": 2,
+      "text_en": "I often put others' needs first and enjoy giving."
+    }
+  },
+  {
+    "id": 2,
+    "optionA": {
+      "text": "我对自己要求很高，容易发现不足并想改进",
+      "type": 1,
+      "text_en": "I set high standards for myself and easily see room for improvement."
+    },
+    "optionB": {
+      "text": "我很在意别人是否喜欢我、需要我",
+      "type": 2,
+      "text_en": "I care a lot about whether others like me and need me."
+    }
+  },
+  {
+    "id": 3,
+    "optionA": {
+      "text": "我认为对错分明，违规的事会让我不安",
+      "type": 1,
+      "text_en": "I see right and wrong clearly; rule-breaking bothers me."
+    },
+    "optionB": {
+      "text": "我善于察觉他人情绪，并愿意给予关怀",
+      "type": 2,
+      "text_en": "I am good at reading others' feelings and like to show care."
+    }
+  },
+  {
+    "id": 4,
+    "optionA": {
+      "text": "我常因事情未达标准而自责或不满",
+      "type": 1,
+      "text_en": "I often blame myself or feel dissatisfied when things fall short of standards."
+    },
+    "optionB": {
+      "text": "我享受被人依赖、被人感谢的感觉",
+      "type": 2,
+      "text_en": "I enjoy being depended on and thanked."
+    }
+  },
+  {
+    "id": 5,
+    "optionA": {
+      "text": "我重视规则和秩序，不喜欢随意变通",
+      "type": 1,
+      "text_en": "I value rules and order and dislike casual flexibility."
+    },
+    "optionB": {
+      "text": "我习惯先满足他人再考虑自己",
+      "type": 2,
+      "text_en": "I am used to satisfying others before considering myself."
+    }
+  },
+  {
+    "id": 6,
+    "optionA": {
+      "text": "我追求成功和认可，希望被人看见",
+      "type": 3,
+      "text_en": "I seek success and recognition and want to be seen."
+    },
+    "optionB": {
+      "text": "我习惯先满足他人再考虑自己",
+      "type": 2,
+      "text_en": "I am used to satisfying others before considering myself."
+    }
+  },
+  {
+    "id": 7,
+    "optionA": {
+      "text": "我做事讲求效率和结果，不喜欢拖沓",
+      "type": 3,
+      "text_en": "I focus on efficiency and results and dislike dragging things out."
+    },
+    "optionB": {
+      "text": "我容易与人建立亲密关系，乐于倾听",
+      "type": 2,
+      "text_en": "I form close bonds easily and like to listen."
+    }
+  },
+  {
+    "id": 8,
+    "optionA": {
+      "text": "我在意形象和表现，希望给人留下好印象",
+      "type": 3,
+      "text_en": "I care about image and performance and want to make a good impression."
+    },
+    "optionB": {
+      "text": "我常为他人付出，有时会忽略自己的需要",
+      "type": 2,
+      "text_en": "I often give to others and sometimes neglect my own needs."
+    }
+  },
+  {
+    "id": 9,
+    "optionA": {
+      "text": "我目标明确，会全力以赴去达成",
+      "type": 3,
+      "text_en": "I have clear goals and go all out to achieve them."
+    },
+    "optionB": {
+      "text": "别人的认可和感激对我很重要",
+      "type": 2,
+      "text_en": "Others' recognition and gratitude matter a lot to me."
+    }
+  },
+  {
+    "id": 10,
+    "optionA": {
+      "text": "我重视原则和正确性，常自我批评",
+      "type": 1,
+      "text_en": "I value principles and correctness and often criticize myself."
+    },
+    "optionB": {
+      "text": "我富有创意，情绪和感受很丰富",
+      "type": 4,
+      "text_en": "I am creative and have rich emotions and feelings."
+    }
+  },
+  {
+    "id": 11,
+    "optionA": {
+      "text": "我难以接受不完美，会反复纠错",
+      "type": 1,
+      "text_en": "I find it hard to accept imperfection and keep correcting."
+    },
+    "optionB": {
+      "text": "我常感到自己与众不同，有独特审美",
+      "type": 4,
+      "text_en": "I often feel different from others and have a distinct aesthetic."
+    }
+  },
+  {
+    "id": 12,
+    "optionA": {
+      "text": "我做事有清晰的是非观和标准",
+      "type": 1,
+      "text_en": "I have a clear sense of right and wrong and standards."
+    },
+    "optionB": {
+      "text": "我容易被美和深刻情感打动",
+      "type": 4,
+      "text_en": "I am easily moved by beauty and deep emotion."
+    }
+  },
+  {
+    "id": 13,
+    "optionA": {
+      "text": "我对自己和他人都有较高要求",
+      "type": 1,
+      "text_en": "I hold myself and others to high standards."
+    },
+    "optionB": {
+      "text": "我有时会沉溺于情绪或过去的回忆",
+      "type": 4,
+      "text_en": "I sometimes get lost in emotions or memories."
+    }
+  },
+  {
+    "id": 14,
+    "optionA": {
+      "text": "我习惯理性分析，需要独处思考",
+      "type": 5,
+      "text_en": "I tend to analyze rationally and need time alone to think."
+    },
+    "optionB": {
+      "text": "我情绪起伏较大，追求真实与深度",
+      "type": 4,
+      "text_en": "My emotions fluctuate; I seek authenticity and depth."
+    }
+  },
+  {
+    "id": 15,
+    "optionA": {
+      "text": "我喜欢探究事物本质，不爱凑热闹",
+      "type": 5,
+      "text_en": "I like to explore the nature of things and avoid crowds."
+    },
+    "optionB": {
+      "text": "我渴望被理解内心，讨厌肤浅",
+      "type": 4,
+      "text_en": "I long to be understood and dislike superficiality."
+    }
+  },
+  {
+    "id": 16,
+    "optionA": {
+      "text": "我倾向于观察和思考，而非立刻参与",
+      "type": 5,
+      "text_en": "I tend to observe and think rather than jump in."
+    },
+    "optionB": {
+      "text": "我常觉得自己与周围格格不入",
+      "type": 4,
+      "text_en": "I often feel I don't fit in."
+    }
+  },
+  {
+    "id": 17,
+    "optionA": {
+      "text": "我重视隐私和边界，不轻易表露自己",
+      "type": 5,
+      "text_en": "I value privacy and boundaries and don't reveal myself easily."
+    },
+    "optionB": {
+      "text": "我容易被悲伤、美、艺术触动",
+      "type": 4,
+      "text_en": "I am easily moved by sadness, beauty, and art."
+    }
+  },
+  {
+    "id": 18,
+    "optionA": {
+      "text": "我做事前会收集足够信息再决定",
+      "type": 5,
+      "text_en": "I gather enough information before deciding."
+    },
+    "optionB": {
+      "text": "我追求独特身份和意义感",
+      "type": 4,
+      "text_en": "I seek a unique identity and sense of meaning."
+    }
+  },
+  {
+    "id": 19,
+    "optionA": {
+      "text": "我注重细节和正确性，讨厌马虎",
+      "type": 1,
+      "text_en": "I focus on details and correctness and hate sloppiness."
+    },
+    "optionB": {
+      "text": "我更喜欢独处阅读或研究，节省精力",
+      "type": 5,
+      "text_en": "I prefer to read or study alone to save energy."
+    }
+  },
+  {
+    "id": 20,
+    "optionA": {
+      "text": "我讲原则，难以对错误视而不见",
+      "type": 1,
+      "text_en": "I stick to principles and find it hard to ignore errors."
+    },
+    "optionB": {
+      "text": "我对知识感兴趣，喜欢搞清原理",
+      "type": 5,
+      "text_en": "I am interested in knowledge and like to understand how things work."
+    }
+  },
+  {
+    "id": 21,
+    "optionA": {
+      "text": "我容易因不完美而焦虑或生气",
+      "type": 1,
+      "text_en": "I get anxious or angry about imperfection."
+    },
+    "optionB": {
+      "text": "我习惯与外界保持一定距离",
+      "type": 5,
+      "text_en": "I keep a certain distance from the outside world."
+    }
+  },
+  {
+    "id": 22,
+    "optionA": {
+      "text": "我做事有明确标准和底线",
+      "type": 1,
+      "text_en": "I have clear standards and bottom lines."
+    },
+    "optionB": {
+      "text": "我不喜欢被打扰，需要个人空间",
+      "type": 5,
+      "text_en": "I don't like to be disturbed and need personal space."
+    }
+  },
+  {
+    "id": 23,
+    "optionA": {
+      "text": "我追求高效和成果，讨厌失败",
+      "type": 3,
+      "text_en": "I pursue efficiency and results and hate to fail."
+    },
+    "optionB": {
+      "text": "我谨慎，会考虑各种风险和可能",
+      "type": 6,
+      "text_en": "I am cautious and consider risks and possibilities."
+    }
+  },
+  {
+    "id": 24,
+    "optionA": {
+      "text": "我善于展示优势，适应不同场合",
+      "type": 3,
+      "text_en": "I am good at showing my strengths and adapting to situations."
+    },
+    "optionB": {
+      "text": "我重视承诺和忠诚，需要安全感",
+      "type": 6,
+      "text_en": "I value commitment and loyalty and need security."
+    }
+  },
+  {
+    "id": 25,
+    "optionA": {
+      "text": "我目标导向强，喜欢挑战",
+      "type": 3,
+      "text_en": "I am goal-driven and like challenges."
+    },
+    "optionB": {
+      "text": "我常预想最坏情况，提前准备",
+      "type": 6,
+      "text_en": "I often imagine the worst and prepare in advance."
+    }
+  },
+  {
+    "id": 26,
+    "optionA": {
+      "text": "我重视形象和他人评价",
+      "type": 3,
+      "text_en": "I value image and others' opinions."
+    },
+    "optionB": {
+      "text": "我对权威既依赖又怀疑，需要可靠依据",
+      "type": 6,
+      "text_en": "I both rely on and doubt authority and need solid grounds."
+    }
+  },
+  {
+    "id": 27,
+    "optionA": {
+      "text": "我乐于助人，希望被需要",
+      "type": 2,
+      "text_en": "I like to help and want to be needed."
+    },
+    "optionB": {
+      "text": "我做事前会反复确认，避免出错",
+      "type": 6,
+      "text_en": "I double-check before acting to avoid mistakes."
+    }
+  },
+  {
+    "id": 28,
+    "optionA": {
+      "text": "我善于察言观色，照顾他人感受",
+      "type": 2,
+      "text_en": "I easily give too much to others and neglect myself."
+    },
+    "optionB": {
+      "text": "我忠诚于团体或信念，讨厌背叛",
+      "type": 6,
+      "text_en": "I think several steps ahead and am cautious."
+    }
+  },
+  {
+    "id": 29,
+    "optionA": {
+      "text": "我容易为他人付出过多而忽略自己",
+      "type": 2,
+      "text_en": "I enjoy being depended on and thanked."
+    },
+    "optionB": {
+      "text": "我遇事会多想几步，比较谨慎",
+      "type": 6,
+      "text_en": "I need a stable, predictable environment to feel at ease."
+    }
+  },
+  {
+    "id": 30,
+    "optionA": {
+      "text": "我享受被人依赖和感谢",
+      "type": 2,
+      "text_en": "I am optimistic and playful and like new, fun things."
+    },
+    "optionB": {
+      "text": "我需要在稳定、可预测的环境中才安心",
+      "type": 6,
+      "text_en": "I worry easily and imagine possible problems."
+    }
+  },
+  {
+    "id": 31,
+    "optionA": {
+      "text": "我乐观爱玩，喜欢新鲜有趣的事",
+      "type": 7,
+      "text_en": "I hate boredom and constraint and always look for fun."
+    },
+    "optionB": {
+      "text": "我容易担心，会设想各种可能的问题",
+      "type": 6,
+      "text_en": "I take responsibility and commitment seriously."
+    }
+  },
+  {
+    "id": 32,
+    "optionA": {
+      "text": "我讨厌无聊和束缚，总想找乐子",
+      "type": 7,
+      "text_en": "I tend to see the positive and avoid pain."
+    },
+    "optionB": {
+      "text": "我重视责任和承诺，说到做到",
+      "type": 6,
+      "text_en": "I am thorough and double-check."
+    }
+  },
+  {
+    "id": 33,
+    "optionA": {
+      "text": "我倾向于看到积极面，避免痛苦",
+      "type": 7,
+      "text_en": "I have wide interests and like to try new things."
+    },
+    "optionB": {
+      "text": "我做事认真，会反复检查",
+      "type": 6,
+      "text_en": "I need a clear view of rules and authority."
+    }
+  },
+  {
+    "id": 34,
+    "optionA": {
+      "text": "我兴趣广泛，喜欢尝试新事物",
+      "type": 7,
+      "text_en": "I am confident and decisive and dislike being controlled."
+    },
+    "optionB": {
+      "text": "我需要对规则和权威有清晰认知",
+      "type": 6,
+      "text_en": "I seek harmony and avoid conflict."
+    }
+  },
+  {
+    "id": 35,
+    "optionA": {
+      "text": "我自信果断，不喜欢被控制",
+      "type": 8,
+      "text_en": "I have strong opinions and dare to disagree."
+    },
+    "optionB": {
+      "text": "我追求和谐，不愿与人冲突",
+      "type": 9,
+      "text_en": "I easily accommodate others and put my needs last."
+    }
+  },
+  {
+    "id": 36,
+    "optionA": {
+      "text": "我有主见，敢于表达不同意见",
+      "type": 8,
+      "text_en": "I value strength and fairness and dislike weakness."
+    },
+    "optionB": {
+      "text": "我容易迁就他人，把需求放在后面",
+      "type": 9,
+      "text_en": "I am easygoing and get along with all kinds of people."
+    }
+  },
+  {
+    "id": 37,
+    "optionA": {
+      "text": "我重视力量和公平，讨厌软弱",
+      "type": 8,
+      "text_en": "I tend to take charge and protect those around me."
+    },
+    "optionB": {
+      "text": "我随和，容易与各种人相处",
+      "type": 9,
+      "text_en": "I tend to avoid conflict and keep the peace."
+    }
+  },
+  {
+    "id": 38,
+    "optionA": {
+      "text": "我习惯掌控局面，保护身边的人",
+      "type": 8,
+      "text_en": "I pursue perfection and find it hard to tolerate error."
+    },
+    "optionB": {
+      "text": "我倾向于回避冲突，维持和平",
+      "type": 9,
+      "text_en": "I am cheerful and like to keep the mood light."
+    }
+  },
+  {
+    "id": 39,
+    "optionA": {
+      "text": "我追求完美，对错误难以容忍",
+      "type": 1,
+      "text_en": "I stick to principles and often restrain myself."
+    },
+    "optionB": {
+      "text": "我乐观开朗，喜欢让气氛轻松",
+      "type": 7,
+      "text_en": "I hate being limited and want to keep my options open."
+    }
+  },
+  {
+    "id": 40,
+    "optionA": {
+      "text": "我做事讲原则，常自我约束",
+      "type": 1,
+      "text_en": "I set high standards for myself and get tense easily."
+    },
+    "optionB": {
+      "text": "我讨厌被限制，总想保持选择自由",
+      "type": 7,
+      "text_en": "I prefer joy and enjoyment to dwelling on pain."
+    }
+  },
+  {
+    "id": 41,
+    "optionA": {
+      "text": "我对自己要求高，容易紧张",
+      "type": 1,
+      "text_en": "I care about right and wrong and rules."
+    },
+    "optionB": {
+      "text": "我更喜欢快乐和享受，不愿沉溺痛苦",
+      "type": 7,
+      "text_en": "I have many interests and like to plan fun things."
+    }
+  },
+  {
+    "id": 42,
+    "optionA": {
+      "text": "我重视对错和规则",
+      "type": 1,
+      "text_en": "I like to give and want others to do well."
+    },
+    "optionB": {
+      "text": "我兴趣多，喜欢计划各种有趣的事",
+      "type": 7,
+      "text_en": "I am strong and like to have the last word."
+    }
+  },
+  {
+    "id": 43,
+    "optionA": {
+      "text": "我乐于付出，希望别人好",
+      "type": 2,
+      "text_en": "I am good at caring for people and value relationships."
+    },
+    "optionB": {
+      "text": "我强势，喜欢说了算",
+      "type": 8,
+      "text_en": "I am direct and dislike beating around the bush."
+    }
+  },
+  {
+    "id": 44,
+    "optionA": {
+      "text": "我善于照顾人，重视关系",
+      "type": 2,
+      "text_en": "I sometimes overgive and neglect myself."
+    },
+    "optionB": {
+      "text": "我直接，不喜欢拐弯抹角",
+      "type": 8,
+      "text_en": "I hate being looked down on and will stand up for myself and others."
+    }
+  },
+  {
+    "id": 45,
+    "optionA": {
+      "text": "我有时会过度付出而忽略自己",
+      "type": 2,
+      "text_en": "I long to be needed and appreciated."
+    },
+    "optionB": {
+      "text": "我讨厌被轻视，会捍卫自己和他人",
+      "type": 8,
+      "text_en": "I tend to take charge and dislike being in a weak position."
+    }
+  },
+  {
+    "id": 46,
+    "optionA": {
+      "text": "我渴望被需要和感激",
+      "type": 2,
+      "text_en": "I seek success and recognition."
+    },
+    "optionB": {
+      "text": "我习惯掌控，不愿处于弱势",
+      "type": 8,
+      "text_en": "I am mild and easygoing and compromise easily."
+    }
+  },
+  {
+    "id": 47,
+    "optionA": {
+      "text": "我追求成功和认可",
+      "type": 3,
+      "text_en": "I am efficient and goal-oriented."
+    },
+    "optionB": {
+      "text": "我温和随和，容易妥协",
+      "type": 9,
+      "text_en": "I hate conflict and often mediate."
+    }
+  },
+  {
+    "id": 48,
+    "optionA": {
+      "text": "我效率高，目标明确",
+      "type": 3,
+      "text_en": "I care about image and achievement."
+    },
+    "optionB": {
+      "text": "我讨厌冲突，常做和事佬",
+      "type": 9,
+      "text_en": "I tend to procrastinate and find it hard to decide."
+    }
+  },
+  {
+    "id": 49,
+    "optionA": {
+      "text": "我在意形象和成就",
+      "type": 3,
+      "text_en": "I am competitive and like to win."
+    },
+    "optionB": {
+      "text": "我容易拖延，难以做决定",
+      "type": 9,
+      "text_en": "I tend to go along with others and keep harmony."
+    }
+  },
+  {
+    "id": 50,
+    "optionA": {
+      "text": "我竞争意识强，喜欢赢",
+      "type": 3,
+      "text_en": "I am emotional and seek uniqueness and depth."
+    },
+    "optionB": {
+      "text": "我倾向于顺应他人，保持和谐",
+      "type": 9,
+      "text_en": "I am rational and like to think alone."
+    }
+  },
+  {
+    "id": 51,
+    "optionA": {
+      "text": "我感性，追求独特与深度",
+      "type": 4,
+      "text_en": "I am emotionally rich and easily moved by art."
+    },
+    "optionB": {
+      "text": "我理性，喜欢独处思考",
+      "type": 5,
+      "text_en": "I tend to observe rather than participate to save energy."
+    }
+  },
+  {
+    "id": 52,
+    "optionA": {
+      "text": "我情绪丰富，容易被艺术打动",
+      "type": 4,
+      "text_en": "I long to be understood."
+    },
+    "optionB": {
+      "text": "我倾向于观察而非参与，节省精力",
+      "type": 5,
+      "text_en": "I am interested in knowledge and truth."
+    }
+  },
+  {
+    "id": 53,
+    "optionA": {
+      "text": "我渴望被理解内心",
+      "type": 4,
+      "text_en": "I sometimes get lost in emotion or fantasy."
+    },
+    "optionB": {
+      "text": "我对知识和真相感兴趣",
+      "type": 5,
+      "text_en": "I keep emotional distance and rely more on logic."
+    }
+  },
+  {
+    "id": 54,
+    "optionA": {
+      "text": "我有时会陷入情绪或幻想",
+      "type": 4,
+      "text_en": "I am cautious and consider risks and possibilities."
+    },
+    "optionB": {
+      "text": "我习惯与情感保持距离，更依赖逻辑",
+      "type": 5,
+      "text_en": "I am optimistic and like novelty and fun."
+    }
+  },
+  {
+    "id": 55,
+    "optionA": {
+      "text": "我谨慎，会考虑风险和可能",
+      "type": 6,
+      "text_en": "I value security and commitment."
+    },
+    "optionB": {
+      "text": "我乐观，喜欢新鲜和乐趣",
+      "type": 7,
+      "text_en": "I hate being tied down and want to stay free."
+    }
+  },
+  {
+    "id": 56,
+    "optionA": {
+      "text": "我重视安全和承诺",
+      "type": 6,
+      "text_en": "I worry easily and prepare in advance."
+    },
+    "optionB": {
+      "text": "我讨厌被束缚，总想保持自由",
+      "type": 7,
+      "text_en": "I tend to see the positive and avoid heaviness."
+    }
+  },
+  {
+    "id": 57,
+    "optionA": {
+      "text": "我容易担心，会提前准备",
+      "type": 6,
+      "text_en": "I am loyal and need dependable rules or people."
+    },
+    "optionB": {
+      "text": "我倾向于看到积极面，避免沉重",
+      "type": 7,
+      "text_en": "I have wide interests and like varied experiences."
+    }
+  },
+  {
+    "id": 58,
+    "optionA": {
+      "text": "我忠诚，需要可依赖的规则或人",
+      "type": 6,
+      "text_en": "I am strong and dare to face conflict."
+    },
+    "optionB": {
+      "text": "我兴趣广泛，喜欢多样体验",
+      "type": 7,
+      "text_en": "I seek harmony and avoid opposing others."
+    }
+  },
+  {
+    "id": 59,
+    "optionA": {
+      "text": "我强势，敢于面对冲突",
+      "type": 8,
+      "text_en": "I have strong opinions and am used to making decisions."
+    },
+    "optionB": {
+      "text": "我追求和谐，不愿与人对立",
+      "type": 9,
+      "text_en": "I am easygoing and adapt to others easily."
+    }
+  },
+  {
+    "id": 60,
+    "optionA": {
+      "text": "我有主见，习惯做决定",
+      "type": 8,
+      "text_en": "I value fairness and strength and hate being pushed around."
+    },
+    "optionB": {
+      "text": "我随和，容易顺应他人",
+      "type": 9,
+      "text_en": "I easily overlook my own needs and accommodate others."
+    }
+  },
+  {
+    "id": 61,
+    "optionA": {
+      "text": "我重视公平和力量，讨厌被欺负",
+      "type": 8,
+      "text_en": "I am protective and willing to stand up for justice."
+    },
+    "optionB": {
+      "text": "我容易忽视自己的需求，迁就别人",
+      "type": 9,
+      "text_en": "I tend to avoid conflict and keep things calm."
+    }
+  },
+  {
+    "id": 62,
+    "optionA": {
+      "text": "我保护欲强，愿意为正义出头",
+      "type": 8,
+      "text_en": "I stick to principles and set high standards for myself."
+    },
+    "optionB": {
+      "text": "我倾向于回避矛盾，维持平静",
+      "type": 9,
+      "text_en": "I am cautious and consider various possibilities."
+    }
+  },
+  {
+    "id": 63,
+    "optionA": {
+      "text": "我讲原则，对自己要求高",
+      "type": 1,
+      "text_en": "I find it hard to accept imperfection and sloppiness."
+    },
+    "optionB": {
+      "text": "我谨慎，会考虑各种可能",
+      "type": 6,
+      "text_en": "I value security and reliability and hate risk."
+    }
+  },
+  {
+    "id": 64,
+    "optionA": {
+      "text": "我难以接受不完美和敷衍",
+      "type": 1,
+      "text_en": "I have clear standards."
+    },
+    "optionB": {
+      "text": "我重视安全和可靠，讨厌冒险",
+      "type": 6,
+      "text_en": "I am loyal and need clear rules or commitment."
+    }
+  },
+  {
+    "id": 65,
+    "optionA": {
+      "text": "我做事有清晰标准",
+      "type": 1,
+      "text_en": "I am prone to self-criticism or dissatisfaction with others."
+    },
+    "optionB": {
+      "text": "我忠诚，需要明确的规则或承诺",
+      "type": 6,
+      "text_en": "I get anxious easily and imagine the worst."
+    }
+  },
+  {
+    "id": 66,
+    "optionA": {
+      "text": "我容易自我批评或对他人不满",
+      "type": 1,
+      "text_en": "I like to help and care about others' feelings."
+    },
+    "optionB": {
+      "text": "我容易焦虑，会预想最坏情况",
+      "type": 6,
+      "text_en": "I seek success and others' recognition."
+    }
+  },
+  {
+    "id": 67,
+    "optionA": {
+      "text": "我乐于助人，在意他人感受",
+      "type": 2,
+      "text_en": "I am good at giving and want to be needed."
+    },
+    "optionB": {
+      "text": "我追求成功和他人认可",
+      "type": 3,
+      "text_en": "I am efficient and goal-oriented."
+    }
+  },
+  {
+    "id": 68,
+    "optionA": {
+      "text": "我善于付出，希望被需要",
+      "type": 2,
+      "text_en": "I value relationships and often consider others."
+    },
+    "optionB": {
+      "text": "我效率高，目标明确",
+      "type": 3,
+      "text_en": "I care about image and achievement."
+    }
+  },
+  {
+    "id": 69,
+    "optionA": {
+      "text": "我重视关系，常为别人考虑",
+      "type": 2,
+      "text_en": "I enjoy being appreciated and depended on."
+    },
+    "optionB": {
+      "text": "我在意形象和成就",
+      "type": 3,
+      "text_en": "I am competitive and like to stand out."
+    }
+  },
+  {
+    "id": 70,
+    "optionA": {
+      "text": "我享受被人感激和依赖",
+      "type": 2,
+      "text_en": "I seek success and recognition."
+    },
+    "optionB": {
+      "text": "我竞争意识强，喜欢表现",
+      "type": 3,
+      "text_en": "I am emotional and seek uniqueness and authenticity."
+    }
+  },
+  {
+    "id": 71,
+    "optionA": {
+      "text": "我追求成功和认可",
+      "type": 3,
+      "text_en": "I am goal-oriented and adapt well to the environment."
+    },
+    "optionB": {
+      "text": "我感性，追求独特与真实",
+      "type": 4,
+      "text_en": "I am emotionally rich and easily moved by beauty."
+    }
+  },
+  {
+    "id": 72,
+    "optionA": {
+      "text": "我目标明确，善于适应环境",
+      "type": 3,
+      "text_en": "I value image and efficiency."
+    },
+    "optionB": {
+      "text": "我情绪丰富，容易被美打动",
+      "type": 4,
+      "text_en": "I long to be understood and dislike superficiality."
+    }
+  },
+  {
+    "id": 73,
+    "optionA": {
+      "text": "我重视形象和效率",
+      "type": 3,
+      "text_en": "I am competitive and hate to fail."
+    },
+    "optionB": {
+      "text": "我渴望被理解内心，讨厌肤浅",
+      "type": 4,
+      "text_en": "I often feel different from others."
+    }
+  },
+  {
+    "id": 74,
+    "optionA": {
+      "text": "我竞争意识强，讨厌失败",
+      "type": 3,
+      "text_en": "I am emotional and seek meaning and depth."
+    },
+    "optionB": {
+      "text": "我常感到自己与众不同",
+      "type": 4,
+      "text_en": "I am rational and like to be alone and think."
+    }
+  },
+  {
+    "id": 75,
+    "optionA": {
+      "text": "我感性，追求意义与深度",
+      "type": 4,
+      "text_en": "I am easily affected by emotions and memories."
+    },
+    "optionB": {
+      "text": "我理性，喜欢独处与思考",
+      "type": 5,
+      "text_en": "I tend to observe and don't get involved easily."
+    }
+  },
+  {
+    "id": 76,
+    "optionA": {
+      "text": "我容易被情绪和回忆影响",
+      "type": 4,
+      "text_en": "I seek a unique identity and authenticity."
+    },
+    "optionB": {
+      "text": "我倾向于观察，不轻易卷入",
+      "type": 5,
+      "text_en": "I am interested in knowledge and logic."
+    }
+  },
+  {
+    "id": 77,
+    "optionA": {
+      "text": "我追求独特身份和真实",
+      "type": 4,
+      "text_en": "I long to be understood."
+    },
+    "optionB": {
+      "text": "我对知识和逻辑感兴趣",
+      "type": 5,
+      "text_en": "I value privacy and boundaries and save energy."
+    }
+  },
+  {
+    "id": 78,
+    "optionA": {
+      "text": "我渴望被理解内心",
+      "type": 4,
+      "text_en": "I stick to principles and see right and wrong clearly."
+    },
+    "optionB": {
+      "text": "我重视隐私和边界，节省精力",
+      "type": 5,
+      "text_en": "I am strong and dare to fight for what I want."
+    }
+  },
+  {
+    "id": 79,
+    "optionA": {
+      "text": "我讲原则，对错分明",
+      "type": 1,
+      "text_en": "I set high standards for myself and others."
+    },
+    "optionB": {
+      "text": "我强势，敢于争取",
+      "type": 8,
+      "text_en": "I hate being controlled and tend to take charge."
+    }
+  },
+  {
+    "id": 80,
+    "optionA": {
+      "text": "我对自己和他人要求高",
+      "type": 1,
+      "text_en": "I value rules and correctness."
+    },
+    "optionB": {
+      "text": "我讨厌被控制，习惯掌控局面",
+      "type": 8,
+      "text_en": "I am direct and protect those around me."
+    }
+  },
+  {
+    "id": 81,
+    "optionA": {
+      "text": "我重视规则和正确性",
+      "type": 1,
+      "text_en": "I get anxious about imperfection."
+    },
+    "optionB": {
+      "text": "我直接，保护身边的人",
+      "type": 8,
+      "text_en": "I value fairness and strength."
+    }
+  },
+  {
+    "id": 82,
+    "optionA": {
+      "text": "我容易因不完美而焦虑",
+      "type": 1,
+      "text_en": "I like to give and am good at caring."
+    },
+    "optionB": {
+      "text": "我重视公平和力量",
+      "type": 8,
+      "text_en": "I am mild and easygoing and avoid conflict."
+    }
+  },
+  {
+    "id": 83,
+    "optionA": {
+      "text": "我乐于付出，善于照顾人",
+      "type": 2,
+      "text_en": "I long to be needed and appreciated."
+    },
+    "optionB": {
+      "text": "我温和随和，不愿冲突",
+      "type": 9,
+      "text_en": "I easily accommodate others and keep harmony."
+    }
+  },
+  {
+    "id": 84,
+    "optionA": {
+      "text": "我渴望被需要和感激",
+      "type": 2,
+      "text_en": "I value relationships and often consider others."
+    },
+    "optionB": {
+      "text": "我容易迁就他人，维持和谐",
+      "type": 9,
+      "text_en": "I tend to adapt to the environment and avoid opposition."
+    }
+  },
+  {
+    "id": 85,
+    "optionA": {
+      "text": "我重视关系，常为他人考虑",
+      "type": 2,
+      "text_en": "I sometimes overgive."
+    },
+    "optionB": {
+      "text": "我倾向于顺应环境，避免对立",
+      "type": 9,
+      "text_en": "I easily overlook my own needs."
+    }
+  },
+  {
+    "id": 86,
+    "optionA": {
+      "text": "我有时过度付出",
+      "type": 2,
+      "text_en": "I seek success and visibility."
+    },
+    "optionB": {
+      "text": "我容易忽视自己的需求",
+      "type": 9,
+      "text_en": "I am rational and like to analyze and be alone."
+    }
+  },
+  {
+    "id": 87,
+    "optionA": {
+      "text": "我追求成功和表现",
+      "type": 3,
+      "text_en": "I am efficient and goal-driven."
+    },
+    "optionB": {
+      "text": "我理性，喜欢分析与独处",
+      "type": 5,
+      "text_en": "I tend to observe and don't participate easily."
+    }
+  },
+  {
+    "id": 88,
+    "optionA": {
+      "text": "我效率高，目标导向",
+      "type": 3,
+      "text_en": "I care about image and achievement."
+    },
+    "optionB": {
+      "text": "我倾向于观察，不轻易参与",
+      "type": 5,
+      "text_en": "I am interested in knowledge and how things work."
+    }
+  },
+  {
+    "id": 89,
+    "optionA": {
+      "text": "我在意形象和成就",
+      "type": 3,
+      "text_en": "I am competitive and like challenges."
+    },
+    "optionB": {
+      "text": "我对知识和原理感兴趣",
+      "type": 5,
+      "text_en": "I value privacy and need personal space."
+    }
+  },
+  {
+    "id": 90,
+    "optionA": {
+      "text": "我竞争意识强，喜欢挑战",
+      "type": 3,
+      "text_en": "I am emotional and seek uniqueness."
+    },
+    "optionB": {
+      "text": "我重视隐私，需要个人空间",
+      "type": 5,
+      "text_en": "I am cautious and value security and commitment."
+    }
+  },
+  {
+    "id": 91,
+    "optionA": {
+      "text": "我感性，追求独特",
+      "type": 4,
+      "text_en": "I am emotionally rich and easily moved by beauty."
+    },
+    "optionB": {
+      "text": "我谨慎，重视安全与承诺",
+      "type": 6,
+      "text_en": "I worry easily and prepare in advance."
+    }
+  },
+  {
+    "id": 92,
+    "optionA": {
+      "text": "我情绪丰富，易被美打动",
+      "type": 4,
+      "text_en": "I long to be understood."
+    },
+    "optionB": {
+      "text": "我容易担心，会提前准备",
+      "type": 6,
+      "text_en": "I am loyal and need reliable grounds."
+    }
+  },
+  {
+    "id": 93,
+    "optionA": {
+      "text": "我渴望被理解内心",
+      "type": 4,
+      "text_en": "I often feel different from others."
+    },
+    "optionB": {
+      "text": "我忠诚，需要可靠依据",
+      "type": 6,
+      "text_en": "I both rely on and doubt authority."
+    }
+  },
+  {
+    "id": 94,
+    "optionA": {
+      "text": "我常感到与众不同",
+      "type": 4,
+      "text_en": "I am rational and like to think alone."
+    },
+    "optionB": {
+      "text": "我对权威既依赖又怀疑",
+      "type": 6,
+      "text_en": "I am optimistic and playful and like new things."
+    }
+  },
+  {
+    "id": 95,
+    "optionA": {
+      "text": "我理性，喜欢独处思考",
+      "type": 5,
+      "text_en": "I tend to observe and gather information."
+    },
+    "optionB": {
+      "text": "我乐观爱玩，喜欢新鲜事",
+      "type": 7,
+      "text_en": "I hate boredom and constraint."
+    }
+  },
+  {
+    "id": 96,
+    "optionA": {
+      "text": "我倾向于观察和收集信息",
+      "type": 5,
+      "text_en": "I value privacy and boundaries."
+    },
+    "optionB": {
+      "text": "我讨厌无聊和束缚",
+      "type": 7,
+      "text_en": "I have wide interests and like varied experiences."
+    }
+  },
+  {
+    "id": 97,
+    "optionA": {
+      "text": "我重视隐私和边界",
+      "type": 5,
+      "text_en": "I look into how things work before acting."
+    },
+    "optionB": {
+      "text": "我兴趣广泛，喜欢多样体验",
+      "type": 7,
+      "text_en": "I tend to see the positive and avoid heaviness."
+    }
+  },
+  {
+    "id": 98,
+    "optionA": {
+      "text": "我做事前会搞清原理",
+      "type": 5,
+      "text_en": "I am cautious and consider risk."
+    },
+    "optionB": {
+      "text": "我倾向于看到积极面，避免沉重",
+      "type": 7,
+      "text_en": "I am strong and dare to fight."
+    }
+  },
+  {
+    "id": 99,
+    "optionA": {
+      "text": "我谨慎，考虑风险",
+      "type": 6,
+      "text_en": "I value security and commitment."
+    },
+    "optionB": {
+      "text": "我强势，敢于争取",
+      "type": 8,
+      "text_en": "I have strong opinions and dislike being controlled."
+    }
+  },
+  {
+    "id": 100,
+    "optionA": {
+      "text": "我重视安全和承诺",
+      "type": 6,
+      "text_en": "I worry easily and imagine problems."
+    },
+    "optionB": {
+      "text": "我有主见，不喜欢被控制",
+      "type": 8,
+      "text_en": "I am direct and protect those around me."
+    }
+  },
+  {
+    "id": 101,
+    "optionA": {
+      "text": "我容易担心，会预想问题",
+      "type": 6,
+      "text_en": "I am loyal and need reliable grounds."
+    },
+    "optionB": {
+      "text": "我直接，保护身边的人",
+      "type": 8,
+      "text_en": "I value fairness and strength."
+    }
+  },
+  {
+    "id": 102,
+    "optionA": {
+      "text": "我忠诚，需要可靠依据",
+      "type": 6,
+      "text_en": "I am optimistic and playful and like novelty."
+    },
+    "optionB": {
+      "text": "我重视公平和力量",
+      "type": 8,
+      "text_en": "I am mild and easygoing and avoid conflict."
+    }
+  },
+  {
+    "id": 103,
+    "optionA": {
+      "text": "我乐观爱玩，喜欢新鲜",
+      "type": 7,
+      "text_en": "I hate being limited and want freedom."
+    },
+    "optionB": {
+      "text": "我温和随和，不愿冲突",
+      "type": 9,
+      "text_en": "I easily accommodate others and keep harmony."
+    }
+  },
+  {
+    "id": 104,
+    "optionA": {
+      "text": "我讨厌被限制，要自由",
+      "type": 7,
+      "text_en": "I have wide interests and like fun."
+    },
+    "optionB": {
+      "text": "我容易迁就他人，维持和谐",
+      "type": 9,
+      "text_en": "I tend to avoid conflict."
+    }
+  },
+  {
+    "id": 105,
+    "optionA": {
+      "text": "我兴趣广泛，喜欢乐趣",
+      "type": 7,
+      "text_en": "I tend to see the positive."
+    },
+    "optionB": {
+      "text": "我倾向于回避冲突",
+      "type": 9,
+      "text_en": "I tend to procrastinate and find it hard to decide."
+    }
+  },
+  {
+    "id": 106,
+    "optionA": {
+      "text": "我倾向于看到积极面",
+      "type": 7,
+      "text_en": "I stick to principles and set high standards for myself."
+    },
+    "optionB": {
+      "text": "我容易拖延，难以做决定",
+      "type": 9,
+      "text_en": "I am mild and easygoing and avoid conflict."
+    }
+  },
+  {
+    "id": 107,
+    "optionA": {
+      "text": "我讲原则，对自己要求高",
+      "type": 1,
+      "text_en": "I find it hard to accept imperfection."
+    },
+    "optionB": {
+      "text": "我温和随和，不愿冲突",
+      "type": 9,
+      "text_en": "I easily accommodate others and put my needs last."
+    }
+  },
+  {
+    "id": 108,
+    "optionA": {
+      "text": "我难以接受不完美",
+      "type": 1,
+      "text_en": "I have clear standards."
+    },
+    "optionB": {
+      "text": "我容易迁就他人，把需求放后面",
+      "type": 9,
+      "text_en": "I tend to adapt to the environment and keep peace."
+    }
+  },
+  {
+    "id": 109,
+    "optionA": {
+      "text": "我做事有清晰标准",
+      "type": 1,
+      "text_en": "I am prone to self-criticism."
+    },
+    "optionB": {
+      "text": "我倾向于顺应环境，保持和平",
+      "type": 9,
+      "text_en": "I easily overlook my own needs."
+    }
+  },
+  {
+    "id": 110,
+    "optionA": {
+      "text": "我容易自我批评",
+      "type": 1,
+      "text_en": "I like to help and am good at giving."
+    },
+    "optionB": {
+      "text": "我容易忽视自己的需求",
+      "type": 9,
+      "text_en": "I am rational and like to think alone."
+    }
+  },
+  {
+    "id": 111,
+    "optionA": {
+      "text": "我乐于助人，善于付出",
+      "type": 2,
+      "text_en": "I long to be needed and appreciated."
+    },
+    "optionB": {
+      "text": "我理性，喜欢独处思考",
+      "type": 5,
+      "text_en": "I tend to observe and don't get involved easily."
+    }
+  },
+  {
+    "id": 112,
+    "optionA": {
+      "text": "我渴望被需要和感激",
+      "type": 2,
+      "text_en": "I value relationships and often consider others."
+    },
+    "optionB": {
+      "text": "我倾向于观察，不轻易卷入",
+      "type": 5,
+      "text_en": "I value privacy and boundaries."
+    }
+  },
+  {
+    "id": 113,
+    "optionA": {
+      "text": "我重视关系，常为他人考虑",
+      "type": 2,
+      "text_en": "I am good at reading people."
+    },
+    "optionB": {
+      "text": "我重视隐私和边界",
+      "type": 5,
+      "text_en": "I am interested in knowledge and logic."
+    }
+  },
+  {
+    "id": 114,
+    "optionA": {
+      "text": "我善于察言观色",
+      "type": 2,
+      "text_en": "I seek success and recognition."
+    },
+    "optionB": {
+      "text": "我对知识和逻辑感兴趣",
+      "type": 5,
+      "text_en": "I am optimistic and playful and like novelty."
+    }
+  },
+  {
+    "id": 115,
+    "optionA": {
+      "text": "我追求成功和认可",
+      "type": 3,
+      "text_en": "I am efficient and goal-oriented."
+    },
+    "optionB": {
+      "text": "我乐观爱玩，喜欢新鲜",
+      "type": 7,
+      "text_en": "I hate being tied down and want freedom."
+    }
+  },
+  {
+    "id": 116,
+    "optionA": {
+      "text": "我效率高，目标明确",
+      "type": 3,
+      "text_en": "I care about image and achievement."
+    },
+    "optionB": {
+      "text": "我讨厌被束缚，要自由",
+      "type": 7,
+      "text_en": "I have wide interests and like varied experiences."
+    }
+  },
+  {
+    "id": 117,
+    "optionA": {
+      "text": "我在意形象和成就",
+      "type": 3,
+      "text_en": "I am competitive."
+    },
+    "optionB": {
+      "text": "我兴趣广泛，喜欢多样体验",
+      "type": 7,
+      "text_en": "I tend to see the positive and avoid heaviness."
+    }
+  },
+  {
+    "id": 118,
+    "optionA": {
+      "text": "我竞争意识强",
+      "type": 3,
+      "text_en": "I am emotional and seek uniqueness and depth."
+    },
+    "optionB": {
+      "text": "我倾向于看到积极面，避免沉重",
+      "type": 7,
+      "text_en": "I am strong and dare to fight."
+    }
+  },
+  {
+    "id": 119,
+    "optionA": {
+      "text": "我感性，追求独特与深度",
+      "type": 4,
+      "text_en": "I am emotionally rich and easily moved by beauty."
+    },
+    "optionB": {
+      "text": "我强势，敢于争取",
+      "type": 8,
+      "text_en": "I have strong opinions and dislike being controlled."
+    }
+  },
+  {
+    "id": 120,
+    "optionA": {
+      "text": "我情绪丰富，易被美打动",
+      "type": 4,
+      "text_en": "I long to be understood."
+    },
+    "optionB": {
+      "text": "我有主见，不喜欢被控制",
+      "type": 8,
+      "text_en": "I am direct and protect those around me."
+    }
+  },
+  {
+    "id": 121,
+    "optionA": {
+      "text": "我渴望被理解内心",
+      "type": 4,
+      "text_en": "I often feel different from others."
+    },
+    "optionB": {
+      "text": "我直接，保护身边的人",
+      "type": 8,
+      "text_en": "I value fairness and strength."
+    }
+  },
+  {
+    "id": 122,
+    "optionA": {
+      "text": "我常感到与众不同",
+      "type": 4,
+      "text_en": "I am rational and like to analyze and be alone."
+    },
+    "optionB": {
+      "text": "我重视公平和力量",
+      "type": 8,
+      "text_en": "I am cautious and value security and commitment."
+    }
+  },
+  {
+    "id": 123,
+    "optionA": {
+      "text": "我理性，喜欢分析与独处",
+      "type": 5,
+      "text_en": "I tend to observe and don't participate easily."
+    },
+    "optionB": {
+      "text": "我谨慎，重视安全与承诺",
+      "type": 6,
+      "text_en": "I worry easily and imagine problems."
+    }
+  },
+  {
+    "id": 124,
+    "optionA": {
+      "text": "我倾向于观察，不轻易参与",
+      "type": 5,
+      "text_en": "I am interested in knowledge and how things work."
+    },
+    "optionB": {
+      "text": "我容易担心，会预想问题",
+      "type": 6,
+      "text_en": "I am loyal and need reliable grounds."
+    }
+  },
+  {
+    "id": 125,
+    "optionA": {
+      "text": "我对知识和原理感兴趣",
+      "type": 5,
+      "text_en": "I value privacy and boundaries."
+    },
+    "optionB": {
+      "text": "我忠诚，需要可靠依据",
+      "type": 6,
+      "text_en": "I both rely on and doubt authority."
+    }
+  },
+  {
+    "id": 126,
+    "optionA": {
+      "text": "我重视隐私和边界",
+      "type": 5,
+      "text_en": "I am optimistic and playful and like novelty."
+    },
+    "optionB": {
+      "text": "我对权威既依赖又怀疑",
+      "type": 6,
+      "text_en": "I am strong and dare to fight."
+    }
+  },
+  {
+    "id": 127,
+    "optionA": {
+      "text": "我乐观爱玩，喜欢新鲜",
+      "type": 7,
+      "text_en": "I hate being limited and want freedom."
+    },
+    "optionB": {
+      "text": "我强势，敢于争取",
+      "type": 8,
+      "text_en": "I have strong opinions and am used to deciding."
+    }
+  },
+  {
+    "id": 128,
+    "optionA": {
+      "text": "我讨厌被限制，要自由",
+      "type": 7,
+      "text_en": "I have wide interests and like fun."
+    },
+    "optionB": {
+      "text": "我有主见，习惯做决定",
+      "type": 8,
+      "text_en": "I am direct and protect those around me."
+    }
+  },
+  {
+    "id": 129,
+    "optionA": {
+      "text": "我兴趣广泛，喜欢乐趣",
+      "type": 7,
+      "text_en": "I tend to see the positive."
+    },
+    "optionB": {
+      "text": "我直接，保护身边的人",
+      "type": 8,
+      "text_en": "I value fairness and strength."
+    }
+  },
+  {
+    "id": 130,
+    "optionA": {
+      "text": "我倾向于看到积极面",
+      "type": 7,
+      "text_en": "I stick to principles and see right and wrong clearly."
+    },
+    "optionB": {
+      "text": "我重视公平和力量",
+      "type": 8,
+      "text_en": "I like to help and am good at giving."
+    }
+  },
+  {
+    "id": 131,
+    "optionA": {
+      "text": "我讲原则，对错分明",
+      "type": 1,
+      "text_en": "I set high standards for myself."
+    },
+    "optionB": {
+      "text": "我乐于助人，善于付出",
+      "type": 2,
+      "text_en": "I long to be needed and appreciated."
+    }
+  },
+  {
+    "id": 132,
+    "optionA": {
+      "text": "我对自己要求高",
+      "type": 1,
+      "text_en": "I find it hard to accept imperfection."
+    },
+    "optionB": {
+      "text": "我渴望被需要和感激",
+      "type": 2,
+      "text_en": "I value relationships and often consider others."
+    }
+  },
+  {
+    "id": 133,
+    "optionA": {
+      "text": "我难以接受不完美",
+      "type": 1,
+      "text_en": "I have clear standards."
+    },
+    "optionB": {
+      "text": "我重视关系，常为他人考虑",
+      "type": 2,
+      "text_en": "I am good at reading people and caring for others."
+    }
+  },
+  {
+    "id": 134,
+    "optionA": {
+      "text": "我做事有清晰标准",
+      "type": 1,
+      "text_en": "I seek success and recognition."
+    },
+    "optionB": {
+      "text": "我善于察言观色，照顾他人",
+      "type": 2,
+      "text_en": "I am emotional and seek uniqueness."
+    }
+  },
+  {
+    "id": 135,
+    "optionA": {
+      "text": "我追求成功和认可",
+      "type": 3,
+      "text_en": "I am efficient and goal-oriented."
+    },
+    "optionB": {
+      "text": "我感性，追求独特",
+      "type": 4,
+      "text_en": "I am emotionally rich and easily moved by beauty."
+    }
+  },
+  {
+    "id": 136,
+    "optionA": {
+      "text": "我效率高，目标明确",
+      "type": 3,
+      "text_en": "I care about image and achievement."
+    },
+    "optionB": {
+      "text": "我情绪丰富，易被美打动",
+      "type": 4,
+      "text_en": "I long to be understood."
+    }
+  },
+  {
+    "id": 137,
+    "optionA": {
+      "text": "我在意形象和成就",
+      "type": 3,
+      "text_en": "I am competitive."
+    },
+    "optionB": {
+      "text": "我渴望被理解内心",
+      "type": 4,
+      "text_en": "I often feel different from others."
+    }
+  },
+  {
+    "id": 138,
+    "optionA": {
+      "text": "我竞争意识强",
+      "type": 3,
+      "text_en": "I am rational and like to think alone."
+    },
+    "optionB": {
+      "text": "我常感到与众不同",
+      "type": 4,
+      "text_en": "I am cautious and value security."
+    }
+  },
+  {
+    "id": 139,
+    "optionA": {
+      "text": "我理性，喜欢独处思考",
+      "type": 5,
+      "text_en": "I tend to observe and don't participate easily."
+    },
+    "optionB": {
+      "text": "我谨慎，重视安全",
+      "type": 6,
+      "text_en": "I worry easily and imagine problems."
+    }
+  },
+  {
+    "id": 140,
+    "optionA": {
+      "text": "遇到问题我更愿意先自己查资料弄明白，再决定怎么做",
+      "type": 5,
+      "text_en": "I am interested in knowledge and how things work."
+    },
+    "optionB": {
+      "text": "遇到问题我更愿意先向可靠的人确认方向与风险，再行动",
+      "type": 6,
+      "text_en": "I am loyal and need reliable grounds."
+    }
+  },
+  {
+    "id": 141,
+    "optionA": {
+      "text": "我更在意信息是否准确、逻辑是否自洽，喜欢把事情想透",
+      "type": 5,
+      "text_en": "I value privacy and boundaries."
+    },
+    "optionB": {
+      "text": "我更在意是否存在隐患与不确定性，喜欢把风险先想清楚",
+      "type": 6,
+      "text_en": "I both rely on and doubt authority."
+    }
+  },
+  {
+    "id": 142,
+    "optionA": {
+      "text": "我不太喜欢频繁社交，更享受安静地学习、研究或独处",
+      "type": 5,
+      "text_en": "When I have a problem I prefer to look it up and understand it before deciding what to do."
+    },
+    "optionB": {
+      "text": "我更在意团队是否可靠、规则是否清晰，明确后才安心",
+      "type": 6,
+      "text_en": "When I have a problem I prefer to confirm direction and risks with someone reliable before acting."
+    }
+  },
+  {
+    "id": 143,
+    "optionA": {
+      "text": "我喜欢把生活安排得丰富有趣，选择越多越让我兴奋",
+      "type": 7,
+      "text_en": "I care more that information is accurate and logic is consistent; I like to think things through."
+    },
+    "optionB": {
+      "text": "我更喜欢节奏平稳、少折腾的生活，变化太多会让我疲惫",
+      "type": 9,
+      "text_en": "I care more about hidden dangers and uncertainty; I like to clarify risks first."
+    }
+  },
+  {
+    "id": 144,
+    "optionA": {
+      "text": "面对压力我倾向于计划新的活动或旅行来转移注意力",
+      "type": 7,
+      "text_en": "I don't like frequent socializing and prefer to study, research, or be alone quietly."
+    },
+    "optionB": {
+      "text": "面对压力我倾向于放慢节奏，先让自己平静下来再说",
+      "type": 9,
+      "text_en": "I care more that the team is reliable and rules are clear; I feel at ease only when that's settled."
+    }
+  }
+]

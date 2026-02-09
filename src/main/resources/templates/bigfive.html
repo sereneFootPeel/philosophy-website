@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html th:lang="${language != null and language == 'en'} ? 'en' : 'zh-CN'" lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:with="pageTitle=${(language != null and language == 'en') ? 'Big Five Personality Test' : (pageTitle != null ? pageTitle : '大五人格测验')}">
+    <th:block th:replace="~{fragments/header :: header-contents}"></th:block>
+    <style type="text/tailwindcss">
+        .bigfive-page main { background-color: var(--bg-secondary) !important; }
+        .bigfive-page .b5-card .border-b,
+        .bigfive-page .b5-card .border-t { border-color: var(--border-primary) !important; }
+        .bigfive-page .b5-card h1,
+        .bigfive-page .b5-card h2 { color: var(--text-primary) !important; }
+        .bigfive-page .b5-card p,
+        .bigfive-page .b5-card span { color: var(--text-secondary) !important; }
+        .bigfive-page .b5-text-muted { color: var(--text-tertiary) !important; }
+        .bigfive-page .b5-progress-track { background-color: var(--border-primary) !important; }
+        .bigfive-page .b5-progress-fill { background-color: var(--color-primary) !important; }
+        .bigfive-page .b5-btn-primary {
+            background-color: var(--color-primary) !important;
+            border: 2px solid var(--color-primary) !important;
+            color: var(--text-on-primary) !important;
+            transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+        }
+        .bigfive-page .b5-btn-primary span { color: var(--text-on-primary) !important; }
+        .bigfive-page .b5-btn-primary:hover {
+            background-color: var(--bg-tertiary) !important;
+            border-color: var(--color-primary) !important;
+            color: var(--color-primary) !important;
+        }
+        .bigfive-page .b5-btn-primary:hover span { color: var(--color-primary) !important; }
+        .bigfive-page .b5-btn-outline {
+            background-color: var(--bg-tertiary) !important;
+            border: 1px solid var(--border-primary) !important;
+            color: var(--text-secondary) !important;
+            transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+        }
+        .bigfive-page .b5-btn-outline span { color: var(--text-secondary) !important; }
+        .bigfive-page .b5-btn-outline:hover {
+            background-color: var(--bg-quaternary) !important;
+            border-color: var(--border-primary) !important;
+            color: var(--text-primary) !important;
+        }
+        .bigfive-page .b5-btn-outline:hover span { color: var(--text-primary) !important; }
+        .bigfive-page .b5-btn-answer.b5-selected {
+            background-color: var(--color-primary) !important;
+            border-color: var(--color-primary) !important;
+            color: var(--text-on-primary) !important;
+        }
+        .bigfive-page .b5-btn-answer.b5-selected span { color: var(--text-on-primary) !important; }
+        .bigfive-page .b5-btn-answer { min-height: 44px; transition: opacity 0.25s ease, transform 0.25s ease; }
+        .bigfive-page .b5-nav-link:focus { outline: none; }
+        .bigfive-page #b5-prev { color: var(--text-tertiary) !important; }
+        .bigfive-page #b5-prev:hover { color: var(--color-primary) !important; }
+        .bigfive-page #b5-next { color: var(--color-primary) !important; }
+        .bigfive-page button:focus, .bigfive-page button:focus-visible, .bigfive-page button:active {
+            outline: none !important;
+            box-shadow: none !important;
+        }
+        .bigfive-page .b5-draft-banner {
+            background-color: var(--bg-tertiary) !important;
+            border-color: var(--border-primary) !important;
+            border-left: 4px solid var(--color-primary) !important;
+        }
+        .bigfive-page .b5-result-row td { color: var(--text-secondary) !important; }
+    </style>
+</head>
+<body class="bigfive-page bg-secondary min-h-screen flex flex-col">
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="flex-grow container mx-auto px-4 py-6 sm:py-8" style="padding-top: calc(3.5rem + 1rem);">
+        <!-- 介绍页 -->
+        <div id="b5-intro" class="max-w-2xl mx-auto">
+            <div class="b5-card b5-card-inner bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 p-6 sm:p-8">
+                <h1 class="text-2xl sm:text-3xl font-bold text-primary mb-4" th:if="${language != null and language == 'en'}">Big Five Personality Test (NEO-PI-R)</h1>
+                <h1 class="text-2xl sm:text-3xl font-bold text-primary mb-4" th:unless="${language != null and language == 'en'}">大五人格测验（NEO-PI-R）</h1>
+                <p class="leading-relaxed mb-4" th:if="${language != null and language == 'en'}">
+                    Please rate each statement from 1 (Strongly disagree) to 5 (Strongly agree) based on how well it describes you. There are no right or wrong answers.
+                </p>
+                <p class="leading-relaxed mb-4" th:unless="${language != null and language == 'en'}">
+                    请用 1（完全不符合）到 5（完全符合）评价每条陈述在多大程度上符合您自己。无对错之分，请勿漏题。
+                </p>
+                <p class="text-sm font-medium mb-3" th:if="${language != null and language == 'en'}">Gender (for norms):</p>
+                <p class="text-sm font-medium mb-3" th:unless="${language != null and language == 'en'}">性别（用于常模换算）：</p>
+                <div class="mb-4">
+                    <select id="b5-gender" class="w-full max-w-xs px-3 py-2 rounded-lg border border-gray-200 bg-white text-sm">
+                        <option value="M" th:text="${language != null and language == 'en'} ? 'Male' : '男'">男</option>
+                        <option value="F" th:text="${language != null and language == 'en'} ? 'Female' : '女'">女</option>
+                    </select>
+                </div>
+                <div id="b5-draft-banner" class="b5-draft-banner hidden mb-4 p-4 rounded-lg border">
+                    <p class="text-sm mb-3" id="b5-draft-text"></p>
+                    <div class="flex gap-2 flex-wrap">
+                        <button type="button" id="b5-resume" class="b5-btn-primary px-4 py-2 rounded-lg text-sm font-medium">
+                            <span th:if="${language != null and language == 'en'}">Resume</span>
+                            <span th:unless="${language != null and language == 'en'}">继续作答</span>
+                        </button>
+                        <button type="button" id="b5-discard-draft" class="b5-btn-outline px-4 py-2 rounded-lg text-sm font-medium">
+                            <span th:if="${language != null and language == 'en'}">Start over</span>
+                            <span th:unless="${language != null and language == 'en'}">重新开始</span>
+                        </button>
+                    </div>
+                </div>
+                <button type="button" id="b5-start" class="b5-btn-primary w-full sm:w-auto px-8 py-4 rounded-xl font-medium">
+                    <span th:if="${language != null and language == 'en'}">Start 240 items</span>
+                    <span th:unless="${language != null and language == 'en'}">开始 240 题</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 答题区 -->
+        <div id="b5-test" class="max-w-2xl mx-auto hidden">
+            <div class="b5-card b5-card-inner bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 p-6 sm:p-8">
+                <div class="flex justify-between items-center mb-4 text-sm b5-text-muted">
+                    <span id="b5-progress-text"></span>
+                </div>
+                <div class="h-2 b5-progress-track rounded-full overflow-hidden mb-6">
+                    <div id="b5-progress-bar" class="h-full b5-progress-fill rounded-full transition-all duration-300" style="width: 0%;"></div>
+                </div>
+                <p id="b5-question-text" class="text-lg sm:text-xl mb-6 leading-relaxed"></p>
+                <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-3">
+                    <button type="button" data-value="0" class="b5-btn-answer b5-btn-outline px-3 py-3 rounded-xl font-medium text-sm">
+                        <span th:if="${language != null and language == 'en'}">1 Strongly disagree</span>
+                        <span th:unless="${language != null and language == 'en'}">1 完全不符合</span>
+                    </button>
+                    <button type="button" data-value="1" class="b5-btn-answer b5-btn-outline px-3 py-3 rounded-xl font-medium text-sm">
+                        <span th:if="${language != null and language == 'en'}">2 Disagree</span>
+                        <span th:unless="${language != null and language == 'en'}">2 比较不符合</span>
+                    </button>
+                    <button type="button" data-value="2" class="b5-btn-answer b5-btn-outline px-3 py-3 rounded-xl font-medium text-sm">
+                        <span th:if="${language != null and language == 'en'}">3 Neutral</span>
+                        <span th:unless="${language != null and language == 'en'}">3 一般</span>
+                    </button>
+                    <button type="button" data-value="3" class="b5-btn-answer b5-btn-outline px-3 py-3 rounded-xl font-medium text-sm">
+                        <span th:if="${language != null and language == 'en'}">4 Agree</span>
+                        <span th:unless="${language != null and language == 'en'}">4 比较符合</span>
+                    </button>
+                    <button type="button" data-value="4" class="b5-btn-answer b5-btn-outline px-3 py-3 rounded-xl font-medium text-sm">
+                        <span th:if="${language != null and language == 'en'}">5 Strongly agree</span>
+                        <span th:unless="${language != null and language == 'en'}">5 完全符合</span>
+                    </button>
+                </div>
+                <div class="mt-4 flex justify-between">
+                    <span role="button" tabindex="0" id="b5-prev" class="b5-nav-link hover:text-primary text-sm py-2 hidden cursor-pointer">
+                        <span th:if="${language != null and language == 'en'}">Previous</span>
+                        <span th:unless="${language != null and language == 'en'}">上一题</span>
+                    </span>
+                    <span role="button" tabindex="0" id="b5-next" class="b5-nav-link text-primary hover:underline text-sm py-2 hidden cursor-pointer">
+                        <span th:if="${language != null and language == 'en'}">Next</span>
+                        <span th:unless="${language != null and language == 'en'}">下一题</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 结果区 -->
+        <div id="b5-result" class="max-w-3xl mx-auto hidden">
+            <div class="b5-card b5-card-inner bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 p-6 sm:p-8">
+                <h2 class="text-xl font-bold text-primary mb-4" th:if="${language != null and language == 'en'}">Results (Raw &amp; T Scores)</h2>
+                <h2 class="text-xl font-bold text-primary mb-4" th:unless="${language != null and language == 'en'}">测验结果（原始分 / T 分）</h2>
+                <p class="text-sm b5-text-muted mb-4" th:unless="${language != null and language == 'en'}">T 分按常模换算：T = 50 + 10×(原始分−均值)/标准差，仅供参考。</p>
+                <p class="text-sm b5-text-muted mb-4" th:if="${language != null and language == 'en'}">T-scores are computed from norms (T = 50 + 10×(raw−mean)/sd). For reference only.</p>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm border-collapse">
+                        <thead>
+                            <tr class="border-b border-gray-200">
+                                <th class="text-left py-2 px-2" th:text="${language != null and language == 'en'} ? 'Code' : '维度代码'">维度代码</th>
+                                <th class="text-left py-2 px-2" th:text="${language != null and language == 'en'} ? 'Dimension' : '维度'">维度</th>
+                                <th class="text-right py-2 px-2" th:text="${language != null and language == 'en'} ? 'Raw' : '原始分'">原始分</th>
+                                <th class="text-right py-2 px-2" th:text="${language != null and language == 'en'} ? 'T' : 'T 分'">T 分</th>
+                            </tr>
+                        </thead>
+                        <tbody id="b5-result-tbody"></tbody>
+                    </table>
+                </div>
+                <div class="mt-6 pt-4 border-t border-gray-200">
+                    <button type="button" id="b5-restart" class="b5-btn-outline px-4 py-2 rounded-lg font-medium">
+                        <span th:if="${language != null and language == 'en'}">Restart Test</span>
+                        <span th:unless="${language != null and language == 'en'}">重新测试</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script th:inline="javascript">
+        (function() {
+            const LANG = /*[[${language}]]*/ 'zh';
+            const isEn = LANG === 'en';
+            const QUESTIONS_URL = /*[[@{/data/bigfive_questions.json}]]*/ '/data/bigfive_questions.json';
+            const NORMS_URL = /*[[@{/data/bigfive_norms.json}]]*/ '/data/bigfive_norms.json';
+            const SCORING_KEY_URL = /*[[@{/data/bigfive_scoring_key.json}]]*/ '/data/bigfive_scoring_key.json';
+            const DIM_NAMES_ZH = { 'N': '神经质', 'E': '外倾性', 'O': '开放性', 'A': '宜人性', 'C': '严谨性' };
+            const DIM_NAMES_EN = { 'N': 'Neuroticism', 'E': 'Extraversion', 'O': 'Openness', 'A': 'Agreeableness', 'C': 'Conscientiousness' };
+            const DIM_NAMES = isEn ? DIM_NAMES_EN : DIM_NAMES_ZH;
+            const MSG_PROGRESS = isEn ? 'Question %1 / %2' : '第 %1 / %2 题';
+            const MSG_DRAFT_BANNER = isEn ? 'You have unsaved progress (240 items, %1 answered). Resume or start over?' : '检测到未完成的答题（共 240 题，已答 %1 题），是否继续？';
+            const STORAGE_KEY = 'bigfive_draft';
+
+            let questions = [];
+            let norms = null;
+            let scoringKey = null;
+            let answers = {};
+            let currentIndex = 0;
+
+            const el = (id) => document.getElementById(id);
+            const show = (id) => el(id).classList.remove('hidden');
+            const hide = (id) => el(id).classList.add('hidden');
+            const getGender = () => (el('b5-gender') ? el('b5-gender').value : 'M');
+
+            function loadNorms() {
+                if (norms) return Promise.resolve(norms);
+                return fetch(NORMS_URL).then(r => r.json()).then(data => { norms = data; return norms; }).catch(() => null);
+            }
+            function loadScoringKey() {
+                if (scoringKey) return Promise.resolve(scoringKey);
+                return fetch(SCORING_KEY_URL).then(r => r.json()).then(data => { scoringKey = data; return scoringKey; }).catch(() => null);
+            }
+            function loadQuestions() {
+                return fetch(QUESTIONS_URL).then(r => r.json()).then(data => {
+                    questions = (scoringKey && scoringKey.items) ? data.map(q => {
+                        const entry = scoringKey.items[String(q.id)];
+                        return Object.assign({}, q, { dimension: entry ? entry.dimension : null, reverse: entry ? entry.reverse : false });
+                    }) : data;
+                    return questions;
+                });
+            }
+
+            function saveToStorage() {
+                if (!questions.length) return;
+                const payload = { answers: Object.assign({}, answers), currentIndex: currentIndex, gender: getGender(), savedAt: Date.now() };
+                try { localStorage.setItem(STORAGE_KEY, JSON.stringify(payload)); } catch (e) {}
+            }
+            function loadFromStorage() {
+                try { const raw = localStorage.getItem(STORAGE_KEY); if (!raw) return null; return JSON.parse(raw); } catch (e) { return null; }
+            }
+            function clearStorage() { try { localStorage.removeItem(STORAGE_KEY); } catch (e) {} }
+            function showDraftBanner(saved) {
+                const answered = Object.keys(saved.answers || {}).length;
+                el('b5-draft-text').textContent = MSG_DRAFT_BANNER.replace('%1', answered);
+                show('b5-draft-banner');
+            }
+            function hideDraftBanner() { hide('b5-draft-banner'); }
+
+            function getAnswer(id) { return answers[String(id)]; }
+            function setAnswer(id, value) { answers[String(id)] = value; }
+
+            function setAnswerUI(value) {
+                document.querySelectorAll('.b5-btn-answer[data-value]').forEach(btn => {
+                    const v = btn.getAttribute('data-value');
+                    btn.classList.toggle('b5-selected', v !== null && Number(v) === Number(value));
+                    btn.setAttribute('aria-pressed', (v !== null && Number(v) === Number(value)) ? 'true' : 'false');
+                });
+            }
+
+            function renderQuestion() {
+                const q = questions[currentIndex];
+                if (!q) return;
+                const text = (isEn && q.text_en) ? q.text_en : q.text;
+                el('b5-question-text').textContent = q.id + '. ' + text;
+                el('b5-progress-text').textContent = MSG_PROGRESS.replace('%1', currentIndex + 1).replace('%2', questions.length);
+                el('b5-progress-bar').style.width = ((currentIndex + 1) / questions.length * 100) + '%';
+                el('b5-prev').classList.toggle('hidden', currentIndex === 0);
+                el('b5-next').classList.toggle('hidden', currentIndex >= questions.length - 1);
+                setAnswerUI(getAnswer(q.id));
+            }
+
+            function computeScores() {
+                const scores = { N: 0, E: 0, O: 0, A: 0, C: 0 };
+                questions.forEach(q => {
+                    const ans = getAnswer(q.id);
+                    if (ans === undefined || ans === null) return;
+                    const v = Number(ans);
+                    if (v < 0 || v > 4) return;
+                    const dim = q.dimension;
+                    if (!dim || !scores.hasOwnProperty(dim)) return;
+                    const itemScore = q.reverse ? (4 - v) : v;
+                    scores[dim] += itemScore;
+                });
+                return scores;
+            }
+
+            function computeTScores(rawScores) {
+                if (!norms || !norms.norms) return {};
+                const gender = getGender();
+                const group = norms.norms[gender];
+                if (!group || !group.mean || !group.sd) return {};
+                const out = {};
+                ['N','E','O','A','C'].forEach(code => {
+                    const mean = group.mean[code], sd = group.sd[code];
+                    const raw = rawScores[code] != null ? Number(rawScores[code]) : 0;
+                    if (typeof mean !== 'number' || typeof sd !== 'number' || sd === 0) { out[code] = null; return; }
+                    out[code] = Math.round((50 + 10 * ((raw - mean) / sd)) * 10) / 10;
+                });
+                return out;
+            }
+
+            function showResult() {
+                clearStorage();
+                const scores = computeScores();
+                const tScores = computeTScores(scores);
+                const tbody = el('b5-result-tbody');
+                tbody.innerHTML = '';
+                ['N','E','O','A','C'].forEach(code => {
+                    const name = DIM_NAMES[code] || code;
+                    const raw = scores[code] || 0;
+                    const t = tScores[code] != null ? tScores[code] : '-';
+                    const tr = document.createElement('tr');
+                    tr.className = 'b5-result-row border-b border-gray-200';
+                    tr.innerHTML = '<td class="py-2 px-2 font-medium">' + code + '</td><td class="py-2 px-2">' + name + '</td><td class="py-2 px-2 text-right">' + raw + '</td><td class="py-2 px-2 text-right">' + t + '</td>';
+                    tbody.appendChild(tr);
+                });
+                hide('b5-test');
+                show('b5-result');
+            }
+
+            function startTest() {
+                Promise.all([loadScoringKey(), loadNorms()]).then(() => loadQuestions()).then(() => {
+                    answers = {};
+                    currentIndex = 0;
+                    hide('b5-intro');
+                    hideDraftBanner();
+                    show('b5-test');
+                    renderQuestion();
+                    saveToStorage();
+                }).catch(err => console.error(err));
+            }
+
+            el('b5-start').addEventListener('click', startTest);
+
+            (function checkDraftOnLoad() {
+                const saved = loadFromStorage();
+                if (saved && Object.keys(saved.answers || {}).length > 0) showDraftBanner(saved);
+            })();
+
+            el('b5-resume').addEventListener('click', function() {
+                const saved = loadFromStorage();
+                if (!saved) return;
+                if (el('b5-gender') && saved.gender) el('b5-gender').value = saved.gender;
+                Promise.all([loadScoringKey(), loadNorms()]).then(() => loadQuestions()).then(() => {
+                    answers = saved.answers || {};
+                    currentIndex = Math.min(saved.currentIndex || 0, Math.max(0, questions.length - 1));
+                    hide('b5-intro');
+                    hideDraftBanner();
+                    show('b5-test');
+                    renderQuestion();
+                    saveToStorage();
+                }).catch(err => console.error(err));
+            });
+            el('b5-discard-draft').addEventListener('click', function() { clearStorage(); hideDraftBanner(); });
+
+            function submitAnswer(value) {
+                const q = questions[currentIndex];
+                if (!q) return;
+                setAnswer(q.id, value);
+                setAnswerUI(value);
+                if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+                saveToStorage();
+                if (currentIndex >= questions.length - 1) { showResult(); return; }
+                currentIndex++;
+                renderQuestion();
+            }
+
+            document.querySelectorAll('.b5-btn-answer[data-value]').forEach(btn => {
+                btn.addEventListener('click', function() { submitAnswer(Number(this.getAttribute('data-value'))); });
+            });
+
+            function onPrev() { if (currentIndex > 0) { currentIndex--; renderQuestion(); saveToStorage(); } }
+            function onNext() { if (currentIndex < questions.length - 1) { currentIndex++; renderQuestion(); saveToStorage(); } }
+            el('b5-prev').addEventListener('click', onPrev);
+            el('b5-next').addEventListener('click', onNext);
+            el('b5-prev').addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onPrev(); } });
+            el('b5-next').addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNext(); } });
+
+            el('b5-restart').addEventListener('click', function() {
+                clearStorage();
+                show('b5-intro');
+                hide('b5-result');
+                answers = {};
+                currentIndex = 0;
+            });
+        })();
+    </script>
+</body>
+</html>

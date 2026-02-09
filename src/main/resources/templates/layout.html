@@ -47,6 +47,7 @@
                 <nav class="hidden md:flex space-x-6 lg:space-x-8">
                     <a href="/philosophers" class="nav-link text-sm lg:text-base" th:classappend="${activePage == 'philosophers'} ? 'active'" data-page="philosophers">哲学</a>
                     <a href="/schools" class="nav-link text-sm lg:text-base" th:classappend="${activePage == 'schools'} ? 'active'" data-page="schools">流派</a>
+                    <a href="/tests" class="nav-link text-sm lg:text-base" th:classappend="${activePage == 'tests'} ? 'active'" data-page="tests" th:text="${language != null and language == 'en'} ? 'Tests' : '测试'">测试</a>
                     <th:block th:if="${isAuthenticated}">
                         <a href="/logout" class="nav-link text-sm lg:text-base" data-page="logout">
                             <span th:text="${language != null and language == 'en'} ? 'Logout' : '退出'">退出</span>
@@ -72,6 +73,10 @@
                 <a href="/schools" class="mobile-nav-link py-3 px-2 border-b border-gray-100 min-h-[44px] flex items-center touch-manipulation" th:classappend="${activePage == 'schools'} ? 'active'" data-page="schools">
                     <i class="fa fa-university mr-2"></i>
                     <span>流派</span>
+                </a>
+                <a href="/tests" class="mobile-nav-link py-3 px-2 border-b border-gray-100 min-h-[44px] flex items-center touch-manipulation" th:classappend="${activePage == 'tests'} ? 'active'" data-page="tests">
+                    <i class="fa fa-clipboard-list mr-2"></i>
+                    <span th:text="${language != null and language == 'en'} ? 'Tests' : '测试'">测试</span>
                 </a>
                 <th:block th:unless="${isAuthenticated}">
                     <a href="/login" class="mobile-nav-link py-3 px-2 text-primary min-h-[44px] flex items-center touch-manipulation" th:classappend="${activePage == 'login'} ? 'active'">

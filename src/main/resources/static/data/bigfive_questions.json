@@ -1,0 +1,1202 @@
+[
+  {
+    "id": 1,
+    "text": "我不是一个容易忧虑的人",
+    "text_en": "I am not a person who worries easily."
+  },
+  {
+    "id": 2,
+    "text": "我的确喜欢我所遇见的大部分人",
+    "text_en": "I really like most people I meet."
+  },
+  {
+    "id": 3,
+    "text": "我的想象力相当丰富",
+    "text_en": "I have a vivid imagination."
+  },
+  {
+    "id": 4,
+    "text": "我认为人们表面上说得漂亮，内心则另有谋",
+    "text_en": "I believe that people often say one thing but mean another."
+  },
+  {
+    "id": 5,
+    "text": "我以办事情慎重稳妥和合乎常理而为人所知",
+    "text_en": "I am known for being careful and sensible in how I do things."
+  },
+  {
+    "id": 6,
+    "text": "我常因别人对我的做法而感到愤怒",
+    "text_en": "I often feel angry about how others treat me."
+  },
+  {
+    "id": 7,
+    "text": "我尽量避开人群",
+    "text_en": "I try to avoid crowds."
+  },
+  {
+    "id": 8,
+    "text": "我并非十分注重事物的审美和艺术方面的特点",
+    "text_en": "I am not very interested in the artistic or aesthetic aspects of things."
+  },
+  {
+    "id": 9,
+    "text": "我并不狡猾",
+    "text_en": "I am not crafty or sly."
+  },
+  {
+    "id": 10,
+    "text": "我宁愿暂时不做决定以便留有选择余地，而不愿提前计划好",
+    "text_en": "I would rather leave things open than plan them in advance."
+  },
+  {
+    "id": 11,
+    "text": "我很少感到孤独和忧郁",
+    "text_en": "I rarely feel lonely or blue."
+  },
+  {
+    "id": 12,
+    "text": "我具有领导才干，喜欢表达和坚持实行自己的主张",
+    "text_en": "I have a natural talent for leading and like to state my views."
+  },
+  {
+    "id": 13,
+    "text": "我宁愿过变动起伏而能获得各种情感体验的生活而不愿过那种安逸稳定而平淡的生活",
+    "text_en": "I would rather live a life of change and strong feelings than one that is calm and routine."
+  },
+  {
+    "id": 14,
+    "text": "有时候，我的一些做法使别人认为我太顾自己或自我中心",
+    "text_en": "Sometimes my behavior makes others think I am self-centered."
+  },
+  {
+    "id": 15,
+    "text": "我尽心尽力地执行一切分派给我的任务",
+    "text_en": "I put my best effort into every task I am given."
+  },
+  {
+    "id": 16,
+    "text": "与别人交往时，我时常害怕出一些丢人现眼或笨拙的差错",
+    "text_en": "When with others, I often worry about embarrassing or awkward mistakes."
+  },
+  {
+    "id": 17,
+    "text": "我更喜欢从事慢节奏的工作和娱乐活动",
+    "text_en": "I prefer work and leisure that are slow-paced."
+  },
+  {
+    "id": 18,
+    "text": "我做事总是有一定的方式，我不喜欢改变我的做事习惯",
+    "text_en": "I do things in a certain way and dislike changing my habits."
+  },
+  {
+    "id": 19,
+    "text": "我情愿与别人合作而不愿与他们竞争",
+    "text_en": "I would rather cooperate with others than compete with them."
+  },
+  {
+    "id": 20,
+    "text": "我有些随和与松懈",
+    "text_en": "I am somewhat easygoing and relaxed."
+  },
+  {
+    "id": 21,
+    "text": "我极少过多沉溺于任何事情",
+    "text_en": "I rarely overindulge in anything."
+  },
+  {
+    "id": 22,
+    "text": "我常常寻求刺激",
+    "text_en": "I often seek excitement."
+  },
+  {
+    "id": 23,
+    "text": "我对理论和抽象的观念很感兴趣",
+    "text_en": "I am very interested in theoretical and abstract ideas."
+  },
+  {
+    "id": 24,
+    "text": "我不会羞于夸耀自己的天分和成就",
+    "text_en": "I am not shy about boasting of my talents and achievements."
+  },
+  {
+    "id": 25,
+    "text": "我善于计划时间安排要做的事情，以至能够及时完成工作",
+    "text_en": "I am good at planning my time so that I finish tasks on schedule."
+  },
+  {
+    "id": 26,
+    "text": "我经常感到无能为力",
+    "text_en": "I often feel helpless."
+  },
+  {
+    "id": 27,
+    "text": "我从没有真正因为开心而跳起来过",
+    "text_en": "I have never really felt so happy that I wanted to jump for joy."
+  },
+  {
+    "id": 28,
+    "text": "我难以想象我会与一个说话带有乡音的人成为好朋友",
+    "text_en": "I would find it hard to be close friends with someone who speaks with a strong accent."
+  },
+  {
+    "id": 29,
+    "text": "我认为领导们在制定政策时，应更多地考虑到民众的生活",
+    "text_en": "I think leaders should consider people's lives more when making policy."
+  },
+  {
+    "id": 30,
+    "text": "在过去的日子里，我做过一些很愚蠢的事",
+    "text_en": "I have done some foolish things in the past."
+  },
+  {
+    "id": 31,
+    "text": "我容易受到惊吓",
+    "text_en": "I startle easily."
+  },
+  {
+    "id": 32,
+    "text": "与别人聊天并不会使我得到许多的乐趣",
+    "text_en": "I don't get much pleasure from chatting with others."
+  },
+  {
+    "id": 33,
+    "text": "我尽量使自己的思想合乎现实而避免幻想",
+    "text_en": "I try to keep my thinking realistic and avoid fantasy."
+  },
+  {
+    "id": 34,
+    "text": "我觉得大部分人基本上是心怀善意的",
+    "text_en": "I believe most people are basically well-intentioned."
+  },
+  {
+    "id": 35,
+    "text": "我觉得与我周围的人相比，我的能力不够强",
+    "text_en": "I feel less capable than those around me."
+  },
+  {
+    "id": 36,
+    "text": "我是一个性情平和的人",
+    "text_en": "I am an even-tempered person."
+  },
+  {
+    "id": 37,
+    "text": "我喜欢很多人在我身边",
+    "text_en": "I like having lots of people around me."
+  },
+  {
+    "id": 38,
+    "text": "当我听音乐时，我有时会完全沉浸在其中",
+    "text_en": "When I listen to music, I sometimes get completely absorbed in it."
+  },
+  {
+    "id": 39,
+    "text": "如有必要，我愿意操纵别人以得到我所想得到的",
+    "text_en": "If necessary, I am willing to manipulate others to get what I want."
+  },
+  {
+    "id": 40,
+    "text": "我通常保持我的物件干净、整洁",
+    "text_en": "I usually keep my belongings clean and tidy."
+  },
+  {
+    "id": 41,
+    "text": "有时我感到自己毫无价值",
+    "text_en": "Sometimes I feel worthless."
+  },
+  {
+    "id": 42,
+    "text": "我有时没有尽我所能地坚持自己的权利",
+    "text_en": "I sometimes don't stand up for my rights as much as I could."
+  },
+  {
+    "id": 43,
+    "text": "我很少有强烈的情绪体验",
+    "text_en": "I rarely have strong emotional experiences."
+  },
+  {
+    "id": 44,
+    "text": "我尽量对我所碰见的每个人都很有礼貌",
+    "text_en": "I try to be polite to everyone I meet."
+  },
+  {
+    "id": 45,
+    "text": "我有时没有像我应该的那样可靠和值得信赖",
+    "text_en": "I am sometimes not as reliable or trustworthy as I should be."
+  },
+  {
+    "id": 46,
+    "text": "我在社交场合很少感到不自在",
+    "text_en": "I rarely feel awkward in social situations."
+  },
+  {
+    "id": 47,
+    "text": "我做事情时感到精力充沛",
+    "text_en": "I feel energetic when I am doing things."
+  },
+  {
+    "id": 48,
+    "text": "我觉得学习和培养新爱好是很有趣的",
+    "text_en": "I find it interesting to learn and develop new hobbies."
+  },
+  {
+    "id": 49,
+    "text": "在有必要时，我会说出一些讽刺挖苦和尖刻的话来",
+    "text_en": "When needed, I can say sarcastic or cutting things."
+  },
+  {
+    "id": 50,
+    "text": "我有明确的目标，并能有条不紊地朝向它而工作",
+    "text_en": "I have clear goals and work toward them in an orderly way."
+  },
+  {
+    "id": 51,
+    "text": "我感到难以克制我对某些事情的欲望",
+    "text_en": "I find it hard to resist my urges sometimes."
+  },
+  {
+    "id": 52,
+    "text": "我不会喜欢去一个热闹喧嚣的大都市度假",
+    "text_en": "I would not enjoy a vacation in a busy, noisy city."
+  },
+  {
+    "id": 53,
+    "text": "我觉得哲学性的争论很乏味",
+    "text_en": "I find philosophical arguments boring."
+  },
+  {
+    "id": 54,
+    "text": "我不喜欢谈论我自己以及我的成就",
+    "text_en": "I don't like to talk about myself or my achievements."
+  },
+  {
+    "id": 55,
+    "text": "我在安顿下来工作之前要浪费掉不少时间",
+    "text_en": "I waste a lot of time before I settle down to work."
+  },
+  {
+    "id": 56,
+    "text": "我觉得我有能力应付我所遇到的大部分问题",
+    "text_en": "I feel able to handle most of the problems I face."
+  },
+  {
+    "id": 57,
+    "text": "我有时会感到极其快乐和欣喜若狂",
+    "text_en": "I sometimes feel extremely happy and elated."
+  },
+  {
+    "id": 58,
+    "text": "我认为法律和社会政策应该及时修改以反映变化着的世界之所需",
+    "text_en": "I believe laws and social policies should change to reflect the changing world."
+  },
+  {
+    "id": 59,
+    "text": "当我在电影或电视中见到一家人悲欢离合的镜头时，我会感动得流出眼泪",
+    "text_en": "When I see family ups and downs in movies or on TV, I sometimes get tearful."
+  },
+  {
+    "id": 60,
+    "text": "我在做出一个决定之前要进行周详的考虑",
+    "text_en": "I think things through carefully before deciding."
+  },
+  {
+    "id": 61,
+    "text": "我很少感到恐惧或焦虑",
+    "text_en": "I rarely feel fearful or anxious."
+  },
+  {
+    "id": 62,
+    "text": "别人认为我是一个热情和友好的人",
+    "text_en": "Others see me as warm and friendly."
+  },
+  {
+    "id": 63,
+    "text": "我常喜欢幻想",
+    "text_en": "I often enjoy fantasizing."
+  },
+  {
+    "id": 64,
+    "text": "我认为如果你任别人怎样对待你，许多人便会趁机利用你",
+    "text_en": "I believe that if you let people treat you as they like, many will take advantage."
+  },
+  {
+    "id": 65,
+    "text": "我尽量掌握新信息，并通常能作出明智的决定",
+    "text_en": "I try to stay informed and usually make sound decisions."
+  },
+  {
+    "id": 66,
+    "text": "我容易激动，性情急躁",
+    "text_en": "I am easily stirred up and quick-tempered."
+  },
+  {
+    "id": 67,
+    "text": "我通常喜欢单独工作",
+    "text_en": "I usually prefer to work alone."
+  },
+  {
+    "id": 68,
+    "text": "看芭蕾舞或现代舞蹈使我感到乏味",
+    "text_en": "Watching ballet or modern dance bores me."
+  },
+  {
+    "id": 69,
+    "text": "即使是我想欺骗别人，我也做不出来",
+    "text_en": "Even when I wanted to, I could not bring myself to deceive others."
+  },
+  {
+    "id": 70,
+    "text": "我不是一个做事有条不紊的人",
+    "text_en": "I am not an orderly person."
+  },
+  {
+    "id": 71,
+    "text": "我很少感到忧郁或沮丧",
+    "text_en": "I rarely feel sad or depressed."
+  },
+  {
+    "id": 72,
+    "text": "我常常在我所在的团体中担负领导责任",
+    "text_en": "I often take a leadership role in groups."
+  },
+  {
+    "id": 73,
+    "text": "与物质生活本身相比，我更注重生活的情调与情趣",
+    "text_en": "I care more about the feeling and flavor of life than material comfort."
+  },
+  {
+    "id": 74,
+    "text": "我有些冷淡而有心计",
+    "text_en": "I am somewhat cold and calculating."
+  },
+  {
+    "id": 75,
+    "text": "我通常会很快如数地还清我的债务",
+    "text_en": "I usually pay my debts on time."
+  },
+  {
+    "id": 76,
+    "text": "有好几次我羞愧得只想躲起来",
+    "text_en": "There have been times when I was so ashamed I wanted to hide."
+  },
+  {
+    "id": 77,
+    "text": "我做事较慢但稳重",
+    "text_en": "I work slowly but steadily."
+  },
+  {
+    "id": 78,
+    "text": "一旦我找到了做事的适当方法，我便会一直照这种方法做下去",
+    "text_en": "Once I find a good way to do something, I stick to it."
+  },
+  {
+    "id": 79,
+    "text": "即使是在理当发怒的情况下，我也会为表达我的愤怒而犹豫",
+    "text_en": "Even when it is right to be angry, I hesitate to show it."
+  },
+  {
+    "id": 80,
+    "text": "每当我开始一项新的自我改进计划后，我总是半途而废",
+    "text_en": "Whenever I start a self-improvement plan, I never finish it."
+  },
+  {
+    "id": 81,
+    "text": "我对于抵抗诱惑并没有什么困难",
+    "text_en": "I have little trouble resisting temptation."
+  },
+  {
+    "id": 82,
+    "text": "有时，我做某些事情只是为了寻求刺激和冒险",
+    "text_en": "Sometimes I do things just for the thrill or adventure."
+  },
+  {
+    "id": 83,
+    "text": "我喜欢解决问题或猜谜",
+    "text_en": "I enjoy solving problems or puzzles."
+  },
+  {
+    "id": 84,
+    "text": "我知道我比大多数人优秀",
+    "text_en": "I know I am better than most people."
+  },
+  {
+    "id": 85,
+    "text": "我是一个总是能够将事情办妥和有工作成效的人",
+    "text_en": "I am someone who gets things done and works effectively."
+  },
+  {
+    "id": 86,
+    "text": "我在大量压力的情况下，有时感到精神象是要崩溃一样",
+    "text_en": "Under a lot of stress, I sometimes feel like I'm falling apart."
+  },
+  {
+    "id": 87,
+    "text": "我不是一个乐观主义者",
+    "text_en": "I am not an optimist."
+  },
+  {
+    "id": 88,
+    "text": "我认为在道德问题上做决定时，我们应遵从宗教权威的判断",
+    "text_en": "I think we should follow religious authority on moral decisions."
+  },
+  {
+    "id": 89,
+    "text": "我认为为了帮助穷人和老年人，我们怎样做也不为多",
+    "text_en": "I believe we can never do enough to help the poor and elderly."
+  },
+  {
+    "id": 90,
+    "text": "有时，我是先干了再想",
+    "text_en": "Sometimes I act first and think later."
+  },
+  {
+    "id": 91,
+    "text": "我常感到紧张和心神不定",
+    "text_en": "I often feel tense and on edge."
+  },
+  {
+    "id": 92,
+    "text": "我的确有些冷淡，并与别人保持距离",
+    "text_en": "I am somewhat cold and keep my distance from others."
+  },
+  {
+    "id": 93,
+    "text": "我不喜欢将时间浪费在白日梦中",
+    "text_en": "I don't like to waste time daydreaming."
+  },
+  {
+    "id": 94,
+    "text": "我认为大部分与我交往的人是诚实可信的",
+    "text_en": "I believe most people I deal with are honest and trustworthy."
+  },
+  {
+    "id": 95,
+    "text": "我常常遇到一些我没有充分准备的情况",
+    "text_en": "I often run into situations I am not prepared for."
+  },
+  {
+    "id": 96,
+    "text": "别人并不认为我是一个易怒或易发脾气的人",
+    "text_en": "Others don't see me as irritable or quick-tempered."
+  },
+  {
+    "id": 97,
+    "text": "假日里，我宁愿找一个僻静的地方去做我愿做的事情，也不愿参加大家在一块的活动",
+    "text_en": "On holiday I would rather find a quiet place than join group activities."
+  },
+  {
+    "id": 98,
+    "text": "我深感艺术和自然所呈现出的各种格调和姿态奇妙有趣",
+    "text_en": "I find the moods and forms of art and nature fascinating."
+  },
+  {
+    "id": 99,
+    "text": "我认为绝对诚实是一种很差的做生意的方法",
+    "text_en": "I think being completely honest is a poor way to do business."
+  },
+  {
+    "id": 100,
+    "text": "我喜欢把东西放在固定的位置，以便我确知它们在哪里",
+    "text_en": "I like to keep things in their place so I know where they are."
+  },
+  {
+    "id": 101,
+    "text": "我有时会深感内疚或有一种负罪感",
+    "text_en": "I sometimes feel very guilty."
+  },
+  {
+    "id": 102,
+    "text": "开会时，我通常让别人发言而自己较少开口",
+    "text_en": "In meetings I usually let others speak and say little myself."
+  },
+  {
+    "id": 103,
+    "text": "我很少会留意我即刻的情绪和感受",
+    "text_en": "I rarely notice my immediate moods or feelings."
+  },
+  {
+    "id": 104,
+    "text": "我通常尽可能深思熟虑",
+    "text_en": "I usually think before I act."
+  },
+  {
+    "id": 105,
+    "text": "当责难临头时，我有时除了扯谎以免被罚外别无他法",
+    "text_en": "When in trouble, I have sometimes had to lie to avoid punishment."
+  },
+  {
+    "id": 106,
+    "text": "当别人嘲笑我和开我的玩笑时，我不会感到太难堪",
+    "text_en": "I don't get too upset when people tease or joke about me."
+  },
+  {
+    "id": 107,
+    "text": "我常常感到精力旺盛",
+    "text_en": "I often feel full of energy."
+  },
+  {
+    "id": 108,
+    "text": "我经常品尝我没吃过的和异地风味的食物",
+    "text_en": "I often try new or exotic foods."
+  },
+  {
+    "id": 109,
+    "text": "如果我不喜欢某人，我便会让对方知道",
+    "text_en": "If I don't like someone, I let them know."
+  },
+  {
+    "id": 110,
+    "text": "我努力工作以达成我的目标",
+    "text_en": "I work hard to reach my goals."
+  },
+  {
+    "id": 111,
+    "text": "当有我爱吃的食物时，我会吃得太多",
+    "text_en": "When food I like is available, I eat too much."
+  },
+  {
+    "id": 112,
+    "text": "我不愿看那些令人震惊或恐怖的电影",
+    "text_en": "I avoid shocking or horror movies."
+  },
+  {
+    "id": 113,
+    "text": "当别人谈论抽象的、理论性的事情时，有时我会感到乏味",
+    "text_en": "I sometimes find it boring when people talk about abstract or theoretical things."
+  },
+  {
+    "id": 114,
+    "text": "我尽量谦卑恭顺",
+    "text_en": "I try to be humble."
+  },
+  {
+    "id": 115,
+    "text": "我很难让自己做我应该做的事",
+    "text_en": "I have trouble making myself do what I should."
+  },
+  {
+    "id": 116,
+    "text": "我在紧急情况下仍能保持头脑冷静",
+    "text_en": "I keep a cool head in emergencies."
+  },
+  {
+    "id": 117,
+    "text": "我有时会充满快乐",
+    "text_en": "I sometimes feel full of joy."
+  },
+  {
+    "id": 118,
+    "text": "我认为其它社会的人可能有与我们不同的是非观念，但对我们来说这些观念可能是正确的",
+    "text_en": "I believe other societies may have different ideas of right and wrong that could be valid for them."
+  },
+  {
+    "id": 119,
+    "text": "我并不同情行乞的人",
+    "text_en": "I have little sympathy for people who beg."
+  },
+  {
+    "id": 120,
+    "text": "我在采取行动之前往往要先考虑后果",
+    "text_en": "I usually consider the consequences before I act."
+  },
+  {
+    "id": 121,
+    "text": "我很少为将来的事情担忧",
+    "text_en": "I rarely worry about the future."
+  },
+  {
+    "id": 122,
+    "text": "我确实喜欢与别人交谈",
+    "text_en": "I really enjoy talking with people."
+  },
+  {
+    "id": 123,
+    "text": "我喜欢沉浸在幻想及想入非非之中，并探询它们所有的可能性，任其发展",
+    "text_en": "I like to get lost in fantasy and explore all the possibilities."
+  },
+  {
+    "id": 124,
+    "text": "当别人为我做一些好事时，我会怀疑他们是否出于真心",
+    "text_en": "When people do me favors, I wonder if they really mean it."
+  },
+  {
+    "id": 125,
+    "text": "我为自己对事情有恰当的判断而感到自豪",
+    "text_en": "I am proud of my good judgment."
+  },
+  {
+    "id": 126,
+    "text": "我常常讨厌那些我不得不与之打交道的人",
+    "text_en": "I often dislike the people I have to deal with."
+  },
+  {
+    "id": 127,
+    "text": "我喜欢做那种可由我单独干而不受别人干扰的工作",
+    "text_en": "I prefer work I can do alone without others around."
+  },
+  {
+    "id": 128,
+    "text": "我很少或不会因诗词而产生什么感触",
+    "text_en": "Poetry rarely moves me."
+  },
+  {
+    "id": 129,
+    "text": "我会特别不愿意被别人认为是一个虚伪的人",
+    "text_en": "I would hate to be seen as phony."
+  },
+  {
+    "id": 130,
+    "text": "我好像总不能把事情安排得井井有条",
+    "text_en": "I never seem to get things organized."
+  },
+  {
+    "id": 131,
+    "text": "当事情出问题时，我喜欢责怪自己",
+    "text_en": "When things go wrong, I tend to blame myself."
+  },
+  {
+    "id": 132,
+    "text": "碰到要做决定时，别人常来找我商量",
+    "text_en": "When a decision is needed, people often ask me."
+  },
+  {
+    "id": 133,
+    "text": "我体验到许多不同的情绪和感受",
+    "text_en": "I experience many different emotions and feelings."
+  },
+  {
+    "id": 134,
+    "text": "别人并不觉得我慷慨",
+    "text_en": "Others don't see me as generous."
+  },
+  {
+    "id": 135,
+    "text": "当我作出承诺后，我总是能够照着去做",
+    "text_en": "When I make a promise, I keep it."
+  },
+  {
+    "id": 136,
+    "text": "我经常感到自己不如别人",
+    "text_en": "I often feel inferior to others."
+  },
+  {
+    "id": 137,
+    "text": "我并不像其他人那样敏感和活跃",
+    "text_en": "I am not as sensitive or active as others."
+  },
+  {
+    "id": 138,
+    "text": "我更愿意在我所熟悉的环境中生活",
+    "text_en": "I prefer to stay in familiar surroundings."
+  },
+  {
+    "id": 139,
+    "text": "当我被别人侮辱时，我尽量宽恕和忘记",
+    "text_en": "When someone insults me, I try to forgive and forget."
+  },
+  {
+    "id": 140,
+    "text": "我并不觉得我在极力驱使自己干出一番事业",
+    "text_en": "I don't feel driven to achieve great things."
+  },
+  {
+    "id": 141,
+    "text": "我很少凭冲动行事",
+    "text_en": "I rarely act on impulse."
+  },
+  {
+    "id": 142,
+    "text": "我喜欢去热闹的场合",
+    "text_en": "I enjoy going to lively places."
+  },
+  {
+    "id": 143,
+    "text": "我喜欢玩需要动脑筋的游戏或解决某种难题",
+    "text_en": "I enjoy games or puzzles that make me think."
+  },
+  {
+    "id": 144,
+    "text": "我对自己有很高的评价",
+    "text_en": "I have a high opinion of myself."
+  },
+  {
+    "id": 145,
+    "text": "一旦我开始一项工作，我差不多总是会将它干完",
+    "text_en": "Once I start a task, I almost always finish it."
+  },
+  {
+    "id": 146,
+    "text": "我常常觉得难以拿定主意",
+    "text_en": "I often have trouble making up my mind."
+  },
+  {
+    "id": 147,
+    "text": "我并不觉得自己特别轻松愉快和乐观开朗",
+    "text_en": "I don't feel especially cheerful or optimistic."
+  },
+  {
+    "id": 148,
+    "text": "我认为对一些历史名人的作用的争论只会混淆人们的思想",
+    "text_en": "I think debating the role of historical figures only confuses people."
+  },
+  {
+    "id": 149,
+    "text": "我常留恋以前那种人们之间人情味很浓的生活",
+    "text_en": "I miss the old days when people were more caring."
+  },
+  {
+    "id": 150,
+    "text": "我经常凭一时冲动做事",
+    "text_en": "I often act on impulse."
+  },
+  {
+    "id": 151,
+    "text": "我常常担心事情可能会出错",
+    "text_en": "I often worry that things will go wrong."
+  },
+  {
+    "id": 152,
+    "text": "我感到对陌生人微笑和与之交往是一件很容易的事情",
+    "text_en": "I find it easy to smile and connect with strangers."
+  },
+  {
+    "id": 153,
+    "text": "当我发现自己在想入非非时，通常会使自己变得忙碌或开始将注意力集中在某些工作或活动上",
+    "text_en": "When I catch myself daydreaming, I usually get busy or focus on work."
+  },
+  {
+    "id": 154,
+    "text": "我首先总是对人们抱以信任的态度",
+    "text_en": "I tend to trust people from the start."
+  },
+  {
+    "id": 155,
+    "text": "我好像什么事情也没有完全干成过",
+    "text_en": "I never seem to have fully finished anything."
+  },
+  {
+    "id": 156,
+    "text": "我一般很难发怒",
+    "text_en": "I am not easily angered."
+  },
+  {
+    "id": 157,
+    "text": "如果要我选择，我更愿去人多的海滩而不愿去森林中单独的小屋中度假",
+    "text_en": "Given the choice, I would rather vacation at a crowded beach than a cabin in the woods."
+  },
+  {
+    "id": 158,
+    "text": "有些音乐总是使我那样着迷",
+    "text_en": "Some music really captivates me."
+  },
+  {
+    "id": 159,
+    "text": "有时我会哄骗别人做些我想要他们做的事",
+    "text_en": "Sometimes I manipulate others to get what I want."
+  },
+  {
+    "id": 160,
+    "text": "我有些挑剔和求全",
+    "text_en": "I can be picky and perfectionistic."
+  },
+  {
+    "id": 161,
+    "text": "我对自己的评价很低",
+    "text_en": "I have a low opinion of myself."
+  },
+  {
+    "id": 162,
+    "text": "我宁愿我行我素也不愿成为别人的领导",
+    "text_en": "I would rather go my own way than lead others."
+  },
+  {
+    "id": 163,
+    "text": "我很少注意不同处境对我的心境或感受的影响",
+    "text_en": "I rarely notice how different situations affect my mood."
+  },
+  {
+    "id": 164,
+    "text": "我所认识的大部分人都喜欢我",
+    "text_en": "Most people I know like me."
+  },
+  {
+    "id": 165,
+    "text": "我严格遵循我的道德准则",
+    "text_en": "I strictly follow my moral principles."
+  },
+  {
+    "id": 166,
+    "text": "在上司与权威面前，我不会感到不自在",
+    "text_en": "I feel at ease with bosses and authority figures."
+  },
+  {
+    "id": 167,
+    "text": "我似乎总是匆匆忙忙的",
+    "text_en": "I always seem to be in a hurry."
+  },
+  {
+    "id": 168,
+    "text": "有时我只是为了得到新的感觉而改变一下屋子里的环境",
+    "text_en": "Sometimes I rearrange the room just for a change of feeling."
+  },
+  {
+    "id": 169,
+    "text": "如果有人先打我，我会立即还击",
+    "text_en": "If someone hits me first, I hit back right away."
+  },
+  {
+    "id": 170,
+    "text": "我努力完成一切我所能做到的事情",
+    "text_en": "I try to do everything I can to the best of my ability."
+  },
+  {
+    "id": 171,
+    "text": "我有时会因吃得过多而弄得肠胃出毛病",
+    "text_en": "I sometimes overeat and upset my stomach."
+  },
+  {
+    "id": 172,
+    "text": "我喜欢「过山车」的刺激",
+    "text_en": "I enjoy the thrill of roller coasters."
+  },
+  {
+    "id": 173,
+    "text": "我没有兴趣思索宇宙的本质或人类的现状",
+    "text_en": "I have no interest in thinking about the nature of the universe or the human condition."
+  },
+  {
+    "id": 174,
+    "text": "我并没有那种比别人要优越的感觉，不管我们的条件怎样",
+    "text_en": "I don't feel superior to others, whatever our circumstances."
+  },
+  {
+    "id": 175,
+    "text": "当一项工作太难时，我宁愿开始一项新的",
+    "text_en": "When a task is too hard, I'd rather start something new."
+  },
+  {
+    "id": 176,
+    "text": "在遇到危机时，我觉得我能很好地控制自己",
+    "text_en": "In a crisis I feel I can keep myself under control."
+  },
+  {
+    "id": 177,
+    "text": "我是一个快乐、生气勃勃的人",
+    "text_en": "I am a cheerful, lively person."
+  },
+  {
+    "id": 178,
+    "text": "我觉得我胸襟宽阔，并能容忍别人的生活方式",
+    "text_en": "I feel broad-minded and tolerant of others' ways of life."
+  },
+  {
+    "id": 179,
+    "text": "我认为整个人类的成员都值得尊重",
+    "text_en": "I believe all human beings deserve respect."
+  },
+  {
+    "id": 180,
+    "text": "我很少做出仓促的决定",
+    "text_en": "I rarely make rash decisions."
+  },
+  {
+    "id": 181,
+    "text": "我所惧怕的事较大部分人要少",
+    "text_en": "I am afraid of fewer things than most people."
+  },
+  {
+    "id": 182,
+    "text": "我对朋友有深厚的感情依恋",
+    "text_en": "I feel strong emotional bonds with my friends."
+  },
+  {
+    "id": 183,
+    "text": "我小时候很少乐于玩「过家家」的游戏",
+    "text_en": "As a child I rarely enjoyed pretend games."
+  },
+  {
+    "id": 184,
+    "text": "我往往把别人设想得尽可能好",
+    "text_en": "I tend to assume the best about people."
+  },
+  {
+    "id": 185,
+    "text": "我是一个很能干的人",
+    "text_en": "I am a capable person."
+  },
+  {
+    "id": 186,
+    "text": "我有时感到怨恨",
+    "text_en": "I sometimes feel resentful."
+  },
+  {
+    "id": 187,
+    "text": "我对大家聚在一起的场合感到乏味",
+    "text_en": "I find large gatherings boring."
+  },
+  {
+    "id": 188,
+    "text": "当我阅读一首诗或观看一件艺术品时，我有时会感到兴奋或惊喜",
+    "text_en": "When I read a poem or look at art, I sometimes feel excited or moved."
+  },
+  {
+    "id": 189,
+    "text": "我有时会恐吓或哄着别人去做我想要他们做的事",
+    "text_en": "I sometimes intimidate or coax others to do what I want."
+  },
+  {
+    "id": 190,
+    "text": "我并不是非得要把东西弄得特别干净",
+    "text_en": "I don't feel I have to keep everything very clean."
+  },
+  {
+    "id": 191,
+    "text": "有时候我感到事情暗淡无望",
+    "text_en": "Sometimes I feel hopeless."
+  },
+  {
+    "id": 192,
+    "text": "与别人谈话时，大部分时间都是我在讲话",
+    "text_en": "When talking with others, I usually do most of the talking."
+  },
+  {
+    "id": 193,
+    "text": "我很容易为别人设身处地着想",
+    "text_en": "I easily put myself in others' shoes."
+  },
+  {
+    "id": 194,
+    "text": "我认为我是一个乐善好施的人",
+    "text_en": "I consider myself charitable."
+  },
+  {
+    "id": 195,
+    "text": "我做事尽量认真细致，以免重做",
+    "text_en": "I try to do things carefully so I don't have to redo them."
+  },
+  {
+    "id": 196,
+    "text": "如果我对别人说错了话或做错了事，我感到难以再次面对他们",
+    "text_en": "If I say or do something wrong to someone, I find it hard to face them again."
+  },
+  {
+    "id": 197,
+    "text": "我的生活节奏很快",
+    "text_en": "My pace of life is fast."
+  },
+  {
+    "id": 198,
+    "text": "与一个从未去过的地方相比，我更愿去一个我曾去过并熟悉的地方度假",
+    "text_en": "I would rather vacation somewhere I've been before than somewhere new."
+  },
+  {
+    "id": 199,
+    "text": "我有些固执，脾气较倔",
+    "text_en": "I can be stubborn and hot-headed."
+  },
+  {
+    "id": 200,
+    "text": "我尽量将我所干的一切事情都干得出色",
+    "text_en": "I try to do everything I do well."
+  },
+  {
+    "id": 201,
+    "text": "有时我会因一时冲动而做一些令我后悔的事情",
+    "text_en": "Sometimes I do things on impulse and regret them later."
+  },
+  {
+    "id": 202,
+    "text": "鲜艳的色彩和华丽的款式对我具有吸引力",
+    "text_en": "Bright colors and fancy styles appeal to me."
+  },
+  {
+    "id": 203,
+    "text": "我有很强的求知欲望",
+    "text_en": "I have a strong desire to learn."
+  },
+  {
+    "id": 204,
+    "text": "较之被人称赞，我更愿意称赞别人",
+    "text_en": "I would rather praise others than be praised."
+  },
+  {
+    "id": 205,
+    "text": "太多的小事需要去做，有时我一概置之不理",
+    "text_en": "There are too many small tasks sometimes and I ignore them."
+  },
+  {
+    "id": 206,
+    "text": "当所有的事情好象都一团糟时，我仍能作出正确的决定",
+    "text_en": "When everything seems a mess, I can still make the right decision."
+  },
+  {
+    "id": 207,
+    "text": "我很少用「绝了」或「好极了」这类的字眼来表达我的体验",
+    "text_en": "I rarely use words like \"amazing\" or \"fantastic\" to describe my experiences."
+  },
+  {
+    "id": 208,
+    "text": "我对别人与我有不同的习惯有些看不顺眼",
+    "text_en": "I am bothered when others have habits different from mine."
+  },
+  {
+    "id": 209,
+    "text": "我对不如我幸运的那些人感到同情",
+    "text_en": "I feel sympathy for those less fortunate than I."
+  },
+  {
+    "id": 210,
+    "text": "旅行之前我要仔细做好计划",
+    "text_en": "I plan carefully before a trip."
+  },
+  {
+    "id": 211,
+    "text": "有时候我的脑中会出现一些可怕的念头",
+    "text_en": "Sometimes I have frightening thoughts."
+  },
+  {
+    "id": 212,
+    "text": "我时常关心与我一块工作的人们的生活情况",
+    "text_en": "I often care about what is going on in the lives of people I work with."
+  },
+  {
+    "id": 213,
+    "text": "对我来说，让思想无拘无束地漫游是一件困难的事",
+    "text_en": "I find it hard to let my mind wander freely."
+  },
+  {
+    "id": 214,
+    "text": "尽管人类社会存在着一些阴暗的东西（如战争、罪恶、欺诈），我仍相信人性总的说来是善良的",
+    "text_en": "Despite the dark side of human society (war, crime, fraud), I still believe human nature is mostly good."
+  },
+  {
+    "id": 215,
+    "text": "我做事有效果，也有效率",
+    "text_en": "I am effective and efficient in what I do."
+  },
+  {
+    "id": 216,
+    "text": "即使是小小的烦恼事也会使我感到受挫",
+    "text_en": "Even small annoyances can make me feel defeated."
+  },
+  {
+    "id": 217,
+    "text": "我喜欢人多的聚会",
+    "text_en": "I enjoy large parties."
+  },
+  {
+    "id": 218,
+    "text": "与故事性的诗歌相比，我更喜欢那些强调情感与意象的诗歌",
+    "text_en": "I prefer poetry that emphasizes feeling and imagery over narrative."
+  },
+  {
+    "id": 219,
+    "text": "我为自己与人打交道时精于人情世故而感到得意",
+    "text_en": "I am proud of being shrewd in dealing with people."
+  },
+  {
+    "id": 220,
+    "text": "我花许多时间寻找我放错地方的东西",
+    "text_en": "I spend a lot of time looking for things I've misplaced."
+  },
+  {
+    "id": 221,
+    "text": "我经常在事情不顺利时感到挫折并想因此而放弃",
+    "text_en": "When things don't go well, I often feel like giving up."
+  },
+  {
+    "id": 222,
+    "text": "我觉得要控制一种局面并非易事",
+    "text_en": "I find it hard to take control of a situation."
+  },
+  {
+    "id": 223,
+    "text": "奇特的事情——如某些气味或远方的地名——能激起我很强的感受",
+    "text_en": "Unusual things—like certain smells or place names—can stir strong feelings in me."
+  },
+  {
+    "id": 224,
+    "text": "我常将自己的事暂搁一旁而去帮助别人",
+    "text_en": "I often put my own business aside to help others."
+  },
+  {
+    "id": 225,
+    "text": "除非我真的病了，我才会请一天假",
+    "text_en": "I only take a day off when I am really sick."
+  },
+  {
+    "id": 226,
+    "text": "我非常在意别人对我的看法",
+    "text_en": "I care a lot about what others think of me."
+  },
+  {
+    "id": 227,
+    "text": "我是一个很活跃的人",
+    "text_en": "I am a very active person."
+  },
+  {
+    "id": 228,
+    "text": "我会沿着惯常的路去某个地方",
+    "text_en": "I tend to take the same route to places."
+  },
+  {
+    "id": 229,
+    "text": "我经常与家人及同事争论",
+    "text_en": "I often argue with family and coworkers."
+  },
+  {
+    "id": 230,
+    "text": "我像一个「工作狂」",
+    "text_en": "I am something of a workaholic."
+  },
+  {
+    "id": 231,
+    "text": "我向来能够控制自己的情绪",
+    "text_en": "I have always been able to control my emotions."
+  },
+  {
+    "id": 232,
+    "text": "我喜欢成为从事某种体育或健身项目群体中的一员",
+    "text_en": "I like being part of a sports or fitness group."
+  },
+  {
+    "id": 233,
+    "text": "我对脑力活动或知识方面的事情有广泛的兴趣",
+    "text_en": "I have a wide interest in intellectual or knowledge-based activities."
+  },
+  {
+    "id": 234,
+    "text": "我认为我是一个优越的人",
+    "text_en": "I consider myself a superior person."
+  },
+  {
+    "id": 235,
+    "text": "我很有自律性",
+    "text_en": "I am very self-disciplined."
+  },
+  {
+    "id": 236,
+    "text": "我的情绪相当稳定",
+    "text_en": "My moods are quite stable."
+  },
+  {
+    "id": 237,
+    "text": "我容易发笑",
+    "text_en": "I laugh easily."
+  },
+  {
+    "id": 238,
+    "text": "我认为严格的纪律使小孩形成遵守规矩的品质比让他们自己形成独立判断和行事的能力更为重要",
+    "text_en": "I think strict discipline is more important for children than letting them form their own judgment."
+  },
+  {
+    "id": 239,
+    "text": "与「公正」相比，我更愿意别人觉得我「仁」",
+    "text_en": "I would rather be seen as kind than as fair."
+  },
+  {
+    "id": 240,
+    "text": "回答问题之前，我要认真思考",
+    "text_en": "I think carefully before answering."
+  }
+]

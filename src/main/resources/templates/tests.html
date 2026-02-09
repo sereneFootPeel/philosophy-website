@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html th:lang="${language != null and language == 'en'} ? 'en' : 'zh-CN'" lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:with="pageTitle=${(language != null and language == 'en') ? 'Personality Tests' : (pageTitle != null ? pageTitle : '心理测试')}">
+    <th:block th:replace="~{fragments/header :: header-contents}"></th:block>
+</head>
+<body class="bg-secondary min-h-screen flex flex-col font-sans">
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="flex-grow container mx-auto px-4 py-8 sm:py-12" style="padding-top: calc(3.5rem + 1rem);">
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-2xl sm:text-3xl font-bold mb-2" th:if="${language != null and language == 'en'}">Personality Tests</h1>
+            <h1 class="text-2xl sm:text-3xl font-bold mb-2" th:unless="${language != null and language == 'en'}">心理测试</h1>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                <!-- MMPI -->
+                <a href="/mmpi" class="group block bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 p-6 border border-gray-100 hover:border-primary/30 hover:-translate-y-1">
+                    <div class="flex items-start gap-4">
+                        <div class="flex-shrink-0 w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                            <i class="fa fa-clipboard-list text-primary text-xl"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-semibold text-gray-800 group-hover:text-primary transition-colors">MMPI</h2>
+                            <p class="text-sm text-gray-600 mt-1" th:if="${language != null and language == 'en'}">Minnesota Multiphasic Personality Inventory</p>
+                            <p class="text-sm text-gray-600 mt-1" th:unless="${language != null and language == 'en'}">明尼苏达多项人格测验</p>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- MBTI -->
+                <a href="/mbti" class="group block bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 p-6 border border-gray-100 hover:border-primary/30 hover:-translate-y-1">
+                    <div class="flex items-start gap-4">
+                        <div class="flex-shrink-0 w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                            <i class="fa fa-user-tag text-primary text-xl"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-semibold text-gray-800 group-hover:text-primary transition-colors">MBTI</h2>
+                            <p class="text-sm text-gray-600 mt-1" th:if="${language != null and language == 'en'}">Myers-Briggs Type Indicator</p>
+                            <p class="text-sm text-gray-600 mt-1" th:unless="${language != null and language == 'en'}">迈尔斯-布里格斯性格分类法</p>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- 九型人格 -->
+                <a href="/enneagram" class="group block bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 p-6 border border-gray-100 hover:border-primary/30 hover:-translate-y-1">
+                    <div class="flex items-start gap-4">
+                        <div class="flex-shrink-0 w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                            <i class="fa fa-pie-chart text-primary text-xl"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-semibold text-gray-800 group-hover:text-primary transition-colors" th:text="${language != null and language == 'en'} ? 'Enneagram' : '九型人格'">九型人格</h2>
+                            <p class="text-sm text-gray-600 mt-1" th:if="${language != null and language == 'en'}">Nine personality types</p>
+                            <p class="text-sm text-gray-600 mt-1" th:unless="${language != null and language == 'en'}">九种人格类型分析</p>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- 大五人格 -->
+                <a href="/bigfive" class="group block bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 p-6 border border-gray-100 hover:border-primary/30 hover:-translate-y-1">
+                    <div class="flex items-start gap-4">
+                        <div class="flex-shrink-0 w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                            <i class="fa fa-chart-bar text-primary text-xl"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-semibold text-gray-800 group-hover:text-primary transition-colors" th:text="${language != null and language == 'en'} ? 'Big Five' : '大五人格'">大五人格</h2>
+                            <p class="text-sm text-gray-600 mt-1" th:if="${language != null and language == 'en'}">Five-Factor Model of personality</p>
+                            <p class="text-sm text-gray-600 mt-1" th:unless="${language != null and language == 'en'}">人格五因素模型</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <div th:replace="~{fragments/footer :: theme-script}"></div>
+</body>
+</html>
