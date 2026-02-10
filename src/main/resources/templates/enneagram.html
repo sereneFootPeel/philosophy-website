@@ -69,6 +69,7 @@
         .enneagram-page .enneagram-draft-banner #enneagram-draft-text { color: var(--text-secondary) !important; }
         .enneagram-page .enneagram-result-row td { color: var(--text-secondary) !important; }
         .enneagram-page .enneagram-type-desc { color: var(--text-secondary) !important; }
+        .enneagram-page .enneagram-rule-note { color: var(--text-tertiary) !important; }
     </style>
 </head>
 <body class="enneagram-page bg-secondary min-h-screen flex flex-col">
@@ -81,10 +82,10 @@
                 <h1 class="text-2xl sm:text-3xl font-bold text-primary mb-4" th:if="${language != null and language == 'en'}">Enneagram Personality Test</h1>
                 <h1 class="text-2xl sm:text-3xl font-bold text-primary mb-4" th:unless="${language != null and language == 'en'}">九型人格测试</h1>
                 <p class="enneagram-text-secondary leading-relaxed mb-4" th:if="${language != null and language == 'en'}">
-                    Choose the option that best describes you. There are no right or wrong answers. The test has 144 questions (two choices per question). Please answer based on your usual behavior and feelings.
+                    Choose the option that best describes you. There are no right or wrong answers. Please answer based on your usual behavior and feelings.
                 </p>
                 <p class="enneagram-text-secondary leading-relaxed mb-4" th:unless="${language != null and language == 'en'}">
-                    请选择最符合您平时行为与感受的选项。无对错之分。本测试共 144 题，每题二选一，请勿漏题。
+                    请选择最符合您平时行为与感受的选项。无对错之分，请尽量完整作答。
                 </p>
                 <div id="enneagram-draft-banner" class="enneagram-draft-banner hidden mb-4 p-4 rounded-lg border">
                     <p class="text-sm mb-3" id="enneagram-draft-text"></p>
@@ -100,8 +101,8 @@
                     </div>
                 </div>
                 <button type="button" id="enneagram-start" class="enneagram-btn-primary w-full sm:w-auto px-8 py-4 rounded-xl font-medium">
-                    <span th:if="${language != null and language == 'en'}">Start Test (144 questions)</span>
-                    <span th:unless="${language != null and language == 'en'}">开始测试（144 题）</span>
+                    <span th:if="${language != null and language == 'en'}">Start Test</span>
+                    <span th:unless="${language != null and language == 'en'}">开始测试</span>
                 </button>
             </div>
         </div>
@@ -113,8 +114,7 @@
                 <div class="h-2 enneagram-progress-track rounded-full overflow-hidden mb-6">
                     <div id="enneagram-progress-bar" class="h-full enneagram-progress-fill rounded-full transition-all duration-300" style="width: 0%;"></div>
                 </div>
-                <p class="text-sm enneagram-text-muted mb-2" th:if="${language != null and language == 'en'}">Which option is more like you?</p>
-                <p class="text-sm enneagram-text-muted mb-2" th:unless="${language != null and language == 'en'}">请选择更符合您的一项：</p>
+                <p id="enneagram-question-text" class="text-base sm:text-lg enneagram-text-secondary mb-3 leading-relaxed"></p>
                 <div class="flex flex-col gap-3 mb-6">
                     <button type="button" id="enneagram-answer-a" class="enneagram-btn-answer enneagram-btn-outline w-full px-6 py-4 rounded-xl font-medium text-left" data-option="a"></button>
                     <button type="button" id="enneagram-answer-b" class="enneagram-btn-answer enneagram-btn-outline w-full px-6 py-4 rounded-xl font-medium text-left" data-option="b"></button>
@@ -167,7 +167,9 @@
         (function() {
             const LANG = /*[[${language}]]*/ 'zh';
             const isEn = LANG === 'en';
-            const QUESTIONS_URL = /*[[@{/data/enneagram_questions.json}]]*/ '/data/enneagram_questions.json';
+            const QUESTIONS_URL_ZH = /*[[@{/data/enneagram_questions.json}]]*/ '/data/enneagram_questions.json';
+            const QUESTIONS_URL_EN = /*[[@{/data/enneagram_questions_en.json}]]*/ '/data/enneagram_questions_en.json';
+            const QUESTIONS_URL = isEn ? QUESTIONS_URL_EN : QUESTIONS_URL_ZH;
             const STORAGE_KEY = 'enneagram_draft';
 
             const TYPE_NAMES_ZH = {
@@ -202,6 +204,9 @@
             const TYPE_DESC = isEn ? TYPE_DESC_EN : TYPE_DESC_ZH;
             const MSG_PROGRESS = isEn ? 'Question %1 / %2' : '第 %1 / %2 题';
             const MSG_DRAFT_BANNER = isEn ? 'You have unsaved progress (%1 answered). Resume or start over?' : '检测到未完成的答题（已答 %1 题），是否继续？';
+            const MSG_OPTION_YES = isEn ? 'Agree / Yes' : '符合';
+            const MSG_OPTION_NO = isEn ? 'Disagree / No' : '不符合';
+            const MSG_STEM_PROMPT = isEn ? 'Please judge whether the statement matches your usual self:' : '请判断以下描述是否符合平时的你：';
 
             let questions = [];
             let answers = {};
@@ -213,9 +218,32 @@
 
             function loadQuestions() {
                 return fetch(QUESTIONS_URL).then(r => r.json()).then(data => {
-                    questions = data;
+                    questions = (data || []).map(normalizeQuestion);
+                    updateStartButtonCount();
                     return questions;
                 });
+            }
+
+            function typeName(typeNum) {
+                return TYPE_NAMES[typeNum] || '';
+            }
+
+            function normalizeQuestion(q) {
+                const id = q && q.id != null ? Number(q.id) : 0;
+                const text = q && q.text ? q.text : '';
+                const type = q && q.type ? Number(q.type) : 0;
+                return {
+                    id,
+                    text,
+                    type
+                };
+            }
+
+            function updateStartButtonCount() {
+                const startBtn = el('enneagram-start');
+                if (!startBtn) return;
+                const count = questions.length || 0;
+                startBtn.innerHTML = '<span>' + (isEn ? ('Start Test (' + count + ' questions)') : ('开始测试（' + count + ' 题）')) + '</span>';
             }
 
             function saveToStorage() {
@@ -256,8 +284,12 @@
             function renderQuestion() {
                 const q = questions[currentIndex];
                 if (!q) return;
-                const textA = (isEn && q.optionA && q.optionA.text_en) ? q.optionA.text_en : (q.optionA && q.optionA.text ? q.optionA.text : '');
-                const textB = (isEn && q.optionB && q.optionB.text_en) ? q.optionB.text_en : (q.optionB && q.optionB.text ? q.optionB.text : '');
+                const stemEl = el('enneagram-question-text');
+
+                const textA = MSG_OPTION_YES;
+                const textB = MSG_OPTION_NO;
+                if (stemEl) stemEl.textContent = q.text || '';
+
                 el('enneagram-progress-text').textContent = MSG_PROGRESS.replace('%1', currentIndex + 1).replace('%2', questions.length);
                 el('enneagram-progress-bar').style.width = ((currentIndex + 1) / questions.length * 100) + '%';
                 el('enneagram-answer-a').innerHTML = '<span>A. ' + textA + '</span>';
@@ -272,8 +304,9 @@
                 const scores = { 1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0 };
                 questions.forEach(q => {
                     const ans = answers[String(q.id)];
-                    if (ans === 'a' && q.optionA && q.optionA.type) scores[q.optionA.type] = (scores[q.optionA.type] || 0) + 1;
-                    if (ans === 'b' && q.optionB && q.optionB.type) scores[q.optionB.type] = (scores[q.optionB.type] || 0) + 1;
+                    if (ans === 'a' && q.type) {
+                        scores[q.type] = (scores[q.type] || 0) + 1;
+                    }
                 });
                 return scores;
             }
@@ -320,6 +353,10 @@
             }
 
             el('enneagram-start').addEventListener('click', startTest);
+
+            (function prefetchQuestionsForRules() {
+                loadQuestions().catch(err => console.error(err));
+            })();
 
             (function checkDraftOnLoad() {
                 const saved = loadFromStorage();

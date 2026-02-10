@@ -302,8 +302,9 @@
     --text-tertiary: #6b7280;
 }
 
-/* Special override for theme-midnight to ensure pure white background and black text (不作用于用户主页，避免黑底黑字) */
-.theme-midnight body:not(.user-profile-page) {
+/* Special override for theme-midnight to ensure pure white background and black text
+   (不作用于用户主页/九型人格页，避免覆盖页面自定义按钮配色导致黑底黑字) */
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) {
     background-color: #FFFFFF !important;
     color: #000000 !important;
 }
@@ -312,53 +313,54 @@
     background-color: #FFFFFF !important;
 }
 
-/* Buttons in midnight theme - white background with black border (用户主页不生效，避免黑按钮黑字) */
-.theme-midnight body:not(.user-profile-page) button,
-.theme-midnight body:not(.user-profile-page) .btn,
-.theme-midnight body:not(.user-profile-page) button.bg-secondary,
-.theme-midnight body:not(.user-profile-page) .btn.bg-secondary,
-.theme-midnight body:not(.user-profile-page) .btn-secondary {
+/* Buttons in midnight theme - white background with black border
+   (用户主页/九型人格页不生效，避免覆盖页面自定义按钮配色导致黑底黑字) */
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) button,
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) .btn,
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) button.bg-secondary,
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) .btn.bg-secondary,
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) .btn-secondary {
     background-color: #FFFFFF !important;
     color: #000000 !important;
     border: 1px solid #000000 !important;
 }
 
-/* Button hover/active/focus states (用户主页不生效) */
-.theme-midnight body:not(.user-profile-page) button:hover,
-.theme-midnight body:not(.user-profile-page) button:active,
-.theme-midnight body:not(.user-profile-page) button:focus,
-.theme-midnight body:not(.user-profile-page) .btn:hover,
-.theme-midnight body:not(.user-profile-page) .btn:active,
-.theme-midnight body:not(.user-profile-page) .btn:focus,
-.theme-midnight body:not(.user-profile-page) button.bg-secondary:hover,
-.theme-midnight body:not(.user-profile-page) button.bg-secondary:active,
-.theme-midnight body:not(.user-profile-page) button.bg-secondary:focus,
-.theme-midnight body:not(.user-profile-page) .btn.bg-secondary:hover,
-.theme-midnight body:not(.user-profile-page) .btn.bg-secondary:active,
-.theme-midnight body:not(.user-profile-page) .btn.bg-secondary:focus,
-.theme-midnight body:not(.user-profile-page) .btn-secondary:hover,
-.theme-midnight body:not(.user-profile-page) .btn-secondary:active,
-.theme-midnight body:not(.user-profile-page) .btn-secondary:focus,
-.theme-midnight body:not(.user-profile-page) .hover\:bg-secondary\/90:hover {
+/* Button hover/active/focus states (用户主页/九型人格页不生效) */
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) button:hover,
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) button:active,
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) button:focus,
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) .btn:hover,
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) .btn:active,
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) .btn:focus,
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) button.bg-secondary:hover,
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) button.bg-secondary:active,
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) button.bg-secondary:focus,
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) .btn.bg-secondary:hover,
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) .btn.bg-secondary:active,
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) .btn.bg-secondary:focus,
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) .btn-secondary:hover,
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) .btn-secondary:active,
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) .btn-secondary:focus,
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) .hover\:bg-secondary\/90:hover {
     background-color: #FFFFFF !important;
     color: #000000 !important;
     border: 2px solid #000000 !important;
 }
 
-/* Primary buttons - white background with black border and text (用户主页不生效) */
-.theme-midnight body:not(.user-profile-page) .btn-primary,
-.theme-midnight body:not(.user-profile-page) button.bg-primary {
+/* Primary buttons - white background with black border and text (用户主页/九型人格页不生效) */
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) .btn-primary,
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) button.bg-primary {
     background-color: #FFFFFF !important;
     color: #000000 !important;
     border: 1px solid #000000 !important;
 }
 
-.theme-midnight body:not(.user-profile-page) .btn-primary:hover,
-.theme-midnight body:not(.user-profile-page) .btn-primary:active,
-.theme-midnight body:not(.user-profile-page) .btn-primary:focus,
-.theme-midnight body:not(.user-profile-page) button.bg-primary:hover,
-.theme-midnight body:not(.user-profile-page) button.bg-primary:active,
-.theme-midnight body:not(.user-profile-page) button.bg-primary:focus {
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) .btn-primary:hover,
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) .btn-primary:active,
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) .btn-primary:focus,
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) button.bg-primary:hover,
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) button.bg-primary:active,
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) button.bg-primary:focus {
     background-color: #FFFFFF !important;
     color: #000000 !important;
     border: 2px solid #000000 !important;
@@ -381,22 +383,23 @@
     border-color: #000000 !important;
 }
 
-/* Ensure all text is black (用户主页不生效，避免黑按钮黑字) */
-.theme-midnight body:not(.user-profile-page) h1,
-.theme-midnight body:not(.user-profile-page) h2,
-.theme-midnight body:not(.user-profile-page) h3,
-.theme-midnight body:not(.user-profile-page) h4,
-.theme-midnight body:not(.user-profile-page) h5,
-.theme-midnight body:not(.user-profile-page) h6,
-.theme-midnight body:not(.user-profile-page) p,
-.theme-midnight body:not(.user-profile-page) span,
-.theme-midnight body:not(.user-profile-page) a:not(.footer-search-btn),
-.theme-midnight body:not(.user-profile-page) label {
+/* Ensure all text is black
+   (用户主页/九型人格页不生效，避免黑按钮黑字；九型人格页按钮由页面内样式控制) */
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) h1,
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) h2,
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) h3,
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) h4,
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) h5,
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) h6,
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) p,
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) span,
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) a:not(.footer-search-btn),
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) label {
     color: #000000 !important;
 }
 
-/* Links should be black with underline on hover (用户主页不生效) */
-.theme-midnight body:not(.user-profile-page) a:not(.footer-search-btn):hover {
+/* Links should be black with underline on hover (用户主页/九型人格页不生效) */
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) a:not(.footer-search-btn):hover {
     color: #000000 !important;
     text-decoration: underline;
 }
@@ -1158,24 +1161,25 @@ body button[type="submit"] {
     color: #FFFFFF !important;
 }
 
-/* Midnight Black theme - buttons with white background and black text (用户主页不生效，避免黑按钮黑字) */
-.theme-midnight body:not(.user-profile-page) button[type="submit"],
-.theme-midnight body:not(.user-profile-page) button[type="submit"]:hover,
-.theme-midnight body:not(.user-profile-page) button[type="submit"]:active,
-.theme-midnight body:not(.user-profile-page) button[type="submit"]:focus {
+/* Midnight Black theme - buttons with white background and black text
+   (用户主页/九型人格页不生效，避免覆盖页面自定义按钮配色导致黑底黑字) */
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) button[type="submit"],
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) button[type="submit"]:hover,
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) button[type="submit"]:active,
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) button[type="submit"]:focus {
     background-color: #FFFFFF !important;
     color: #000000 !important;
     border: 1px solid #000000 !important;
 }
 
-.theme-midnight body:not(.user-profile-page) button[type="submit"]:hover,
-.theme-midnight body:not(.user-profile-page) button[type="submit"]:active,
-.theme-midnight body:not(.user-profile-page) button[type="submit"]:focus {
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) button[type="submit"]:hover,
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) button[type="submit"]:active,
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) button[type="submit"]:focus {
     border: 2px solid #000000 !important;
 }
 
-.theme-midnight body:not(.mmpi-page):not(.user-profile-page) button[type="submit"] span,
-.theme-midnight body:not(.mmpi-page):not(.user-profile-page) button .text-white:not(.footer-search-btn) {
+.theme-midnight body:not(.mmpi-page):not(.user-profile-page):not(.enneagram-page) button[type="submit"] span,
+.theme-midnight body:not(.mmpi-page):not(.user-profile-page):not(.enneagram-page) button .text-white:not(.footer-search-btn) {
     color: #000000 !important;
 }
 
@@ -1186,33 +1190,33 @@ body button[type="submit"] {
     color: #FFFFFF !important;
 }
 
-/* All buttons with bg-primary class - white background with black border (用户主页不生效，避免黑按钮黑字) */
-.theme-midnight body:not(.user-profile-page) button.bg-primary,
-.theme-midnight body:not(.user-profile-page) .btn.bg-primary {
+/* All buttons with bg-primary class - white background with black border (用户主页/九型人格页不生效) */
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) button.bg-primary,
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) .btn.bg-primary {
     background-color: #FFFFFF !important;
     color: #000000 !important;
     border: 1px solid #000000 !important;
 }
 
-.theme-midnight body:not(.user-profile-page) button.bg-primary:hover,
-.theme-midnight body:not(.user-profile-page) button.bg-primary:active,
-.theme-midnight body:not(.user-profile-page) button.bg-primary:focus,
-.theme-midnight body:not(.user-profile-page) .btn.bg-primary:hover,
-.theme-midnight body:not(.user-profile-page) .btn.bg-primary:active,
-.theme-midnight body:not(.user-profile-page) .btn.bg-primary:focus {
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) button.bg-primary:hover,
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) button.bg-primary:active,
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) button.bg-primary:focus,
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) .btn.bg-primary:hover,
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) .btn.bg-primary:active,
+.theme-midnight body:not(.user-profile-page):not(.enneagram-page) .btn.bg-primary:focus {
     background-color: #FFFFFF !important;
     color: #000000 !important;
     border: 2px solid #000000 !important;
 }
 
-/* Ensure button text is always black in midnight theme (except footer buttons; 用户主页、MMPI 页不生效) */
-.theme-midnight body:not(.mmpi-page):not(.user-profile-page) button:not(.footer-search-btn),
-.theme-midnight body:not(.mmpi-page):not(.user-profile-page) .btn:not(.footer-search-btn) {
+/* Ensure button text is always black in midnight theme (except footer buttons; 用户主页、MMPI、九型人格页不生效) */
+.theme-midnight body:not(.mmpi-page):not(.user-profile-page):not(.enneagram-page) button:not(.footer-search-btn),
+.theme-midnight body:not(.mmpi-page):not(.user-profile-page):not(.enneagram-page) .btn:not(.footer-search-btn) {
     color: #000000 !important;
 }
 
-.theme-midnight body:not(.mmpi-page):not(.user-profile-page) button:not(.footer-search-btn) span,
-.theme-midnight body:not(.mmpi-page):not(.user-profile-page) .btn:not(.footer-search-btn) span {
+.theme-midnight body:not(.mmpi-page):not(.user-profile-page):not(.enneagram-page) button:not(.footer-search-btn) span,
+.theme-midnight body:not(.mmpi-page):not(.user-profile-page):not(.enneagram-page) .btn:not(.footer-search-btn) span {
     color: #000000 !important;
 }
 
