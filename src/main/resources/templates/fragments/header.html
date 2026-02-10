@@ -41,12 +41,18 @@
                     console.log('Using default light theme');
                 }
                 
+                if (finalTheme === 'midnight') {
+                    finalTheme = 'light';
+                    localStorage.setItem('philosophy_theme', finalTheme);
+                }
+                
                 // 强制移除所有可能的主题类，确保清洁状态
                 document.documentElement.classList.remove(
                     'theme-light', 'theme-dark', 'theme-forest', 
                     'theme-sunset', 'theme-ocean', 'theme-purple',
                     'theme-sakura', 'theme-nordic', 'theme-emerald',
-                    'theme-midnight', 'theme-carbon', 'theme-obsidian'
+                    'theme-midnight', 'theme-carbon', 'theme-obsidian',
+                    'theme-aurora'
                 );
                 
                 // 应用主题类
@@ -66,7 +72,8 @@
                         'theme-light', 'theme-dark', 'theme-forest', 
                         'theme-sunset', 'theme-ocean', 'theme-purple',
                         'theme-sakura', 'theme-nordic', 'theme-emerald',
-                        'theme-midnight', 'theme-carbon', 'theme-obsidian'
+                        'theme-midnight', 'theme-carbon', 'theme-obsidian',
+                        'theme-aurora'
                     );
                 } catch (cleanupError) {
                     console.error('Failed to cleanup theme classes:', cleanupError);
@@ -233,11 +240,17 @@
                     localStorage.setItem('philosophy_theme', serverTheme);
                 }
                 
+                if (finalTheme === 'midnight') {
+                    finalTheme = 'light';
+                    localStorage.setItem('philosophy_theme', finalTheme);
+                }
+                
                 document.documentElement.classList.remove(
                     'theme-light', 'theme-dark', 'theme-forest', 
                     'theme-sunset', 'theme-ocean', 'theme-purple',
                     'theme-sakura', 'theme-nordic', 'theme-emerald',
-                    'theme-midnight', 'theme-carbon', 'theme-obsidian'
+                    'theme-midnight', 'theme-carbon', 'theme-obsidian',
+                    'theme-aurora'
                 );
                 
                 if (finalTheme && finalTheme !== 'light') {

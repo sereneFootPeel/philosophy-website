@@ -466,8 +466,12 @@ public class UserProfileController {
             return response;
         }
 
+        if ("midnight".equals(theme)) {
+            theme = "light";
+        }
+
         // 验证主题值
-        String[] validThemes = {"light", "forest", "dark", "sunset", "ocean", "purple", "sakura", "nordic", "emerald", "midnight", "carbon", "obsidian"};
+        String[] validThemes = {"light", "forest", "dark", "sunset", "ocean", "purple", "sakura", "nordic", "emerald", "carbon", "obsidian", "aurora"};
         boolean isValidTheme = false;
         for (String validTheme : validThemes) {
             if (validTheme.equals(theme)) {

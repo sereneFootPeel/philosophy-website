@@ -45,6 +45,14 @@
             color: var(--text-on-primary) !important;
         }
         .bigfive-page .b5-btn-answer.b5-selected span { color: var(--text-on-primary) !important; }
+        /* 选中态与 enneagram 一致：按下时加深为主题深色，上一题返回时颜色清晰可见 */
+        .bigfive-page .b5-btn-answer[aria-pressed="true"] {
+            background-color: var(--color-primary-dark) !important;
+            border-color: var(--color-primary-dark) !important;
+            color: var(--text-on-primary) !important;
+            box-shadow: none !important;
+        }
+        .bigfive-page .b5-btn-answer[aria-pressed="true"] span { color: var(--text-on-primary) !important; }
         .bigfive-page .b5-btn-answer { min-height: 44px; transition: opacity 0.25s ease, transform 0.25s ease; }
         .bigfive-page .b5-nav-link:focus { outline: none; }
         .bigfive-page #b5-prev { color: var(--text-tertiary) !important; }

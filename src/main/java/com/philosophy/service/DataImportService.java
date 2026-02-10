@@ -1078,7 +1078,7 @@ public class DataImportService {
                 if (fields.length > 23 && !fields[23].isEmpty() && !fields[23].equals("null")) {
                     user.setTheme(fields[23]);
                 } else {
-                    user.setTheme("midnight"); // 默认值
+                    user.setTheme("light"); // 默认值
                 }
 
                 // 解析创建时间 (字段24)

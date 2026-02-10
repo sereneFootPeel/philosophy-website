@@ -118,12 +118,6 @@
             transform: scale(1.02);
         }
         
-        /* Special handling for midnight theme (theme-midnight) to show light gray background */
-        .theme-midnight .theme-card.active {
-            background: #FAFAFA !important;
-            border-color: #64748B !important;
-        }
-        
         .theme-card.active::after {
             content: '\f00c';
             font-family: 'FontAwesome';
@@ -376,15 +370,15 @@
                 <div class="mb-6 pb-6 border-b border-gray-200" th:data-user-id="${user.id}">
                     <h3 class="text-lg font-semibold text-gray-800 mb-4" th:text="${translationService.getStaticText('theme_color', language)}">主题颜色</h3>
                     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                        <!-- Theme 1: Ocean Wave -->
+                        <!-- Theme 1: Pure White -->
                         <button class="theme-card group relative overflow-hidden bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 hover:scale-105 theme-btn p-4 border-2 border-transparent"
                                 data-theme="light"
-                                title="海洋波浪">
+                                title="极简纯白">
                             <div class="flex flex-col items-center justify-center h-full">
                                 <div class="flex space-x-1.5">
-                                    <div class="w-6 h-6 rounded-full bg-[#0891B2] shadow-md border border-blue-200"></div>
-                                    <div class="w-6 h-6 rounded-full bg-[#F97316] shadow-md border border-orange-200"></div>
-                                    <div class="w-6 h-6 rounded-full bg-[#F0FDFF] shadow-md border border-gray-300"></div>
+                                    <div class="w-6 h-6 rounded-full bg-[#FFFFFF] shadow-md border border-gray-300"></div>
+                                    <div class="w-6 h-6 rounded-full bg-[#F3F4F6] shadow-md border border-gray-300"></div>
+                                    <div class="w-6 h-6 rounded-full bg-[#1F2937] shadow-md border border-gray-400"></div>
                                 </div>
                             </div>
                         </button>
@@ -493,20 +487,7 @@
                             </div>
                         </button>
 
-                        <!-- Theme 10: Pure White Minimal -->
-                        <button class="theme-card group relative overflow-hidden bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 hover:scale-105 theme-btn p-4 border-2 border-transparent"
-                                data-theme="midnight"
-                                title="极简纯白">
-                            <div class="flex flex-col items-center justify-center h-full">
-                                <div class="flex space-x-1.5">
-                                    <div class="w-6 h-6 rounded-full bg-[#FFFFFF] shadow-md border border-gray-200"></div>
-                                    <div class="w-6 h-6 rounded-full bg-[#FFFFFF] shadow-md border border-gray-200"></div>
-                                    <div class="w-6 h-6 rounded-full bg-[#000000] shadow-md border border-gray-300"></div>
-                                </div>
-                            </div>
-                        </button>
-
-                        <!-- Theme 11: Pure Black Scale -->
+                        <!-- Theme 10: Pure Black Scale -->
                         <button class="theme-card group relative overflow-hidden bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 hover:scale-105 theme-btn p-4 border-2 border-transparent"
                                 data-theme="carbon"
                                 title="纯黑奢华">
@@ -519,7 +500,7 @@
                             </div>
                         </button>
 
-                        <!-- Theme 12: Elegant Purple -->
+                        <!-- Theme 11: Elegant Purple -->
                         <button class="theme-card group relative overflow-hidden bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 hover:scale-105 theme-btn p-4 border-2 border-transparent"
                                 data-theme="obsidian"
                                 title="优雅紫韵">
@@ -528,6 +509,19 @@
                                     <div class="w-6 h-6 rounded-full bg-[#8B7D9A] shadow-md border border-purple-300"></div>
                                     <div class="w-6 h-6 rounded-full bg-[#A89BB8] shadow-md border border-purple-200"></div>
                                     <div class="w-6 h-6 rounded-full bg-[#B8A8CC] shadow-md border border-purple-100"></div>
+                                </div>
+                            </div>
+                        </button>
+
+                        <!-- Theme 12: Aurora Twilight -->
+                        <button class="theme-card group relative overflow-hidden bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 hover:scale-105 theme-btn p-4 border-2 border-transparent"
+                                data-theme="aurora"
+                                title="极光蓝紫">
+                            <div class="flex flex-col items-center justify-center h-full">
+                                <div class="flex space-x-1.5">
+                                    <div class="w-6 h-6 rounded-full bg-[#5E60CE] shadow-md border border-indigo-300"></div>
+                                    <div class="w-6 h-6 rounded-full bg-[#4EA8DE] shadow-md border border-sky-300"></div>
+                                    <div class="w-6 h-6 rounded-full bg-[#F6F9FF] shadow-md border border-gray-200"></div>
                                 </div>
                             </div>
                         </button>

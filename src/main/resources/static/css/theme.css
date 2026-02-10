@@ -4,34 +4,34 @@
  */
 
 /* ==========================================================================
-   Theme 1: Ocean Wave (Default Theme)
-   - Concept: 海洋波浪，清新自然，充满活力
-   - Palette: 海蓝、珊瑚粉、珍珠白
-   ========================================================================== */
+  Theme 1: Pure White (Default Theme)
+  - Concept: 极简白色主题，清爽克制，提升可读性
+  - Palette: 纯白、浅灰、深灰
+  ========================================================================== */
 :root {
     /* Primary & Accent Colors */
-    --color-primary: #0891B2; /* Ocean Blue */
-    --color-primary-dark: #0E7490;
-    --color-primary-light: #22D3EE;
-    --color-secondary: #F97316; /* Coral Orange */
-    --color-accent: #F0FDFF; /* Ice Blue */
+    --color-primary: #F8FAFC; /* Very Light Slate */
+    --color-primary-dark: #EEF2F7; /* Light hover color */
+    --color-primary-light: #FFFFFF; /* Pure White */
+    --color-secondary: #F1F5F9; /* Soft Gray */
+    --color-accent: #FFFFFF; /* White */
     
     /* Background Colors */
     --bg-primary: #FFFFFF; /* Pure White */
-    --bg-secondary: #F0FDFF; /* Very Light Blue */
-    --bg-tertiary: #E0F7FA; /* Light Blue */
-    --bg-quaternary: #CCFBF1; /* Soft Teal */
+    --bg-secondary: #FFFFFF;
+    --bg-tertiary: #F9FAFB; /* Light Gray */
+    --bg-quaternary: #F3F4F6; /* Gray 100 */
     
     /* Text Colors */
-    --text-primary: #0C4A6E; /* Deep Ocean Blue */
-    --text-secondary: #0F766E; /* Dark Teal */
-    --text-tertiary: #155E75; /* Medium Blue */
-    --text-on-primary: #FFFFFF; /* White text on primary color */
+    --text-primary: #111827; /* Slate 900 */
+    --text-secondary: #374151; /* Slate 700 */
+    --text-tertiary: #6B7280; /* Slate 500 */
+    --text-on-primary: #111827; /* Dark text on light primary */
     
     /* Border Colors */
-    --border-primary: #E0F7FA;
-    --border-secondary: #CCFBF1;
-    --border-tertiary: #99F6E4;
+    --border-primary: #E5E7EB; /* Gray 200 */
+    --border-secondary: #D1D5DB; /* Gray 300 */
+    --border-tertiary: #9CA3AF; /* Gray 400 */
     
     /* Status Colors */
     --color-success: #28a745;
@@ -458,6 +458,32 @@
 }
 
 /* ==========================================================================
+   Theme 13: Aurora Twilight
+   - Concept: 蓝紫极光，清透柔和，现代科技感
+   - Palette: 靛蓝、极光蓝、雾白
+   ========================================================================== */
+.theme-aurora {
+    --color-primary: #5E60CE; /* Indigo */
+    --color-primary-dark: #4f46b6;
+    --color-primary-light: #7F9CF5;
+    --color-secondary: #4EA8DE; /* Aurora Blue */
+    --color-accent: #EEF6FF;
+
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #F6F9FF;
+    --bg-tertiary: #EEF4FF;
+    --bg-quaternary: #E2ECFF;
+    
+    --text-primary: #1E293B;
+    --text-secondary: #334155;
+    --text-tertiary: #64748B;
+    --text-on-primary: #FFFFFF;
+    
+    --border-primary: #DBE7FF;
+    --border-secondary: #C5D7FF;
+}
+
+/* ==========================================================================
    Global Styles & Component Application
    ========================================================================== */
 
@@ -615,27 +641,52 @@ a:hover {
 /* Footer Styles - Enhanced contrast for all themes */
 .footer-component {
     background-color: var(--color-primary);
-    color: var(--text-on-primary);
+    color: var(--text-primary);
 }
 
 .footer-title {
-    color: var(--text-on-primary);
+    color: var(--text-primary);
 }
 
 .footer-subtitle {
-    color: var(--text-on-primary);
-    opacity: 0.85;
+    color: var(--text-primary);
+    opacity: 0.9;
 }
 
 .footer-search-btn {
-    background-color: rgba(255, 255, 255, 0.15);
-    color: var(--text-on-primary);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-primary);
 }
 
 .footer-search-btn:hover {
-    background-color: rgba(255, 255, 255, 0.25);
-    border-color: rgba(255, 255, 255, 0.3);
+    background-color: var(--bg-quaternary);
+    border-color: var(--border-secondary);
+}
+
+/* Light theme explicit contrast fix:
+   When no theme class is present (theme=light), force dark text in header/footer. */
+html:not([class*="theme-"]) #navbar,
+html:not([class*="theme-"]) #navbar a,
+html:not([class*="theme-"]) #navbar span,
+html:not([class*="theme-"]) #navbar i,
+html:not([class*="theme-"]) #menu-toggle,
+html:not([class*="theme-"]) .footer-component,
+html:not([class*="theme-"]) .footer-title,
+html:not([class*="theme-"]) .footer-subtitle,
+html:not([class*="theme-"]) .footer-search-btn,
+html:not([class*="theme-"]) .footer-search-btn i,
+html.theme-light #navbar,
+html.theme-light #navbar a,
+html.theme-light #navbar span,
+html.theme-light #navbar i,
+html.theme-light #menu-toggle,
+html.theme-light .footer-component,
+html.theme-light .footer-title,
+html.theme-light .footer-subtitle,
+html.theme-light .footer-search-btn,
+html.theme-light .footer-search-btn i {
+    color: var(--text-primary) !important;
 }
 
 /* Search Modal Styles - Override Tailwind for theme consistency */
@@ -1018,6 +1069,27 @@ a:hover {
     border-color: var(--color-primary-dark);
 }
 
+/* Aurora theme footer - cool blue-purple background */
+.theme-aurora .footer-component {
+    background-color: var(--color-primary);
+}
+
+.theme-aurora .footer-title,
+.theme-aurora .footer-subtitle {
+    color: #FFFFFF;
+}
+
+.theme-aurora .footer-search-btn {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: #FFFFFF;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.theme-aurora .footer-search-btn:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
 /* Login Page Styles - Theme-aware colors */
 body .bg-white {
     background-color: var(--bg-primary) !important;
@@ -1229,6 +1301,14 @@ body button[type="submit"] {
 .theme-obsidian button[type="submit"] span,
 .theme-obsidian .bg-primary span,
 .theme-obsidian button .text-white {
+    color: #FFFFFF !important;
+}
+
+/* Aurora theme - white text on indigo buttons */
+.theme-aurora button[type="submit"],
+.theme-aurora button[type="submit"] span,
+.theme-aurora .bg-primary span,
+.theme-aurora button .text-white {
     color: #FFFFFF !important;
 }
 
@@ -1452,6 +1532,40 @@ body .border-yellow-400 {
     background-color: rgba(255, 193, 7, 0.15) !important;
 }
 
+/* Aurora theme specific overrides */
+.theme-aurora .text-red-500,
+.theme-aurora .text-red-700 {
+    color: #dc3545 !important;
+}
+
+.theme-aurora .bg-red-100 {
+    background-color: rgba(220, 53, 69, 0.12) !important;
+}
+
+.theme-aurora .text-green-700 {
+    color: #1f8b4c !important;
+}
+
+.theme-aurora .bg-green-100 {
+    background-color: rgba(40, 167, 69, 0.12) !important;
+}
+
+.theme-aurora .text-blue-700 {
+    color: #1d4ed8 !important;
+}
+
+.theme-aurora .bg-blue-100 {
+    background-color: rgba(29, 78, 216, 0.12) !important;
+}
+
+.theme-aurora .text-yellow-700 {
+    color: #a16207 !important;
+}
+
+.theme-aurora .bg-yellow-100 {
+    background-color: rgba(250, 204, 21, 0.18) !important;
+}
+
 /* Shadow overrides for cards in dark theme */
 .theme-dark .shadow-md,
 .theme-dark .shadow-lg {
@@ -1479,6 +1593,12 @@ body .border-yellow-400 {
 /* Shadow overrides for cards in obsidian night theme */
 .theme-obsidian .shadow-md,
 .theme-obsidian .shadow-lg {
+    box-shadow: var(--shadow-md);
+}
+
+/* Shadow overrides for cards in aurora theme */
+.theme-aurora .shadow-md,
+.theme-aurora .shadow-lg {
     box-shadow: var(--shadow-md);
 }
 

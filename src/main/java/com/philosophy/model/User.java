@@ -126,7 +126,7 @@ public class User implements UserDetails {
 
     @Size(max = 10, message = "主题设置长度不能超过10个字符")
     @Column(name = "theme", length = 10)
-    private String theme = "midnight";
+    private String theme = "light";
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

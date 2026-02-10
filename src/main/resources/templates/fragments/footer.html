@@ -586,7 +586,7 @@
 </script>
 
 <!-- Footer 内容 -->
-<footer class="footer-component pt-10 pb-2" th:fragment="footer">
+<footer class="footer-component pt-10 pb-0" th:fragment="footer">
     <div class="container mx-auto px-4">
         <div class="flex flex-col items-center space-y-4">
             <div class="flex w-full items-center justify-end">
@@ -657,7 +657,7 @@
     const GlobalThemeManager = {
         // Theme configuration
         themes: {
-            light: '海洋波浪',
+            light: '极简纯白',
             forest: '森林薄荷',
             dark: '暗夜水晶',
             sunset: '日落霞光',
@@ -666,15 +666,36 @@
             sakura: '樱花之恋',
             nordic: '北欧简约',
             emerald: '赛博暗黑',
-            midnight: '极简纯白',
             carbon: '纯黑奢华',
-            obsidian: '优雅紫韵'
+            obsidian: '优雅紫韵',
+            aurora: '极光蓝紫'
+        },
+        
+        // Normalize deprecated/invalid theme values.
+        normalizeTheme: function(theme) {
+            if (!theme || theme === 'midnight' || !this.themes[theme]) {
+                return 'light';
+            }
+            return theme;
         },
         
         // Get the current theme from localStorage
         getCurrentTheme: function() {
             try {
-                return localStorage.getItem('philosophy_theme') || 'light';
+                const rawTheme = localStorage.getItem('philosophy_theme');
+
+                // 如果还没有显式保存过主题，不在这里写入localStorage，
+                // 仅返回全局默认主题，让后续逻辑（例如用户主页的第一个主题卡片）
+                // 有机会决定真正的初始默认主题。
+                if (!rawTheme) {
+                    return 'light';
+                }
+
+                const normalizedTheme = this.normalizeTheme(rawTheme);
+                if (normalizedTheme !== rawTheme) {
+                    localStorage.setItem('philosophy_theme', normalizedTheme);
+                }
+                return normalizedTheme;
             } catch (e) {
                 console.warn('Could not access localStorage. Using default theme.');
                 return 'light';
@@ -683,6 +704,7 @@
         
         // Set a new theme
         setTheme: function(theme) {
+            theme = this.normalizeTheme(theme);
             console.log(`ThemeManager: setTheme called with theme: '${theme}'.`);
             try {
                 localStorage.setItem('philosophy_theme', theme);
@@ -754,7 +776,8 @@
                 'theme-light', 'theme-dark', 'theme-forest', 
                 'theme-sunset', 'theme-ocean', 'theme-purple',
                 'theme-sakura', 'theme-nordic', 'theme-emerald',
-                'theme-midnight', 'theme-carbon', 'theme-obsidian'
+                'theme-midnight', 'theme-carbon', 'theme-obsidian',
+                'theme-aurora'
             );
             
             // Add the selected theme class. For 'light', no class is needed as it's the default.
@@ -821,13 +844,45 @@
         // This function sets up the theme controls (buttons)
         setupThemeControls: function() {
             console.log('ThemeManager: Setting up theme controls...');
-            const savedTheme = this.getCurrentTheme();
-            this.updateThemeButtons(savedTheme);
 
-            // Bind click events to theme buttons
+            // 先找到当前页面上的主题按钮（主要存在于用户主页）
             const themeButtons = document.querySelectorAll('.theme-btn');
             console.log(`ThemeManager: Found ${themeButtons.length} theme buttons.`);
 
+            // 检查本地是否已经有显式保存的主题
+            let hasSavedTheme = false;
+            let savedTheme = 'light';
+            try {
+                const rawTheme = localStorage.getItem('philosophy_theme');
+                if (rawTheme && rawTheme !== 'null' && rawTheme !== '') {
+                    hasSavedTheme = true;
+                    savedTheme = this.normalizeTheme(rawTheme);
+                }
+            } catch (e) {
+                console.warn('ThemeManager: Cannot access localStorage in setupThemeControls:', e);
+            }
+
+            // 如果还没有任何保存的主题，并且当前页面上存在主题按钮，
+            // 则将“第一个主题按钮”的主题作为默认主题进行应用和保存。
+            if (!hasSavedTheme && themeButtons.length > 0) {
+                const firstThemeAttr = themeButtons[0].getAttribute('data-theme') || 'light';
+                const defaultTheme = this.normalizeTheme(firstThemeAttr);
+                console.log(`ThemeManager: No saved theme, using first theme button as default: '${defaultTheme}'.`);
+                try {
+                    localStorage.setItem('philosophy_theme', defaultTheme);
+                } catch (e) {
+                    console.warn('ThemeManager: Failed to persist default theme from first button:', e);
+                }
+                // 应用主题、更新按钮状态，并同步到服务器，但不弹出“已切换主题”的提示
+                this.applyTheme(defaultTheme);
+                this.updateThemeButtons(defaultTheme);
+                this.saveThemeToServer(defaultTheme);
+            } else {
+                // 已经有保存的主题（或没有按钮时），仅根据保存的主题更新按钮状态
+                this.updateThemeButtons(savedTheme);
+            }
+
+            // 绑定主题按钮点击事件
             themeButtons.forEach(btn => {
                 // Remove existing listeners to prevent duplicates
                 const newBtn = btn.cloneNode(true);
@@ -869,7 +924,8 @@
                     'theme-light', 'theme-dark', 'theme-forest', 
                     'theme-sunset', 'theme-ocean', 'theme-purple',
                     'theme-sakura', 'theme-nordic', 'theme-emerald',
-                    'theme-midnight', 'theme-carbon', 'theme-obsidian'
+                    'theme-midnight', 'theme-carbon', 'theme-obsidian',
+                    'theme-aurora'
                 );
                 
                 // Apply the current theme
