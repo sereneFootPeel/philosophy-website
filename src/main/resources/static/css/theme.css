@@ -302,6 +302,13 @@
     --text-tertiary: #6b7280;
 }
 
+/* 第十主题下用户主页：语言切换按钮激活时确保白字（黑底白字） */
+.theme-midnight body.user-profile-page .language-switch-btn.active,
+.theme-midnight body.user-profile-page .language-switch-btn.active span,
+.theme-midnight body.user-profile-page .language-switch-btn.active i {
+    color: #FFFFFF !important;
+}
+
 /* Special override for theme-midnight to ensure pure white background and black text
    (不作用于用户主页/九型人格页，避免覆盖页面自定义按钮配色导致黑底黑字) */
 .theme-midnight body:not(.user-profile-page):not(.enneagram-page) {
@@ -383,20 +390,6 @@
     border-color: #000000 !important;
 }
 
-/* Ensure all text is black
-   (用户主页/九型人格页不生效，避免黑按钮黑字；九型人格页按钮由页面内样式控制) */
-.theme-midnight body:not(.user-profile-page):not(.enneagram-page) h1,
-.theme-midnight body:not(.user-profile-page):not(.enneagram-page) h2,
-.theme-midnight body:not(.user-profile-page):not(.enneagram-page) h3,
-.theme-midnight body:not(.user-profile-page):not(.enneagram-page) h4,
-.theme-midnight body:not(.user-profile-page):not(.enneagram-page) h5,
-.theme-midnight body:not(.user-profile-page):not(.enneagram-page) h6,
-.theme-midnight body:not(.user-profile-page):not(.enneagram-page) p,
-.theme-midnight body:not(.user-profile-page):not(.enneagram-page) span,
-.theme-midnight body:not(.user-profile-page):not(.enneagram-page) a:not(.footer-search-btn),
-.theme-midnight body:not(.user-profile-page):not(.enneagram-page) label {
-    color: #000000 !important;
-}
 
 /* Links should be black with underline on hover (用户主页/九型人格页不生效) */
 .theme-midnight body:not(.user-profile-page):not(.enneagram-page) a:not(.footer-search-btn):hover {
@@ -889,7 +882,8 @@ a:hover {
     border-color: var(--color-primary-dark);
 }
 
-/* Midnight Black theme footer - pure white with black border */
+/* Midnight Black theme footer - white background with dark text
+   保持搜索按钮使用通用“半透明白色”样式，只把整块 footer 改成白色 */
 .theme-midnight .footer-component {
     background-color: #FFFFFF !important;
     border-top: 1px solid #000000 !important;
@@ -900,15 +894,21 @@ a:hover {
     color: #000000 !important;
 }
 
+/* 白底 footer 上搜索按钮需深色样式才能看见 */
 .theme-midnight .footer-search-btn {
-    background-color: #000000 !important;
-    color: #FFFFFF !important;
-    border-color: #000000 !important;
+    background-color: rgba(0, 0, 0, 0.08) !important;
+    color: #000000 !important;
+    border: 1px solid rgba(0, 0, 0, 0.2) !important;
 }
 
 .theme-midnight .footer-search-btn:hover {
-    background-color: #333333 !important;
-    border-color: #333333 !important;
+    background-color: rgba(0, 0, 0, 0.15) !important;
+    border-color: rgba(0, 0, 0, 0.35) !important;
+    color: #000000 !important;
+}
+
+.theme-midnight .footer-search-btn i {
+    color: #000000 !important;
 }
 
 /* Midnight Black theme navbar - pure white with black border */
@@ -1183,12 +1183,8 @@ body button[type="submit"] {
     color: #000000 !important;
 }
 
-/* Keep footer search button black (special case) */
-.theme-midnight .footer-search-btn,
-.theme-midnight .footer-search-btn span {
-    background-color: #000000 !important;
-    color: #FFFFFF !important;
-}
+/* 保持 footer 搜索按钮使用通用样式，
+   不再在第十主题下强制改成纯黑，保证各页面效果一致 */
 
 /* All buttons with bg-primary class - white background with black border (用户主页/九型人格页不生效) */
 .theme-midnight body:not(.user-profile-page):not(.enneagram-page) button.bg-primary,

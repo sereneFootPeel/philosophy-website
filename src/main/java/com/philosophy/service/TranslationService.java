@@ -501,6 +501,7 @@ public class TranslationService {
             case "contents": return "内容";
             case "all_contents": return "全部内容";
             case "all_rights_reserved": return "保留所有权利";
+            case "footer_disclaimer": return "本网站仅供学习使用，不用于商业用途。如有侵权请联系管理员。";
             case "philosophy_website": return "哲学网站";
             case "home": return "首页";
             case "user_profile": return "用户主页";
@@ -653,6 +654,7 @@ public class TranslationService {
             case "contents": return "Contents";
             case "all_contents": return "All Contents";
             case "all_rights_reserved": return "All rights reserved";
+            case "footer_disclaimer": return "This website is for learning purposes only, not for commercial use. If you find any copyright infringement, please contact the administrator.";
             case "philosophy_website": return "Philosophy Website";
             case "home": return "Home";
             case "user_profile": return "User Profile";

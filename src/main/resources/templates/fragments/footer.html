@@ -575,25 +575,35 @@
             }
         }
     });
+
+    // 在 search-script 内绑定关闭按钮，确保仅引入搜索的页面（如测试页）也能关闭弹窗
+    document.addEventListener('DOMContentLoaded', function() {
+        const closeBtn = document.querySelector('#search-panel .search-close-btn');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', closeSearchModal);
+        }
+    });
 </script>
 
 <!-- Footer 内容 -->
-<footer class="footer-component py-10" th:fragment="footer">
+<footer class="footer-component pt-10 pb-2" th:fragment="footer">
     <div class="container mx-auto px-4">
-        <div class="flex flex-col md:flex-row justify-between items-center">
-            <div class="mb-4 md:mb-0">
-                <h3 class="text-2xl font-bold mb-1 font-sans footer-title" th:text="${translationService != null ? translationService.getStaticText('philosophy', language) : '哲学'}">哲学</h3>
-                <p class="text-sm font-sans footer-subtitle" th:text="${translationService != null ? translationService.getStaticText('my_learning_notes', language) : '我的学习笔记'}">我的学习笔记</p>
-            </div>
-            <div class="flex items-center space-x-4">
-                <!-- 搜索按钮 -->
+        <div class="flex flex-col items-center space-y-4">
+            <div class="flex w-full items-center justify-end">
+                <!-- 搜索按钮（与用户主页/ layout 统一：圆形、仅图标） -->
                 <button id="search-toggle"
-                        class="flex items-center space-x-2 px-4 py-2 footer-search-btn rounded-lg transition-all duration-300 hover:scale-105 font-sans"
+                        class="flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 bg-white/10 hover:bg-white/20 footer-search-btn rounded-full transition-all duration-300 hover:scale-105 active:scale-95 touch-manipulation min-w-[44px] min-h-[44px]"
                         onclick="toggleSearch()"
-                        th:title="${translationService != null ? translationService.getStaticText('search', language) : '搜索'}">
-                    <i class="fa fa-search"></i>
-                    <span th:text="${translationService != null ? translationService.getStaticText('search', language) : '搜索'}">搜索</span>
+                        th:title="${translationService != null ? translationService.getStaticText('search', language) : '搜索'}"
+                        aria-label="搜索">
+                    <i class="fa fa-search text-xl sm:text-2xl"></i>
                 </button>
+            </div>
+            <div>
+                <p class="text-sm font-sans footer-subtitle max-w-md text-center"
+                   th:text="${translationService != null ? translationService.getStaticText('footer_disclaimer', language) : '本网站仅供学习使用，不用于商业用途。如有侵权请联系管理员。'}">
+                    本网站仅供学习使用，不用于商业用途。如有侵权请联系管理员。
+                </p>
             </div>
         </div>
     </div>
@@ -610,7 +620,7 @@
             <!-- 搜索头部 -->
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-lg font-semibold text-gray-800" th:text="${translationService != null ? translationService.getStaticText('search', language) : '搜索'}">搜索</h3>
-                <button type="button" aria-label="关闭搜索" class="search-close-btn text-gray-500 hover:text-gray-700 transition-colors">
+                <button type="button" aria-label="关闭搜索" class="search-close-btn text-gray-500 hover:text-gray-700 transition-colors" onclick="closeSearchModal()">
                     <i class="fa fa-times text-lg"></i>
                 </button>
             </div>

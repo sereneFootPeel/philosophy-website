@@ -109,11 +109,7 @@
 
     <footer class="bg-primary text-white py-6 sm:py-8">
         <div class="container mx-auto px-4">
-            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-                <div class="text-center md:text-left">
-                    <h3 class="text-xl sm:text-2xl font-bold mb-1">哲学</h3>
-                    <p class="text-gray-300 text-xs sm:text-sm">我的学习笔记</p>
-                </div>
+            <div class="flex flex-col items-center gap-4">
                 <div class="flex items-center justify-center">
                     <!-- 搜索按钮 -->
                     <button id="search-toggle" 
@@ -123,6 +119,12 @@
                             aria-label="搜索">
                         <i class="fa fa-search text-xl sm:text-2xl"></i>
                     </button>
+                </div>
+                <div class="text-center">
+                    <p class="text-gray-300 text-xs sm:text-sm max-w-md mx-auto"
+                       th:text="${translationService != null ? translationService.getStaticText('footer_disclaimer', language) : '本网站仅供学习使用，不用于商业用途。如有侵权请联系管理员。'}">
+                        本网站仅供学习使用，不用于商业用途。如有侵权请联系管理员。
+                    </p>
                 </div>
             </div>
         </div>
