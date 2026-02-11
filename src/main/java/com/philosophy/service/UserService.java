@@ -295,7 +295,8 @@ public class UserService implements UserDetailsService {
         if (normalized.isEmpty()) {
             return new ArrayList<>();
         }
-        return userRepository.searchByUsernameOrNameNormalized(trimmed, normalized);
+        String subsequencePattern = SearchNormalizer.buildSubsequenceLikePattern(normalized);
+        return userRepository.searchByUsernameOrNameNormalized(trimmed, normalized, subsequencePattern);
     }
     
     @Transactional(readOnly = true)

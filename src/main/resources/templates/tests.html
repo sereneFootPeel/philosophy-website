@@ -66,6 +66,20 @@
                         </div>
                     </div>
                 </a>
+
+                <!-- 8values 政治价值 -->
+                <a href="/values8" class="group block bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 p-6 border border-gray-100 hover:border-primary/30 hover:-translate-y-1">
+                    <div class="flex items-start gap-4">
+                        <div class="flex-shrink-0 w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                            <i class="fa fa-balance-scale text-primary text-xl"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-semibold text-gray-800 group-hover:text-primary transition-colors" th:text="${language != null and language == 'en'} ? '8values' : '政治价值'">8values</h2>
+                            <p class="text-sm text-gray-600 mt-1" th:if="${language != null and language == 'en'}">Test eight political values.</p>
+                            <p class="text-sm text-gray-600 mt-1" th:unless="${language != null and language == 'en'}">测试八条政治价值。</p>
+                        </div>
+                    </div>
+                </a>
             </div>
         </div>
     </main>

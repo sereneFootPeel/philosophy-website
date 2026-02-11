@@ -397,6 +397,42 @@
     text-decoration: underline;
 }
 
+
+/* ==========================================================================
+   Values8 Test Page
+   - Ensures the political values test inherits themed backgrounds/buttons
+   ========================================================================== */
+body.values8-page {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+body.values8-page .v8-card {
+    background-color: var(--bg-primary) !important;
+    border-color: var(--border-primary) !important;
+}
+
+body.values8-page .v8-btn-primary {
+    background-color: var(--color-primary) !important;
+    color: var(--text-on-primary) !important;
+    border-color: var(--color-primary) !important;
+}
+
+body.values8-page .v8-btn-outline {
+    background-color: var(--bg-tertiary) !important;
+    border-color: var(--border-primary) !important;
+    color: var(--text-secondary) !important;
+}
+
+body.values8-page .v8-axis-track {
+    background-color: var(--border-primary) !important;
+}
+
+body.values8-page .v8-axis-fill,
+body.values8-page .v8-progress-fill {
+    background-color: var(--color-primary) !important;
+}
+
 /* ==========================================================================
    Theme 11: Pure Black Scale
    - Concept: 黑色系纯黑色不同明度，极简奢华
@@ -1161,12 +1197,6 @@ body .bg-primary.text-white span,
 body button[type="submit"] span,
 body button[type="submit"] {
     color: var(--text-on-primary) !important;
-}
-
-/* Default theme - white text on royal blue */
-:root button[type="submit"] span,
-:root .bg-primary span {
-    color: #FFFFFF !important;
 }
 
 /* Forest theme - white text on forest green */

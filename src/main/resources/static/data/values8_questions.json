@@ -1,0 +1,772 @@
+[
+  {
+    "id": 1,
+    "text": "企业的压迫比政府的压迫更令人担忧。",
+    "text_en": "Corporate oppression is more concerning than government oppression.",
+    "effect": {
+      "econ": 10,
+      "dipl": 0,
+      "govt": -5,
+      "scty": 0
+    }
+  },
+  {
+    "id": 2,
+    "text": "政府有必要对经济进行干预，以保护消费者。",
+    "text_en": "Government intervention in the economy is necessary to protect consumers.",
+    "effect": {
+      "econ": 10,
+      "dipl": 0,
+      "govt": 0,
+      "scty": 0
+    }
+  },
+  {
+    "id": 3,
+    "text": "市场越自由，人民就越自由。",
+    "text_en": "The freer the market, the freer the people.",
+    "effect": {
+      "econ": -10,
+      "dipl": 0,
+      "govt": 0,
+      "scty": 0
+    }
+  },
+  {
+    "id": 4,
+    "text": "与其确保所有公民的福利，不如保持预算平衡。",
+    "text_en": "It is better to maintain a balanced budget than to ensure welfare for all citizens.",
+    "effect": {
+      "econ": -10,
+      "dipl": 0,
+      "govt": 0,
+      "scty": 0
+    }
+  },
+  {
+    "id": 5,
+    "text": "政府资助的研究比交给市场进行的研究对人民更有利。",
+    "text_en": "Government-funded research is more beneficial to the people than research left to the market.",
+    "effect": {
+      "econ": 10,
+      "dipl": 0,
+      "govt": 0,
+      "scty": 10
+    }
+  },
+  {
+    "id": 6,
+    "text": "国际贸易关税对于鼓励本地生产非常重要。",
+    "text_en": "Tariffs on international trade are important to encourage local production.",
+    "effect": {
+      "econ": 5,
+      "dipl": 0,
+      "govt": -10,
+      "scty": 0
+    }
+  },
+  {
+    "id": 7,
+    "text": "各尽所能，各取所需。",
+    "text_en": "From each according to his ability, to each according to his needs.",
+    "effect": {
+      "econ": 10,
+      "dipl": 0,
+      "govt": 0,
+      "scty": 0
+    }
+  },
+  {
+    "id": 8,
+    "text": "最好的办法是废除社会计划，转而实行私人慈善。",
+    "text_en": "The best approach is to abolish social programs and rely on private charity.",
+    "effect": {
+      "econ": -10,
+      "dipl": 0,
+      "govt": 0,
+      "scty": 0
+    }
+  },
+  {
+    "id": 9,
+    "text": "应该增加富人的税收，以救济穷人。",
+    "text_en": "Taxes on the wealthy should be increased to support the poor.",
+    "effect": {
+      "econ": 10,
+      "dipl": 0,
+      "govt": 0,
+      "scty": 0
+    }
+  },
+  {
+    "id": 10,
+    "text": "继承遗产是一种合法的财富形式。",
+    "text_en": "Inheritance is a legitimate form of wealth.",
+    "effect": {
+      "econ": -10,
+      "dipl": 0,
+      "govt": 0,
+      "scty": -5
+    }
+  },
+  {
+    "id": 11,
+    "text": "道路和电力等基本公用事业应为公有。",
+    "text_en": "Basic utilities such as roads and electricity should be publicly owned.",
+    "effect": {
+      "econ": 10,
+      "dipl": 0,
+      "govt": 0,
+      "scty": 0
+    }
+  },
+  {
+    "id": 12,
+    "text": "政府干预是对经济的威胁。",
+    "text_en": "Government intervention is a threat to the economy.",
+    "effect": {
+      "econ": -10,
+      "dipl": 0,
+      "govt": 0,
+      "scty": 0
+    }
+  },
+  {
+    "id": 13,
+    "text": "支付能力更强的人应该得到更好的医疗服务。",
+    "text_en": "Those who can afford it should receive better healthcare.",
+    "effect": {
+      "econ": -10,
+      "dipl": 0,
+      "govt": 0,
+      "scty": 0
+    }
+  },
+  {
+    "id": 14,
+    "text": "接受优质教育是所有人的权利。",
+    "text_en": "Quality education is a right for everyone.",
+    "effect": {
+      "econ": 10,
+      "dipl": 0,
+      "govt": 0,
+      "scty": 5
+    }
+  },
+  {
+    "id": 15,
+    "text": "生产资料应属于使用它们的工人。",
+    "text_en": "The means of production should belong to the workers who use them.",
+    "effect": {
+      "econ": 10,
+      "dipl": 0,
+      "govt": 0,
+      "scty": 0
+    }
+  },
+  {
+    "id": 16,
+    "text": "联合国应该被废除。",
+    "text_en": "The United Nations should be abolished.",
+    "effect": {
+      "econ": 0,
+      "dipl": -10,
+      "govt": -5,
+      "scty": 0
+    }
+  },
+  {
+    "id": 17,
+    "text": "为了保护祖国，我们国家的军事行动往往是必要的。",
+    "text_en": "Military action by our nation is often necessary to protect the homeland.",
+    "effect": {
+      "econ": 0,
+      "dipl": -10,
+      "govt": -10,
+      "scty": 0
+    }
+  },
+  {
+    "id": 18,
+    "text": "我支持区域联盟，比如欧盟。",
+    "text_en": "I support regional unions such as the European Union.",
+    "effect": {
+      "econ": -5,
+      "dipl": 10,
+      "govt": 10,
+      "scty": 5
+    }
+  },
+  {
+    "id": 19,
+    "text": "维护我国国家主权非常重要。",
+    "text_en": "It is very important to maintain our nation's sovereignty.",
+    "effect": {
+      "econ": 0,
+      "dipl": -10,
+      "govt": -5,
+      "scty": 0
+    }
+  },
+  {
+    "id": 20,
+    "text": "一个统一的世界政府将造福人类。",
+    "text_en": "A unified world government would benefit humanity.",
+    "effect": {
+      "econ": 0,
+      "dipl": 10,
+      "govt": 0,
+      "scty": 0
+    }
+  },
+  {
+    "id": 21,
+    "text": "保持和平关系比增强我们的实力更重要。",
+    "text_en": "Maintaining peaceful relations is more important than strengthening our power.",
+    "effect": {
+      "econ": 0,
+      "dipl": 10,
+      "govt": 0,
+      "scty": 0
+    }
+  },
+  {
+    "id": 22,
+    "text": "战争不需要向其他国家证明其合理性。",
+    "text_en": "War does not need to be justified to other nations.",
+    "effect": {
+      "econ": 0,
+      "dipl": -10,
+      "govt": -10,
+      "scty": 0
+    }
+  },
+  {
+    "id": 23,
+    "text": "军费开支是一种浪费。",
+    "text_en": "Military spending is a waste.",
+    "effect": {
+      "econ": 0,
+      "dipl": 10,
+      "govt": 10,
+      "scty": 0
+    }
+  },
+  {
+    "id": 24,
+    "text": "国际援助是一种浪费。",
+    "text_en": "International aid is a waste.",
+    "effect": {
+      "econ": -5,
+      "dipl": -10,
+      "govt": 0,
+      "scty": 0
+    }
+  },
+  {
+    "id": 25,
+    "text": "我的民族是伟大的。",
+    "text_en": "My nation is great.",
+    "effect": {
+      "econ": 0,
+      "dipl": -10,
+      "govt": 0,
+      "scty": 0
+    }
+  },
+  {
+    "id": 26,
+    "text": "研究工作应在国际范围内进行。",
+    "text_en": "Research should be conducted on an international scale.",
+    "effect": {
+      "econ": 0,
+      "dipl": 10,
+      "govt": 0,
+      "scty": 10
+    }
+  },
+  {
+    "id": 27,
+    "text": "各国政府应向国际社会负责。",
+    "text_en": "Governments should be accountable to the international community.",
+    "effect": {
+      "econ": 0,
+      "dipl": 10,
+      "govt": 5,
+      "scty": 0
+    }
+  },
+  {
+    "id": 28,
+    "text": "即使是抗议专制政府，暴力也是不可接受的。",
+    "text_en": "Violence is unacceptable even when protesting authoritarian governments.",
+    "effect": {
+      "econ": 0,
+      "dipl": 5,
+      "govt": -5,
+      "scty": 0
+    }
+  },
+  {
+    "id": 29,
+    "text": "我的宗教价值观应得到尽可能广泛的传播。",
+    "text_en": "My religious values should be spread as widely as possible.",
+    "effect": {
+      "econ": 0,
+      "dipl": -5,
+      "govt": -10,
+      "scty": -10
+    }
+  },
+  {
+    "id": 30,
+    "text": "我的民族的价值观应尽可能广泛传播。",
+    "text_en": "My nation's values should be spread as widely as possible.",
+    "effect": {
+      "econ": 0,
+      "dipl": -10,
+      "govt": -5,
+      "scty": 0
+    }
+  },
+  {
+    "id": 31,
+    "text": "维护法律和秩序非常重要。",
+    "text_en": "Maintaining law and order is very important.",
+    "effect": {
+      "econ": 0,
+      "dipl": -5,
+      "govt": -10,
+      "scty": -5
+    }
+  },
+  {
+    "id": 32,
+    "text": "普通民众会做出错误的决策。",
+    "text_en": "Ordinary people make wrong decisions.",
+    "effect": {
+      "econ": 0,
+      "dipl": 0,
+      "govt": -10,
+      "scty": 0
+    }
+  },
+  {
+    "id": 33,
+    "text": "安乐死应该合法。",
+    "text_en": "Euthanasia should be legal.",
+    "effect": {
+      "econ": 0,
+      "dipl": 0,
+      "govt": 10,
+      "scty": 0
+    }
+  },
+  {
+    "id": 34,
+    "text": "为了保护我们免受恐怖主义行为的侵害，牺牲一些公民自由是必要的。",
+    "text_en": "Sacrificing some civil liberties is necessary to protect us from terrorism.",
+    "effect": {
+      "econ": 0,
+      "dipl": 0,
+      "govt": -10,
+      "scty": 0
+    }
+  },
+  {
+    "id": 35,
+    "text": "在现代社会，政府监督是必要的。",
+    "text_en": "Government surveillance is necessary in modern society.",
+    "effect": {
+      "econ": 0,
+      "dipl": 0,
+      "govt": -10,
+      "scty": 0
+    }
+  },
+  {
+    "id": 36,
+    "text": "国家的存在本身就是对我们自由的一种威胁。",
+    "text_en": "The very existence of the state is a threat to our freedom.",
+    "effect": {
+      "econ": 0,
+      "dipl": 0,
+      "govt": 10,
+      "scty": 0
+    }
+  },
+  {
+    "id": 37,
+    "text": "无论政治观点如何，重要的是要支持自己的国家。",
+    "text_en": "Regardless of political views, it is important to support one's country.",
+    "effect": {
+      "econ": 0,
+      "dipl": -10,
+      "govt": -10,
+      "scty": -5
+    }
+  },
+  {
+    "id": 38,
+    "text": "一切权威都应受到质疑。",
+    "text_en": "All authority should be questioned.",
+    "effect": {
+      "econ": 0,
+      "dipl": 0,
+      "govt": 10,
+      "scty": 5
+    }
+  },
+  {
+    "id": 39,
+    "text": "等级制度的国家是最好的。",
+    "text_en": "A hierarchical state is best.",
+    "effect": {
+      "econ": 0,
+      "dipl": 0,
+      "govt": -10,
+      "scty": 0
+    }
+  },
+  {
+    "id": 40,
+    "text": "政府要听从多数人的意见，即使多数人是错误的。",
+    "text_en": "The government should follow the will of the majority, even when the majority is wrong.",
+    "effect": {
+      "econ": 0,
+      "dipl": 0,
+      "govt": 10,
+      "scty": 0
+    }
+  },
+  {
+    "id": 41,
+    "text": "领导力越强越好。",
+    "text_en": "The stronger the leadership, the better.",
+    "effect": {
+      "econ": 0,
+      "dipl": -10,
+      "govt": -10,
+      "scty": 0
+    }
+  },
+  {
+    "id": 42,
+    "text": "民主不仅仅是一个决策过程。",
+    "text_en": "Democracy is more than just a decision-making process.",
+    "effect": {
+      "econ": 0,
+      "dipl": 0,
+      "govt": 10,
+      "scty": 0
+    }
+  },
+  {
+    "id": 43,
+    "text": "环境法规至关重要。",
+    "text_en": "Environmental regulations are essential.",
+    "effect": {
+      "econ": 5,
+      "dipl": 0,
+      "govt": 0,
+      "scty": 10
+    }
+  },
+  {
+    "id": 44,
+    "text": "自动化与科技将创造更美好的世界。",
+    "text_en": "Automation and technology will create a better world.",
+    "effect": {
+      "econ": 0,
+      "dipl": 0,
+      "govt": 0,
+      "scty": 10
+    }
+  },
+  {
+    "id": 45,
+    "text": "儿童应接受宗教或传统价值观教育。",
+    "text_en": "Children should be educated in religious or traditional values.",
+    "effect": {
+      "econ": 0,
+      "dipl": 0,
+      "govt": -5,
+      "scty": -10
+    }
+  },
+  {
+    "id": 46,
+    "text": "传统本身并没有任何价值。",
+    "text_en": "Tradition has no value in itself.",
+    "effect": {
+      "econ": 0,
+      "dipl": 0,
+      "govt": 0,
+      "scty": 10
+    }
+  },
+  {
+    "id": 47,
+    "text": "宗教应在政府中发挥作用。",
+    "text_en": "Religion should play a role in government.",
+    "effect": {
+      "econ": 0,
+      "dipl": 0,
+      "govt": -10,
+      "scty": -10
+    }
+  },
+  {
+    "id": 48,
+    "text": "教会应与其他机构一样纳税。",
+    "text_en": "Churches should be taxed like other institutions.",
+    "effect": {
+      "econ": 5,
+      "dipl": 0,
+      "govt": 0,
+      "scty": 10
+    }
+  },
+  {
+    "id": 49,
+    "text": "气候变化是目前我们生活方式面临的最大威胁之一。",
+    "text_en": "Climate change is one of the greatest threats to our way of life.",
+    "effect": {
+      "econ": 0,
+      "dipl": 0,
+      "govt": 0,
+      "scty": 10
+    }
+  },
+  {
+    "id": 50,
+    "text": "世界应该团结一致，共同应对气候变化。",
+    "text_en": "The world should unite to address climate change.",
+    "effect": {
+      "econ": 0,
+      "dipl": 10,
+      "govt": 0,
+      "scty": 10
+    }
+  },
+  {
+    "id": 51,
+    "text": "多年前的社会比现在好。",
+    "text_en": "Society was better in the past than it is now.",
+    "effect": {
+      "econ": 0,
+      "dipl": 0,
+      "govt": 0,
+      "scty": -10
+    }
+  },
+  {
+    "id": 52,
+    "text": "我们必须保持过去的传统。",
+    "text_en": "We must preserve the traditions of the past.",
+    "effect": {
+      "econ": 0,
+      "dipl": 0,
+      "govt": 0,
+      "scty": -10
+    }
+  },
+  {
+    "id": 53,
+    "text": "我们要从长远考虑，超越我们的寿命。",
+    "text_en": "We should think in the long term, beyond our own lifespans.",
+    "effect": {
+      "econ": 0,
+      "dipl": 0,
+      "govt": 0,
+      "scty": 10
+    }
+  },
+  {
+    "id": 54,
+    "text": "理性比维护我们的文化更重要。",
+    "text_en": "Reason is more important than preserving our culture.",
+    "effect": {
+      "econ": 0,
+      "dipl": 0,
+      "govt": 0,
+      "scty": 10
+    }
+  },
+  {
+    "id": 55,
+    "text": "吸毒应合法化或非刑事化。",
+    "text_en": "Drug use should be legalized or decriminalized.",
+    "effect": {
+      "econ": 0,
+      "dipl": 0,
+      "govt": 10,
+      "scty": 2
+    }
+  },
+  {
+    "id": 56,
+    "text": "同性婚姻应合法化。",
+    "text_en": "Same-sex marriage should be legalized.",
+    "effect": {
+      "econ": 0,
+      "dipl": 0,
+      "govt": 10,
+      "scty": 10
+    }
+  },
+  {
+    "id": 57,
+    "text": "没有哪种文化比其他文化更优越。",
+    "text_en": "No culture is superior to another.",
+    "effect": {
+      "econ": 0,
+      "dipl": 10,
+      "govt": 5,
+      "scty": 10
+    }
+  },
+  {
+    "id": 58,
+    "text": "婚外性行为是不道德的。",
+    "text_en": "Sex outside marriage is immoral.",
+    "effect": {
+      "econ": 0,
+      "dipl": 0,
+      "govt": -5,
+      "scty": -10
+    }
+  },
+  {
+    "id": 59,
+    "text": "如果我们接受移民，移民就必须融入我们的文化。",
+    "text_en": "If we accept immigrants, they must assimilate into our culture.",
+    "effect": {
+      "econ": 0,
+      "dipl": 0,
+      "govt": -5,
+      "scty": -10
+    }
+  },
+  {
+    "id": 60,
+    "text": "大多数或所有情况下都应禁止堕胎。",
+    "text_en": "Abortion should be banned in most or all cases.",
+    "effect": {
+      "econ": 0,
+      "dipl": 0,
+      "govt": -10,
+      "scty": -10
+    }
+  },
+  {
+    "id": 61,
+    "text": "应该禁止那些没有正当理由的人拥有枪支。",
+    "text_en": "Gun ownership should be restricted for those without a valid reason.",
+    "effect": {
+      "econ": 0,
+      "dipl": 0,
+      "govt": -10,
+      "scty": 0
+    }
+  },
+  {
+    "id": 62,
+    "text": "我支持单人付费的全民医疗保健。",
+    "text_en": "I support single-payer universal healthcare.",
+    "effect": {
+      "econ": 10,
+      "dipl": 0,
+      "govt": 0,
+      "scty": 0
+    }
+  },
+  {
+    "id": 63,
+    "text": "卖淫应该非法。",
+    "text_en": "Prostitution should be illegal.",
+    "effect": {
+      "econ": 0,
+      "dipl": 0,
+      "govt": -10,
+      "scty": -10
+    }
+  },
+  {
+    "id": 64,
+    "text": "维护家庭价值观至关重要。",
+    "text_en": "Upholding family values is essential.",
+    "effect": {
+      "econ": 0,
+      "dipl": 0,
+      "govt": 0,
+      "scty": -10
+    }
+  },
+  {
+    "id": 65,
+    "text": "不惜一切代价追求进步是危险的。",
+    "text_en": "Pursuing progress at all costs is dangerous.",
+    "effect": {
+      "econ": 0,
+      "dipl": 0,
+      "govt": 0,
+      "scty": -10
+    }
+  },
+  {
+    "id": 66,
+    "text": "基因改造是一种有益的力量，即使对人类也是如此。",
+    "text_en": "Genetic modification is a beneficial force, even for humans.",
+    "effect": {
+      "econ": 0,
+      "dipl": 0,
+      "govt": 0,
+      "scty": 10
+    }
+  },
+  {
+    "id": 67,
+    "text": "我们应该向移民开放边境。",
+    "text_en": "We should open our borders to immigration.",
+    "effect": {
+      "econ": 0,
+      "dipl": 10,
+      "govt": 10,
+      "scty": 0
+    }
+  },
+  {
+    "id": 68,
+    "text": "各国政府应该像关心本国公民一样关心外国人。",
+    "text_en": "Governments should care for foreigners as they do their own citizens.",
+    "effect": {
+      "econ": 0,
+      "dipl": 10,
+      "govt": 0,
+      "scty": 0
+    }
+  },
+  {
+    "id": 69,
+    "text": "无论文化或性取向等因素如何，所有人都应受到平等对待。",
+    "text_en": "Everyone should be treated equally regardless of culture, sexual orientation, or similar factors.",
+    "effect": {
+      "econ": 10,
+      "dipl": 10,
+      "govt": 10,
+      "scty": 10
+    }
+  },
+  {
+    "id": 70,
+    "text": "最重要的是我们要实现我们团队的目标。",
+    "text_en": "What matters most is that we achieve our collective goals.",
+    "effect": {
+      "econ": -10,
+      "dipl": -10,
+      "govt": -10,
+      "scty": -10
+    }
+  }
+]

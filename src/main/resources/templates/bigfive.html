@@ -261,6 +261,7 @@
             }
 
             function renderQuestion() {
+                if (document.activeElement && typeof document.activeElement.blur === 'function') document.activeElement.blur();
                 const q = questions[currentIndex];
                 if (!q) return;
                 const text = (isEn && q.text_en) ? q.text_en : q.text;

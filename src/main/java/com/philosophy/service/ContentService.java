@@ -268,7 +268,8 @@ public class ContentService {
         if (normalized.isEmpty()) {
             return new ArrayList<>();
         }
-        return contentRepository.searchByContentOrContentEnOrTitleNormalized(trimmed, normalized);
+        String subsequencePattern = SearchNormalizer.buildSubsequenceLikePattern(normalized);
+        return contentRepository.searchByContentOrContentEnOrTitleNormalized(trimmed, normalized, subsequencePattern);
     }
 
     // 获取指定哲学家和流派的内容，按用户角色优先级排序

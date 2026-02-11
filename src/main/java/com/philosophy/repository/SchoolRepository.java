@@ -45,8 +45,10 @@ public interface SchoolRepository extends JpaRepository<School, Long> {
            "LOWER(s.name) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
            "LOWER(s.nameEn) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
            "LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(s.name, '·', ''), '・', ''), '‧', ''), '.', ''), '．', ''), ' ', ''), '　', '')) LIKE CONCAT('%', :normalizedQuery, '%') OR " +
-           "LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(s.nameEn, '·', ''), '・', ''), '‧', ''), '.', ''), '．', ''), ' ', ''), '　', '')) LIKE CONCAT('%', :normalizedQuery, '%')")
-    List<School> searchByNameOrNameEnNormalized(@Param("query") String query, @Param("normalizedQuery") String normalizedQuery);
+           "LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(s.nameEn, '·', ''), '・', ''), '‧', ''), '.', ''), '．', ''), ' ', ''), '　', '')) LIKE CONCAT('%', :normalizedQuery, '%') OR " +
+           "LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(s.name, '·', ''), '・', ''), '‧', ''), '.', ''), '．', ''), ' ', ''), '　', '')) LIKE :subsequencePattern ESCAPE '\\' OR " +
+           "LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(s.nameEn, '·', ''), '・', ''), '‧', ''), '.', ''), '．', ''), ' ', ''), '　', '')) LIKE :subsequencePattern ESCAPE '\\'")
+    List<School> searchByNameOrNameEnNormalized(@Param("query") String query, @Param("normalizedQuery") String normalizedQuery, @Param("subsequencePattern") String subsequencePattern);
 
     /**
      * 批量判断哪些 parentId 拥有至少一个子流派。

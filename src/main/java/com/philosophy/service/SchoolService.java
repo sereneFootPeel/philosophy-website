@@ -248,7 +248,8 @@ public class SchoolService {
         if (normalized.isEmpty()) {
             return new ArrayList<>();
         }
-        return schoolRepository.searchByNameOrNameEnNormalized(trimmed, normalized);
+        String subsequencePattern = SearchNormalizer.buildSubsequenceLikePattern(normalized);
+        return schoolRepository.searchByNameOrNameEnNormalized(trimmed, normalized, subsequencePattern);
     }
     
     // 获取指定流派及其所有子孙流派的ID集合

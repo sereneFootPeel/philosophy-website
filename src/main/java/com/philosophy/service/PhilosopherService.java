@@ -293,7 +293,8 @@ public class PhilosopherService {
         if (normalized.isEmpty()) {
             return new ArrayList<>();
         }
-        return philosopherRepository.searchByNameOrNameEn(trimmed, normalized);
+        String subsequencePattern = SearchNormalizer.buildSubsequenceLikePattern(normalized);
+        return philosopherRepository.searchByNameOrNameEn(trimmed, normalized, subsequencePattern);
     }
 
     /**

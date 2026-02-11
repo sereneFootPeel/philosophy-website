@@ -81,8 +81,8 @@
                     <p class="text-gray-600">
                         <span th:if="${language != null and language == 'en'}" th:text="'Don\'t have an account?'">Don't have an account?</span>
                         <span th:unless="${language != null and language == 'en'}" th:text="'还没有账号?'">还没有账号?</span> 
-                        <a href="/register" class="text-primary hover:text-primary/80 font-medium" th:if="${language != null and language == 'en'}" th:text="'Register now'">Register now</a>
-                        <a href="/register" class="text-primary hover:text-primary/80 font-medium" th:unless="${language != null and language == 'en'}" th:text="'立即注册'">立即注册</a>
+                        <a href="/register" class="text-gray-600 hover:text-gray-800 font-medium underline-offset-2 hover:underline" th:if="${language != null and language == 'en'}" th:text="'Register now'">Register now</a>
+                        <a href="/register" class="text-gray-600 hover:text-gray-800 font-medium underline-offset-2 hover:underline" th:unless="${language != null and language == 'en'}" th:text="'立即注册'">立即注册</a>
                     </p>
                 </div>
             </div>
