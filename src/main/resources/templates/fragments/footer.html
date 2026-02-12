@@ -576,11 +576,19 @@
         }
     });
 
-    // 在 search-script 内绑定关闭按钮，确保仅引入搜索的页面（如测试页）也能关闭弹窗
+    // 在 search-script 内绑定关闭按钮与搜索按钮，确保仅引入搜索的页面（如测试页）也能正常使用
     document.addEventListener('DOMContentLoaded', function() {
         const closeBtn = document.querySelector('#search-panel .search-close-btn');
         if (closeBtn) {
             closeBtn.addEventListener('click', closeSearchModal);
+        }
+        const searchBtn = document.querySelector('#search-panel .relative button.bg-primary');
+        if (searchBtn) {
+            searchBtn.addEventListener('click', performSearch);
+        }
+        const searchInput = document.getElementById('search-input');
+        if (searchInput) {
+            searchInput.addEventListener('keypress', handleSearchKeypress);
         }
     });
 </script>

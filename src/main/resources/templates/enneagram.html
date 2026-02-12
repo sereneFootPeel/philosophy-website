@@ -70,6 +70,11 @@
         .enneagram-page .enneagram-result-row td { color: var(--text-secondary) !important; }
         .enneagram-page .enneagram-type-desc { color: var(--text-secondary) !important; }
         .enneagram-page .enneagram-rule-note { color: var(--text-tertiary) !important; }
+        /* 结果区主类型块：第一个主题下避免白字白底，统一用深色主文字色 */
+        .enneagram-page #enneagram-main-type,
+        .enneagram-page #enneagram-main-type strong { color: var(--text-primary) !important; }
+        .enneagram-page #enneagram-main-type .enneagram-type-desc { color: var(--text-secondary) !important; }
+        .enneagram-page #enneagram-main-type .enneagram-rule-note { color: var(--text-tertiary) !important; }
     </style>
 </head>
 <body class="enneagram-page bg-secondary min-h-screen flex flex-col">
@@ -115,9 +120,12 @@
                     <div id="enneagram-progress-bar" class="h-full enneagram-progress-fill rounded-full transition-all duration-300" style="width: 0%;"></div>
                 </div>
                 <p id="enneagram-question-text" class="text-base sm:text-lg enneagram-text-secondary mb-3 leading-relaxed"></p>
-                <div class="flex flex-col gap-3 mb-6">
-                    <button type="button" id="enneagram-answer-a" class="enneagram-btn-answer enneagram-btn-outline w-full px-6 py-4 rounded-xl font-medium text-left" data-option="a"></button>
-                    <button type="button" id="enneagram-answer-b" class="enneagram-btn-answer enneagram-btn-outline w-full px-6 py-4 rounded-xl font-medium text-left" data-option="b"></button>
+                <div class="flex flex-col gap-3 mb-6" id="enneagram-answer-group">
+                    <button type="button" id="enneagram-answer-1" class="enneagram-btn-answer enneagram-btn-outline w-full px-6 py-4 rounded-xl font-medium text-left" data-option="1"></button>
+                    <button type="button" id="enneagram-answer-2" class="enneagram-btn-answer enneagram-btn-outline w-full px-6 py-4 rounded-xl font-medium text-left" data-option="2"></button>
+                    <button type="button" id="enneagram-answer-3" class="enneagram-btn-answer enneagram-btn-outline w-full px-6 py-4 rounded-xl font-medium text-left" data-option="3"></button>
+                    <button type="button" id="enneagram-answer-4" class="enneagram-btn-answer enneagram-btn-outline w-full px-6 py-4 rounded-xl font-medium text-left" data-option="4"></button>
+                    <button type="button" id="enneagram-answer-5" class="enneagram-btn-answer enneagram-btn-outline w-full px-6 py-4 rounded-xl font-medium text-left" data-option="5"></button>
                 </div>
                 <div class="mt-4 flex justify-between">
                     <span role="button" tabindex="0" id="enneagram-prev" class="enneagram-nav-link enneagram-text-secondary hover:text-primary text-sm py-2 hidden cursor-pointer">
@@ -204,9 +212,9 @@
             const TYPE_DESC = isEn ? TYPE_DESC_EN : TYPE_DESC_ZH;
             const MSG_PROGRESS = isEn ? 'Question %1 / %2' : '第 %1 / %2 题';
             const MSG_DRAFT_BANNER = isEn ? 'You have unsaved progress (%1 answered). Resume or start over?' : '检测到未完成的答题（已答 %1 题），是否继续？';
-            const MSG_OPTION_YES = isEn ? 'Agree / Yes' : '符合';
-            const MSG_OPTION_NO = isEn ? 'Disagree / No' : '不符合';
-            const MSG_STEM_PROMPT = isEn ? 'Please judge whether the statement matches your usual self:' : '请判断以下描述是否符合平时的你：';
+            const LIKERT_LABELS_ZH = ['非常符合', '比较符合', '一般', '比较不符合', '非常不符合'];
+            const LIKERT_LABELS_EN = ['Strongly agree', 'Agree', 'Neutral', 'Disagree', 'Strongly disagree'];
+            const LIKERT_LABELS = isEn ? LIKERT_LABELS_EN : LIKERT_LABELS_ZH;
 
             let questions = [];
             let answers = {};
@@ -270,15 +278,21 @@
             }
 
             function setAnswerUI(option) {
-                const btnA = el('enneagram-answer-a');
-                const btnB = el('enneagram-answer-b');
-                [btnA, btnB].forEach(b => {
-                    if (!b) return;
-                    b.classList.remove('enneagram-selected');
-                    b.setAttribute('aria-pressed', 'false');
-                });
-                if (option === 'a' && btnA) { btnA.classList.add('enneagram-selected'); btnA.setAttribute('aria-pressed', 'true'); }
-                if (option === 'b' && btnB) { btnB.classList.add('enneagram-selected'); btnB.setAttribute('aria-pressed', 'true'); }
+                const displayOption = option ? String(6 - parseInt(option, 10)) : null;
+                for (let i = 1; i <= 5; i++) {
+                    const btn = el('enneagram-answer-' + i);
+                    if (!btn) continue;
+                    btn.classList.toggle('enneagram-selected', displayOption === String(i));
+                    btn.setAttribute('aria-pressed', displayOption === String(i) ? 'true' : 'false');
+                }
+            }
+
+            function normalizeStoredAnswer(val) {
+                if (val === 'a') return '4';
+                if (val === 'b') return '2';
+                if (val >= 1 && val <= 5) return String(val);
+                if (String(val) >= '1' && String(val) <= '5') return String(val);
+                return null;
             }
 
             function renderQuestion() {
@@ -286,27 +300,29 @@
                 const q = questions[currentIndex];
                 if (!q) return;
                 const stemEl = el('enneagram-question-text');
-
-                const textA = MSG_OPTION_YES;
-                const textB = MSG_OPTION_NO;
                 if (stemEl) stemEl.textContent = q.text || '';
 
                 el('enneagram-progress-text').textContent = MSG_PROGRESS.replace('%1', currentIndex + 1).replace('%2', questions.length);
                 el('enneagram-progress-bar').style.width = ((currentIndex + 1) / questions.length * 100) + '%';
-                el('enneagram-answer-a').innerHTML = '<span>A. ' + textA + '</span>';
-                el('enneagram-answer-b').innerHTML = '<span>B. ' + textB + '</span>';
+                for (let i = 1; i <= 5; i++) {
+                    const btn = el('enneagram-answer-' + i);
+                    if (btn) btn.innerHTML = '<span>' + (LIKERT_LABELS[i - 1] || '') + '</span>';
+                }
                 el('enneagram-prev').classList.toggle('hidden', currentIndex === 0);
                 el('enneagram-next').classList.toggle('hidden', currentIndex >= questions.length - 1);
-                const ans = answers[String(q.id)];
-                setAnswerUI(ans === 'a' ? 'a' : ans === 'b' ? 'b' : null);
+                const raw = answers[String(q.id)];
+                const ans = normalizeStoredAnswer(raw);
+                setAnswerUI(ans);
             }
 
             function computeScores() {
                 const scores = { 1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0 };
                 questions.forEach(q => {
-                    const ans = answers[String(q.id)];
-                    if (ans === 'a' && q.type) {
-                        scores[q.type] = (scores[q.type] || 0) + 1;
+                    const raw = answers[String(q.id)];
+                    const ans = normalizeStoredAnswer(raw);
+                    const point = ans ? parseInt(ans, 10) : 0;
+                    if (q.type && point >= 1 && point <= 5) {
+                        scores[q.type] = (scores[q.type] || 0) + point;
                     }
                 });
                 return scores;
@@ -316,13 +332,18 @@
                 clearStorage();
                 const scores = computeScores();
                 const order = [1,2,3,4,5,6,7,8,9];
-                const sorted = order.slice().sort((a, b) => (scores[b] || 0) - (scores[a] || 0));
+                const sorted = order.slice().sort((a, b) => {
+                    const sa = scores[a] || 0, sb = scores[b] || 0;
+                    if (sb !== sa) return sb - sa;
+                    return a - b;
+                });
                 const mainType = sorted[0];
                 const mainName = TYPE_NAMES[mainType] || '';
                 const mainDesc = TYPE_DESC[mainType] || '';
 
                 const mainEl = el('enneagram-main-type');
-                mainEl.innerHTML = '<strong class="text-primary">' + (isEn ? 'Your main type: ' : '您的主要类型：') + '第' + mainType + '型 ' + mainName + '</strong><br><span class="enneagram-type-desc">' + mainDesc + '</span>';
+                const mainHtml = '<strong class="text-primary">' + (isEn ? 'Your main type: ' : '您的主要类型：') + '第' + mainType + '型 ' + mainName + '</strong><br><span class="enneagram-type-desc">' + mainDesc + '</span>';
+                mainEl.innerHTML = mainHtml;
 
                 const tbody = el('enneagram-result-tbody');
                 tbody.innerHTML = '';
@@ -368,7 +389,12 @@
                 const saved = loadFromStorage();
                 if (!saved) return;
                 loadQuestions().then(() => {
-                    answers = saved.answers || {};
+                    const raw = saved.answers || {};
+                    answers = {};
+                    Object.keys(raw).forEach(k => {
+                        const v = normalizeStoredAnswer(raw[k]);
+                        if (v) answers[k] = v;
+                    });
                     currentIndex = Math.min(saved.currentIndex || 0, Math.max(0, questions.length - 1));
                     hide('enneagram-intro');
                     hide('enneagram-draft-banner');
@@ -382,8 +408,10 @@
             function submitAnswer(option) {
                 const q = questions[currentIndex];
                 if (!q) return;
-                answers[String(q.id)] = option;
-                setAnswerUI(option);
+                const val = normalizeStoredAnswer(option) || option;
+                if (val < '1' || val > '5') return;
+                answers[String(q.id)] = val;
+                setAnswerUI(val);
                 if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
                 saveToStorage();
                 if (currentIndex >= questions.length - 1) {
@@ -393,8 +421,9 @@
                 currentIndex++;
                 renderQuestion();
             }
-            el('enneagram-answer-a').addEventListener('click', function() { submitAnswer('a'); });
-            el('enneagram-answer-b').addEventListener('click', function() { submitAnswer('b'); });
+            for (let i = 1; i <= 5; i++) {
+                el('enneagram-answer-' + i).addEventListener('click', function() { submitAnswer(String(6 - i)); });
+            }
 
             function onPrev() {
                 if (currentIndex > 0) {
