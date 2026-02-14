@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head}" th:with="pageTitle=${'测试记录 - ' + (record != null ? record.resultSummary : '')}">
+</head>
+<body class="bg-secondary min-h-screen flex flex-col">
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="flex-grow pt-16">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <a th:href="@{'/user/profile/' + ${record.user.id}}" class="inline-flex items-center text-gray-600 hover:text-primary mb-6">
+                <i class="fa fa-arrow-left mr-2"></i>
+                <span th:text="${isOwner ? '返回我的主页' : '返回用户主页'}">返回</span>
+            </a>
+
+            <div class="bg-white rounded-lg shadow-md p-6 sm:p-8">
+                <span class="text-sm font-medium text-gray-500 uppercase tracking-wide" th:switch="${record.testType}">
+                    <span th:case="'enneagram'" th:text="${language == 'en'} ? 'Enneagram' : '九型人格'">九型人格</span>
+                    <span th:case="'mbti'">MBTI</span>
+                    <span th:case="'bigfive'" th:text="${language == 'en'} ? 'Big Five' : '大五人格'">大五人格</span>
+                    <span th:case="'mmpi'">MMPI</span>
+                    <span th:case="'values8'" th:text="${language == 'en'} ? '8values' : '政治价值'">8values</span>
+                    <span th:case="*" th:text="${record.testType}">其他</span>
+                </span>
+                <h1 class="mt-2 text-2xl font-bold text-primary" th:text="${record.resultSummary}">结果摘要</h1>
+                <p class="mt-1 text-sm text-gray-500" th:text="${record.createdAt != null ? #temporals.format(record.createdAt, 'yyyy-MM-dd HH:mm') : '-'}">日期</p>
+
+                <!-- 根据 testType 与 resultJson 渲染详情 -->
+                <div id="test-result-body" class="mt-6 pt-4 border-t border-gray-200">
+                    <div id="result-json-rendered"></div>
+                    <pre id="result-json-raw" class="hidden text-xs bg-gray-50 p-4 rounded overflow-auto max-h-96" th:if="${record.resultJson != null and !record.resultJson.isEmpty()}"></pre>
+                    <div id="result-json-data" class="hidden" th:attr="data-test-type=${record.testType}" th:text="${record.resultJson}"></div>
+                </div>
+
+                <div class="mt-6 pt-4 border-t border-gray-200 flex gap-3">
+                    <a th:href="@{'/user/profile/' + ${record.user.id}}" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">返回主页</a>
+                    <a th:if="${record.testType == 'enneagram'}" th:href="@{/enneagram}" class="px-4 py-2 rounded-lg bg-primary text-white hover:opacity-90" th:text="${language == 'en'} ? 'Retake Enneagram' : '再测九型人格'">再测九型人格</a>
+                    <a th:if="${record.testType == 'mbti'}" th:href="@{/mbti}" class="px-4 py-2 rounded-lg bg-primary text-white hover:opacity-90" th:text="${language == 'en'} ? 'Retake MBTI' : '再测 MBTI'">再测 MBTI</a>
+                    <a th:if="${record.testType == 'values8'}" th:href="@{/values8}" class="px-4 py-2 rounded-lg bg-primary text-white hover:opacity-90" th:text="${language == 'en'} ? 'Retake 8values' : '再测 8values'">再测 8values</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <script>
+        (function() {
+            var el = document.getElementById('result-json-data');
+            if (!el) return;
+            var testType = el.getAttribute('data-test-type') || '';
+            var resultJsonStr = el.textContent;
+            if (!resultJsonStr) return;
+            var data;
+            try { data = JSON.parse(resultJsonStr); } catch (e) { return; }
+            var container = document.getElementById('result-json-rendered');
+            var rawEl = document.getElementById('result-json-raw');
+            if (!container) return;
+
+            if (testType === 'enneagram' && data.scores) {
+                var order = [1,2,3,4,5,6,7,8,9];
+                var typeNames = data.typeNames || {};
+                var sorted = order.slice().sort(function(a, b) {
+                    var sa = data.scores[a] || 0, sb = data.scores[b] || 0;
+                    if (sb !== sa) return sb - sa;
+                    return a - b;
+                });
+                var main = sorted[0];
+                container.innerHTML = '<p class="font-medium text-gray-700 mb-2">' + (main ? ('第' + main + '型 ' + (typeNames[main] || '')) : '') + '</p>' +
+                    '<table class="w-full text-sm border-collapse"><thead><tr class="border-b border-gray-200">' +
+                    '<th class="text-left py-2 px-2">类型</th><th class="text-left py-2 px-2">名称</th><th class="text-right py-2 px-2">得分</th></tr></thead><tbody></tbody></table>';
+                var tbody = container.querySelector('tbody');
+                order.forEach(function(t) {
+                    var tr = document.createElement('tr');
+                    tr.className = 'border-b border-gray-200';
+                    tr.innerHTML = '<td class="py-2 px-2 font-medium">' + t + '</td><td class="py-2 px-2">' + (typeNames[t] || '') + '</td><td class="py-2 px-2 text-right">' + (data.scores[t] || 0) + '</td>';
+                    tbody.appendChild(tr);
+                });
+            } else if (testType === 'mbti' && data.type) {
+                container.innerHTML = '<p class="font-medium text-gray-700 mb-2">类型：<strong class="text-primary">' + data.type + '</strong></p>';
+                if (data.scores && typeof data.scores === 'object') {
+                    var dims = [['E','I'],['S','N'],['T','F'],['J','P']];
+                    var rows = dims.map(function(d) {
+                        var a = data.scores[d[0]] || 0, b = data.scores[d[1]] || 0;
+                        return '<tr class="border-b border-gray-200"><td class="py-2 px-2">' + d[0] + '-' + d[1] + '</td><td class="py-2 px-2 text-right">' + d[0] + ': ' + a + ' &nbsp; ' + d[1] + ': ' + b + '</td></tr>';
+                    }).join('');
+                    container.innerHTML += '<table class="w-full text-sm border-collapse mt-2"><tbody>' + rows + '</tbody></table>';
+                }
+            } else if (testType === 'values8' && data.scores && data.labels) {
+                var axes = ['econ', 'dipl', 'govt', 'scty'];
+                var leftPct = function(axis) {
+                    if (axis === 'econ' || axis === 'govt') return (data.scores[axis] != null ? data.scores[axis] : 0);
+                    return Math.round((100 - (data.scores[axis] != null ? data.scores[axis] : 0)) * 10) / 10;
+                };
+                var rows = axes.map(function(axis) {
+                    var left = leftPct(axis);
+                    var right = Math.round((100 - left) * 10) / 10;
+                    var lbl = data.labels[axis];
+                    var leftName = (lbl && lbl[0]) ? lbl[0] : axis;
+                    var rightName = (lbl && lbl[1]) ? lbl[1] : '';
+                    return '<tr class="border-b border-gray-200"><td class="py-2 px-2 font-medium">' + leftName + ' ↔ ' + rightName + '</td><td class="py-2 px-2 text-right">' + leftName + ' ' + left + '% &nbsp; ' + rightName + ' ' + right + '%</td></tr>';
+                }).join('');
+                container.innerHTML = '<table class="w-full text-sm border-collapse"><thead><tr class="border-b border-gray-200"><th class="text-left py-2 px-2">轴</th><th class="text-right py-2 px-2">得分</th></tr></thead><tbody>' + rows + '</tbody></table>';
+            } else if (rawEl) {
+                rawEl.textContent = resultJsonStr;
+                rawEl.classList.remove('hidden');
+            }
+        })();
+    </script>
+</body>
+</html>

@@ -54,6 +54,13 @@
             box-shadow: none !important;
         }
         .enneagram-page .enneagram-btn-answer[aria-pressed="true"] span { color: var(--text-on-primary) !important; }
+        /* 切题后短暂禁用选项 hover，避免“刚点的位置”仍显变深 */
+        .enneagram-page #enneagram-answer-group.enneagram-no-hover .enneagram-btn-answer:not(.enneagram-selected):hover {
+            background-color: var(--bg-tertiary) !important;
+            border-color: var(--border-primary) !important;
+            color: var(--text-secondary) !important;
+        }
+        .enneagram-page #enneagram-answer-group.enneagram-no-hover .enneagram-btn-answer:not(.enneagram-selected):hover span { color: var(--text-secondary) !important; }
         .enneagram-page .enneagram-nav-link { outline: none; }
         .enneagram-page #enneagram-prev { color: var(--text-tertiary) !important; }
         .enneagram-page #enneagram-prev:hover { color: var(--color-primary) !important; }
@@ -159,7 +166,7 @@
                     </table>
                 </div>
                 <div id="enneagram-type-descriptions" class="enneagram-type-desc text-sm space-y-2 mb-4"></div>
-                <div class="mt-6 pt-4 border-t border-gray-200">
+                <div class="mt-6 pt-4 border-t border-gray-200 flex flex-wrap items-center gap-4">
                     <button type="button" id="enneagram-restart" class="enneagram-btn-outline px-4 py-2 rounded-lg font-medium">
                         <span th:if="${language != null and language == 'en'}">Restart Test</span>
                         <span th:unless="${language != null and language == 'en'}">重新测试</span>
@@ -219,6 +226,7 @@
             let questions = [];
             let answers = {};
             let currentIndex = 0;
+            let lastEnneagramResult = null;
 
             const el = (id) => document.getElementById(id);
             const show = (id) => el(id).classList.remove('hidden');
@@ -313,6 +321,12 @@
                 const raw = answers[String(q.id)];
                 const ans = normalizeStoredAnswer(raw);
                 setAnswerUI(ans);
+                const answerGroup = el('enneagram-answer-group');
+                if (answerGroup) {
+                    answerGroup.classList.add('enneagram-no-hover');
+                    clearTimeout(answerGroup._noHoverTimer);
+                    answerGroup._noHoverTimer = setTimeout(function() { answerGroup.classList.remove('enneagram-no-hover'); }, 280);
+                }
             }
 
             function computeScores() {
@@ -358,8 +372,14 @@
                 descEl.innerHTML = '<p class="font-medium enneagram-text-muted mb-2">' + (isEn ? 'Brief descriptions of all types:' : '各类型简要说明：') + '</p>' +
                     order.map(t => '<p><strong>' + t + ' ' + (TYPE_NAMES[t] || '') + '</strong>：' + (TYPE_DESC[t] || '') + '</p>').join('');
 
+                if (typeof lastEnneagramResult !== 'undefined') lastEnneagramResult = null;
+                lastEnneagramResult = { scores: Object.assign({}, scores), mainType: mainType, mainName: mainName, typeNames: Object.assign({}, TYPE_NAMES) };
+
                 hide('enneagram-test');
                 show('enneagram-result');
+                var resultSummary = '第' + mainType + '型 ' + (mainName || '');
+                var resultJson = JSON.stringify({ scores: lastEnneagramResult.scores, typeNames: lastEnneagramResult.typeNames });
+                saveResultToProfile('enneagram', resultSummary, resultJson);
             }
 
             function startTest() {
@@ -404,6 +424,20 @@
                 }).catch(err => console.error(err));
             });
             el('enneagram-discard-draft').addEventListener('click', function() { clearStorage(); hide('enneagram-draft-banner'); });
+
+            function saveResultToProfile(testType, resultSummary, resultJson) {
+                var isAuth = /*[[${isAuthenticated}]]*/ false;
+                if (!isAuth) return;
+                var csrf = document.querySelector('meta[name="_csrf"]');
+                var csrfHeader = document.querySelector('meta[name="_csrf_header"]');
+                var token = csrf ? csrf.getAttribute('content') : '';
+                var headerName = csrfHeader ? csrfHeader.getAttribute('content') : 'X-CSRF-TOKEN';
+                var body = 'testType=' + testType + '&resultSummary=' + encodeURIComponent(resultSummary) + '&resultJson=' + encodeURIComponent(resultJson) + '&isPublic=false';
+                fetch('/api/test-results', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded', [headerName]: token }, body: body })
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) { if (data.success && typeof showMessage === 'function') showMessage(data.message, 'success'); })
+                    .catch(function() {});
+            }
 
             function submitAnswer(option) {
                 const q = questions[currentIndex];

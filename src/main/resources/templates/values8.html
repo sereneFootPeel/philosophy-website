@@ -408,6 +408,28 @@
             hide('v8-test');
             show('v8-result');
             clearDraft();
+
+            // 存储到用户主页：每一项分数存入 resultJson
+            const resultSummary = AXES.map(axis => LABELS[axis][0] + Math.round(leftPercentByAxis[axis] * 10) / 10 + '%').join(' ');
+            const resultJson = JSON.stringify({
+                scores: { econ: percents.econ, dipl: percents.dipl, govt: percents.govt, scty: percents.scty },
+                labels: LABELS
+            });
+            saveResultToProfile('values8', resultSummary, resultJson);
+        }
+
+        function saveResultToProfile(testType, resultSummary, resultJson) {
+            const isAuth = /*[[${isAuthenticated}]]*/ false;
+            if (!isAuth) return;
+            const csrf = document.querySelector('meta[name="_csrf"]');
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]');
+            const token = csrf ? csrf.getAttribute('content') : '';
+            const headerName = csrfHeader ? csrfHeader.getAttribute('content') : 'X-CSRF-TOKEN';
+            const body = 'testType=' + encodeURIComponent(testType) + '&resultSummary=' + encodeURIComponent(resultSummary) + '&resultJson=' + encodeURIComponent(resultJson) + '&isPublic=false';
+            fetch('/api/test-results', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded', [headerName]: token }, body: body })
+                .then(r => r.json())
+                .then(data => { if (data.success && typeof showMessage === 'function') showMessage(data.message, 'success'); })
+                .catch(() => {});
         }
 
         function submitAnswer(value) {

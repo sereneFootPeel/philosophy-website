@@ -76,7 +76,7 @@ public class SecurityConfig {
                 // 公开的随机名句API
                 .requestMatchers(HttpMethod.GET, "/api/quotes/random").permitAll()
                 // 允许所有用户访问的页面
-                .requestMatchers("/", "/home", "/philosophers", "/schools", "/schools/filter/**", "/api/schools/children", "/api/schools/detail", "/api/philosophers/**", "/partials/schools/contents", "/search/**", "/api/search/**", "/register", "/css/**", "/js/**", "/images/**", "/uploads/**", "/data/**", "/test/**", "/quotes", "/error", "/language/**", "/user/profile/**", "/contents", "/mmpi", "/MMPI", "/Mmpi", "/mbti", "/MBTI", "/Mbti", "/enneagram", "/Enneagram", "/bigfive", "/big-five", "/BigFive", "/Bigfive", "/tests", "/test", "/values8", "/values-8", "/8values", "/eightvalues").permitAll()
+                .requestMatchers("/", "/home", "/philosophers", "/schools", "/schools/filter/**", "/api/schools/children", "/api/schools/detail", "/api/philosophers/**", "/partials/schools/contents", "/search/**", "/api/search/**", "/register", "/css/**", "/js/**", "/images/**", "/uploads/**", "/data/**", "/test/**", "/quotes", "/error", "/language/**", "/user/profile/**", "/user/test-results/**", "/contents", "/mmpi", "/MMPI", "/Mmpi", "/mbti", "/MBTI", "/Mbti", "/enneagram", "/Enneagram", "/bigfive", "/big-five", "/BigFive", "/Bigfive", "/tests", "/test", "/values8", "/values-8", "/8values", "/eightvalues").permitAll()
                 // 允许发送注册验证码
                 .requestMatchers(HttpMethod.POST, "/register/send-code").permitAll()
                 // 允许访问Vite相关资源
@@ -91,6 +91,8 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/comments/status/**").authenticated()
                 // 点赞相关端点需要认证
                 .requestMatchers("/likes/**").authenticated()
+                // 测试结果保存/可见性/删除需认证
+                .requestMatchers("/api/test-results", "/api/test-results/**").authenticated()
                 // 管理员页面需要ADMIN角色
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 // 版主页面需要MODERATOR角色

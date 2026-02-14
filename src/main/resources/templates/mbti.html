@@ -63,6 +63,13 @@
         }
         .mbti-page .mbti-btn-answer.mbti-selected span,
         .mbti-page .mbti-btn-answer[aria-pressed="true"] span { color: var(--text-on-primary) !important; }
+        /* 切题后短暂禁用选项 hover，避免“刚点的位置”仍显变深 */
+        .mbti-page #mbti-answer-group.mbti-no-hover .mbti-btn-answer:not(.mbti-selected):hover {
+            background-color: var(--bg-tertiary) !important;
+            border-color: var(--border-primary) !important;
+            color: var(--text-secondary) !important;
+        }
+        .mbti-page #mbti-answer-group.mbti-no-hover .mbti-btn-answer:not(.mbti-selected):hover span { color: var(--text-secondary) !important; }
         .mbti-page .mbti-draft-banner {
             background-color: var(--bg-tertiary) !important;
             border-color: var(--border-primary) !important;
@@ -84,7 +91,7 @@
                     Choose the option that best describes you (Strongly disagree to Strongly agree). There are no right or wrong answers. Please answer based on your usual behavior and feelings. 60 questions, about 10 minutes.
                 </p>
                 <p class="mbti-text-secondary leading-relaxed mb-4" th:unless="${language != null and language == 'en'}">
-                    请选择最符合您平时行为与感受的选项（非常不符合～非常符合）。无对错之分，请尽量完整作答。共 60 题，约 10 分钟。题目风格参考自 <a href="https://www.16personalities.com/ch/%E4%BA%BA%E6%A0%BC%E6%B5%8B%E8%AF%95" target="_blank" rel="noopener" class="text-primary hover:underline">16Personalities 人格测试</a>。
+                    请选择最符合您平时行为与感受的选项（非常不符合～非常符合）。无对错之分，请尽量完整作答。共 60 题，约 10 分钟。
                 </p>
                 <!-- 未完成答题恢复提示 -->
                 <div id="mbti-draft-banner" class="mbti-draft-banner hidden mb-4 p-4 rounded-lg border">
@@ -160,7 +167,7 @@
                     </table>
                 </div>
                 <p id="mbti-type-desc" class="text-sm mbti-text-secondary leading-relaxed mb-4"></p>
-                <div class="mt-6 pt-4 border-t border-gray-200">
+                <div class="mt-6 pt-4 border-t border-gray-200 flex flex-wrap items-center gap-4">
                     <button type="button" id="mbti-restart" class="mbti-btn-outline px-4 py-2 rounded-lg font-medium">
                         <span th:if="${language != null and language == 'en'}">Restart Test</span>
                         <span th:unless="${language != null and language == 'en'}">重新测试</span>
@@ -225,6 +232,7 @@
             let questions = [];
             let answers = {};
             let currentIndex = 0;
+            let lastMbtiResult = null;
 
             const el = (id) => document.getElementById(id);
             const show = (id) => el(id).classList.remove('hidden');
@@ -305,6 +313,12 @@
                 const raw = getAnswer(q.id);
                 const ans = normalizeStoredAnswer(raw);
                 setAnswerUI(ans);
+                const answerGroup = el('mbti-answer-group');
+                if (answerGroup) {
+                    answerGroup.classList.add('mbti-no-hover');
+                    clearTimeout(answerGroup._noHoverTimer);
+                    answerGroup._noHoverTimer = setTimeout(function() { answerGroup.classList.remove('mbti-no-hover'); }, 280);
+                }
             }
 
             /** 五级记分：1→+2 倾向 B，2→+1 倾向 B，3→0，4→+1 倾向 A，5→+2 倾向 A */
@@ -351,8 +365,10 @@
                     tbody.appendChild(tr);
                 });
                 el('mbti-type-desc').textContent = TYPE_DESC[type] || '';
+                lastMbtiResult = { type: type, scores: Object.assign({}, scores) };
                 hide('mbti-test');
                 show('mbti-result');
+                saveResultToProfile('mbti', lastMbtiResult.type, JSON.stringify({ type: lastMbtiResult.type, scores: lastMbtiResult.scores }));
             }
 
             function startTest() {
@@ -399,6 +415,20 @@
                 clearStorage();
                 hide('mbti-draft-banner');
             });
+
+            function saveResultToProfile(testType, resultSummary, resultJson) {
+                const isAuth = /*[[${isAuthenticated}]]*/ false;
+                if (!isAuth) return;
+                const csrf = document.querySelector('meta[name="_csrf"]');
+                const csrfHeader = document.querySelector('meta[name="_csrf_header"]');
+                const token = csrf ? csrf.getAttribute('content') : '';
+                const headerName = csrfHeader ? csrfHeader.getAttribute('content') : 'X-CSRF-TOKEN';
+                const body = 'testType=' + testType + '&resultSummary=' + encodeURIComponent(resultSummary) + '&resultJson=' + encodeURIComponent(resultJson) + '&isPublic=false';
+                fetch('/api/test-results', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded', [headerName]: token }, body: body })
+                    .then(r => r.json())
+                    .then(data => { if (data.success && typeof showMessage === 'function') showMessage(data.message, 'success'); })
+                    .catch(() => {});
+            }
 
             function submitAnswer(option) {
                 const q = questions[currentIndex];

@@ -14,7 +14,9 @@ import com.philosophy.service.ContentService;
 import com.philosophy.service.UserContentEditService;
 import com.philosophy.service.SchoolService;
 import com.philosophy.service.UserBlockService;
+import com.philosophy.service.TestResultService;
 import com.philosophy.model.School;
+import com.philosophy.model.TestResult;
 import com.philosophy.util.UserInfoCollector;
 import com.philosophy.util.LanguageUtil;
 import org.slf4j.Logger;
@@ -47,15 +49,18 @@ public class UserProfileController {
     private final UserContentEditService userContentEditService;
     private final SchoolService schoolService;
     private final UserBlockService userBlockService;
+    private final TestResultService testResultService;
     private final LanguageUtil languageUtil;
 
     private static final Logger logger = LoggerFactory.getLogger(UserProfileController.class);
+    private static final int MAX_PROFILE_TEST_RESULTS = 30;
 
     public UserProfileController(UserService userService, CommentService commentService,
                                 UserInfoCollector userInfoCollector, TranslationService translationService,
                                 LikeService likeService, ContentService contentService,
                                 UserContentEditService userContentEditService, SchoolService schoolService,
-                                UserBlockService userBlockService, LanguageUtil languageUtil) {
+                                UserBlockService userBlockService, TestResultService testResultService,
+                                LanguageUtil languageUtil) {
         this.userService = userService;
         this.commentService = commentService;
         this.userInfoCollector = userInfoCollector;
@@ -65,6 +70,7 @@ public class UserProfileController {
         this.userContentEditService = userContentEditService;
         this.schoolService = schoolService;
         this.userBlockService = userBlockService;
+        this.testResultService = testResultService;
         this.languageUtil = languageUtil;
     }
 
@@ -211,6 +217,10 @@ public class UserProfileController {
             moderatorContentCount = userContentCount;
         }
 
+        // 测试记录：当前用户看自己的全部
+        List<TestResult> testResults = limitProfileTestResults(
+                testResultService.findVisibleForProfile(currentUser.getId(), currentUser)
+        );
 
         model.addAttribute("user", currentUser);
         model.addAttribute("comments", comments);
@@ -231,6 +241,7 @@ public class UserProfileController {
         model.addAttribute("userContentCount", userContentCount);
         model.addAttribute("moderatorContents", moderatorContents);
         model.addAttribute("moderatorContentCount", moderatorContentCount);
+        model.addAttribute("testResults", testResults);
         model.addAttribute("isAdmin", isAdmin);
         model.addAttribute("isCurrentUser", true); // 标记为当前用户
         model.addAttribute("isBlocked", false); // 当前用户不能屏蔽自己
@@ -273,6 +284,11 @@ public class UserProfileController {
         List<Content> userCreatedContents = contentService.getContentsByUserIdWithPrivacyFilter(id, currentUser);
         long userContentCount = userCreatedContents.size();
 
+        // 测试记录：本人看全部，访客只看公开
+        List<TestResult> testResults = limitProfileTestResults(
+                testResultService.findVisibleForProfile(id, currentUser)
+        );
+
         // 检查当前登录用户是否是评论所有者或管理员
         boolean canDeleteComments = false;
         boolean isCurrentUser = false;
@@ -298,6 +314,7 @@ public class UserProfileController {
         model.addAttribute("userEditCount", userEditCount);
         model.addAttribute("userCreatedContents", userCreatedContents);
         model.addAttribute("userContentCount", userContentCount);
+        model.addAttribute("testResults", testResults);
         model.addAttribute("isCurrentUser", isCurrentUser);
         model.addAttribute("isAdmin", isAdmin);
         model.addAttribute("canDeleteComments", canDeleteComments);
@@ -659,5 +676,12 @@ public class UserProfileController {
         } catch (Exception e) {
             return "{\"success\": false, \"message\": \"获取屏蔽状态失败\"}";
         }
+    }
+
+    private List<TestResult> limitProfileTestResults(List<TestResult> testResults) {
+        if (testResults == null || testResults.size() <= MAX_PROFILE_TEST_RESULTS) {
+            return testResults;
+        }
+        return testResults.subList(0, MAX_PROFILE_TEST_RESULTS);
     }
 }

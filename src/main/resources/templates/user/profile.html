@@ -334,6 +334,41 @@
                 </div>
             </div>
 
+            <!-- 测试记录卡片区域 -->
+            <div th:if="${!isAdmin}" class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xl font-bold text-gray-900" th:text="${isCurrentUser ? '我的测试记录' : '测试记录'}">测试记录</h2>
+                    <span class="text-sm text-gray-500" th:if="${testResults != null && !testResults.isEmpty()}" th:text="'共 ' + ${testResults.size()} + ' 条'">共 X 条</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" th:if="${testResults != null && !testResults.isEmpty()}">
+                    <th:block th:each="record : ${testResults}">
+                        <div class="test-result-card border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all duration-300 hover:border-primary/30 relative group cursor-pointer"
+                             th:attr="data-test-type=${record.testType},data-test-result-id=${record.id}">
+                            <a th:href="@{/user/test-results/{id}(id=${record.id})}" class="block focus:outline-none pr-8">
+                                <span class="text-xs font-medium text-gray-500 uppercase tracking-wide" th:switch="${record.testType}">
+                                    <span th:case="'enneagram'" th:text="${language != null and language == 'en'} ? 'Enneagram' : '九型人格'">九型人格</span>
+                                    <span th:case="'mbti'">MBTI</span>
+                                    <span th:case="'bigfive'" th:text="${language != null and language == 'en'} ? 'Big Five' : '大五人格'">大五人格</span>
+                                    <span th:case="'mmpi'">MMPI</span>
+                                    <span th:case="'values8'" th:text="${language != null and language == 'en'} ? '8values' : '政治价值'">8values</span>
+                                    <span th:case="*" th:text="${record.testType}">其他</span>
+                                </span>
+                                <p class="mt-2 font-semibold text-gray-900 truncate" th:text="${record.resultSummary}">结果摘要</p>
+                                <!-- 每一项分数展示区域，由下方脚本根据 resultJson 填充 -->
+                                <div class="test-result-scores mt-2 text-xs text-gray-600 space-y-0.5" aria-label="各维度分数"></div>
+                                <p class="mt-1 text-sm text-gray-500" th:text="${record.createdAt != null ? #temporals.format(record.createdAt, 'yyyy-MM-dd HH:mm') : '-'}">日期</p>
+                            </a>
+                            <button th:if="${isCurrentUser}" type="button" class="test-result-delete absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity text-red-600 hover:text-red-700 text-sm p-1.5 rounded hover:bg-red-50 z-10" th:data-id="${record.id}" title="删除">
+                                <i class="fa fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </th:block>
+                </div>
+                <div th:if="${testResults == null || testResults.isEmpty()}" class="text-center py-8">
+                    <p class="text-gray-500" th:text="${isCurrentUser ? '暂无测试记录，完成测试后可保存到主页' : '该用户暂无公开的测试记录'}">暂无记录</p>
+                </div>
+            </div>
+
             <!-- 设置卡片 (仅当前用户可见) -->
             <div th:if="${isCurrentUser}" class="bg-white rounded-lg shadow-md p-6 mb-8">
                 <h2 class="text-xl font-bold text-dark mb-6" th:text="${translationService.getStaticText('settings', language)}">设置</h2>
@@ -929,6 +964,70 @@
 
             console.log('搜索功能初始化完成');
         }
+
+        // 测试记录卡片：分批请求分数预览，避免 HTML 内嵌巨大 resultJson 导致白屏
+        (function renderTestResultScores() {
+            var cards = Array.prototype.slice.call(document.querySelectorAll('.test-result-card'));
+            var BATCH_SIZE = 6;
+
+            function renderOneCard(card) {
+                var container = card.querySelector('.test-result-scores');
+                if (!container) return;
+                var id = card.getAttribute('data-test-result-id');
+                if (!id) return;
+
+                container.innerHTML = '<div class="truncate text-gray-400">加载中...</div>';
+                fetch('/api/test-results/' + id + '/scores')
+                    .then(function(response) { return response.json(); })
+                    .then(function(data) {
+                        if (!data || !data.success || !Array.isArray(data.lines) || data.lines.length === 0) {
+                            container.innerHTML = '<div class="truncate text-gray-400">暂无分数明细</div>';
+                            return;
+                        }
+                        container.innerHTML = data.lines.map(function(line) {
+                            return '<div class="truncate">' + line + '</div>';
+                        }).join('');
+                    })
+                    .catch(function() {
+                        container.innerHTML = '<div class="truncate text-gray-400">分数加载失败</div>';
+                    });
+            }
+
+            function runBatch(index) {
+                var end = Math.min(index + BATCH_SIZE, cards.length);
+                for (var i = index; i < end; i++) {
+                    renderOneCard(cards[i]);
+                }
+                if (end >= cards.length) return;
+                if (window.requestIdleCallback) {
+                    window.requestIdleCallback(function() { runBatch(end); }, { timeout: 120 });
+                } else {
+                    setTimeout(function() { runBatch(end); }, 0);
+                }
+            }
+
+            runBatch(0);
+        })();
+
+        // 测试记录：删除
+        document.querySelectorAll('.test-result-delete').forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const id = this.getAttribute('data-id');
+                if (!confirm('确定要删除这条测试记录吗？')) return;
+                const card = this.closest('.test-result-card');
+                const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content') || '';
+                const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content') || 'X-CSRF-TOKEN';
+                fetch('/api/test-results/' + id, { method: 'DELETE', headers: { [csrfHeader]: csrfToken } })
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        if (data.success && card) card.remove();
+                        if (typeof showMessage === 'function') showMessage(data.message, data.success ? 'success' : 'error');
+                    })
+                    .catch(function() { if (typeof showMessage === 'function') showMessage('删除失败', 'error'); });
+            });
+        });
 
         // 屏蔽用户功能
         function toggleBlockUser(userId) {
