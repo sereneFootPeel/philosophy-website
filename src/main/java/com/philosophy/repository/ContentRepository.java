@@ -189,8 +189,8 @@ public interface ContentRepository extends JpaRepository<Content, Long> {
            "LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(c.content, '·', ''), '・', ''), '‧', ''), '.', ''), '．', ''), ' ', ''), '　', '')) LIKE CONCAT('%', :normalizedQuery, '%') OR " +
            "LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(c.contentEn, '·', ''), '・', ''), '‧', ''), '.', ''), '．', ''), ' ', ''), '　', '')) LIKE CONCAT('%', :normalizedQuery, '%') OR " +
            "LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(c.title, '·', ''), '・', ''), '‧', ''), '.', ''), '．', ''), ' ', ''), '　', '')) LIKE CONCAT('%', :normalizedQuery, '%') OR " +
-           "LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(c.content, '·', ''), '・', ''), '‧', ''), '.', ''), '．', ''), ' ', ''), '　', '')) LIKE :subsequencePattern ESCAPE '\\' OR " +
-           "LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(c.contentEn, '·', ''), '・', ''), '‧', ''), '.', ''), '．', ''), ' ', ''), '　', '')) LIKE :subsequencePattern ESCAPE '\\' OR " +
-           "LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(c.title, '·', ''), '・', ''), '‧', ''), '.', ''), '．', ''), ' ', ''), '　', '')) LIKE :subsequencePattern ESCAPE '\\'")
-    List<Content> searchByContentOrContentEnOrTitleNormalized(@Param("query") String query, @Param("normalizedQuery") String normalizedQuery, @Param("subsequencePattern") String subsequencePattern);
+           "(:enableSubsequence = true AND LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(c.content, '·', ''), '・', ''), '‧', ''), '.', ''), '．', ''), ' ', ''), '　', '')) LIKE :subsequencePattern ESCAPE '\\') OR " +
+           "(:enableSubsequence = true AND LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(c.contentEn, '·', ''), '・', ''), '‧', ''), '.', ''), '．', ''), ' ', ''), '　', '')) LIKE :subsequencePattern ESCAPE '\\') OR " +
+           "(:enableSubsequence = true AND LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(c.title, '·', ''), '・', ''), '‧', ''), '.', ''), '．', ''), ' ', ''), '　', '')) LIKE :subsequencePattern ESCAPE '\\')")
+    List<Content> searchByContentOrContentEnOrTitleNormalized(@Param("query") String query, @Param("normalizedQuery") String normalizedQuery, @Param("subsequencePattern") String subsequencePattern, @Param("enableSubsequence") boolean enableSubsequence);
 }

@@ -293,8 +293,17 @@ public class PhilosopherService {
         if (normalized.isEmpty()) {
             return new ArrayList<>();
         }
+        boolean strictAsciiToken = SearchNormalizer.isAsciiAlnumToken(trimmed);
+        boolean enableSubsequence = !strictAsciiToken && SearchNormalizer.shouldEnableSubsequence(trimmed, normalized);
         String subsequencePattern = SearchNormalizer.buildSubsequenceLikePattern(normalized);
-        return philosopherRepository.searchByNameOrNameEn(trimmed, normalized, subsequencePattern);
+        List<Philosopher> list = philosopherRepository.searchByNameOrNameEn(trimmed, normalized, subsequencePattern, enableSubsequence);
+        if (strictAsciiToken) {
+            list = list.stream().filter(p ->
+                    SearchNormalizer.containsIgnoreCase(p.getName(), trimmed)
+                            || SearchNormalizer.containsIgnoreCase(p.getNameEn(), trimmed))
+                    .toList();
+        }
+        return list;
     }
 
     /**

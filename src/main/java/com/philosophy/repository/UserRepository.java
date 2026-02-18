@@ -89,8 +89,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
            "LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(u.username, '·', ''), '・', ''), '‧', ''), '.', ''), '．', ''), ' ', ''), '　', '')) LIKE CONCAT('%', :normalizedQuery, '%') OR " +
            "LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(u.firstName, '·', ''), '・', ''), '‧', ''), '.', ''), '．', ''), ' ', ''), '　', '')) LIKE CONCAT('%', :normalizedQuery, '%') OR " +
            "LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(u.lastName, '·', ''), '・', ''), '‧', ''), '.', ''), '．', ''), ' ', ''), '　', '')) LIKE CONCAT('%', :normalizedQuery, '%') OR " +
-           "LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(u.username, '·', ''), '・', ''), '‧', ''), '.', ''), '．', ''), ' ', ''), '　', '')) LIKE :subsequencePattern ESCAPE '\\' OR " +
-           "LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(u.firstName, '·', ''), '・', ''), '‧', ''), '.', ''), '．', ''), ' ', ''), '　', '')) LIKE :subsequencePattern ESCAPE '\\' OR " +
-           "LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(u.lastName, '·', ''), '・', ''), '‧', ''), '.', ''), '．', ''), ' ', ''), '　', '')) LIKE :subsequencePattern ESCAPE '\\'")
-    List<User> searchByUsernameOrNameNormalized(@Param("query") String query, @Param("normalizedQuery") String normalizedQuery, @Param("subsequencePattern") String subsequencePattern);
+           "(:enableSubsequence = true AND LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(u.username, '·', ''), '・', ''), '‧', ''), '.', ''), '．', ''), ' ', ''), '　', '')) LIKE :subsequencePattern ESCAPE '\\') OR " +
+           "(:enableSubsequence = true AND LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(u.firstName, '·', ''), '・', ''), '‧', ''), '.', ''), '．', ''), ' ', ''), '　', '')) LIKE :subsequencePattern ESCAPE '\\') OR " +
+           "(:enableSubsequence = true AND LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(u.lastName, '·', ''), '・', ''), '‧', ''), '.', ''), '．', ''), ' ', ''), '　', '')) LIKE :subsequencePattern ESCAPE '\\')")
+    List<User> searchByUsernameOrNameNormalized(@Param("query") String query, @Param("normalizedQuery") String normalizedQuery, @Param("subsequencePattern") String subsequencePattern, @Param("enableSubsequence") boolean enableSubsequence);
 }

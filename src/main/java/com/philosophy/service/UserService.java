@@ -295,8 +295,18 @@ public class UserService implements UserDetailsService {
         if (normalized.isEmpty()) {
             return new ArrayList<>();
         }
+        boolean strictAsciiToken = SearchNormalizer.isAsciiAlnumToken(trimmed);
+        boolean enableSubsequence = !strictAsciiToken && SearchNormalizer.shouldEnableSubsequence(trimmed, normalized);
         String subsequencePattern = SearchNormalizer.buildSubsequenceLikePattern(normalized);
-        return userRepository.searchByUsernameOrNameNormalized(trimmed, normalized, subsequencePattern);
+        List<User> list = userRepository.searchByUsernameOrNameNormalized(trimmed, normalized, subsequencePattern, enableSubsequence);
+        if (strictAsciiToken) {
+            list = list.stream().filter(u ->
+                    SearchNormalizer.containsIgnoreCase(u.getUsername(), trimmed)
+                            || SearchNormalizer.containsIgnoreCase(u.getFirstName(), trimmed)
+                            || SearchNormalizer.containsIgnoreCase(u.getLastName(), trimmed))
+                    .toList();
+        }
+        return list;
     }
     
     @Transactional(readOnly = true)

@@ -248,8 +248,17 @@ public class SchoolService {
         if (normalized.isEmpty()) {
             return new ArrayList<>();
         }
+        boolean strictAsciiToken = SearchNormalizer.isAsciiAlnumToken(trimmed);
+        boolean enableSubsequence = !strictAsciiToken && SearchNormalizer.shouldEnableSubsequence(trimmed, normalized);
         String subsequencePattern = SearchNormalizer.buildSubsequenceLikePattern(normalized);
-        return schoolRepository.searchByNameOrNameEnNormalized(trimmed, normalized, subsequencePattern);
+        List<School> list = schoolRepository.searchByNameOrNameEnNormalized(trimmed, normalized, subsequencePattern, enableSubsequence);
+        if (strictAsciiToken) {
+            list = list.stream().filter(s ->
+                    SearchNormalizer.containsIgnoreCase(s.getName(), trimmed)
+                            || SearchNormalizer.containsIgnoreCase(s.getNameEn(), trimmed))
+                    .toList();
+        }
+        return list;
     }
     
     // 获取指定流派及其所有子孙流派的ID集合

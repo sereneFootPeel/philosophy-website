@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ContentService {
@@ -268,8 +269,39 @@ public class ContentService {
         if (normalized.isEmpty()) {
             return new ArrayList<>();
         }
+        boolean strictAsciiToken = SearchNormalizer.isAsciiAlnumToken(trimmed);
+        boolean enableSubsequence = !strictAsciiToken && SearchNormalizer.shouldEnableSubsequence(trimmed, normalized);
         String subsequencePattern = SearchNormalizer.buildSubsequenceLikePattern(normalized);
-        return contentRepository.searchByContentOrContentEnOrTitleNormalized(trimmed, normalized, subsequencePattern);
+        List<Content> list = contentRepository.searchByContentOrContentEnOrTitleNormalized(trimmed, normalized, subsequencePattern, enableSubsequence);
+        // 纯英文数字词采用严格字面匹配，避免“去空格归一化”导致命中过宽
+        if (strictAsciiToken) {
+            list = list.stream().filter(c -> contentMatchesLiteralQuery(c, trimmed)).collect(Collectors.toList());
+        }
+        // 多关键词且用户未用空格分隔时：只保留“关键词之间间隔”在限制内的内容；若用户用空格分隔则不限制
+        List<String> words = SearchNormalizer.normalizedWords(trimmed);
+        boolean userUsedSpaces = trimmed.contains(" ");
+        if (words.size() >= 2 && !userUsedSpaces) {
+            int maxGap = SearchNormalizer.MAX_KEYWORD_GAP_CHARS;
+            list = list.stream().filter(c -> contentMatchesWithMaxGap(c, words, maxGap)).collect(Collectors.toList());
+        }
+        return list;
+    }
+
+    /** 判断内容在 content/contentEn/title 任一字段中，按序包含所有词且相邻词间隔不超过 maxGap。 */
+    private boolean contentMatchesWithMaxGap(Content c, List<String> normalizedWords, int maxGap) {
+        String normContent = c.getContent() != null ? SearchNormalizer.normalize(c.getContent()) : "";
+        String normContentEn = c.getContentEn() != null ? SearchNormalizer.normalize(c.getContentEn()) : "";
+        String normTitle = c.getTitle() != null ? SearchNormalizer.normalize(c.getTitle()) : "";
+        return SearchNormalizer.matchesWithMaxGap(normContent, normalizedWords, maxGap)
+                || SearchNormalizer.matchesWithMaxGap(normContentEn, normalizedWords, maxGap)
+                || SearchNormalizer.matchesWithMaxGap(normTitle, normalizedWords, maxGap);
+    }
+
+    /** 严格字面匹配（忽略大小写），用于英文数字词收紧结果。 */
+    private boolean contentMatchesLiteralQuery(Content c, String query) {
+        return SearchNormalizer.containsIgnoreCase(c.getContent(), query)
+                || SearchNormalizer.containsIgnoreCase(c.getContentEn(), query)
+                || SearchNormalizer.containsIgnoreCase(c.getTitle(), query);
     }
 
     // 获取指定哲学家和流派的内容，按用户角色优先级排序
