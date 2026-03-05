@@ -160,6 +160,10 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <!-- 解决 Ubuntu 新内核下 CgroupInfo 空指针问题 -->
+                    <jvmArguments>-XX:-UseContainerSupport</jvmArguments>
+                </configuration>
             </plugin>
             
             <!-- Flyway Maven 插件 -->

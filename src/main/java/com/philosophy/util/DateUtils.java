@@ -96,13 +96,28 @@ public class DateUtils {
             }
         }
         
-        // 3. 尝试匹配年份范围格式（支持BC）：c.460 - 490BC 或 460 - 490BC
-        // 捕获组1: 开始年份前的 c. (可选)
-        // 捕获组2: 开始年份
-        // 捕获组3: 结束年份前的 c. (可选)
-        // 捕获组4: 结束年份
-        // 捕获组5: BC标记 (可选)
-        pattern = Pattern.compile("(c\\.)?\\s*(\\d+)\\s*-\\s*(c\\.)?\\s*(\\d+)\\s*(bc)?", Pattern.CASE_INSENSITIVE);
+        // 3a. 尝试匹配年份范围且每段可带独立 BC：c.20BC - 50 或 20BC - 50AD 或 c.460 - 490BC
+        // 捕获组1: 开始 c.  2: 开始年份  3: 开始BC  4: 结束 c.  5: 结束年份  6: 结束BC
+        pattern = Pattern.compile("(c\\.)?\\s*(\\d+)\\s*(bc)?\\s*" + RANGE_SEP + "\\s*(c\\.)?\\s*(\\d+)\\s*(bc)?", Pattern.CASE_INSENSITIVE);
+        matcher = pattern.matcher(cleaned);
+        
+        if (matcher.find()) {
+            try {
+                boolean startHasC = matcher.group(1) != null;
+                int birthYear = Integer.parseInt(matcher.group(2));
+                String birthBC = matcher.group(3);
+                if (birthBC != null && !birthBC.isEmpty()) {
+                    birthYear = -birthYear;
+                }
+                int dateSuffix = startHasC ? 1 : 0;
+                return birthYear * 10000 + (birthYear < 0 ? -dateSuffix : dateSuffix);
+            } catch (NumberFormatException e) {
+                return null;
+            }
+        }
+        
+        // 3b. 兼容旧格式：范围末尾单一 BC（c.460 - 490BC），BC 表示两段均为公元前
+        pattern = Pattern.compile("(c\\.)?\\s*(\\d+)\\s*" + RANGE_SEP + "\\s*(c\\.)?\\s*(\\d+)\\s*(bc)?", Pattern.CASE_INSENSITIVE);
         matcher = pattern.matcher(cleaned);
         
         if (matcher.find()) {
@@ -110,17 +125,10 @@ public class DateUtils {
                 boolean startHasC = matcher.group(1) != null;
                 int birthYear = Integer.parseInt(matcher.group(2));
                 String bcMarker = matcher.group(5);
-                
-                // 如果是BC（公元前），年份为负数
                 if (bcMarker != null && !bcMarker.isEmpty()) {
                     birthYear = -birthYear;
                 }
-                
-                // 转换为 YYYYMMDD 格式
-                // 仅年份时：月日补 00（用于排序）
-                // 约年（c.）用 day=01 做标记，方便显示为 "c. YYYY"
                 int dateSuffix = startHasC ? 1 : 0;
-                
                 return birthYear * 10000 + (birthYear < 0 ? -dateSuffix : dateSuffix);
             } catch (NumberFormatException e) {
                 return null;
@@ -317,13 +325,28 @@ public class DateUtils {
             }
         }
         
-        // 2. 尝试匹配年份范围格式（支持BC）：c.460 - 490BC 或 460 - 490BC
-        // 捕获组1: 开始年份前的 c. (可选)
-        // 捕获组2: 开始年份
-        // 捕获组3: 结束年份前的 c. (可选)
-        // 捕获组4: 结束年份
-        // 捕获组5: BC标记 (可选)
-        pattern = Pattern.compile("(c\\.)?\\s*(\\d+)\\s*-\\s*(c\\.)?\\s*(\\d+)\\s*(bc)?", Pattern.CASE_INSENSITIVE);
+        // 2a. 尝试匹配年份范围且每段可带独立 BC：c.20BC - 50 或 20BC - 50AD
+        // 捕获组1: 开始 c.  2: 开始年份  3: 开始BC  4: 结束 c.  5: 结束年份  6: 结束BC
+        pattern = Pattern.compile("(c\\.)?\\s*(\\d+)\\s*(bc)?\\s*" + RANGE_SEP + "\\s*(c\\.)?\\s*(\\d+)\\s*(bc)?", Pattern.CASE_INSENSITIVE);
+        matcher = pattern.matcher(cleaned);
+        
+        if (matcher.find()) {
+            try {
+                boolean endHasC = matcher.group(4) != null;
+                int deathYear = Integer.parseInt(matcher.group(5));
+                String deathBC = matcher.group(6);
+                if (deathBC != null && !deathBC.isEmpty()) {
+                    deathYear = -deathYear;
+                }
+                int dateSuffix = endHasC ? 1 : 0;
+                return deathYear * 10000 + (deathYear < 0 ? -dateSuffix : dateSuffix);
+            } catch (NumberFormatException e) {
+                return null;
+            }
+        }
+        
+        // 2b. 兼容旧格式：范围末尾单一 BC（c.460 - 490BC），BC 表示两段均为公元前
+        pattern = Pattern.compile("(c\\.)?\\s*(\\d+)\\s*" + RANGE_SEP + "\\s*(c\\.)?\\s*(\\d+)\\s*(bc)?", Pattern.CASE_INSENSITIVE);
         matcher = pattern.matcher(cleaned);
         
         if (matcher.find()) {
@@ -331,17 +354,10 @@ public class DateUtils {
                 boolean endHasC = matcher.group(3) != null;
                 int deathYear = Integer.parseInt(matcher.group(4));
                 String bcMarker = matcher.group(5);
-                
-                // 如果是BC（公元前），年份为负数
                 if (bcMarker != null && !bcMarker.isEmpty()) {
                     deathYear = -deathYear;
                 }
-                
-                // 转换为 YYYYMMDD 格式
-                // 仅年份时：月日补 00（用于排序）
-                // 约年（c.）用 day=01 做标记，方便显示为 "c. YYYY"
                 int dateSuffix = endHasC ? 1 : 0;
-                
                 return deathYear * 10000 + (deathYear < 0 ? -dateSuffix : dateSuffix);
             } catch (NumberFormatException e) {
                 return null;
