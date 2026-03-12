@@ -5,15 +5,12 @@ import com.philosophy.model.Philosopher;
 import com.philosophy.model.School;
 import com.philosophy.model.SchoolTranslation;
 import com.philosophy.model.User;
-import com.philosophy.model.Comment;
 import com.philosophy.service.ContentService;
 import com.philosophy.service.PhilosopherService;
 import com.philosophy.service.SchoolService;
 import com.philosophy.service.TranslationService;
 import com.philosophy.service.UserService;
-import com.philosophy.service.CommentService;
 import com.philosophy.repository.SchoolTranslationRepository;
-import com.philosophy.util.UserInfoCollector;
 import com.philosophy.util.DateUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -42,21 +39,16 @@ public class ModeratorController {
     private final UserService userService;
     private final TranslationService translationService;
     private final SchoolTranslationRepository schoolTranslationRepository;
-    private final UserInfoCollector userInfoCollector;
-    private final CommentService commentService;
 
     public ModeratorController(PhilosopherService philosopherService, SchoolService schoolService,
                               ContentService contentService, UserService userService,
-                              TranslationService translationService, SchoolTranslationRepository schoolTranslationRepository,
-                              UserInfoCollector userInfoCollector, CommentService commentService) {
+                              TranslationService translationService, SchoolTranslationRepository schoolTranslationRepository) {
         this.philosopherService = philosopherService;
         this.schoolService = schoolService;
         this.contentService = contentService;
         this.userService = userService;
         this.translationService = translationService;
         this.schoolTranslationRepository = schoolTranslationRepository;
-        this.userInfoCollector = userInfoCollector;
-        this.commentService = commentService;
     }
 
     // 获取当前登录的版主用户
@@ -853,44 +845,6 @@ public class ModeratorController {
 
 
 
-
-    // 评论管理 - 显示版主负责流派下的所有评论
-    @GetMapping("/comments")
-    public String listComments(Model model, HttpServletRequest request) {
-        User moderator = getCurrentModerator();
-        if (moderator == null) {
-            return "redirect:/login";
-        }
-
-        // 检查版主是否已被分配流派
-        if (moderator.getAssignedSchoolId() == null) {
-            String language = getLanguage(request);
-            model.addAttribute("errorMessage", "en".equals(language) ?
-                "You have not been assigned a school yet. Please contact the administrator to assign you a school." :
-                "您尚未被分配负责的流派，请联系管理员为您分配流派。");
-            model.addAttribute("comments", java.util.Collections.emptyList());
-            model.addAttribute("todayCommentsCount", 0L);
-            model.addAttribute("translationService", translationService);
-            return "moderator/comments/list";
-        }
-
-        // 获取版主负责的流派及其子流派的ID
-        List<Long> schoolIds = schoolService.getSchoolIdWithDescendants(moderator.getAssignedSchoolId());
-        
-        // 获取这些流派下的所有评论（按时间排序，最新的在前）
-        List<Comment> comments = commentService.findBySchoolIdsWithPrivacyFilter(schoolIds, moderator);
-
-        // 计算今日评论数量
-        long todayCommentsCount = comments.stream()
-            .filter(comment -> comment.getCreatedAt() != null && 
-                              comment.getCreatedAt().toLocalDate().equals(java.time.LocalDate.now()))
-            .count();
-
-        model.addAttribute("comments", comments);
-        model.addAttribute("todayCommentsCount", todayCommentsCount);
-        model.addAttribute("translationService", translationService);
-        return "moderator/comments/list";
-    }
 
     @GetMapping("/exit")
     public String exitModeratorPanel() {

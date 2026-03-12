@@ -239,7 +239,7 @@ public class CommentController {
             }
         }
         
-        return "redirect:/moderator/comments";
+        return "redirect:/moderator";
     }
 
     // 取消屏蔽评论
@@ -258,7 +258,7 @@ public class CommentController {
             }
         }
         
-        return "redirect:/moderator/comments";
+        return "redirect:/moderator";
     }
 
     // 设置评论隐私状态

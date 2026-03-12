@@ -33,7 +33,7 @@
                 <!-- 错误信息将通过JavaScript显示 -->
 
                 <!-- 统计卡片 -->
-                <div th:if="!${errorMessage}" class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div th:if="!${errorMessage}" class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     <div class="moderator-card p-5">
                         <div class="text-sm moderator-text-secondary">哲学家总数</div>
                         <div class="text-3xl font-bold moderator-text-primary mt-2" th:text="${philosophersCount}">0</div>
@@ -55,16 +55,6 @@
                         <div class="text-3xl font-bold moderator-text-primary mt-2" th:text="${contentsCount}">0</div>
                         <a href="/moderator/contents" class="mt-4 inline-flex items-center gap-2 text-sm moderator-text-primary hover:opacity-80">
                             <span>管理内容</span>
-                            <i class="fa fa-angle-right"></i>
-                        </a>
-                    </div>
-                    <div class="moderator-card p-5">
-                        <div class="text-sm moderator-text-secondary">评论管理</div>
-                        <div class="text-3xl font-bold moderator-text-primary mt-2">
-                            <i class="fa fa-comments"></i>
-                        </div>
-                        <a href="/moderator/comments" class="mt-4 inline-flex items-center gap-2 text-sm moderator-text-primary hover:opacity-80">
-                            <span>管理评论</span>
                             <i class="fa fa-angle-right"></i>
                         </a>
                     </div>

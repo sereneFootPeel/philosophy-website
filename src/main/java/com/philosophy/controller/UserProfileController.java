@@ -101,17 +101,6 @@ public class UserProfileController {
         List<Comment> comments = commentService.findByUserIdWithPrivacyFilter(id, currentUser);
         long commentCount = commentService.countByUserId(id);
         
-        // 获取用户的IP地址和设备信息
-        String userIpAddress = userInfoCollector.getUserIpAddress(id);
-        String userDevice = userInfoCollector.getUserDevice(id);
-        
-        // 获取用户的所有历史登录信息
-        Set<String> allUserIpAddresses = userInfoCollector.getAllUserIpAddresses(id);
-        Set<String> allUserDevices = userInfoCollector.getAllUserDevices(id);
-        Set<String> allUserBrowsers = userInfoCollector.getAllUserBrowsers(id);
-        Set<String> allUserOperatingSystems = userInfoCollector.getAllUserOperatingSystems(id);
-        Set<String> allUserDeviceIds = userInfoCollector.getAllUserDeviceIds(id);
-        List<UserLoginInfo> userLoginRecords = userInfoCollector.getUserLoginRecords(id);
         long loginCount = userInfoCollector.getUserLoginCount(id);
 
         // 获取用户的编辑内容
@@ -132,14 +121,6 @@ public class UserProfileController {
         model.addAttribute("user", user);
         model.addAttribute("comments", comments);
         model.addAttribute("commentCount", commentCount);
-        model.addAttribute("userIpAddress", userIpAddress);
-        model.addAttribute("userDevice", userDevice);
-        model.addAttribute("allUserIpAddresses", allUserIpAddresses);
-        model.addAttribute("allUserDevices", allUserDevices);
-        model.addAttribute("allUserBrowsers", allUserBrowsers);
-        model.addAttribute("allUserOperatingSystems", allUserOperatingSystems);
-        model.addAttribute("allUserDeviceIds", allUserDeviceIds);
-        model.addAttribute("userLoginRecords", userLoginRecords);
         model.addAttribute("loginCount", loginCount);
         model.addAttribute("userEdits", userEdits);
         model.addAttribute("userEditCount", userEditCount);
@@ -147,7 +128,6 @@ public class UserProfileController {
         model.addAttribute("moderatorContentCount", moderatorContentCount);
         model.addAttribute("isAdmin", isAdmin);
         model.addAttribute("allSchools", allSchools);
-        model.addAttribute("userInfoCollector", userInfoCollector);
         model.addAttribute("language", language);
         model.addAttribute("translationService", translationService);
         model.addAttribute("isAuthenticated", isAuthenticated);

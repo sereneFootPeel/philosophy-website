@@ -35,7 +35,7 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                     <div class="admin-card rounded-xl p-4 text-center">
                         <div class="text-3xl font-bold admin-text-primary" th:text="${loginCount}"></div>
                         <div class="admin-text-secondary text-sm">登录次数</div>
@@ -45,20 +45,12 @@
                         <div class="admin-text-secondary text-sm">评论总数</div>
                     </div>
                     <div class="admin-card rounded-xl p-4 text-center">
-                        <div class="text-3xl font-bold admin-text-primary" th:text="${allUserIpAddresses.size()}"></div>
-                        <div class="admin-text-secondary text-sm">唯一IP地址</div>
-                    </div>
-                    <div class="admin-card rounded-xl p-4 text-center">
-                        <div class="text-3xl font-bold admin-text-primary" th:text="${allUserDevices.size()}"></div>
-                        <div class="admin-text-secondary text-sm">设备类型</div>
-                    </div>
-                    <div class="admin-card rounded-xl p-4 text-center">
                         <div class="text-3xl font-bold admin-text-primary" th:text="${userEditCount}"></div>
                         <div class="admin-text-secondary text-sm">编辑内容</div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 gap-6">
                     <div class="admin-card rounded-xl overflow-hidden h-full">
                         <div class="px-5 py-3 border-b admin-table-head font-semibold">基本信息</div>
                         <div class="p-5 space-y-3">
@@ -81,27 +73,6 @@
                         </div>
                     </div>
 
-                    <div class="admin-card rounded-xl overflow-hidden h-full min-h-[18rem]">
-                        <div class="px-5 py-3 border-b admin-table-head font-semibold">设备信息</div>
-                        <div class="p-5 space-y-3">
-                            <div class="flex justify-between border-b pb-2 admin-border"><span class="font-medium admin-text-primary">最近登录IP：</span><span class="admin-text-secondary" th:text="${userIpAddress}"></span></div>
-                            <div class="flex justify-between border-b pb-2 admin-border"><span class="font-medium admin-text-primary">最近设备类型：</span><span class="admin-text-secondary" th:text="${userDevice}"></span></div>
-                            <div class="mt-2">
-                                <div class="font-medium mb-2 admin-text-primary">所有IP地址：</div>
-                                <div class="grid grid-cols-2 md:grid-cols-3 gap-2" th:if="${!allUserIpAddresses.isEmpty()}">
-                                    <div class="rounded px-3 py-2 text-center" style="background-color: var(--bg-tertiary); color: var(--text-primary);" th:each="ip : ${allUserIpAddresses}" th:text="${ip}"></div>
-                                </div>
-                                <p th:if="${allUserIpAddresses.isEmpty()}" class="admin-text-secondary">暂无IP地址记录</p>
-                            </div>
-                            <div class="mt-2">
-                                <div class="font-medium mb-2 admin-text-primary">设备ID：</div>
-                                <div th:if="${allUserDeviceIds != null and !allUserDeviceIds.isEmpty()}">
-                                    <div th:each="did : ${allUserDeviceIds}" class="text-sm admin-text-secondary break-all mb-1" th:text="${did}"></div>
-                                </div>
-                                <p th:if="${allUserDeviceIds == null or allUserDeviceIds.isEmpty()}" class="admin-text-secondary">暂无设备ID记录</p>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
                 <!-- 评论历史 -->
