@@ -20,14 +20,12 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final ContentService contentService;
     private final UserBlockService userBlockService;
-    private final ModeratorBlockService moderatorBlockService;
 
     public CommentService(CommentRepository commentRepository, ContentService contentService, 
-                         UserBlockService userBlockService, ModeratorBlockService moderatorBlockService) {
+                         UserBlockService userBlockService) {
         this.commentRepository = commentRepository;
         this.contentService = contentService;
         this.userBlockService = userBlockService;
-        this.moderatorBlockService = moderatorBlockService;
     }
 
     @Transactional(readOnly = true)
@@ -224,27 +222,6 @@ public class CommentService {
                     filteredComments.add(comment);
                 }
                 continue; // 跳过后续检查
-            }
-            
-            // 检查版主屏蔽关系：如果评论作者在相关流派中被版主屏蔽
-            if (currentUser != null) {
-                // 获取评论所属内容的流派ID
-                Long schoolId = comment.getContent().getSchool() != null ? comment.getContent().getSchool().getId() : null;
-                if (schoolId != null) {
-                    // 检查用户是否在该流派及其子流派中被版主屏蔽
-                    boolean isModeratorBlocked = moderatorBlockService.isUserBlockedInSchoolAndSubSchools(comment.getUser().getId(), schoolId);
-                    if (isModeratorBlocked) {
-                        // 被版主屏蔽的用户评论，只有评论作者本人和管理员可见
-                        if (comment.getUser().getId().equals(currentUser.getId()) || isAdmin) {
-                            canView = true;
-                        }
-                        logger.debug("Comment {} is from moderator-blocked user, canView: {}", comment.getId(), canView);
-                        if (canView) {
-                            filteredComments.add(comment);
-                        }
-                        continue; // 跳过后续检查
-                    }
-                }
             }
             
             // 添加调试日志

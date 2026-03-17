@@ -28,7 +28,6 @@ public class DataExportService {
     private final LikeRepository likeRepository;
     private final UserContentEditRepository userContentEditRepository;
     private final UserBlockRepository userBlockRepository;
-    private final ModeratorBlockRepository moderatorBlockRepository;
     private final UserLoginInfoRepository userLoginInfoRepository;
     private final UserFollowRepository userFollowRepository;
     private final SchoolTranslationRepository schoolTranslationRepository;
@@ -43,7 +42,6 @@ public class DataExportService {
                              LikeRepository likeRepository,
                              UserContentEditRepository userContentEditRepository,
                              UserBlockRepository userBlockRepository,
-                             ModeratorBlockRepository moderatorBlockRepository,
                              UserLoginInfoRepository userLoginInfoRepository,
                              UserFollowRepository userFollowRepository,
                              SchoolTranslationRepository schoolTranslationRepository,
@@ -57,7 +55,6 @@ public class DataExportService {
         this.likeRepository = likeRepository;
         this.userContentEditRepository = userContentEditRepository;
         this.userBlockRepository = userBlockRepository;
-        this.moderatorBlockRepository = moderatorBlockRepository;
         this.userLoginInfoRepository = userLoginInfoRepository;
         this.userFollowRepository = userFollowRepository;
         this.schoolTranslationRepository = schoolTranslationRepository;
@@ -260,22 +257,6 @@ public class DataExportService {
                     block.getId(),
                     block.getBlocker().getId(),
                     block.getBlocked().getId(),
-                    block.getCreatedAt() != null ? block.getCreatedAt().format(formatter) : "未知时间"
-                );
-            }
-            pw.println();
-
-            // 导出版主屏蔽数据
-            pw.println("版主屏蔽数据");
-            pw.println("ID,版主ID,被屏蔽用户ID,学派ID,原因,创建时间");
-            List<ModeratorBlock> moderatorBlocks = moderatorBlockRepository.findAll();
-            for (ModeratorBlock block : moderatorBlocks) {
-                pw.printf("%d,%d,%d,%d,%s,%s%n",
-                    block.getId(),
-                    block.getModerator().getId(),
-                    block.getBlockedUser().getId(),
-                    block.getSchool().getId(),
-                    escapeCsv(block.getReason()),
                     block.getCreatedAt() != null ? block.getCreatedAt().format(formatter) : "未知时间"
                 );
             }

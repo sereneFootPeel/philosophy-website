@@ -8,7 +8,6 @@ import com.philosophy.model.UserFollow;
 import com.philosophy.model.Like;
 import com.philosophy.model.UserContentEdit;
 import com.philosophy.model.UserBlock;
-import com.philosophy.model.ModeratorBlock;
 import com.philosophy.model.Philosopher;
 import com.philosophy.repository.UserRepository;
 import com.philosophy.repository.UserLoginInfoRepository;
@@ -18,7 +17,6 @@ import com.philosophy.repository.UserFollowRepository;
 import com.philosophy.repository.LikeRepository;
 import com.philosophy.repository.UserContentEditRepository;
 import com.philosophy.repository.UserBlockRepository;
-import com.philosophy.repository.ModeratorBlockRepository;
 import com.philosophy.repository.PhilosopherRepository;
 import com.philosophy.util.SearchNormalizer;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -42,14 +40,13 @@ public class UserService implements UserDetailsService {
     private final LikeRepository likeRepository;
     private final UserContentEditRepository userContentEditRepository;
     private final UserBlockRepository userBlockRepository;
-    private final ModeratorBlockRepository moderatorBlockRepository;
     private final PhilosopherRepository philosopherRepository;
     
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, 
                       UserLoginInfoRepository userLoginInfoRepository, CommentRepository commentRepository,
                       ContentRepository contentRepository, UserFollowRepository userFollowRepository,
                       LikeRepository likeRepository, UserContentEditRepository userContentEditRepository,
-                      UserBlockRepository userBlockRepository, ModeratorBlockRepository moderatorBlockRepository,
+                      UserBlockRepository userBlockRepository,
                       PhilosopherRepository philosopherRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -60,7 +57,6 @@ public class UserService implements UserDetailsService {
         this.likeRepository = likeRepository;
         this.userContentEditRepository = userContentEditRepository;
         this.userBlockRepository = userBlockRepository;
-        this.moderatorBlockRepository = moderatorBlockRepository;
         this.philosopherRepository = philosopherRepository;
     }
 
@@ -75,6 +71,12 @@ public class UserService implements UserDetailsService {
     public User registerNewUser(User user) {
         // 加密密码
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        // 角色兜底：只允许 USER/ADMIN，其他一律降级为 USER
+        String role = (user.getRole() == null) ? "USER" : user.getRole().trim();
+        if (!"USER".equals(role) && !"ADMIN".equals(role)) {
+            role = "USER";
+        }
+        user.setRole(role);
         return userRepository.save(user);
     }
 
@@ -239,20 +241,14 @@ public class UserService implements UserDetailsService {
             userBlockRepository.deleteAll(userBlocks);
         }
         
-        // 11. 删除用户的ModeratorBlock记录
-        List<ModeratorBlock> moderatorBlocks = moderatorBlockRepository.findByUserIdOrModeratorId(id, id);
-        if (!moderatorBlocks.isEmpty()) {
-            moderatorBlockRepository.deleteAll(moderatorBlocks);
-        }
-        
-        // 12. 处理Philosopher表中的外键约束 - 重置user_id为null
+        // 11. 处理Philosopher表中的外键约束 - 重置user_id为null
         List<Philosopher> userPhilosophers = philosopherRepository.findByUserId(id);
         for (Philosopher philosopher : userPhilosophers) {
             philosopher.setUser(null);
             philosopherRepository.save(philosopher);
         }
         
-        // 13. 最后删除用户记录
+        // 12. 最后删除用户记录
         userRepository.delete(user);
     }
     
@@ -276,11 +272,6 @@ public class UserService implements UserDetailsService {
         }
     }
     
-    @Transactional(readOnly = true)
-    public boolean isModerator(Long userId) {
-        User user = userRepository.findById(userId).orElse(null);
-        return user != null && "MODERATOR".equals(user.getRole());
-    }
     
     /**
      * 搜索用户（支持关键词）
@@ -309,27 +300,5 @@ public class UserService implements UserDetailsService {
         return list;
     }
     
-    @Transactional(readOnly = true)
-    public List<User> getModerators() {
-        return userRepository.findByRole("MODERATOR");
-    }
-    
-    @Transactional
-    public void assignSchoolToModerator(Long userId, Long schoolId) {
-        User user = userRepository.findById(userId).orElse(null);
-        if (user != null && "MODERATOR".equals(user.getRole())) {
-            user.setAssignedSchoolId(schoolId);
-            userRepository.save(user);
-        }
-    }
-    
-    @Transactional
-    public void removeSchoolFromModerator(Long userId) {
-        User user = userRepository.findById(userId).orElse(null);
-        if (user != null && "MODERATOR".equals(user.getRole())) {
-            user.setAssignedSchoolId(null);
-            userRepository.save(user);
-        }
-    }
 }
     

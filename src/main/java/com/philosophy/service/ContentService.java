@@ -26,7 +26,6 @@ public class ContentService {
     private final UserContentEditRepository userContentEditRepository;
     private final ContentTranslationRepository contentTranslationRepository;
     private final UserBlockService userBlockService;
-    private final ModeratorBlockService moderatorBlockService;
     private final SchoolService schoolService;
 
     private static final Logger logger = LoggerFactory.getLogger(ContentService.class);
@@ -35,14 +34,12 @@ public class ContentService {
                          UserContentEditRepository userContentEditRepository, 
                          ContentTranslationRepository contentTranslationRepository,
                          UserBlockService userBlockService,
-                         ModeratorBlockService moderatorBlockService,
                          SchoolService schoolService) {
         this.contentRepository = contentRepository;
         this.philosopherService = philosopherService;
         this.userContentEditRepository = userContentEditRepository;
         this.contentTranslationRepository = contentTranslationRepository;
         this.userBlockService = userBlockService;
-        this.moderatorBlockService = moderatorBlockService;
         this.schoolService = schoolService;
     }
 
@@ -564,29 +561,6 @@ public class ContentService {
                 continue; // 跳过后续检查
             }
 
-            // 检查版主屏蔽关系：如果内容作者在相关流派中被版主屏蔽
-            if (currentUser != null && !isAdmin) {
-                // 获取内容所属的流派ID
-                Long schoolId = content.getSchool() != null ? content.getSchool().getId() : null;
-                if (schoolId != null) {
-                    // 检查用户是否在该流派及其子流派中被版主屏蔽
-                    boolean isModeratorBlocked = moderatorBlockService.isUserBlockedInSchoolAndSubSchools(content.getUser().getId(), schoolId);
-                    if (isModeratorBlocked) {
-                        moderatorBlockedCount++;
-                        // 被版主屏蔽的用户内容，只有内容作者本人和管理员可见
-                        if (content.getUser().getId().equals(currentUser.getId()) || isAdmin) {
-                            canView = true;
-                        }
-                        if (canView) {
-                            filteredContents.add(content);
-                            visibleCount++;
-                        }
-                        continue; // 跳过后续检查
-                    }
-                }
-            }
-
-
             // 检查管理员设置的状态字段
             if (content.getStatus() == 1) {
                 adminHiddenCount++;
@@ -617,9 +591,9 @@ public class ContentService {
         }
         
         // 输出详细的过滤统计日志
-        logger.info("隐私过滤统计 - 总数: {}, null/无用户: {}, 用户屏蔽: {}, 内容被屏蔽: {}, 版主屏蔽: {}, 管理员隐藏: {}, 私有内容: {}, 最终可见: {}", 
+        logger.info("隐私过滤统计 - 总数: {}, null/无用户: {}, 用户屏蔽: {}, 内容被屏蔽: {}, 管理员隐藏: {}, 私有内容: {}, 最终可见: {}", 
                     totalCount, nullOrNoUserCount, userBlockedCount, blockedContentCount, 
-                    moderatorBlockedCount, adminHiddenCount, privateContentCount, visibleCount);
+                    adminHiddenCount, privateContentCount, visibleCount);
 
         return filteredContents;
     }

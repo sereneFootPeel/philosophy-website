@@ -8,7 +8,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.core.Ordered;
 import jakarta.servlet.Filter;
@@ -95,8 +94,6 @@ public class SecurityConfig {
                 .requestMatchers("/api/test-results", "/api/test-results/**").authenticated()
                 // 管理员页面需要ADMIN角色
                 .requestMatchers("/admin/**").hasRole("ADMIN")
-                // 版主页面需要MODERATOR角色
-                .requestMatchers("/moderator/**").hasRole("MODERATOR")
                 // 登录页面允许所有人访问
                 .requestMatchers("/login").permitAll()
                 // 其他所有请求都需要认证
@@ -110,7 +107,7 @@ public class SecurityConfig {
                 .permitAll()
             )
             .logout(logout -> logout
-                .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+                .logoutUrl("/logout")
                 .logoutSuccessUrl("/")
                 .deleteCookies("remember-me")
                 .permitAll()

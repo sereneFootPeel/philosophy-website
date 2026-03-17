@@ -63,9 +63,6 @@ public class DataImportService {
     private UserBlockRepository userBlockRepository;
 
     @Autowired
-    private ModeratorBlockRepository moderatorBlockRepository;
-
-    @Autowired
     private SchoolTranslationRepository schoolTranslationRepository;
 
     @Autowired
@@ -228,7 +225,6 @@ public class DataImportService {
             importLikesInTransaction(result, dataSections.get("点赞数据"));
             importUserContentEditsInTransaction(result, dataSections.get("用户内容编辑数据"));
             importUserBlocksInTransaction(result, dataSections.get("用户屏蔽数据"));
-            importModeratorBlocksInTransaction(result, dataSections.get("版主屏蔽数据"));
             importUserLoginInfoInTransaction(result, dataSections.get("用户登录信息数据"));
             importUserFollowsInTransaction(result, dataSections.get("用户关注数据"));
             
@@ -350,7 +346,6 @@ public class DataImportService {
     private void clearTablesInOrder() {
         // 1. 删除所有依赖表（没有外键约束的表）
         safeDeleteTable("user_login_info", "用户登录信息表");
-        safeDeleteTable("moderator_blocks", "版主屏蔽表");
         safeDeleteTable("user_blocks", "用户屏蔽表");
         safeDeleteTable("user_content_edits", "用户内容编辑表");
         safeDeleteTable("likes", "点赞表");
@@ -413,13 +408,6 @@ public class DataImportService {
                 logger.info("清空用户登录信息表");
             } catch (Exception e) {
                 logger.warn("清空用户登录信息表失败，可能表不存在: {}", e.getMessage());
-            }
-            
-            try {
-                entityManager.createNativeQuery("DELETE FROM moderator_blocks").executeUpdate();
-                logger.info("清空版主屏蔽表");
-            } catch (Exception e) {
-                logger.warn("清空版主屏蔽表失败，可能表不存在: {}", e.getMessage());
             }
             
             try {
@@ -554,9 +542,6 @@ public class DataImportService {
             // 1. 删除所有依赖表（没有外键约束的表）
             entityManager.createNativeQuery("DELETE FROM user_login_info").executeUpdate();
             logger.info("清空用户登录信息表");
-            
-            entityManager.createNativeQuery("DELETE FROM moderator_blocks").executeUpdate();
-            logger.info("清空版主屏蔽表");
             
             entityManager.createNativeQuery("DELETE FROM user_blocks").executeUpdate();
             logger.info("清空用户屏蔽表");
@@ -1235,11 +1220,6 @@ public class DataImportService {
             deleteBlockQuery.setParameter(2, userId);
             deleteBlockQuery.executeUpdate();
 
-            jakarta.persistence.Query deleteModeratorBlockQuery = entityManager.createNativeQuery("DELETE FROM moderator_blocks WHERE moderator_id = ? OR blocked_user_id = ?");
-            deleteModeratorBlockQuery.setParameter(1, userId);
-            deleteModeratorBlockQuery.setParameter(2, userId);
-            deleteModeratorBlockQuery.executeUpdate();
-
             jakarta.persistence.Query deleteUserContentEditQuery = entityManager.createNativeQuery("DELETE FROM user_content_edits WHERE user_id = ?");
             deleteUserContentEditQuery.setParameter(1, userId);
             deleteUserContentEditQuery.executeUpdate();
@@ -1353,11 +1333,6 @@ public class DataImportService {
                     "DELETE FROM user_content_edits WHERE school_id IN (SELECT id FROM schools WHERE user_id = ?)");
             deleteUserContentEditsBySchoolQuery.setParameter(1, userId);
             deleteUserContentEditsBySchoolQuery.executeUpdate();
-
-            jakarta.persistence.Query deleteModeratorBlocksBySchoolQuery = entityManager.createNativeQuery(
-                    "DELETE FROM moderator_blocks WHERE school_id IN (SELECT id FROM schools WHERE user_id = ?)");
-            deleteModeratorBlocksBySchoolQuery.setParameter(1, userId);
-            deleteModeratorBlocksBySchoolQuery.executeUpdate();
 
             jakarta.persistence.Query deleteContentBySchoolQuery = entityManager.createNativeQuery(
                     "DELETE FROM contents WHERE school_id IN (SELECT id FROM schools WHERE user_id = ?)");
@@ -3530,76 +3505,6 @@ public class DataImportService {
     }
 
     @Transactional
-    public void importModeratorBlocksInTransaction(ImportResult result, List<String[]> data) {
-        importModeratorBlocks(result, data);
-    }
-
-    private void importModeratorBlocks(ImportResult result, List<String[]> data) {
-        if (data == null) return;
-
-        logger.info("开始导入版主屏蔽数据，共 {} 条", data.size());
-        int success = 0, failed = 0;
-
-        for (String[] fields : data) {
-            try {
-                if (fields.length < 6) continue;
-
-                ModeratorBlock block = new ModeratorBlock();
-                block.setId(Long.parseLong(fields[0]));
-
-                // 解析版主
-                if (!fields[1].isEmpty()) {
-                    Optional<User> moderator = userRepository.findById(Long.parseLong(fields[1]));
-                    if (moderator.isPresent()) {
-                        block.setModerator(moderator.get());
-                    } else {
-                        logger.warn("版主用户ID '{}' 不存在，跳过版主屏蔽记录", fields[1]);
-                        continue;
-                    }
-                }
-
-                // 解析被屏蔽用户
-                if (!fields[2].isEmpty() && !fields[2].equals("null")) {
-                    Optional<User> blockedUser = userRepository.findById(Long.parseLong(fields[2]));
-                    if (blockedUser.isPresent()) {
-                        block.setBlockedUser(blockedUser.get());
-                    } else {
-                        logger.warn("被屏蔽用户ID '{}' 不存在，跳过版主屏蔽记录", fields[2]);
-                        continue;
-                    }
-                }
-
-                // 解析学派
-                if (!fields[3].isEmpty() && !fields[3].equals("null")) {
-                    Optional<School> school = schoolRepository.findById(Long.parseLong(fields[3]));
-                    if (school.isPresent()) {
-                        block.setSchool(school.get());
-                    } else {
-                        logger.warn("学派ID '{}' 不存在，跳过版主屏蔽记录", fields[3]);
-                        continue;
-                    }
-                }
-
-                block.setReason(fields[4]);
-
-                // 解析创建时间
-                if (!fields[5].equals("未知时间") && !fields[5].isEmpty() && !fields[5].equals("null")) {
-                    block.setCreatedAt(LocalDateTime.parse(fields[5], DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-                }
-
-                moderatorBlockRepository.save(block);
-                success++;
-
-            } catch (Exception e) {
-                failed++;
-                logger.warn("导入版主屏蔽失败: " + Arrays.toString(fields), e);
-            }
-        }
-
-        result.addResult("版主屏蔽", success, failed);
-        logger.info("版主屏蔽数据导入完成，成功: {}, 失败: {}", success, failed);
-    }
-
     public void importSchoolTranslationsInTransaction(ImportResult result, List<String[]> data) {
         try {
             transactionTemplate.execute(status -> {

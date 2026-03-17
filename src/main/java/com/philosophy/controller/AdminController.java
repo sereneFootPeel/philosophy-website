@@ -9,7 +9,6 @@ import com.philosophy.service.PhilosopherService;
 import com.philosophy.service.SchoolService;
 import com.philosophy.service.UserService;
 import com.philosophy.service.TranslationService;
-import com.philosophy.service.ModeratorBlockService;
 import com.philosophy.util.UserInfoCollector;
 import com.philosophy.util.InputValidator;
 import com.philosophy.util.DateUtils;
@@ -39,16 +38,13 @@ public class AdminController {
     private final UserService userService;
     private final UserInfoCollector userInfoCollector;
     private final TranslationService translationService;
-    private final ModeratorBlockService moderatorBlockService;
-    
-    public AdminController(PhilosopherService philosopherService, SchoolService schoolService, ContentService contentService, UserService userService, UserInfoCollector userInfoCollector, TranslationService translationService, ModeratorBlockService moderatorBlockService) {
+    public AdminController(PhilosopherService philosopherService, SchoolService schoolService, ContentService contentService, UserService userService, UserInfoCollector userInfoCollector, TranslationService translationService) {
         this.philosopherService = philosopherService;
         this.schoolService = schoolService;
         this.contentService = contentService;
         this.userService = userService;
         this.userInfoCollector = userInfoCollector;
         this.translationService = translationService;
-        this.moderatorBlockService = moderatorBlockService;
     }
 
     @GetMapping
@@ -693,9 +689,19 @@ public class AdminController {
     public String saveUser(@ModelAttribute("user") User formUser,
                           @RequestParam(value = "password", required = false) String password,
                           @RequestParam(value = "confirmPassword", required = false) String confirmPassword,
-                          @RequestParam(value = "assignedSchoolId", required = false) Long assignedSchoolId,
                           Model model,
                           org.springframework.security.core.Authentication authentication) {
+
+        // 角色白名单：当前版本仅支持 USER/ADMIN
+        String role = (formUser.getRole() == null) ? "USER" : formUser.getRole().trim();
+        if (!"USER".equals(role) && !"ADMIN".equals(role)) {
+            model.addAttribute("errorMessage", "不支持的角色：" + role);
+            formUser.setRole("USER");
+            model.addAttribute("user", formUser);
+            model.addAttribute("allSchools", schoolService.getAllSchools());
+            return "admin/users/form";
+        }
+        formUser.setRole(role);
 
         // 如果是新用户（没有ID）
         if (formUser.getId() == null) {
@@ -703,18 +709,21 @@ public class AdminController {
             if (password == null || password.trim().isEmpty()) {
                 model.addAttribute("errorMessage", "密码不能为空");
                 model.addAttribute("user", formUser);
+                model.addAttribute("allSchools", schoolService.getAllSchools());
                 return "admin/users/form";
             }
             
             if (password.length() < 6) {
                 model.addAttribute("errorMessage", "密码长度不能少于6位");
                 model.addAttribute("user", formUser);
+                model.addAttribute("allSchools", schoolService.getAllSchools());
                 return "admin/users/form";
             }
             
             if (!password.equals(confirmPassword)) {
                 model.addAttribute("errorMessage", "两次输入的密码不一致");
                 model.addAttribute("user", formUser);
+                model.addAttribute("allSchools", schoolService.getAllSchools());
                 return "admin/users/form";
             }
             
@@ -722,19 +731,17 @@ public class AdminController {
             if (userService.existsByUsername(formUser.getUsername())) {
                 model.addAttribute("errorMessage", "用户名已存在");
                 model.addAttribute("user", formUser);
+                model.addAttribute("allSchools", schoolService.getAllSchools());
                 return "admin/users/form";
             }
             
             if (userService.existsByEmail(formUser.getEmail())) {
                 model.addAttribute("errorMessage", "邮箱已存在");
                 model.addAttribute("user", formUser);
+                model.addAttribute("allSchools", schoolService.getAllSchools());
                 return "admin/users/form";
             }
             
-            // 处理版主流派分配
-            if ("MODERATOR".equals(formUser.getRole())) {
-                formUser.setAssignedSchoolId(assignedSchoolId);
-            }
 
             // 设置密码并保存新用户
             formUser.setPassword(password);
@@ -753,6 +760,7 @@ public class AdminController {
                 userService.existsByUsername(formUser.getUsername())) {
                 model.addAttribute("errorMessage", "用户名已被其他用户使用");
                 model.addAttribute("user", formUser);
+                model.addAttribute("allSchools", schoolService.getAllSchools());
                 return "admin/users/form";
             }
             
@@ -760,6 +768,7 @@ public class AdminController {
                 userService.existsByEmail(formUser.getEmail())) {
                 model.addAttribute("errorMessage", "邮箱已被其他用户使用");
                 model.addAttribute("user", formUser);
+                model.addAttribute("allSchools", schoolService.getAllSchools());
                 return "admin/users/form";
             }
 
@@ -776,25 +785,12 @@ public class AdminController {
             if (!existing.getRole().equals(formUser.getRole())) {
                 changes.append("role: '").append(existing.getRole()).append("' -> '").append(formUser.getRole()).append("'; ");
             }
-            if (assignedSchoolId != null && !assignedSchoolId.equals(existing.getAssignedSchoolId())) {
-                changes.append("assignedSchoolId: ").append(existing.getAssignedSchoolId()).append(" -> ").append(assignedSchoolId).append("; ");
-            } else if (assignedSchoolId == null && existing.getAssignedSchoolId() != null) {
-                changes.append("assignedSchoolId: ").append(existing.getAssignedSchoolId()).append(" -> null; ");
-            }
-
-
             // 更新用户信息
             existing.setUsername(formUser.getUsername());
             existing.setEmail(formUser.getEmail());
             existing.setEnabled(formUser.isEnabled());
             existing.setRole(formUser.getRole());
 
-            // 处理版主流派分配
-            if ("MODERATOR".equals(formUser.getRole())) {
-                existing.setAssignedSchoolId(assignedSchoolId);
-            } else {
-                existing.setAssignedSchoolId(null);
-            }
 
             userService.saveUser(existing);
 
@@ -834,144 +830,6 @@ public class AdminController {
         userService.updatePassword(id, newPassword);
 
         return "redirect:/admin/users/view/" + id;
-    }
-
-    // 为版主分配流派
-    @PostMapping("/users/{userId}/assign-school")
-    public String assignSchoolToModerator(@PathVariable Long userId, @RequestParam Long schoolId, org.springframework.security.core.Authentication authentication) {
-        User user = userService.getUserById(userId);
-        if (user != null && "MODERATOR".equals(user.getRole())) {
-            userService.assignSchoolToModerator(userId, schoolId);
-        }
-        return "redirect:/admin/users/view/" + userId;
-    }
-
-    // 移除版主的流派分配
-    @PostMapping("/users/{userId}/remove-school")
-    public String removeSchoolFromModerator(@PathVariable Long userId, org.springframework.security.core.Authentication authentication) {
-        User user = userService.getUserById(userId);
-        if (user != null && "MODERATOR".equals(user.getRole())) {
-            userService.removeSchoolFromModerator(userId);
-        }
-        return "redirect:/admin/users/view/" + userId;
-    }
-
-    // =============================================
-    // 版主屏蔽用户管理
-    // =============================================
-
-    /**
-     * 版主屏蔽用户在特定流派中
-     * @param moderatorId 版主用户ID
-     * @param blockedUserId 被屏蔽用户ID
-     * @param schoolId 流派ID
-     * @param reason 屏蔽原因
-     * @return 操作结果
-     */
-    @PostMapping("/moderator/block-user")
-    @ResponseBody
-    public String blockUserInSchool(@RequestParam Long moderatorId, 
-                                   @RequestParam Long blockedUserId, 
-                                   @RequestParam Long schoolId, 
-                                   @RequestParam(required = false) String reason) {
-        try {
-            boolean success = moderatorBlockService.blockUserInSchool(moderatorId, blockedUserId, schoolId, reason);
-            if (success) {
-                return "success";
-            } else {
-                return "error: 屏蔽失败，可能已经屏蔽过该用户";
-            }
-        } catch (SecurityException e) {
-            return "error: " + e.getMessage();
-        } catch (Exception e) {
-            return "error: 系统错误：" + e.getMessage();
-        }
-    }
-
-    /**
-     * 取消版主屏蔽用户在特定流派中
-     * @param moderatorId 版主用户ID
-     * @param blockedUserId 被屏蔽用户ID
-     * @param schoolId 流派ID
-     * @return 操作结果
-     */
-    @PostMapping("/moderator/unblock-user")
-    @ResponseBody
-    public String unblockUserInSchool(@RequestParam Long moderatorId, 
-                                     @RequestParam Long blockedUserId, 
-                                     @RequestParam Long schoolId) {
-        try {
-            boolean success = moderatorBlockService.unblockUserInSchool(moderatorId, blockedUserId, schoolId);
-            if (success) {
-                return "success";
-            } else {
-                return "error: 取消屏蔽失败";
-            }
-        } catch (SecurityException e) {
-            return "error: " + e.getMessage();
-        } catch (Exception e) {
-            return "error: 系统错误：" + e.getMessage();
-        }
-    }
-
-    /**
-     * 获取版主在特定流派中屏蔽的用户列表
-     * @param moderatorId 版主用户ID
-     * @param schoolId 流派ID
-     * @param model 模型
-     * @return 屏蔽用户列表页面
-     */
-    @GetMapping("/moderator/{moderatorId}/school/{schoolId}/blocked-users")
-    public String getBlockedUsersInSchool(@PathVariable Long moderatorId, 
-                                         @PathVariable Long schoolId, 
-                                         Model model, 
-                                         HttpServletRequest request) {
-        // 获取版主信息
-        User moderator = userService.getUserById(moderatorId);
-        if (moderator == null || !"MODERATOR".equals(moderator.getRole())) {
-            model.addAttribute("errorMessage", "版主不存在");
-            return "error";
-        }
-
-        // 获取流派信息
-        School school = schoolService.getSchoolById(schoolId);
-        if (school == null) {
-            model.addAttribute("errorMessage", "流派不存在");
-            return "error";
-        }
-
-        // 获取屏蔽的用户列表
-        List<com.philosophy.model.ModeratorBlock> blockedUsers = moderatorBlockService.getBlockedUsersInSchool(moderatorId, schoolId);
-
-        model.addAttribute("moderator", moderator);
-        model.addAttribute("school", school);
-        model.addAttribute("blockedUsers", blockedUsers);
-
-        return "admin/moderator/blocked-users";
-    }
-
-    /**
-     * 获取用户被版主屏蔽的详情
-     * @param userId 用户ID
-     * @param model 模型
-     * @return 屏蔽详情页面
-     */
-    @GetMapping("/users/{userId}/moderator-blocks")
-    public String getUserModeratorBlocks(@PathVariable Long userId, Model model, HttpServletRequest request) {
-        // 获取用户信息
-        User user = userService.getUserById(userId);
-        if (user == null) {
-            model.addAttribute("errorMessage", "用户不存在");
-            return "error";
-        }
-
-        // 获取用户被版主屏蔽的关系
-        List<com.philosophy.model.ModeratorBlock> blockRelationships = moderatorBlockService.getBlockRelationshipsForUser(userId);
-
-        model.addAttribute("user", user);
-        model.addAttribute("blockRelationships", blockRelationships);
-
-        return "admin/users/moderator-blocks";
     }
 
     // 退出后台管理，返回到前台名句页面

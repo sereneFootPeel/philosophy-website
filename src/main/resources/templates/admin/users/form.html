@@ -14,21 +14,6 @@
             }
             return true;
         }
-
-        function toggleModeratorSchoolSection() {
-            const roleSelect = document.getElementById('role');
-            const schoolSection = document.getElementById('moderatorSchoolSection');
-            const schoolSelect = document.getElementById('assignedSchoolId');
-
-            if (roleSelect.value === 'MODERATOR') {
-                schoolSection.style.display = 'block';
-                schoolSelect.required = true;
-            } else {
-                schoolSection.style.display = 'none';
-                schoolSelect.required = false;
-                schoolSelect.value = '';
-            }
-        }
     </script>
     <style type="text/css">
         .admin-form-input {
@@ -162,19 +147,8 @@
                             <label class="admin-form-label" for="role">角色</label>
                             <select id="role" class="admin-form-input" th:field="*{role}" th:attr="data-original=${user.role != null ? user.role : 'USER'}">
                                 <option value="USER">USER</option>
-                                <option value="MODERATOR">MODERATOR</option>
                                 <option value="ADMIN">ADMIN</option>
                             </select>
-                        </div>
-
-                        <!-- 版主流派分配 - 仅在选择MODERATOR角色时显示 -->
-                        <div id="moderatorSchoolSection" class="mb-5" style="display: none;">
-                            <label class="admin-form-label" for="assignedSchoolId">负责流派</label>
-                            <select id="assignedSchoolId" name="assignedSchoolId" class="admin-form-input">
-                                <option value="">请选择流派</option>
-                                <option th:each="school : ${allSchools}" th:value="${school.id}" th:text="${school.name}" th:selected="${user.assignedSchoolId != null && user.assignedSchoolId == school.id}"></option>
-                            </select>
-                            <p class="text-sm admin-text-tertiary mt-1">为版主分配负责的哲学流派</p>
                         </div>
 
 
@@ -219,12 +193,6 @@
             if (select && !select.getAttribute('data-original')) {
                 select.setAttribute('data-original', select.value);
             }
-
-            // 初始化版主流派分配显示状态
-            toggleModeratorSchoolSection();
-
-            // 监听角色选择变化
-            select.addEventListener('change', toggleModeratorSchoolSection);
         })();
     </script>
 

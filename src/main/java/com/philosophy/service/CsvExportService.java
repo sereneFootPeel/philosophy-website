@@ -25,7 +25,6 @@ public class CsvExportService {
     private final ContentRepository contentRepository;
     private final ContentTranslationRepository contentTranslationRepository;
     private final LikeRepository likeRepository;
-    private final ModeratorBlockRepository moderatorBlockRepository;
     private final PhilosopherRepository philosopherRepository;
     private final PhilosopherTranslationRepository philosopherTranslationRepository;
     private final SchoolRepository schoolRepository;
@@ -40,7 +39,6 @@ public class CsvExportService {
                               ContentRepository contentRepository,
                               ContentTranslationRepository contentTranslationRepository,
                               LikeRepository likeRepository,
-                              ModeratorBlockRepository moderatorBlockRepository,
                               PhilosopherRepository philosopherRepository,
                               PhilosopherTranslationRepository philosopherTranslationRepository,
                               SchoolRepository schoolRepository,
@@ -54,7 +52,6 @@ public class CsvExportService {
         this.contentRepository = contentRepository;
         this.contentTranslationRepository = contentTranslationRepository;
         this.likeRepository = likeRepository;
-        this.moderatorBlockRepository = moderatorBlockRepository;
         this.philosopherRepository = philosopherRepository;
         this.philosopherTranslationRepository = philosopherTranslationRepository;
         this.schoolRepository = schoolRepository;
@@ -71,7 +68,6 @@ public class CsvExportService {
         exportToCsv(directoryPath + "/contents.csv", Content.class, contentRepository.findAll());
         exportToCsv(directoryPath + "/content_translations.csv", ContentTranslation.class, contentTranslationRepository.findAll());
         exportToCsv(directoryPath + "/likes.csv", Like.class, likeRepository.findAll());
-        exportToCsv(directoryPath + "/moderator_blocks.csv", ModeratorBlock.class, moderatorBlockRepository.findAll());
         exportToCsv(directoryPath + "/philosophers.csv", Philosopher.class, philosopherRepository.findAll());
         exportToCsv(directoryPath + "/philosopher_translations.csv", PhilosopherTranslation.class, philosopherTranslationRepository.findAll());
         exportToCsv(directoryPath + "/schools.csv", School.class, schoolRepository.findAll());
