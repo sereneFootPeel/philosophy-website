@@ -42,8 +42,6 @@ public class AdminAccountInitializer implements ApplicationRunner {
             admin.setEmail("admin@philosophy.com");
             admin.setRole("ADMIN");
             admin.setEnabled(true);
-            admin.setAccountLocked(false);
-            admin.setFailedLoginAttempts(0);
             admin.setAdminLoginAttempts(0);
             admin.setProfilePrivate(false);
             admin.setLikeCount(0);

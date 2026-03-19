@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @RestController
@@ -63,6 +65,52 @@ public class SchoolApiController {
                     parentId,
                     displayName,
                     hasChildren
+            ));
+        }
+
+        return ResponseEntity.ok(result);
+    }
+
+    /**
+     * 一次性返回所有流派的“名字节点”（不包含描述/内容），供前端构建可展开的树。
+     * 前端首屏只渲染顶级节点；点击时再在前端展开子节点（无需再请求 children）。
+     */
+    @GetMapping("/api/schools/nodes")
+    @Transactional(readOnly = true)
+    public ResponseEntity<List<SchoolNameNodeDTO>> getAllSchoolNameNodes(HttpServletRequest request) {
+        // 获取当前语言设置（根据IP自动判断默认语言）
+        String language = languageUtil.getLanguage(request);
+
+        List<School> all = schoolService.findAllSchools();
+        if (all == null || all.isEmpty()) {
+            return ResponseEntity.ok(List.of());
+        }
+
+        // 计算哪些节点拥有子节点（避免 N+1）
+        List<Long> allIds = all.stream().map(School::getId).toList();
+        Set<Long> hasChildrenSet = schoolService.findParentIdsHavingChildren(allIds);
+
+        PinyinStringComparator nameComparator = new PinyinStringComparator();
+
+        // 给前端排序用的 key：与后端 children 接口一致，按中文名拼音/忽略大小写
+        Map<Long, String> sortKeyById = new HashMap<>();
+        for (School s : all) {
+            sortKeyById.put(s.getId(), nameComparator.toComparableKey(s.getName()));
+        }
+
+        List<SchoolNameNodeDTO> result = new ArrayList<>(all.size());
+        for (School s : all) {
+            Long parentId = (s.getParent() != null) ? s.getParent().getId() : null;
+            String displayName = translationService.getSchoolDisplayName(s, language);
+            boolean hasChildren = hasChildrenSet.contains(s.getId());
+            result.add(new SchoolNameNodeDTO(
+                    s.getId(),
+                    parentId,
+                    displayName,
+                    s.getName(),
+                    s.getNameEn(),
+                    hasChildren,
+                    sortKeyById.get(s.getId())
             ));
         }
 
@@ -238,6 +286,49 @@ public class SchoolApiController {
         public void setParentId(Long parentId) {
             this.parentId = parentId;
         }
+    }
+
+    public static class SchoolNameNodeDTO {
+        private Long id;
+        private Long parentId;
+        private String displayName;
+        private String name;
+        private String nameEn;
+        private boolean hasChildren;
+        private String sortKey;
+
+        public SchoolNameNodeDTO() {}
+
+        public SchoolNameNodeDTO(Long id, Long parentId, String displayName, String name, String nameEn, boolean hasChildren, String sortKey) {
+            this.id = id;
+            this.parentId = parentId;
+            this.displayName = displayName;
+            this.name = name;
+            this.nameEn = nameEn;
+            this.hasChildren = hasChildren;
+            this.sortKey = sortKey;
+        }
+
+        public Long getId() { return id; }
+        public void setId(Long id) { this.id = id; }
+
+        public Long getParentId() { return parentId; }
+        public void setParentId(Long parentId) { this.parentId = parentId; }
+
+        public String getDisplayName() { return displayName; }
+        public void setDisplayName(String displayName) { this.displayName = displayName; }
+
+        public String getName() { return name; }
+        public void setName(String name) { this.name = name; }
+
+        public String getNameEn() { return nameEn; }
+        public void setNameEn(String nameEn) { this.nameEn = nameEn; }
+
+        public boolean isHasChildren() { return hasChildren; }
+        public void setHasChildren(boolean hasChildren) { this.hasChildren = hasChildren; }
+
+        public String getSortKey() { return sortKey; }
+        public void setSortKey(String sortKey) { this.sortKey = sortKey; }
     }
 }
 

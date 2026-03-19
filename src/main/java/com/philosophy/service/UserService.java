@@ -141,12 +141,6 @@ public class UserService implements UserDetailsService {
     }
     
     @Transactional
-    public void resetFailedAttempts(String username) {
-        // 使用直接更新，避免触发实体验证
-        userRepository.resetFailedAttemptsByUsername(username);
-    }
-    
-    @Transactional
     public void deleteUser(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + id));

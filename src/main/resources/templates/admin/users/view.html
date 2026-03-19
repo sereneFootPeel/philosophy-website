@@ -25,21 +25,11 @@
                     <div class="text-2xl font-bold admin-text-primary" th:text="${user.username}"></div>
                     <div class="admin-text-secondary" th:text="${user.email}"></div>
                     <div class="mt-3">
-                        <span class="px-3 py-1 rounded-full text-sm font-semibold" th:classappend="${user.accountLocked} ? 'admin-badge-error' : 'admin-badge-success'" th:text="${user.accountLocked} ? '账户已锁定' : '账户正常'"></span>
-                        <div class="mt-2">
-                            <form th:action="@{/admin/users/toggle-lock/} + ${user.id}" method="post" class="inline-block">
-                                <button type="submit" class="admin-btn-secondary" th:classappend="${user.accountLocked} ? 'admin-badge-success' : 'admin-badge-error'" th:text="${user.accountLocked} ? '解除锁定' : '锁定账户'" onclick="return confirm('确定要执行此操作吗?')"></button>
-                            </form>
-                            <a th:href="@{'/admin/users/edit/' + ${user.id}}" class="admin-btn-secondary ml-2">编辑用户</a>
-                        </div>
+                        <a th:href="@{'/admin/users/edit/' + ${user.id}}" class="admin-btn-secondary">编辑用户</a>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                    <div class="admin-card rounded-xl p-4 text-center">
-                        <div class="text-3xl font-bold admin-text-primary" th:text="${loginCount}"></div>
-                        <div class="admin-text-secondary text-sm">登录次数</div>
-                    </div>
                     <div class="admin-card rounded-xl p-4 text-center">
                         <div class="text-3xl font-bold admin-text-primary" th:text="${commentCount}"></div>
                         <div class="admin-text-secondary text-sm">评论总数</div>
@@ -60,8 +50,6 @@
                             <div class="flex justify-between border-b pb-2 admin-border"><span class="font-medium admin-text-primary">创建时间：</span><span class="admin-text-secondary" th:text="${user.createdAt != null ? #temporals.format(user.createdAt, 'yyyy-MM-dd HH:mm:ss') : '未知时间'}"></span></div>
                             <div class="flex justify-between border-b pb-2 admin-border"><span class="font-medium admin-text-primary">更新时间：</span><span class="admin-text-secondary" th:text="${user.updatedAt != null ? #temporals.format(user.updatedAt, 'yyyy-MM-dd HH:mm:ss') : '未知时间'}"></span></div>
                             <div class="flex justify-between border-b pb-2 admin-border"><span class="font-medium admin-text-primary">账户状态：</span><span class="admin-text-secondary" th:text="${user.enabled ? '启用' : '禁用'}"></span></div>
-                            <div class="flex justify-between border-b pb-2 admin-border"><span class="font-medium admin-text-primary">登录失败次数：</span><span class="admin-text-secondary" th:text="${user.failedLoginAttempts}"></span></div>
-                            <div class="flex justify-between" th:if="${user.lockTime != null}"><span class="font-medium admin-text-primary">锁定时间：</span><span class="admin-text-secondary" th:text="${#temporals.format(user.lockTime, 'yyyy-MM-dd HH:mm:ss')}"></span></div>
                             <!-- 版主流派分配 -->
                             <div th:if="${user.role == 'MODERATOR'}" class="flex justify-between border-b pb-2 admin-border">
                                 <span class="font-medium admin-text-primary">负责流派：</span>

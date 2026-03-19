@@ -935,42 +935,6 @@ public class DataImportService {
                     user.setEnabled(true);
                 }
                 
-                // 处理失败登录次数
-                if (fields.length > 8 && !fields[8].isEmpty() && !fields[8].equals("null")) {
-                    try {
-                        user.setFailedLoginAttempts(Integer.parseInt(fields[8]));
-                    } catch (NumberFormatException e) {
-                        user.setFailedLoginAttempts(0);
-                    }
-                } else {
-                    user.setFailedLoginAttempts(0);
-                }
-                
-                // 处理账户锁定状态 (字段9)
-                if (fields.length > 9 && !fields[9].isEmpty() && !fields[9].equals("null")) {
-                    user.setAccountLocked("1".equals(fields[9]) || "true".equalsIgnoreCase(fields[9]));
-                } else {
-                    user.setAccountLocked(false);
-                }
-                
-                // 处理锁定时间 (字段10)
-                if (fields.length > 10 && !fields[10].isEmpty() && !fields[10].equals("null")) {
-                    try {
-                        user.setLockTime(LocalDateTime.parse(fields[10], DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-                    } catch (Exception e) {
-                        logger.warn("用户ID {}: 锁定时间格式错误: {}", userId, fields[10]);
-                    }
-                }
-                
-                // 处理锁定过期时间 (字段11)
-                if (fields.length > 11 && !fields[11].isEmpty() && !fields[11].equals("null")) {
-                    try {
-                        user.setLockExpireTime(LocalDateTime.parse(fields[11], DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-                    } catch (Exception e) {
-                        logger.warn("用户ID {}: 锁定过期时间格式错误: {}", userId, fields[11]);
-                    }
-                }
-
                 // 处理隐私设置 (字段12-14: 个人资料隐私,评论隐私,内容隐私)
                 if (fields.length > 12 && !fields[12].isEmpty() && !fields[12].equals("null")) {
                     user.setProfilePrivate("1".equals(fields[12]) || "true".equalsIgnoreCase(fields[12]));
@@ -1030,10 +994,7 @@ public class DataImportService {
                 }
                 deferAssignedSchoolAssignment(user, sectionName, i);
                 
-                // 处理IP地址和设备信息 (字段18-20: IP地址,设备类型,用户代理)
-                if (fields.length > 18 && !fields[18].isEmpty() && !fields[18].equals("null")) {
-                    user.setIpAddress(fields[18]);
-                }
+                // 处理设备信息 (字段19-20: 设备类型,用户代理)
                 if (fields.length > 19 && !fields[19].isEmpty() && !fields[19].equals("null")) {
                     user.setDeviceType(fields[19]);
                 }
@@ -1460,10 +1421,6 @@ public class DataImportService {
 
         addInsertColumn(columns, params, tableName, "role", user.getRole(), context, true);
         addInsertColumn(columns, params, tableName, "enabled", user.isEnabled(), context, true);
-        addInsertColumn(columns, params, tableName, "account_locked", user.isAccountLocked(), context, false);
-        addInsertColumn(columns, params, tableName, "failed_login_attempts", user.getFailedLoginAttempts(), context, false);
-        addInsertColumn(columns, params, tableName, "lock_time", user.getLockTime(), context, false);
-        addInsertColumn(columns, params, tableName, "lock_expire_time", user.getLockExpireTime(), context, false);
 
         addInsertColumn(columns, params, tableName, "profile_private", user.isProfilePrivate(), context, false);
         addInsertColumn(columns, params, tableName, "comments_private", user.isCommentsPrivate(), context, false);
@@ -1473,7 +1430,6 @@ public class DataImportService {
         addInsertColumn(columns, params, tableName, "like_count", user.getLikeCount(), context, false);
         addInsertColumn(columns, params, tableName, "assigned_school_id", user.getAssignedSchoolId(), context, false);
 
-        addInsertColumn(columns, params, tableName, "ip_address", user.getIpAddress(), context, false);
         addInsertColumn(columns, params, tableName, "device_type", user.getDeviceType(), context, false);
         addInsertColumn(columns, params, tableName, "user_agent", user.getUserAgent(), context, false);
         addInsertColumn(columns, params, tableName, "avatar_url", user.getAvatarUrl(), context, false);

@@ -56,18 +56,6 @@ public class User implements UserDetails {
     @Column(name = "role", nullable = false)
     private String role = "USER";
 
-    @Column(name = "failed_login_attempts", nullable = false)
-    private int failedLoginAttempts = 0;
-
-    @Column(name = "account_locked", nullable = false)
-    private boolean accountLocked = false;
-
-    @Column(name = "lock_time")
-    private LocalDateTime lockTime;
-    
-    @Column(name = "lock_expire_time")
-    private LocalDateTime lockExpireTime;
-
     /**
      * 主页隐私设置 - 控制整个用户主页的可见性
      * true: 所有内容和评论仅自己可见
@@ -103,10 +91,6 @@ public class User implements UserDetails {
 
     @Column(name = "assigned_school_id")
     private Long assignedSchoolId;
-
-    @Size(max = 45, message = "IP地址长度不能超过45个字符")
-    @Column(name = "ip_address", length = 45)
-    private String ipAddress;
 
     @Size(max = 50, message = "设备类型长度不能超过50个字符")
     @Column(name = "device_type", length = 50)
@@ -229,38 +213,6 @@ public class User implements UserDetails {
         this.updatedAt = updatedAt;
     }
 
-    public int getFailedLoginAttempts() {
-        return failedLoginAttempts;
-    }
-
-    public void setFailedLoginAttempts(int failedLoginAttempts) {
-        this.failedLoginAttempts = failedLoginAttempts;
-    }
-
-    public boolean isAccountLocked() {
-        return accountLocked;
-    }
-
-    public void setAccountLocked(boolean accountLocked) {
-        this.accountLocked = accountLocked;
-    }
-
-    public LocalDateTime getLockTime() {
-        return lockTime;
-    }
-
-    public void setLockTime(LocalDateTime lockTime) {
-        this.lockTime = lockTime;
-    }
-
-    public LocalDateTime getLockExpireTime() {
-        return lockExpireTime;
-    }
-
-    public void setLockExpireTime(LocalDateTime lockExpireTime) {
-        this.lockExpireTime = lockExpireTime;
-    }
-
     public boolean isProfilePrivate() {
         return profilePrivate;
     }
@@ -307,14 +259,6 @@ public class User implements UserDetails {
 
     public void setAssignedSchoolId(Long assignedSchoolId) {
         this.assignedSchoolId = assignedSchoolId;
-    }
-
-    public String getIpAddress() {
-        return ipAddress;
-    }
-
-    public void setIpAddress(String ipAddress) {
-        this.ipAddress = ipAddress;
     }
 
     public String getDeviceType() {
@@ -370,11 +314,7 @@ public class User implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        // 如果账户被锁定，检查是否已过期
-        if (accountLocked && lockExpireTime != null) {
-            return LocalDateTime.now().isAfter(lockExpireTime);
-        }
-        return !accountLocked;
+        return true;
     }
 
     @Override

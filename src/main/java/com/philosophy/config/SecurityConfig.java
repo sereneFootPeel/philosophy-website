@@ -143,24 +143,10 @@ public class SecurityConfig {
     @Bean
     public AuthenticationSuccessHandler customAuthenticationSuccessHandler() {
         return (request, response, authentication) -> {
-            // 记录用户登录信息并重置失败次数
+            // 记录用户登录信息（已移除“失败次数锁定/自动解锁/重置失败次数”逻辑）
             try {
                 User user = (User) authentication.getPrincipal();
-                
-                // 检查账户锁定是否已过期，如果过期则自动解锁
-                if (user.isAccountLocked() && user.getLockExpireTime() != null && 
-                    java.time.LocalDateTime.now().isAfter(user.getLockExpireTime())) {
-                    user.setAccountLocked(false);
-                    user.setLockTime(null);
-                    user.setLockExpireTime(null);
-                    user.setFailedLoginAttempts(0);
-                    userService.saveUser(user);
-                    logger.info("账户 {} 的锁定已自动过期解锁", user.getUsername());
-                }
-                
-                // 重置登录失败次数
-                userService.resetFailedAttempts(user.getUsername());
-                
+
                 // 记录登录信息
                 userInfoCollector.recordLoginInfo(user, request);
                 logger.info("User {} logged in from IP: {}", user.getUsername(), userInfoCollector.getUserIpAddress(user.getId()));

@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     const tree = document.getElementById('school-tree');
     if (!tree) return;
+    const rootUl = document.getElementById('school-tree-root');
     const detail = document.getElementById('school-detail');
     const titleEl = document.getElementById('school-title');
     const descEl = document.getElementById('school-desc');
@@ -14,13 +15,65 @@ document.addEventListener('DOMContentLoaded', function () {
     let isLoading = false;
     let hasMore = true;
 
-    // 顶级流派的展开图标由后端在模板中直接决定（避免页面加载时逐个请求 children）
-    // 初始化完成后，检查是否有选中的流派需要自动加载
-    if (window.selectedSchoolId) {
-        // 延迟一下，确保DOM完全渲染
-        setTimeout(() => {
-            findAndSelectSchool(window.selectedSchoolId);
-        }, 100);
+    // 一次性缓存：所有流派名字节点（点击展开时仅在前端渲染，不再请求 children）
+    /** @type {Map<string, any>} */
+    const nodeById = new Map();
+    /** @type {Map<string|null, any[]>} */
+    const childrenByParentId = new Map();
+
+    // 初始化：加载所有名字节点并渲染顶级节点
+    initTree().catch(err => console.error('初始化流派树失败', err));
+
+    async function initTree() {
+        if (!rootUl) return;
+        const loadingLi = document.getElementById('school-tree-loading');
+        if (loadingLi) loadingLi.textContent = '加载中...';
+
+        const resp = await fetch('/api/schools/nodes');
+        if (!resp.ok) throw new Error('Network error');
+        const nodes = await resp.json();
+
+        nodeById.clear();
+        childrenByParentId.clear();
+
+        if (Array.isArray(nodes)) {
+            for (const n of nodes) {
+                if (!n || n.id == null) continue;
+                const id = String(n.id);
+                const parentKey = (n.parentId == null) ? null : String(n.parentId);
+                nodeById.set(id, n);
+                if (!childrenByParentId.has(parentKey)) {
+                    childrenByParentId.set(parentKey, []);
+                }
+                childrenByParentId.get(parentKey).push(n);
+            }
+        }
+
+        // 按 sortKey 排序每个父节点下的子列表（后端提供，避免前端拼音计算）
+        for (const [, list] of childrenByParentId) {
+            list.sort((a, b) => String(a.sortKey || '').localeCompare(String(b.sortKey || '')));
+        }
+
+        // 渲染顶级节点
+        rootUl.innerHTML = '';
+        const topList = childrenByParentId.get(null) || [];
+        if (topList.length === 0) {
+            const li = document.createElement('li');
+            li.className = 'text-sm text-gray-500 px-3 py-2';
+            li.textContent = '暂无流派';
+            rootUl.appendChild(li);
+        } else {
+            for (const node of topList) {
+                rootUl.appendChild(renderNodeLi(node));
+            }
+        }
+
+        // 初始化完成后，如果URL里带了选中的流派ID，则自动定位并展开路径
+        if (window.selectedSchoolId) {
+            setTimeout(() => {
+                findAndSelectSchool(String(window.selectedSchoolId));
+            }, 50);
+        }
     }
 
     function getDirectSchoolLink(li) {
@@ -89,57 +142,25 @@ document.addEventListener('DOMContentLoaded', function () {
         row.classList.add('bg-primary', 'text-white');
         row.classList.remove('text-gray-700');
 
-        // 已加载则仅折叠/展开
-        if (childrenUl && childrenUl.dataset.loaded === 'true') {
-            const isHidden = childrenUl.classList.contains('hidden');
-            if (isHidden) {
-                childrenUl.classList.remove('hidden');
-                toggleExpandIcon(row, true);
-            } else {
-                childrenUl.classList.add('hidden');
-                toggleExpandIcon(row, false);
+        // 仅在前端渲染/切换展开（不再请求 /api/schools/children）
+        if (childrenUl) {
+            if (childrenUl.dataset.rendered !== 'true') {
+                renderChildrenInto(childrenUl, schoolId);
+                childrenUl.dataset.rendered = 'true';
             }
-            // 选中节点时加载右侧面板，但避免重复加载
-            if (String(currentSchoolId) !== String(schoolId)) {
-                await loadRightPanel(schoolId);
-            }
-            return;
-        }
-
-        // 异步加载子流派（无hover类）
-        if (childrenUl && childrenUl.dataset.loaded !== 'true') {
-            try {
-                const resp = await fetch(`/api/schools/children?parentId=${encodeURIComponent(schoolId)}`);
-                if (!resp.ok) throw new Error('Network error');
-                const data = await resp.json();
-                childrenUl.innerHTML = '';
-                if (Array.isArray(data) && data.length > 0) {
-                    for (const node of data) {
-                        const li = document.createElement('li');
-                        li.className = 'mt-2';
-                        const displayName = node.displayName || node.name || '未命名';
-                        const hasChildren = node.hasChildren || false;
-                        li.innerHTML = `
-                            <div class="school-link px-3 py-2 rounded-lg transition-smooth text-gray-700 cursor-pointer flex items-center justify-between" data-id="${node.id}">
-                                <span class="font-medium">${escapeHtml(displayName)}</span>
-                                <i class="fa fa-chevron-right expand-icon transition-transform duration-200" style="display: ${hasChildren ? 'inline-block' : 'none'};"></i>
-                            </div>
-                            <ul class="children mt-2 hidden" id="children-of-${node.id}"></ul>
-                        `;
-                        childrenUl.appendChild(li);
-                    }
-                    childrenUl.dataset.loaded = 'true';
-                    // 第一次加载时展开显示子流派
+            const hasChild = childrenUl.children.length > 0;
+            showExpandIcon(row, hasChild);
+            if (hasChild) {
+                const isHidden = childrenUl.classList.contains('hidden');
+                if (isHidden) {
                     childrenUl.classList.remove('hidden');
                     toggleExpandIcon(row, true);
                 } else {
-                    childrenUl.dataset.loaded = 'true';
-                    // 没有子项，不显示展开图标
-                    showExpandIcon(row, false);
+                    childrenUl.classList.add('hidden');
                     toggleExpandIcon(row, false);
                 }
-            } catch (err) {
-                console.error('加载子流派失败', err);
+            } else {
+                toggleExpandIcon(row, false);
             }
         }
 
@@ -414,112 +435,86 @@ document.addEventListener('DOMContentLoaded', function () {
         return content.content || content.contentEn || '';
     }
 
-    // 加载某个节点的一层 children（如果没加载过）。不会自动展开，调用方自行决定是否展开。
-    async function ensureChildrenLoaded(linkElement) {
-        if (!linkElement) return null;
-        const parentId = linkElement.getAttribute('data-id');
-        if (!parentId) return null;
+    function renderNodeLi(node) {
+        const li = document.createElement('li');
+        li.className = '';
+        const displayName = node.displayName || node.name || '未命名';
+        const hasChildren = !!node.hasChildren;
+        li.innerHTML = `
+            <div class="school-link px-3 py-2.5 sm:py-2 rounded-lg transition-smooth text-gray-700 cursor-pointer flex items-center justify-between min-h-[44px] touch-manipulation" data-id="${escapeHtml(node.id)}">
+                <span class="font-medium text-sm sm:text-base">${escapeHtml(displayName)}</span>
+                <i class="fa fa-chevron-right expand-icon transition-transform duration-200" style="display: ${hasChildren ? 'inline-block' : 'none'};"></i>
+            </div>
+            <ul class="children mt-2 hidden" id="children-of-${escapeHtml(node.id)}"></ul>
+        `;
+        return li;
+    }
 
-        const childrenUl = linkElement.parentElement.querySelector('.children');
-        if (!childrenUl) return null;
-
-        if (childrenUl.dataset.loaded === 'true') {
-            return childrenUl;
-        }
-
-        try {
-            const resp = await fetch(`/api/schools/children?parentId=${encodeURIComponent(parentId)}`);
-            if (!resp.ok) throw new Error('Network error');
-            const data = await resp.json();
-
-            childrenUl.innerHTML = '';
-            if (Array.isArray(data) && data.length > 0) {
-                for (const node of data) {
-                    const li = document.createElement('li');
-                    li.className = 'mt-2';
-                    const displayName = node.displayName || node.name || '未命名';
-                    const hasChildren = node.hasChildren || false;
-                    li.innerHTML = `
-                        <div class="school-link px-3 py-2 rounded-lg transition-smooth text-gray-700 cursor-pointer flex items-center justify-between" data-id="${node.id}">
-                            <span class="font-medium">${escapeHtml(displayName)}</span>
-                            <i class="fa fa-chevron-right expand-icon transition-transform duration-200" style="display: ${hasChildren ? 'inline-block' : 'none'};"></i>
-                        </div>
-                        <ul class="children mt-2 hidden" id="children-of-${node.id}"></ul>
-                    `;
-                    childrenUl.appendChild(li);
-                }
-                showExpandIcon(linkElement, true);
-            } else {
-                // 没有子项，不显示展开图标
-                showExpandIcon(linkElement, false);
-                toggleExpandIcon(linkElement, false);
-            }
-            childrenUl.dataset.loaded = 'true';
-            return childrenUl;
-        } catch (err) {
-            console.error('加载子流派失败', err);
-            return null;
+    function renderChildrenInto(childrenUl, parentId) {
+        if (!childrenUl) return;
+        const list = childrenByParentId.get(String(parentId)) || [];
+        childrenUl.innerHTML = '';
+        for (const node of list) {
+            const li = document.createElement('li');
+            li.className = 'mt-2';
+            const displayName = node.displayName || node.name || '未命名';
+            const hasChildren = !!node.hasChildren;
+            li.innerHTML = `
+                <div class="school-link px-3 py-2 rounded-lg transition-smooth text-gray-700 cursor-pointer flex items-center justify-between" data-id="${escapeHtml(node.id)}">
+                    <span class="font-medium">${escapeHtml(displayName)}</span>
+                    <i class="fa fa-chevron-right expand-icon transition-transform duration-200" style="display: ${hasChildren ? 'inline-block' : 'none'};"></i>
+                </div>
+                <ul class="children mt-2 hidden" id="children-of-${escapeHtml(node.id)}"></ul>
+            `;
+            childrenUl.appendChild(li);
         }
     }
 
     // 查找并选中指定的流派（用于从URL跳转时自动定位）
-    // 规则：只加载最高级流派 + 沿祖先路径逐层懒加载展开，不扫描整棵树。
     async function findAndSelectSchool(schoolId) {
         if (!schoolId) return;
+        const targetId = String(schoolId);
+        if (!nodeById.has(targetId)) return;
 
-        // 先请求祖先路径（从顶级到当前，包含自身）
-        let path = [];
-        try {
-            const resp = await fetch(`/api/schools/ancestry?id=${encodeURIComponent(schoolId)}`);
-            if (resp.ok) {
-                const data = await resp.json();
-                if (Array.isArray(data)) {
-                    path = data;
-                }
-            }
-        } catch (e) {
-            console.error('加载祖先路径失败', e);
+        // 计算从顶级到目标的路径（基于已缓存 parentId）
+        const path = [];
+        let cur = targetId;
+        while (cur && nodeById.has(cur)) {
+            path.unshift(cur);
+            const n = nodeById.get(cur);
+            cur = (n && n.parentId != null) ? String(n.parentId) : null;
         }
 
-        // 如果没有路径信息，降级：只尝试顶层直接命中
-        if (!path || path.length === 0) {
-            const direct = tree.querySelector(`.school-link[data-id="${schoolId}"]`);
-            if (direct) {
-                direct.click();
-                setTimeout(() => {
-                    direct.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                }, 300);
-            }
-            return;
-        }
+        if (path.length === 0) return;
 
-        // 沿路径逐层展开
+        // 逐层展开路径
         let currentLink = tree.querySelector(`.school-link[data-id="${path[0]}"]`);
         if (!currentLink) return;
 
-        for (let i = 1; i < path.length; i++) {
-            const nextId = String(path[i]);
-            const childrenUl = await ensureChildrenLoaded(currentLink);
+        for (let i = 0; i < path.length - 1; i++) {
+            const id = path[i];
+            const nextId = path[i + 1];
+            const childrenUl = currentLink.parentElement.querySelector('.children');
             if (!childrenUl) return;
 
-            // 展开当前节点一层（只展开路径上的节点）
+            if (childrenUl.dataset.rendered !== 'true') {
+                renderChildrenInto(childrenUl, id);
+                childrenUl.dataset.rendered = 'true';
+            }
             if (childrenUl.classList.contains('hidden')) {
                 childrenUl.classList.remove('hidden');
                 toggleExpandIcon(currentLink, true);
             }
-
             const nextLink = childrenUl.querySelector(`.school-link[data-id="${nextId}"]`);
             if (!nextLink) return;
             currentLink = nextLink;
         }
 
-        // 最后只点击目标节点（触发右侧加载/高亮）
         currentLink.click();
         setTimeout(() => {
             currentLink.scrollIntoView({ behavior: 'smooth', block: 'center' });
             window.scrollTo({ top: 0, behavior: 'smooth' });
-        }, 500);
+        }, 300);
     }
 });
 

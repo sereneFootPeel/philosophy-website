@@ -54,30 +54,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Transactional
     @Query("UPDATE User u SET u.likeCount = u.likeCount + :delta WHERE u.id = :id")
     void updateLikeCount(Long id, int delta);
-    
-    /**
-     * 直接更新登录失败次数，避免触发实体验证
-     */
-    @Modifying
-    @Transactional
-    @Query("UPDATE User u SET u.failedLoginAttempts = :attempts WHERE u.id = :id")
-    void updateFailedLoginAttempts(@Param("id") Long id, @Param("attempts") int attempts);
-    
-    /**
-     * 直接更新账户锁定状态，避免触发实体验证
-     */
-    @Modifying
-    @Transactional
-    @Query("UPDATE User u SET u.failedLoginAttempts = :attempts, u.accountLocked = :locked, u.lockTime = :lockTime, u.lockExpireTime = :lockExpireTime WHERE u.id = :id")
-    void updateAccountLockStatus(@Param("id") Long id, @Param("attempts") int attempts, @Param("locked") boolean locked, @Param("lockTime") LocalDateTime lockTime, @Param("lockExpireTime") LocalDateTime lockExpireTime);
-    
-    /**
-     * 重置登录失败次数和账户锁定状态，避免触发实体验证
-     */
-    @Modifying
-    @Transactional
-    @Query("UPDATE User u SET u.failedLoginAttempts = 0, u.accountLocked = false, u.lockTime = null, u.lockExpireTime = null WHERE u.username = :username")
-    void resetFailedAttemptsByUsername(@Param("username") String username);
 
     @Query("SELECT u FROM User u WHERE LOWER(u.username) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(u.firstName) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(u.lastName) LIKE LOWER(CONCAT('%', :query, '%'))")
     List<User> searchByUsernameOrName(@Param("query") String query);

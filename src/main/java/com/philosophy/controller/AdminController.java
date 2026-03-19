@@ -76,38 +76,7 @@ public class AdminController {
         return "redirect:/admin/users";
     }
 
-    // 添加用户锁定切换功能
-    @PostMapping("/users/toggle-lock/{id}")
-    public String toggleUserLock(@PathVariable Long id, org.springframework.security.core.Authentication authentication) {
-        User user = userService.getUserById(id);
-        if (user != null) {
-            user.setAccountLocked(!user.isAccountLocked());
-            if (user.isAccountLocked()) {
-                user.setLockTime(LocalDateTime.now());
-                user.setLockExpireTime(LocalDateTime.now().plusHours(24)); // 24小时后过期
-            } else {
-                user.setLockTime(null);
-                user.setLockExpireTime(null);
-                user.setFailedLoginAttempts(0); // 重置失败次数
-            }
-            userService.saveUser(user);
-        }
-        return "redirect:/admin/users/view/" + id;
-    }
-
-    // 添加用户解锁功能（立即解锁）
-    @PostMapping("/users/unlock/{id}")
-    public String unlockUser(@PathVariable Long id, org.springframework.security.core.Authentication authentication) {
-        User user = userService.getUserById(id);
-        if (user != null) {
-            user.setAccountLocked(false);
-            user.setLockTime(null);
-            user.setLockExpireTime(null);
-            user.setFailedLoginAttempts(0);
-            userService.saveUser(user);
-        }
-        return "redirect:/admin/users/view/" + id;
-    }
+    // 已移除：用户“失败次数锁定/解锁”功能
 
     // 哲学家管理
     @GetMapping("/philosophers")

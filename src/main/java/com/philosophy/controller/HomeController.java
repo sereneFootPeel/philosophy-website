@@ -86,21 +86,6 @@ public class HomeController {
         philosophers.sort(Comparator.comparing(this::philosopherSortKey));
     }
     
-    // 递归排序所有层级的流派
-    private void sortSchoolsRecursively(List<School> schools, PinyinStringComparator nameComparator) {
-        if (schools == null) return;
-        
-        // 排序当前层级的流派
-        schools.sort(Comparator.comparing(s -> nameComparator.toComparableKey(s.getName())));
-        
-        // 递归排序每个流派的子流派
-        for (School school : schools) {
-            if (school.getChildren() != null && !school.getChildren().isEmpty()) {
-                sortSchoolsRecursively(school.getChildren(), nameComparator);
-            }
-        }
-    }
-    
     @GetMapping("/")
     public String home(HttpServletRequest request, Model model, Authentication authentication) {
         // 获取当前语言设置（根据IP自动判断默认语言）
@@ -339,18 +324,6 @@ public class HomeController {
     public String schools(Model model, Authentication authentication, HttpServletRequest request) {
         // 获取当前语言设置（根据IP自动判断默认语言）
         String language = languageUtil.getLanguage(request);
-        
-        List<School> allSchools = schoolService.findTopLevelSchools();
-        // 使用拼音/忽略大小写排序顶级流派
-        PinyinStringComparator nameComparator = new PinyinStringComparator();
-        allSchools.sort(Comparator.comparing(s -> nameComparator.toComparableKey(s.getName())));
-
-        // 批量判断顶级流派是否有子流派（用于决定是否显示展开图标）
-        List<Long> topIds = allSchools.stream()
-                .map(School::getId)
-                .toList();
-        model.addAttribute("topLevelHasChildren", schoolService.findParentIdsHavingChildren(topIds));
-        List<Philosopher> allPhilosophers = philosopherService.getAllPhilosophers();
 
         // 添加身份验证相关变量
         boolean isAuthenticated = authentication != null && authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken);
@@ -360,8 +333,6 @@ public class HomeController {
 
         model.addAttribute("isAuthenticated", isAuthenticated);
         model.addAttribute("isAdmin", isAdmin);
-        model.addAttribute("topLevelSchools", allSchools);
-        model.addAttribute("philosophers", allPhilosophers);
         model.addAttribute("selectedSchool", null);
         // 初始不加载内容，由用户点击流派后再加载
         model.addAttribute("contents", new ArrayList<Content>());
@@ -376,17 +347,6 @@ public class HomeController {
     public String filterBySchool(@PathVariable Long id, Model model, Authentication authentication, HttpServletRequest request) {
         // 获取当前语言设置（根据IP自动判断默认语言）
         String language = languageUtil.getLanguage(request);
-        
-        List<School> allSchools = schoolService.findTopLevelSchools();
-        // 使用拼音/忽略大小写排序顶级流派
-        PinyinStringComparator nameComparator = new PinyinStringComparator();
-        allSchools.sort(Comparator.comparing(s -> nameComparator.toComparableKey(s.getName())));
-
-        // 批量判断顶级流派是否有子流派（用于决定是否显示展开图标）
-        List<Long> topIds = allSchools.stream()
-                .map(School::getId)
-                .toList();
-        model.addAttribute("topLevelHasChildren", schoolService.findParentIdsHavingChildren(topIds));
         School selectedSchool = schoolService.getSchoolById(id);
         
         // 添加身份验证相关变量
@@ -411,7 +371,6 @@ public class HomeController {
         
         model.addAttribute("isAuthenticated", isAuthenticated);
         model.addAttribute("isAdmin", isAdmin);
-        model.addAttribute("topLevelSchools", allSchools);
         model.addAttribute("selectedSchool", selectedSchool);
         
         if (selectedSchool != null) {
