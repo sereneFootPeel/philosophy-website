@@ -259,13 +259,12 @@ public class DataExportService {
 
             // 导出用户登录信息数据
             pw.println("用户登录信息数据");
-            pw.println("ID,用户ID,IP地址,浏览器,操作系统,设备类型,登录时间");
+            pw.println("ID,用户ID,浏览器,操作系统,设备类型,登录时间");
             List<UserLoginInfo> loginInfos = userLoginInfoRepository.findAll();
             for (UserLoginInfo info : loginInfos) {
-                pw.printf("%d,%d,%s,%s,%s,%s,%s%n",
+                pw.printf("%d,%d,%s,%s,%s,%s%n",
                     info.getId(),
                     info.getUser().getId(),
-                    escapeCsv(info.getIpAddress()),
                     escapeCsv(info.getBrowser()),
                     escapeCsv(info.getOperatingSystem()),
                     escapeCsv(info.getDeviceType()),

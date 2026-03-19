@@ -18,7 +18,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.philosophy.model.User;
-import com.philosophy.util.UserInfoCollector;
 import com.philosophy.service.IpLocationService;
 import com.philosophy.util.LanguageUtil;
 
@@ -28,18 +27,15 @@ public class SecurityConfig {
     
     private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
     
-    private final UserInfoCollector userInfoCollector;
     private final com.philosophy.service.UserService userService;
     private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
     private final IpLocationService ipLocationService;
     private final LanguageUtil languageUtil;
     
-    public SecurityConfig(UserInfoCollector userInfoCollector,
-                          com.philosophy.service.UserService userService,
+    public SecurityConfig(com.philosophy.service.UserService userService,
                           CustomAuthenticationFailureHandler customAuthenticationFailureHandler,
                           IpLocationService ipLocationService,
                           LanguageUtil languageUtil) {
-        this.userInfoCollector = userInfoCollector;
         this.userService = userService;
         this.customAuthenticationFailureHandler = customAuthenticationFailureHandler;
         this.ipLocationService = ipLocationService;
@@ -143,13 +139,8 @@ public class SecurityConfig {
     @Bean
     public AuthenticationSuccessHandler customAuthenticationSuccessHandler() {
         return (request, response, authentication) -> {
-            // 记录用户登录信息（已移除“失败次数锁定/自动解锁/重置失败次数”逻辑）
             try {
                 User user = (User) authentication.getPrincipal();
-
-                // 记录登录信息
-                userInfoCollector.recordLoginInfo(user, request);
-                logger.info("User {} logged in from IP: {}", user.getUsername(), userInfoCollector.getUserIpAddress(user.getId()));
                 
                 // 从数据库读取用户的语言偏好并设置到Session和Cookie
                 try {

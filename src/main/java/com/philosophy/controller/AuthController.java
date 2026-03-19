@@ -6,7 +6,6 @@ import com.philosophy.service.TranslationService;
 import com.philosophy.service.EmailService;
 import com.philosophy.service.VerificationCodeService;
 import com.philosophy.service.RateLimitingService;
-import com.philosophy.util.UserInfoCollector;
 import com.philosophy.util.LanguageUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
@@ -31,16 +30,14 @@ public class AuthController {
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
     
     private final UserService userService;
-    private final UserInfoCollector userInfoCollector;
     private final TranslationService translationService;
     private final EmailService emailService;
     private final VerificationCodeService verificationCodeService;
     private final RateLimitingService rateLimitingService;
     private final LanguageUtil languageUtil;
     
-    public AuthController(UserService userService, UserInfoCollector userInfoCollector, TranslationService translationService, EmailService emailService, VerificationCodeService verificationCodeService, RateLimitingService rateLimitingService, LanguageUtil languageUtil) {
+    public AuthController(UserService userService, TranslationService translationService, EmailService emailService, VerificationCodeService verificationCodeService, RateLimitingService rateLimitingService, LanguageUtil languageUtil) {
         this.userService = userService;
-        this.userInfoCollector = userInfoCollector;
         this.translationService = translationService;
         this.emailService = emailService;
         this.verificationCodeService = verificationCodeService;
@@ -81,8 +78,8 @@ public class AuthController {
 
     @PostMapping("/register/send-code")
     public ResponseEntity<Map<String, Object>> sendRegistrationCode(@RequestParam String email, HttpServletRequest request) {
-        // 获取客户端IP地址
-        String clientIp = userInfoCollector.getIpAddress(request);
+        // 获取客户端IP地址（仅用于速率限制，不做持久化收集）
+        String clientIp = getClientIpAddress(request);
         
         // 检查速率限制（防止DDoS攻击）
         RateLimitingService.RateLimitResult rateLimitResult = rateLimitingService.checkRateLimit(clientIp);
@@ -169,21 +166,40 @@ public class AuthController {
         // 注册新用户
         User registeredUser = userService.registerNewUser(user);
         
-        // 记录注册信息（首次登录记录）
-        userInfoCollector.recordLoginInfo(registeredUser, request);
-        
-        // 检查并删除同一天内相同IP和设备的旧账户
-        List<Long> deletedUserIds = userInfoCollector.checkAndDeleteDuplicateAccounts(registeredUser.getId(), request);
-        if (!deletedUserIds.isEmpty()) {
-            logger.info("注册完成后删除了 {} 个重复用户账户", deletedUserIds.size());
-        }
-        
         // 注册成功，重定向到登录页面
         String language = languageUtil.getLanguage(request);
         model.addAttribute("language", language);
         model.addAttribute("translationService", translationService);
         model.addAttribute("successMessage", "注册成功，请登录");
         return "login";
+    }
+
+    private String getClientIpAddress(HttpServletRequest request) {
+        if (request == null) return "unknown";
+
+        String ipAddress = request.getHeader("X-Forwarded-For");
+        if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
+            ipAddress = request.getHeader("Proxy-Client-IP");
+        }
+        if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
+            ipAddress = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
+            ipAddress = request.getHeader("X-Real-IP");
+        }
+        if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
+            ipAddress = request.getRemoteAddr();
+        }
+        if (ipAddress != null && ipAddress.contains(",")) {
+            String[] ipAddresses = ipAddress.split(",");
+            for (String ip : ipAddresses) {
+                if (!"unknown".equalsIgnoreCase(ip.trim())) {
+                    ipAddress = ip.trim();
+                    break;
+                }
+            }
+        }
+        return ipAddress != null ? ipAddress : "unknown";
     }
 }
     

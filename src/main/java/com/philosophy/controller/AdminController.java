@@ -9,7 +9,6 @@ import com.philosophy.service.PhilosopherService;
 import com.philosophy.service.SchoolService;
 import com.philosophy.service.UserService;
 import com.philosophy.service.TranslationService;
-import com.philosophy.util.UserInfoCollector;
 import com.philosophy.util.InputValidator;
 import com.philosophy.util.DateUtils;
 import org.springframework.stereotype.Controller;
@@ -36,14 +35,12 @@ public class AdminController {
     private final SchoolService schoolService;
     private final ContentService contentService;
     private final UserService userService;
-    private final UserInfoCollector userInfoCollector;
     private final TranslationService translationService;
-    public AdminController(PhilosopherService philosopherService, SchoolService schoolService, ContentService contentService, UserService userService, UserInfoCollector userInfoCollector, TranslationService translationService) {
+    public AdminController(PhilosopherService philosopherService, SchoolService schoolService, ContentService contentService, UserService userService, TranslationService translationService) {
         this.philosopherService = philosopherService;
         this.schoolService = schoolService;
         this.contentService = contentService;
         this.userService = userService;
-        this.userInfoCollector = userInfoCollector;
         this.translationService = translationService;
     }
 
@@ -66,7 +63,6 @@ public class AdminController {
     public String listUsers(Model model, HttpServletRequest request) {
         List<User> users = userService.getAllUsers();
         model.addAttribute("users", users);
-        model.addAttribute("userInfoCollector", userInfoCollector);
         return "admin/users/list";
     }
     

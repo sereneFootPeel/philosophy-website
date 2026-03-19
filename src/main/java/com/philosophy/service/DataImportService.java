@@ -3181,7 +3181,6 @@ public class DataImportService {
 
                 Long loginInfoId = Long.parseLong(fields[0]);
                 Long userId = Long.parseLong(fields[1]);
-                String ipAddress = fields[2];
                 String browser = fields[3];
                 String operatingSystem = fields[4];
                 String deviceType = fields[5];
@@ -3220,7 +3219,6 @@ public class DataImportService {
 
                     addInsertColumn(insertColumns, insertParams, tableName, "id", loginInfoId, context, true);
                     addInsertColumn(insertColumns, insertParams, tableName, "user_id", userId, context, true);
-                    addInsertColumn(insertColumns, insertParams, tableName, "ip_address", ipAddress, context, true);
                     addInsertColumn(insertColumns, insertParams, tableName, "browser", browser, context, false);
                     addInsertColumn(insertColumns, insertParams, tableName, "operating_system", operatingSystem, context, false);
                     addInsertColumn(insertColumns, insertParams, tableName, "device_type", deviceType, context, false);

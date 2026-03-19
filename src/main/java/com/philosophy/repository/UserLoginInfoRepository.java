@@ -24,12 +24,6 @@ public interface UserLoginInfoRepository extends JpaRepository<UserLoginInfo, Lo
     List<UserLoginInfo> findByUserIdOrderByLoginTimeDesc(Long userId);
 
     /**
-     * 获取用户的所有唯一IP地址
-     */
-    @Query("SELECT DISTINCT u.ipAddress FROM UserLoginInfo u WHERE u.user.id = :userId")
-    Set<String> findDistinctIpAddressesByUserId(@Param("userId") Long userId);
-
-    /**
      * 获取用户的所有唯一设备类型
      */
     @Query("SELECT DISTINCT u.deviceType FROM UserLoginInfo u WHERE u.user.id = :userId")
@@ -86,21 +80,6 @@ public interface UserLoginInfoRepository extends JpaRepository<UserLoginInfo, Lo
 
     // 删除复杂的重复检测相关查询方法，简化注册流程
     
-    /**
-     * 查找同一天内使用相同IP和设备类型注册的用户（排除指定用户ID、管理员和版主）
-     */
-    @Query("SELECT u.user FROM UserLoginInfo u WHERE u.ipAddress = :ipAddress AND u.deviceType = :deviceType AND DATE(u.user.createdAt) = CURRENT_DATE AND u.user.id != :excludeUserId AND u.user.role = 'USER'")
-    List<User> findDuplicateUsersByIpAndDeviceToday(@Param("ipAddress") String ipAddress, @Param("deviceType") String deviceType, @Param("excludeUserId") Long excludeUserId);
-
-    /**
-     * 查找过去24小时内使用相同IP和设备类型注册的用户（排除指定用户ID、管理员和版主）
-     */
-    @Query("SELECT u.user FROM UserLoginInfo u WHERE u.ipAddress = :ipAddress AND u.deviceType = :deviceType AND u.user.createdAt >= :sinceTime AND u.user.id != :excludeUserId AND u.user.role = 'USER'")
-    List<User> findDuplicateUsersByIpAndDeviceSince(@Param("ipAddress") String ipAddress,
-                                                    @Param("deviceType") String deviceType,
-                                                    @Param("excludeUserId") Long excludeUserId,
-                                                    @Param("sinceTime") java.time.LocalDateTime sinceTime);
-
     /**
      * 查找过去24小时内使用相同设备ID注册的用户（排除指定用户ID、管理员和版主）
      */

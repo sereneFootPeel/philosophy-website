@@ -2,7 +2,6 @@ package com.philosophy.controller;
 
 import com.philosophy.model.User;
 import com.philosophy.model.Comment;
-import com.philosophy.model.UserLoginInfo;
 import com.philosophy.model.Content;
 import com.philosophy.model.Like;
 import com.philosophy.model.UserContentEdit;
@@ -17,7 +16,6 @@ import com.philosophy.service.UserBlockService;
 import com.philosophy.service.TestResultService;
 import com.philosophy.model.School;
 import com.philosophy.model.TestResult;
-import com.philosophy.util.UserInfoCollector;
 import com.philosophy.util.LanguageUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +40,6 @@ public class UserProfileController {
 
     private final UserService userService;
     private final CommentService commentService;
-    private final UserInfoCollector userInfoCollector;
     private final TranslationService translationService;
     private final LikeService likeService;
     private final ContentService contentService;
@@ -56,14 +53,13 @@ public class UserProfileController {
     private static final int MAX_PROFILE_TEST_RESULTS = 30;
 
     public UserProfileController(UserService userService, CommentService commentService,
-                                UserInfoCollector userInfoCollector, TranslationService translationService,
+                                TranslationService translationService,
                                 LikeService likeService, ContentService contentService,
                                 UserContentEditService userContentEditService, SchoolService schoolService,
                                 UserBlockService userBlockService, TestResultService testResultService,
                                 LanguageUtil languageUtil) {
         this.userService = userService;
         this.commentService = commentService;
-        this.userInfoCollector = userInfoCollector;
         this.translationService = translationService;
         this.likeService = likeService;
         this.contentService = contentService;
@@ -101,8 +97,6 @@ public class UserProfileController {
         List<Comment> comments = commentService.findByUserIdWithPrivacyFilter(id, currentUser);
         long commentCount = commentService.countByUserId(id);
         
-        long loginCount = userInfoCollector.getUserLoginCount(id);
-
         // 获取用户的编辑内容
         List<UserContentEdit> userEdits = userContentEditService.getUserEdits(id, org.springframework.data.domain.PageRequest.of(0, 20)).getContent();
         long userEditCount = userContentEditService.getUserEditCount(id);
@@ -121,7 +115,6 @@ public class UserProfileController {
         model.addAttribute("user", user);
         model.addAttribute("comments", comments);
         model.addAttribute("commentCount", commentCount);
-        model.addAttribute("loginCount", loginCount);
         model.addAttribute("userEdits", userEdits);
         model.addAttribute("userEditCount", userEditCount);
         model.addAttribute("moderatorContents", moderatorContents);
@@ -168,19 +161,6 @@ public class UserProfileController {
             allComments = commentService.findByUserIdIncludingDeleted(currentUser.getId());
         }
 
-        // 获取用户的IP地址和设备信息
-        String userIpAddress = userInfoCollector.getUserIpAddress(currentUser.getId());
-        String userDevice = userInfoCollector.getUserDevice(currentUser.getId());
-        
-        // 获取用户的所有历史登录信息
-        Set<String> allUserIpAddresses = userInfoCollector.getAllUserIpAddresses(currentUser.getId());
-        Set<String> allUserDevices = userInfoCollector.getAllUserDevices(currentUser.getId());
-        Set<String> allUserBrowsers = userInfoCollector.getAllUserBrowsers(currentUser.getId());
-        Set<String> allUserOperatingSystems = userInfoCollector.getAllUserOperatingSystems(currentUser.getId());
-        Set<String> allUserDeviceIds = userInfoCollector.getAllUserDeviceIds(currentUser.getId());
-        List<UserLoginInfo> userLoginRecords = userInfoCollector.getUserLoginRecords(currentUser.getId());
-        long loginCount = userInfoCollector.getUserLoginCount(currentUser.getId());
-
         // 获取用户编辑的content数据
         List<UserContentEdit> userEdits = userContentEditService.getUserEdits(currentUser.getId(), org.springframework.data.domain.PageRequest.of(0, 10)).getContent();
         long userEditCount = userContentEditService.getUserEditCount(currentUser.getId());
@@ -206,15 +186,6 @@ public class UserProfileController {
         model.addAttribute("comments", comments);
         model.addAttribute("commentCount", commentCount);
         model.addAttribute("allComments", allComments);
-        model.addAttribute("userIpAddress", userIpAddress);
-        model.addAttribute("userDevice", userDevice);
-        model.addAttribute("allUserIpAddresses", allUserIpAddresses);
-        model.addAttribute("allUserDevices", allUserDevices);
-        model.addAttribute("allUserBrowsers", allUserBrowsers);
-        model.addAttribute("allUserOperatingSystems", allUserOperatingSystems);
-        model.addAttribute("allUserDeviceIds", allUserDeviceIds);
-        model.addAttribute("userLoginRecords", userLoginRecords);
-        model.addAttribute("loginCount", loginCount);
         model.addAttribute("userEdits", userEdits);
         model.addAttribute("userEditCount", userEditCount);
         model.addAttribute("userCreatedContents", userCreatedContents);
@@ -225,7 +196,6 @@ public class UserProfileController {
         model.addAttribute("isAdmin", isAdmin);
         model.addAttribute("isCurrentUser", true); // 标记为当前用户
         model.addAttribute("isBlocked", false); // 当前用户不能屏蔽自己
-        model.addAttribute("userInfoCollector", userInfoCollector);
         model.addAttribute("language", language);
         model.addAttribute("translationService", translationService);
         model.addAttribute("isAuthenticated", isAuthenticated);

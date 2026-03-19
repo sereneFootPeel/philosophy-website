@@ -17,9 +17,6 @@ public class UserLoginInfo {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "ip_address", nullable = false, length = 45)
-    private String ipAddress;
-
     @Column(name = "user_agent", columnDefinition = "TEXT")
     private String userAgent;
 
@@ -43,9 +40,8 @@ public class UserLoginInfo {
     public UserLoginInfo() {
     }
 
-    public UserLoginInfo(User user, String ipAddress, String userAgent, String browser, String operatingSystem, String deviceType) {
+    public UserLoginInfo(User user, String userAgent, String browser, String operatingSystem, String deviceType) {
         this.user = user;
-        this.ipAddress = ipAddress;
         this.userAgent = userAgent;
         this.browser = browser;
         this.operatingSystem = operatingSystem;
@@ -75,14 +71,6 @@ public class UserLoginInfo {
 
     public void setUser(User user) {
         this.user = user;
-    }
-
-    public String getIpAddress() {
-        return ipAddress;
-    }
-
-    public void setIpAddress(String ipAddress) {
-        this.ipAddress = ipAddress;
     }
 
     public String getUserAgent() {
@@ -130,7 +118,6 @@ public class UserLoginInfo {
         return "UserLoginInfo{" +
                 "id=" + id +
                 ", userId=" + (user != null ? user.getId() : null) +
-                ", ipAddress='" + ipAddress + '\'' +
                 ", browser='" + browser + '\'' +
                 ", operatingSystem='" + operatingSystem + '\'' +
                 ", loginTime=" + loginTime +
